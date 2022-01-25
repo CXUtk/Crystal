@@ -7,9 +7,13 @@ namespace crystal
 	class CrystalTracer : public Application
 	{
 	public:
-		CrystalTracer(Engine* engine);
-		~CrystalTracer();
+		CrystalTracer();
+		virtual ~CrystalTracer() override;
 
-		void Run();
+		virtual void Initialize() override;
+
+		virtual void Update(double deltaTime) override;
+
+		virtual void Draw(double deltaTime) override;
 	};
 }

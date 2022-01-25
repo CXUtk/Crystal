@@ -7,7 +7,7 @@ namespace crystal
 	{
 	public:
 		Application() {}
-		virtual ~Application() = 0;
+		virtual ~Application() = 0 {};
 
 		/**
 		 * @brief Set engine pointer

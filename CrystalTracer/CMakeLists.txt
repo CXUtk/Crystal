@@ -11,5 +11,7 @@ file(GLOB_RECURSE CrystalTracerHeaders "src/*.h")
 add_executable (CrystalTracer ${CrystalTracerSources} ${CrystalTracerHeaders})
 
 target_include_directories(CrystalTracer SYSTEM PRIVATE "src")
+target_include_directories(CrystalTracer SYSTEM PRIVATE "..")
 
 target_link_libraries(CrystalTracer PRIVATE CrystalEngine)
+add_dependencies(CrystalTracer CrystalEngine)

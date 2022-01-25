@@ -2,10 +2,14 @@
 
 namespace crystal
 {
-	CrystalTracer::CrystalTracer(Engine* engine)
+	CrystalTracer::CrystalTracer()
 	{}
 	CrystalTracer::~CrystalTracer()
 	{}
-	void CrystalTracer::Run()
+	void CrystalTracer::Initialize()
+	{}
+	void CrystalTracer::Update(double deltaTime)
+	{}
+	void CrystalTracer::Draw(double deltaTime)
 	{}
 }

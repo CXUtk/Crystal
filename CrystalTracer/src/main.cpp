@@ -5,7 +5,7 @@ using namespace crystal;
 
 int main()
 {
-	CrystalTracer tracer(Engine::GetInstance());
-	tracer.Run();
+	Engine* engine = Engine::GetInstance();
+	engine->Start(std::make_unique<CrystalTracer>());
 	return 0;
 }
