@@ -10,7 +10,7 @@ file(GLOB_RECURSE CrystalTracerHeaders "src/*.h")
 # 将源代码添加到此项目的可执行文件。
 add_executable (CrystalTracer ${CrystalTracerSources} ${CrystalTracerHeaders})
 
-target_include_directories(CrystalTracer SYSTEM PRIVATE "src")
+target_include_directories(CrystalTracer SYSTEM PUBLIC "src")
 target_include_directories(CrystalTracer SYSTEM PRIVATE "..")
 
 target_link_libraries(CrystalTracer PRIVATE CrystalEngine)

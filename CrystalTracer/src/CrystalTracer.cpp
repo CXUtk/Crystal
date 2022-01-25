@@ -1,6 +1,6 @@
 ﻿#include "CrystalTracer.h"
 
-namespace crystal
+namespace tracer
 {
 	CrystalTracer::CrystalTracer()
 	{}

@@ -38,6 +38,6 @@ target_link_libraries(CrystalEngine PRIVATE OpenGL::GL)
 target_link_libraries(CrystalEngine PRIVATE glad SJson)
 
 target_include_directories(CrystalEngine SYSTEM PUBLIC "external")
-target_include_directories(CrystalEngine SYSTEM PRIVATE "src")
+target_include_directories(CrystalEngine SYSTEM PUBLIC "src")
 
 # TODO: 如有需要，请添加测试并安装目标。

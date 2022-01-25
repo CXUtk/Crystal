@@ -3,12 +3,12 @@
 
 namespace crystal
 {
-	class InitArgs
+	constexpr int MAX_WINDOW_TITLE_LENGTH = 128;
+
+	struct InitArgs
 	{
-	public:
-
-
-	private:
-		uint32_t _windowsWidth, _windowsHeight;
+		uint32_t WindowWidth, WindowHeight;
+		bool WindowResizable;
+		char WindowTitle[MAX_WINDOW_TITLE_LENGTH];
 	};
 }

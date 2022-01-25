@@ -30,7 +30,7 @@ namespace crystal
 		{
 			for (auto& handler : _eventHandlers)
 			{
-				handler(args...);
+				handler(args ...);
 			}
 		}
 

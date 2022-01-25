@@ -1,10 +1,9 @@
 ﻿#pragma once
 #include <CrystalEngine/src/Core/Application.h>
 #include <CrystalEngine/src/Crystal.h>
-
-namespace crystal
+namespace tracer
 {
-	class CrystalTracer : public Application
+	class CrystalTracer : public crystal::Application
 	{
 	public:
 		CrystalTracer();
