@@ -10,6 +10,7 @@ namespace crystal
 	class GLFWGameWindow : public IGameWindow
 	{
 	public:
+
 		GLFWGameWindow(const InitArgs& settings);
 		~GLFWGameWindow();
 
@@ -23,20 +24,45 @@ namespace crystal
 		Vector2i GetMousePos() const override;
 		Vector2i GetWindowSize() const override { return _windowSize; }
 
-		virtual void AppendOnResizeEvent(Event<Vector2i>::Func eventHandler) override
+		virtual void AppendOnResizeEvent(OnResizeEvent::Func eventHandler) override
 		{
 			_eventOnWindowResize += eventHandler;
 		}
 
-		void Resize(Vector2i newSize)
+		virtual void AppendOnMouseScrollEvent(OnMouseScrollEvent::Func eventHandler) override
 		{
-			_eventOnWindowResize.Invoke(newSize);
+			_eventOnMouseScroll += eventHandler;
+		}
+
+		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) override
+		{
+			_eventOnMouseButtonChange += eventHandler;
+		}
+
+		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) override
+		{
+			_eventOnKeyChange += eventHandler;
 		}
 
 	private:
-		GLFWwindow* _window;
-		Vector2i _windowSize;
+		friend void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
+		friend void glfw_mousescroll_callback_function(GLFWwindow* window, double xoffset, double yoffset);
+		friend void glfw_key_callback_function(GLFWwindow* window, int key, int scancode, int action, int mods);
+		friend void glfw_mousebutton_callback_function(GLFWwindow* window, int button, int action, int mods);
 
-		Event<Vector2i> _eventOnWindowResize;
+		GLFWwindow*		_window;
+		Vector2i		_windowSize;
+		Vector2f		_scrollWheel{};
+
+		OnResizeEvent				_eventOnWindowResize;
+		OnKeyChangeEvent			_eventOnKeyChange;
+		OnMouseScrollEvent			_eventOnMouseScroll;
+		OnMouseButtonChangeEvent	_eventOnMouseButtonChange;
+
+
+		void _resize(Vector2i newSize);
+		void _mouseScroll(Vector2f offset);
+		void _mouseButtonChange(int button, int action, int mods);
+		void _keyChange(int key, int scancode, int action, int mods);
 	};
 }

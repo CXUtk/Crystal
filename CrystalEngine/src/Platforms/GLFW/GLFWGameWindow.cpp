@@ -6,123 +6,162 @@
 
 namespace crystal
 {
-    constexpr size_t MAX_KEYS = 512;
-    template<size_t N>
-    constexpr std::array<KeyCode, N> generateKeyCodeMapper()
-    {
-        std::array<KeyCode, N> M{};
-        M[GLFW_KEY_W] = KeyCode::TRV2_W_KEY;
-        M[GLFW_KEY_A] = KeyCode::TRV2_A_KEY;
-        M[GLFW_KEY_S] = KeyCode::TRV2_S_KEY;
-        M[GLFW_KEY_D] = KeyCode::TRV2_D_KEY;
-        M[GLFW_KEY_M] = KeyCode::TRV2_M_KEY;
+	constexpr size_t MAX_KEYS = 512;
+	template<size_t N>
+	constexpr std::array<KeyCode, N> generateKeyCodeMapper()
+	{
+		std::array<KeyCode, N> M{};
+		M[GLFW_KEY_W] = KeyCode::CRYSTAL_W_KEY;
+		M[GLFW_KEY_A] = KeyCode::CRYSTAL_A_KEY;
+		M[GLFW_KEY_S] = KeyCode::CRYSTAL_S_KEY;
+		M[GLFW_KEY_D] = KeyCode::CRYSTAL_D_KEY;
+		M[GLFW_KEY_M] = KeyCode::CRYSTAL_M_KEY;
 
-        M[GLFW_KEY_UP] = KeyCode::TRV2_UP_KEY;
-        M[GLFW_KEY_DOWN] = KeyCode::TRV2_DOWN_KEY;
-        M[GLFW_KEY_LEFT] = KeyCode::TRV2_LEFT_KEY;
-        M[GLFW_KEY_RIGHT] = KeyCode::TRV2_RIGHT_KEY;
+		M[GLFW_KEY_UP] = KeyCode::CRYSTAL_UP_KEY;
+		M[GLFW_KEY_DOWN] = KeyCode::CRYSTAL_DOWN_KEY;
+		M[GLFW_KEY_LEFT] = KeyCode::CRYSTAL_LEFT_KEY;
+		M[GLFW_KEY_RIGHT] = KeyCode::CRYSTAL_RIGHT_KEY;
 
-        M[GLFW_KEY_ENTER] = KeyCode::TRV2_ENTER_KEY;
-        M[GLFW_KEY_LEFT_CONTROL] = KeyCode::TRV2_CTRL_KEY;
-        M[GLFW_KEY_RIGHT_CONTROL] = KeyCode::TRV2_CTRL_KEY;
-        M[GLFW_KEY_LEFT_ALT] = KeyCode::TRV2_ALT_KEY;
-        M[GLFW_KEY_RIGHT_ALT] = KeyCode::TRV2_ALT_KEY;
-
-
-        M[GLFW_KEY_1] = KeyCode::TRV2_1_KEY;
-        M[GLFW_KEY_2] = KeyCode::TRV2_2_KEY;
-        M[GLFW_KEY_3] = KeyCode::TRV2_3_KEY;
-        M[GLFW_KEY_4] = KeyCode::TRV2_4_KEY;
-        M[GLFW_KEY_5] = KeyCode::TRV2_5_KEY;
-        M[GLFW_KEY_6] = KeyCode::TRV2_6_KEY;
-        M[GLFW_KEY_7] = KeyCode::TRV2_7_KEY;
-        M[GLFW_KEY_8] = KeyCode::TRV2_8_KEY;
-        M[GLFW_KEY_9] = KeyCode::TRV2_9_KEY;
-        M[GLFW_KEY_0] = KeyCode::TRV2_0_KEY;
+		M[GLFW_KEY_ENTER] = KeyCode::CRYSTAL_ENTER_KEY;
+		M[GLFW_KEY_LEFT_CONTROL] = KeyCode::CRYSTAL_LEFT_CTRL_KEY;
+		M[GLFW_KEY_RIGHT_CONTROL] = KeyCode::CRYSTAL_RIGHT_CTRL_KEY;
+		M[GLFW_KEY_LEFT_ALT] = KeyCode::CRYSTAL_LEFT_ALT_KEY;
+		M[GLFW_KEY_RIGHT_ALT] = KeyCode::CRYSTAL_RIGHT_ALT_KEY;
 
 
-        M[GLFW_KEY_EQUAL] = KeyCode::TRV2_PLUS_KEY;
-        M[GLFW_KEY_MINUS] = KeyCode::TRV2_MINUS_KEY;
-        M[GLFW_KEY_GRAVE_ACCENT] = KeyCode::TRV2_TILDE_KEY;
+		M[GLFW_KEY_1] = KeyCode::CRYSTAL_1_KEY;
+		M[GLFW_KEY_2] = KeyCode::CRYSTAL_2_KEY;
+		M[GLFW_KEY_3] = KeyCode::CRYSTAL_3_KEY;
+		M[GLFW_KEY_4] = KeyCode::CRYSTAL_4_KEY;
+		M[GLFW_KEY_5] = KeyCode::CRYSTAL_5_KEY;
+		M[GLFW_KEY_6] = KeyCode::CRYSTAL_6_KEY;
+		M[GLFW_KEY_7] = KeyCode::CRYSTAL_7_KEY;
+		M[GLFW_KEY_8] = KeyCode::CRYSTAL_8_KEY;
+		M[GLFW_KEY_9] = KeyCode::CRYSTAL_9_KEY;
+		M[GLFW_KEY_0] = KeyCode::CRYSTAL_0_KEY;
 
-        M[GLFW_KEY_SPACE] = KeyCode::TRV2_SPACE_KEY;
-        M[GLFW_KEY_ESCAPE] = KeyCode::TRV2_ESC_KEY;
 
-        return M;
-    }
+		M[GLFW_KEY_EQUAL] = KeyCode::CRYSTAL_PLUS_KEY;
+		M[GLFW_KEY_MINUS] = KeyCode::CRYSTAL_MINUS_KEY;
+		M[GLFW_KEY_GRAVE_ACCENT] = KeyCode::CRYSTAL_TILDE_KEY;
 
-    template<size_t T>
-    constexpr std::array<MouseButtonCode, T> generateMouseButtonCodeMapper()
-    {
-        std::array<MouseButtonCode, T> M{ };
+		M[GLFW_KEY_SPACE] = KeyCode::CRYSTAL_SPACE_KEY;
+		M[GLFW_KEY_ESCAPE] = KeyCode::CRYSTAL_ESC_KEY;
 
-        M[GLFW_MOUSE_BUTTON_LEFT] = MouseButtonCode::LEFT_BUTTON;
-        M[GLFW_MOUSE_BUTTON_RIGHT] = MouseButtonCode::RIGHT_BUTTON;
-        M[GLFW_MOUSE_BUTTON_MIDDLE] = MouseButtonCode::MIDDLE_BUTTON;
-        return M;
-    }
-    static constexpr auto keyCodeMap = generateKeyCodeMapper<MAX_KEYS>();
-    static constexpr auto mouseButtonCodeMap = generateMouseButtonCodeMapper<MAX_KEYS>();
+		return M;
+	}
 
-    static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-    {
-        auto gameWindow = (GLFWGameWindow*)glfwGetWindowUserPointer(window);
-        gameWindow->Resize(glm::ivec2(width, height));
+	template<size_t T>
+	constexpr std::array<MouseButtonCode, T> generateMouseButtonCodeMapper()
+	{
+		std::array<MouseButtonCode, T> M{ };
 
-        glViewport(0, 0, width, height);
-    }
+		M[GLFW_MOUSE_BUTTON_LEFT] = MouseButtonCode::LEFT_BUTTON;
+		M[GLFW_MOUSE_BUTTON_RIGHT] = MouseButtonCode::RIGHT_BUTTON;
+		M[GLFW_MOUSE_BUTTON_MIDDLE] = MouseButtonCode::MIDDLE_BUTTON;
+		return M;
+	}
+	constexpr auto keyCodeMap = generateKeyCodeMapper<MAX_KEYS>();
+	constexpr auto mouseButtonCodeMap = generateMouseButtonCodeMapper<MAX_KEYS>();
 
-    static void mouseScrollCallbackFunction(GLFWwindow* window, double xoffset, double yoffset)
-    {
-        auto inputController = trv2::Engine::GetInstance()->GetInputController();
-        inputController->OnScrollWheel(glm::vec2(xoffset, yoffset));
-    }
+	void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height)
+	{
+		auto gameWindow = (GLFWGameWindow*)glfwGetWindowUserPointer(window);
+		gameWindow->_resize(glm::ivec2(width, height));
 
-    static void keyCallbackFunction(GLFWwindow* window, int key, int scancode, int action, int mods)
-    {
-        auto inputController = Engine::GetInstance()->GetInputController();
-        if (key < 0 || key >= MAX_KEYS) return;
-        inputController->TriggerKeyChange(keyCodeMap[key], action != GLFW_RELEASE);
-    }
+		glViewport(0, 0, width, height);
+	}
 
-    static void mouseButtonCallbackFunction(GLFWwindow* window, int button, int action, int mods)
-    {
-        auto inputController = Engine::GetInstance()->GetInputController();
-        inputController->TriggerMouseChange(mouseButtonCodeMap[button], action == GLFW_PRESS);
-    }
+	void glfw_mousescroll_callback_function(GLFWwindow* window, double xoffset, double yoffset)
+	{
+		auto gameWindow = (GLFWGameWindow*)glfwGetWindowUserPointer(window);
+		gameWindow->_mouseScroll(glm::vec2(xoffset, yoffset));
+	}
+
+	void glfw_key_callback_function(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		auto gameWindow = (GLFWGameWindow*)glfwGetWindowUserPointer(window);
+		gameWindow->_keyChange(key, scancode, action, mods);
+		//auto inputController = Engine::GetInstance()->GetInputController();
+		//if (key < 0 || key >= MAX_KEYS) return;
+		//inputController->TriggerKeyChange(keyCodeMap[key], action != GLFW_RELEASE);
+	}
+
+	void glfw_mousebutton_callback_function(GLFWwindow* window, int button, int action, int mods)
+	{
+		auto gameWindow = (GLFWGameWindow*)glfwGetWindowUserPointer(window);
+		gameWindow->_mouseButtonChange(button, action, mods);
+	}
 
 
 	GLFWGameWindow::GLFWGameWindow(const InitArgs& args)
 	{
-        _windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
+		_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 
-        _window = glfwCreateWindow(_windowSize.x, _windowSize.y,
-            args.WindowTitle, nullptr, nullptr);
-        if (!_window)
-        {
-            throw std::exception("Failed to create window");
-        }
+		_window = glfwCreateWindow(_windowSize.x, _windowSize.y,
+			args.WindowTitle, nullptr, nullptr);
+		if (!_window)
+		{
+			throw std::exception("Failed to create window");
+		}
 
-        glfwMakeContextCurrent(_window);
-        glfwSetWindowUserPointer(_window, this);
+		glfwMakeContextCurrent(_window);
+		glfwSetWindowUserPointer(_window, this);
 
-        glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
-        glfwSetScrollCallback(_window, mouseScrollCallbackFunction);
-        glfwSetMouseButtonCallback(_window, mouseButtonCallbackFunction);
-        glfwSetKeyCallback(_window, keyCallbackFunction);
-
-        auto& windowSize = _windowSize;
-        _eventOnWindowResize += [&windowSize](glm::ivec2 newSize) {
-            windowSize = newSize;
-        };
+		glfwSetFramebufferSizeCallback(_window, glfw_framebuffer_size_callback);
+		glfwSetScrollCallback(_window, glfw_mousescroll_callback_function);
+		glfwSetMouseButtonCallback(_window, glfw_mousebutton_callback_function);
+		glfwSetKeyCallback(_window, glfw_key_callback_function);
 	}
 	GLFWGameWindow::~GLFWGameWindow()
 	{
-        if (_window)
-        {
-            glfwDestroyWindow(_window);
-        }
-        _window = nullptr;
-        glfwTerminate();
-    }
+		if (_window)
+		{
+			glfwDestroyWindow(_window);
+		}
+		_window = nullptr;
+		glfwTerminate();
+	}
+
+	void GLFWGameWindow::BeginFrame()
+	{}
+
+	void GLFWGameWindow::EndFrame()
+	{}
+
+	bool GLFWGameWindow::ShouldClose() const
+	{
+		return false;
+	}
+
+	void GLFWGameWindow::PollEvents()
+	{}
+
+	Vector2i GLFWGameWindow::GetMousePos() const
+	{
+		return Vector2i();
+	}
+
+	void GLFWGameWindow::_resize(Vector2i newSize)
+	{
+		_windowSize = newSize;
+		_eventOnWindowResize.Invoke(newSize);
+	}
+
+	void GLFWGameWindow::_mouseScroll(Vector2f offset)
+	{
+		_scrollWheel += offset;
+		_eventOnMouseScroll.Invoke(offset);
+	}
+
+	void GLFWGameWindow::_mouseButtonChange(int button, int action, int mods)
+	{
+		_eventOnMouseButtonChange.Invoke(button, action, mods);
+	}
+
+	void GLFWGameWindow::_keyChange(int key, int scancode, int action, int mods)
+	{
+		_eventOnKeyChange.Invoke(key, scancode, action, mods);
+	}
+
 }
