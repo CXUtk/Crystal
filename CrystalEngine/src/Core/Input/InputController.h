@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <bitset>
-#include <glm/glm.hpp>
+#include <Crystal.h>
+#include <Utils/Geometry.h>
 #include "InputCode.h"
 
 namespace crystal
@@ -25,7 +26,7 @@ namespace crystal
 		 * @brief Get the change of mouse wheel value in this frame
 		 * @return
 		*/
-		glm::vec2 GetScrollValue() const { return _scrollWheel; }
+		Vector2f GetScrollValue() const { return _scrollWheel; }
 
 		/**
 		 * @brief Returns true if the given key is just pressed
@@ -73,11 +74,7 @@ namespace crystal
 		 * @brief Get current mouse position related to the bottom left point of the window
 		 * @return
 		*/
-		glm::vec2 GetMousePos() const;
-
-		void TriggerKeyChange(KeyCode key, bool down);
-		void TriggerMouseChange(MouseButtonCode button, bool down);
-		void OnScrollWheel(glm::vec2 dir);
+		Vector2i GetMousePos() const;
 
 	private:
 

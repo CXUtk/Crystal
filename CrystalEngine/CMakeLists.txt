@@ -9,6 +9,10 @@ file(GLOB_RECURSE CrystalEngineHeaders "src/*.h")
 # 将源代码添加到此项目的可执行文件。
 add_library (CrystalEngine ${CrystalEngineSources} ${CrystalEngineHeaders})
 
+set_target_properties(CrystalEngine PROPERTIES
+            CXX_STANDARD 17
+            CXX_EXTENSIONS OFF
+            )
 
 # 调整GLFW的Flags，关掉无用的编译组件
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)

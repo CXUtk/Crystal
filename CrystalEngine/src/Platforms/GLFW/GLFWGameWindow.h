@@ -50,9 +50,8 @@ namespace crystal
 		friend void glfw_key_callback_function(GLFWwindow* window, int key, int scancode, int action, int mods);
 		friend void glfw_mousebutton_callback_function(GLFWwindow* window, int button, int action, int mods);
 
-		GLFWwindow*		_window;
-		Vector2i		_windowSize;
-		Vector2f		_scrollWheel{};
+		GLFWwindow*		_window = nullptr;
+		Vector2i		_windowSize{};
 
 		OnResizeEvent				_eventOnWindowResize;
 		OnKeyChangeEvent			_eventOnKeyChange;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Crystal.h"
+#include <Platforms/Platforms.h>
 #include <functional>
 
 namespace crystal
@@ -31,6 +32,7 @@ namespace crystal
 
 	private:
 		std::unique_ptr<Application> _application;
+		std::unique_ptr<IPlatformProvider> _platformProvider;
 	
 		Engine();
 	};

@@ -54,4 +54,27 @@ namespace crystal
 
 		__COUNT,
 	};
+
+	enum class InputAction
+	{
+		RELEASE,
+		PRESS,
+		REPEAT,
+
+		__COUNT,
+	};
+
+	struct MouseButtonEventArgs
+	{
+		MouseButtonCode ButtonCode;
+		InputAction Action;
+		int mods;
+	};
+
+	struct KeyEventArgs
+	{
+		KeyCode KeyCode;
+		InputAction Action;
+		int mods;
+	};
 }

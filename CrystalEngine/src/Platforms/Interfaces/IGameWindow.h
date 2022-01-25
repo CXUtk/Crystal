@@ -4,7 +4,6 @@
 #include <Utils/Event.h>
 #include <Utils/Geometry.h>
 
-
 namespace crystal
 {
 	class IGameWindow
@@ -12,8 +11,8 @@ namespace crystal
 	public:
 		using OnResizeEvent =				Event<Vector2i>;
 		using OnMouseScrollEvent =			Event<Vector2f>;
-		using OnMouseButtonChangeEvent =	Event<int, int, int>;
-		using OnKeyChangeEvent =			Event<int, int, int, int>;
+		using OnMouseButtonChangeEvent =	Event<MouseButtonEventArgs>;
+		using OnKeyChangeEvent =			Event<KeyEventArgs>;
 
 		virtual ~IGameWindow() = 0 {};
 

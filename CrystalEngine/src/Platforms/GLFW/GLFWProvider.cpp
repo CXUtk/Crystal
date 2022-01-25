@@ -18,7 +18,6 @@ namespace crystal
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
 		_gameWindow = std::make_unique<GLFWGameWindow>(args);
-		_fileSystem = std::make_unique<WindowsFileSystem>();
 	}
 	GLFWProvider::~GLFWProvider()
 	{

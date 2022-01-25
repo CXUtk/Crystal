@@ -10,5 +10,4 @@ namespace crystal
 	public:
 		virtual ~IFileSystem() = 0 {};
 	};
-
 }

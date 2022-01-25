@@ -5,6 +5,7 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("CrystalTracer")
 
+
 if (UNIX)
 	add_compile_definitions(CRYSTAL_USE_UNIX)
 elseif(WIN32)

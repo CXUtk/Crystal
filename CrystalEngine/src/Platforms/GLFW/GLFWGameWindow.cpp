@@ -1,4 +1,5 @@
 #include "GLFWGameWindow.h"
+#include <array>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -61,8 +62,21 @@ namespace crystal
 		M[GLFW_MOUSE_BUTTON_MIDDLE] = MouseButtonCode::MIDDLE_BUTTON;
 		return M;
 	}
+
+	template<size_t T>
+	constexpr std::array<InputAction, T> generateInputActionMap()
+	{
+		std::array<InputAction, T> M{ };
+
+		M[GLFW_RELEASE] = InputAction::RELEASE;
+		M[GLFW_PRESS] = InputAction::RELEASE;
+		M[GLFW_REPEAT] = InputAction::REPEAT;
+		return M;
+	}
+
 	constexpr auto keyCodeMap = generateKeyCodeMapper<MAX_KEYS>();
-	constexpr auto mouseButtonCodeMap = generateMouseButtonCodeMapper<MAX_KEYS>();
+	constexpr auto inputActionMap = generateInputActionMap<(size_t)InputAction::__COUNT>();
+	constexpr auto mouseButtonCodeMap = generateMouseButtonCodeMapper<(size_t)MouseButtonCode::__COUNT>();
 
 	void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
@@ -127,19 +141,26 @@ namespace crystal
 	{}
 
 	void GLFWGameWindow::EndFrame()
-	{}
+	{
+		glfwSwapBuffers(_window);
+	}
 
 	bool GLFWGameWindow::ShouldClose() const
 	{
-		return false;
+		return glfwWindowShouldClose(_window);
 	}
 
 	void GLFWGameWindow::PollEvents()
-	{}
+	{
+		glfwPollEvents();
+	}
 
 	Vector2i GLFWGameWindow::GetMousePos() const
 	{
-		return Vector2i();
+		double x, y;
+		glfwGetCursorPos(_window, &x, &y);
+
+		return Vector2i(x, _windowSize.y - y - 1);
 	}
 
 	void GLFWGameWindow::_resize(Vector2i newSize)
@@ -150,18 +171,24 @@ namespace crystal
 
 	void GLFWGameWindow::_mouseScroll(Vector2f offset)
 	{
-		_scrollWheel += offset;
 		_eventOnMouseScroll.Invoke(offset);
 	}
 
 	void GLFWGameWindow::_mouseButtonChange(int button, int action, int mods)
 	{
-		_eventOnMouseButtonChange.Invoke(button, action, mods);
+		MouseButtonEventArgs args{};
+		args.ButtonCode = mouseButtonCodeMap[button];
+		args.Action = inputActionMap[action];
+		_eventOnMouseButtonChange.Invoke(args);
 	}
 
 	void GLFWGameWindow::_keyChange(int key, int scancode, int action, int mods)
 	{
-		_eventOnKeyChange.Invoke(key, scancode, action, mods);
+		KeyEventArgs args{};
+		args.KeyCode = keyCodeMap[key];
+		args.Action = inputActionMap[action];
+		args.mods = mods;
+		_eventOnKeyChange.Invoke(args);
 	}
 
 }

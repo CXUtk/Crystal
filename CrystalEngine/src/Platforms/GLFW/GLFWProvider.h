@@ -11,10 +11,10 @@ namespace crystal
 		~GLFWProvider() override;
 
 		virtual IGameWindow* GetGameWindow() const override { return ptr(_gameWindow); }
-		virtual IFileSystem* GetFileSystem() const override { return ptr(_fileSystem); }
+		virtual IFileSystem* GetFileSystem() const override { return nullptr; }
 
 	private:
 		std::unique_ptr<IGameWindow> _gameWindow;
-		std::unique_ptr<IFileSystem> _fileSystem;
+		//std::unique_ptr<IFileSystem> _fileSystem;
 	};
 }
