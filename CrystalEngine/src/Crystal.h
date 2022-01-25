@@ -4,18 +4,27 @@
 
 namespace crystal
 {
-	using Point2f = glm::vec2;
-	using Point2i = glm::ivec2;
-	using Point3f = glm::vec3;
-	using Vector2f = glm::vec2;
-	using Vector3f = glm::vec3;
-	using Normal3f = glm::vec3;
-	using Spectrum = glm::vec3;
-	using Color3f = glm::vec3;
+	using Float32 = float;
+	using Float64 = double;
+#ifdef CRYSTAL_USE_FLOAT32
 	using Float = float;
-
+#else
+	using Float = double;
+#endif
 
 	// Core
 	class Engine;
 	class Application;
+
+	// GraphicsAPI
+	class IGraphicsDevice;
+	class IGraphicsResourceManager;
+	class IGraphicsProvider;
+
+	// Platform
+	class IGameWindow;
+	class IFileSystem;
+	class IPlatformProvider;
+
+	class GameTimer;
 }

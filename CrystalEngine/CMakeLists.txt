@@ -9,6 +9,7 @@ file(GLOB_RECURSE CrystalEngineHeaders "src/*.h")
 # 将源代码添加到此项目的可执行文件。
 add_library (CrystalEngine ${CrystalEngineSources} ${CrystalEngineHeaders})
 
+
 # 调整GLFW的Flags，关掉无用的编译组件
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -37,6 +38,6 @@ target_link_libraries(CrystalEngine PRIVATE OpenGL::GL)
 target_link_libraries(CrystalEngine PRIVATE glad SJson)
 
 target_include_directories(CrystalEngine SYSTEM PUBLIC "external")
-target_include_directories(CrystalEngine PUBLIC "src")
+target_include_directories(CrystalEngine PRIVATE "src")
 
 # TODO: 如有需要，请添加测试并安装目标。

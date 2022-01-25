@@ -1,10 +1,11 @@
-﻿#include <Crystal.h>
-#include <Engine.h>
+﻿#include "CrystalTracer.h"
 
-using namespace crystal;
-
-int main()
+namespace crystal
 {
-	Engine* engine = Engine::GetInstance();
-	return 0;
+	CrystalTracer::CrystalTracer(Engine* engine)
+	{}
+	CrystalTracer::~CrystalTracer()
+	{}
+	void CrystalTracer::Run()
+	{}
 }

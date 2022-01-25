@@ -4,12 +4,12 @@
 
 namespace crystal
 {
-	using OnInitEventHandler = std::function<void()>;
-	using OnUpdateEventHandler = std::function<void()>;
-	using OnDrawEventHandler = std::function<void()>;
-	using OnExitEventHandler = std::function<void()>;
+	//using OnInitEventHandler = std::function<void()>;
+	//using OnUpdateEventHandler = std::function<void()>;
+	//using OnDrawEventHandler = std::function<void()>;
+	//using OnExitEventHandler = std::function<void()>;
 
-	class Engine
+	class Engine final
 	{
 	public:
 		~Engine();
@@ -23,17 +23,15 @@ namespace crystal
 			return &engine; 
 		}
 
-		void SetOnInitialize(OnInitEventHandler onInit) { _onInit = onInit; }
-		void SetOnUpdate(OnUpdateEventHandler onUpdate) { _onUpdate = onUpdate; }
-		void SetOnDraw(OnDrawEventHandler onDraw) { _onDraw = onDraw; }
-		void SetOnExit(OnExitEventHandler onExit) { _onExit = onExit; }
+		/**
+		 * @brief Take control on the application and start the main game loop
+		 * @param application 
+		*/
+		void Start(std::unique_ptr<Application>&& application);
 
 	private:
+		std::unique_ptr<Application> _application;
+	
 		Engine();
-
-		OnInitEventHandler _onInit;
-		OnUpdateEventHandler _onUpdate;
-		OnDrawEventHandler _onDraw;
-		OnExitEventHandler _onExit;
 	};
 }
