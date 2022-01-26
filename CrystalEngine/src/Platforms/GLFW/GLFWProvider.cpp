@@ -22,4 +22,12 @@ namespace crystal
 	GLFWProvider::~GLFWProvider()
 	{
 	}
+	IGameWindow* GLFWProvider::GetGameWindow() const
+	{
+		return ptr(_gameWindow);
+	}
+	IFileSystem* GLFWProvider::GetFileSystem() const
+	{
+		return nullptr;
+	}
 }

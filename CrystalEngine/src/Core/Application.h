@@ -34,6 +34,9 @@ namespace crystal
 		*/
 		virtual void Draw(double deltaTime) = 0;
 
+
+		virtual void Exit() = 0;
+
 	protected:
 		Engine* _engine = nullptr;
 	};

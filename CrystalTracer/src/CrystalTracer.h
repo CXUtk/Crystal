@@ -14,5 +14,7 @@ namespace tracer
 		virtual void Update(double deltaTime) override;
 
 		virtual void Draw(double deltaTime) override;
+
+		virtual void Exit() override;
 	};
 }

@@ -25,6 +25,7 @@ namespace crystal
 	class IGraphicsProvider;
 
 	class GameTimer;
+	class InputController;
 
 
 	// Templates

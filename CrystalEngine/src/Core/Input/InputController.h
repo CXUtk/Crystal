@@ -1,15 +1,18 @@
 ﻿#pragma once
+#include "InputCode.h"
+
 #include <bitset>
 #include <Crystal.h>
-#include <Utils/Geometry.h>
-#include "InputCode.h"
+#include <Core/Utils/Geometry.h>
+#include <Platforms/Platforms.h>
+
 
 namespace crystal
 {
 	class InputController
 	{
 	public:
-		InputController();
+		InputController(IGameWindow* window);
 		~InputController();
 
 		/**
@@ -20,7 +23,7 @@ namespace crystal
 		/**
 		 * @brief Calculate input state from poll events in this frame
 		*/
-		void DispatchInput();
+		void SampleNewInput();
 
 		/**
 		 * @brief Get the change of mouse wheel value in this frame

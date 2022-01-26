@@ -25,6 +25,12 @@ namespace crystal
 		}
 
 		/**
+		 * @brief Get instance of current running window
+		 * @return 
+		*/
+		IGameWindow* GetWindow() const;
+
+		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 
 		*/
@@ -33,6 +39,8 @@ namespace crystal
 	private:
 		std::unique_ptr<Application> _application;
 		std::unique_ptr<IPlatformProvider> _platformProvider;
+		std::unique_ptr<GameTimer> _gameTimer;
+		std::unique_ptr<InputController> _inputController;
 	
 		Engine();
 	};
