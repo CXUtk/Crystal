@@ -22,8 +22,10 @@ namespace crystal
 	struct InitArgs;
 
 	// Platforms & GraphicsAPI
+	
+	// For creating all other objects (textures, buffers, etc.)
 	class IGraphicsDevice;
-	class IGraphicsResourceManager;
+	class IGraphicsContext;
 	class IGraphicsProvider;
 
 	class IGameWindow;

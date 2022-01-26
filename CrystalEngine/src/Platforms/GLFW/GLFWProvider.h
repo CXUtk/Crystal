@@ -18,5 +18,7 @@ namespace crystal
 	private:
 		std::unique_ptr<GLFWGameWindow> _gameWindow;
 		//std::unique_ptr<IFileSystem> _fileSystem;
+
+		void mountDebugErrorLog();
 	};
 }

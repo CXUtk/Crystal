@@ -80,7 +80,7 @@ namespace crystal
 		std::bitset<(int)KeyCode::__COUNT> _wasKeysDown;
 
 		// Mouse wheel
-		glm::vec2 _scrollWheel{};
+		Vector2f _scrollWheel{};
 
 		// Mouse button
 		std::bitset<(int)MouseButtonCode::__COUNT> _curMouseButtonDown;
