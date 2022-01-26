@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Core/InitArgs.h>
+#include <Core/Utils/Logger.h>
 
 namespace crystal
 {
@@ -69,7 +70,7 @@ namespace crystal
 		std::array<InputAction, T> M{ };
 
 		M[GLFW_RELEASE] = InputAction::RELEASE;
-		M[GLFW_PRESS] = InputAction::RELEASE;
+		M[GLFW_PRESS] = InputAction::PRESS;
 		M[GLFW_REPEAT] = InputAction::REPEAT;
 		return M;
 	}
@@ -119,6 +120,8 @@ namespace crystal
 			throw std::exception("Failed to create window");
 		}
 
+		GlobalLogger::Log(SeverityLevel::Debug, "GLFWWindow construct");
+
 		glfwMakeContextCurrent(_window);
 		glfwSetWindowUserPointer(_window, this);
 
@@ -134,7 +137,7 @@ namespace crystal
 			glfwDestroyWindow(_window);
 		}
 		_window = nullptr;
-		glfwTerminate();
+		GlobalLogger::Log(SeverityLevel::Debug, "GLFWWindow destruct");
 	}
 
 	void GLFWGameWindow::BeginFrame()
@@ -185,6 +188,8 @@ namespace crystal
 	void GLFWGameWindow::_keyChange(int key, int scancode, int action, int mods)
 	{
 		KeyEventArgs args{};
+		// Unknown key
+		if (key == -1) return;
 		args.KeyCode = keyCodeMap[key];
 		args.Action = inputActionMap[action];
 		args.mods = mods;

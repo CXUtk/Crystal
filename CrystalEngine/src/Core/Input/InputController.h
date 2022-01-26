@@ -4,7 +4,6 @@
 #include <bitset>
 #include <Crystal.h>
 #include <Core/Utils/Geometry.h>
-#include <Platforms/Platforms.h>
 
 
 namespace crystal
@@ -17,11 +16,6 @@ namespace crystal
 
 		/**
 		 * @brief Clear current input states and swap them to old state
-		*/
-		void ClearInput();
-
-		/**
-		 * @brief Calculate input state from poll events in this frame
 		*/
 		void SampleNewInput();
 
@@ -77,7 +71,7 @@ namespace crystal
 		 * @brief Get current mouse position related to the bottom left point of the window
 		 * @return
 		*/
-		Vector2i GetMousePos() const;
+		Point2i GetMousePos() const;
 
 	private:
 
@@ -86,10 +80,12 @@ namespace crystal
 		std::bitset<(int)KeyCode::__COUNT> _wasKeysDown;
 
 		// Mouse wheel
-		glm::vec2 _scrollWheel;
+		glm::vec2 _scrollWheel{};
 
 		// Mouse button
 		std::bitset<(int)MouseButtonCode::__COUNT> _curMouseButtonDown;
 		std::bitset<(int)MouseButtonCode::__COUNT> _wasMouseButtonDown;
+
+		IGameWindow* _gameWindow = nullptr;
 	};
 }

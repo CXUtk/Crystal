@@ -1,6 +1,5 @@
 #pragma once
 #include "Crystal.h"
-#include <Platforms/Platforms.h>
 #include <functional>
 
 namespace crystal
@@ -31,16 +30,22 @@ namespace crystal
 		IGameWindow* GetWindow() const;
 
 		/**
+		 * @brief GEt instance of engine input controller
+		 * @return 
+		*/
+		InputController* GetInputController() const;
+
+		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 
 		*/
 		void Start(std::unique_ptr<Application>&& application);
 
 	private:
-		std::unique_ptr<Application> _application;
-		std::unique_ptr<IPlatformProvider> _platformProvider;
-		std::unique_ptr<GameTimer> _gameTimer;
-		std::unique_ptr<InputController> _inputController;
+		std::unique_ptr<Application>			_application;
+		std::unique_ptr<IPlatformProvider>		_platformProvider;
+		std::unique_ptr<GameTimer>				_gameTimer;
+		std::unique_ptr<InputController>		_inputController;
 	
 		Engine();
 	};

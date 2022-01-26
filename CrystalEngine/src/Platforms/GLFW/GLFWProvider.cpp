@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Core/InitArgs.h>
+#include <Core/Utils/Logger.h>
 
 namespace crystal
 {
@@ -17,10 +18,14 @@ namespace crystal
 #ifdef _DEBUG
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
+		GlobalLogger::Log(SeverityLevel::Debug, "GLFW construct");
 		_gameWindow = std::make_unique<GLFWGameWindow>(args);
 	}
 	GLFWProvider::~GLFWProvider()
 	{
+		_gameWindow.reset();
+		glfwTerminate();
+		GlobalLogger::Log(SeverityLevel::Debug, "GLFW destruct");
 	}
 	IGameWindow* GLFWProvider::GetGameWindow() const
 	{

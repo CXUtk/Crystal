@@ -1,5 +1,6 @@
 ﻿#include "InputController.h"
-#include <Platforms/Interfaces/IGameWindow.h>
+#include <Core/Platform/Platforms.h>
+#include <Core/Utils/Logger.h>
 
 namespace crystal
 {
@@ -18,7 +19,23 @@ namespace crystal
 			bool downed = (args.Action != InputAction::RELEASE);
 			_curKeysDown[(int)args.KeyCode] = downed;
 		});
+
+		GlobalLogger::Log(SeverityLevel::Debug, "InputController construct");
 	}
+
 	InputController::~InputController()
-	{}
+	{
+		GlobalLogger::Log(SeverityLevel::Debug, "InputController destruct");
+	}
+
+	void InputController::SampleNewInput()
+	{
+		_wasKeysDown = _curKeysDown;
+		_wasMouseButtonDown = _curMouseButtonDown;
+		_scrollWheel = Vector2f(0);
+	}
+	Point2i InputController::GetMousePos() const
+	{
+		return _gameWindow->GetMousePos();
+	}
 }

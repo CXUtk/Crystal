@@ -1,5 +1,4 @@
 #pragma once
-#include <Platforms/Platforms.h>
 #include <Core/Input/InputCode.h>
 #include <Core/Utils/Event.h>
 #include <Core/Utils/Geometry.h>

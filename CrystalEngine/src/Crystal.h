@@ -15,17 +15,20 @@ namespace crystal
 	// Core
 	class Engine;
 	class Application;
+	class GameTimer;
+	class InputController;
 
 	// Data
 	struct InitArgs;
 
-	// GraphicsAPI
+	// Platforms & GraphicsAPI
 	class IGraphicsDevice;
 	class IGraphicsResourceManager;
 	class IGraphicsProvider;
 
-	class GameTimer;
-	class InputController;
+	class IGameWindow;
+	class IPlatformProvider;
+	class IFileSystem;
 
 
 	// Templates

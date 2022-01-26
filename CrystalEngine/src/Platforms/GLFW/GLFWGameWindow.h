@@ -1,5 +1,5 @@
 #pragma once
-#include <Platforms/Interfaces/IGameWindow.h>
+#include <Core/Platform/Platforms.h>
 #include <Crystal.h>
 
 #include <glad/glad.h>

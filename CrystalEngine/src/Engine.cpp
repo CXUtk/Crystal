@@ -3,6 +3,7 @@
 #include "Core/InitArgs.h"
 #include "Core/Utils/GameTimer.h"
 #include "Core/Input/InputController.h"
+#include "Core/Utils/Logger.h"
 
 #ifdef CRYSTAL_USE_GLFW
 #include <Platforms/GLFWPlatform.h>
@@ -18,19 +19,28 @@ namespace crystal
         args.WindowResizable = false;
         strcpy(args.WindowTitle, "Test");
 
+        GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
+
 #ifdef CRYSTAL_USE_GLFW
         _platformProvider = std::make_unique<GLFWProvider>(args);
 #endif
         _gameTimer = std::make_unique<GameTimer>();
+
     }
     
     Engine::~Engine()
     {
+        GlobalLogger::Log(SeverityLevel::Debug, "Engine Destruct");
     }
 
     IGameWindow* Engine::GetWindow() const
     {
         return _platformProvider->GetGameWindow();
+    }
+
+    InputController* Engine::GetInputController() const
+    {
+        return ptr(_inputController);
     }
 
     void Engine::Start(std::unique_ptr<Application>&& application)
@@ -60,6 +70,7 @@ namespace crystal
             }
             window->EndFrame();
 
+            _inputController->SampleNewInput();
             do
             {
                 window->PollEvents();

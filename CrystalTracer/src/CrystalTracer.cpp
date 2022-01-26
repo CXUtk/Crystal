@@ -1,26 +1,35 @@
 ﻿#include "CrystalTracer.h"
+#include <CrystalEngine/src/Engine.h>
+#include <CrystalEngine/src/Core/Platform/Platforms.h>
+#include <CrystalEngine/src/Core/Utils/Logger.h>
+#include <CrystalEngine/src/Core/Input/InputController.h>
 
 namespace tracer
 {
 	CrystalTracer::CrystalTracer()
 	{
-		printf("Construct\n");
+
 	}
 	CrystalTracer::~CrystalTracer()
 	{
-		printf("Destruct\n");
+		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer destruct");
 	}
 	void CrystalTracer::Initialize()
 	{
-		printf("Init\n");
+		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer initialize");
 	}
 	void CrystalTracer::Update(double deltaTime)
 	{
+		auto inputController = _engine->GetInstance()->GetInputController();
+		if (inputController->IsKeyJustPressed(crystal::KeyCode::CRYSTAL_A_KEY))
+		{
+			printf("A pressed\n");
+		}
 	}
 	void CrystalTracer::Draw(double deltaTime)
 	{}
 	void CrystalTracer::Exit()
 	{
-		printf("Exit\n");
+		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer exit");
 	}
 }
