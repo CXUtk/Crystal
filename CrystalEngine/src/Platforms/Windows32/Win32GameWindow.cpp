@@ -27,7 +27,10 @@ namespace crystal
 
 		m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 
-		initMainWindow();
+		if (!initMainWindow())
+		{
+			throw std::exception("[Win32GameWindow::Win32GameWindow] Unable to start Win32 window");
+		}
 	}
 
 	Win32GameWindow::~Win32GameWindow()
@@ -99,8 +102,11 @@ namespace crystal
 		RECT R = { 0, 0, m_windowSize.x, m_windowSize.y };
 		AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 
+		int width = R.right - R.left;
+		int height = R.bottom - R.top;
+
 		m_hMainWnd = CreateWindow("Win32WndClassName", m_windowTitle.c_str(),
-			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, m_windowSize.x, m_windowSize.y,
+			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height,
 			0, 0, m_hWindowInstance, 0);
 		if (!m_hMainWnd)
 		{
@@ -122,6 +128,9 @@ namespace crystal
 	{
 		m_eventOnMouseScroll.Invoke(offset);
 	}
+
+	void Win32GameWindow::mouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam)
+	{}
 
 	constexpr size_t MAX_KEYS = 512;
 	template<size_t N>
@@ -254,6 +263,8 @@ namespace crystal
 			// Save the new client area dimensions.
 			m_windowSize.x = LOWORD(lParam);
 			m_windowSize.y = HIWORD(lParam);
+
+			printf("%d, %d\n", m_windowSize.x, m_windowSize.y);
 
 			if (wParam == SIZE_MINIMIZED)
 			{

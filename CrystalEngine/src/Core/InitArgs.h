@@ -10,5 +10,6 @@ namespace crystal
 		uint32_t WindowWidth, WindowHeight;
 		bool WindowResizable;
 		char WindowTitle[MAX_WINDOW_TITLE_LENGTH];
+		bool Enable4xMSAA;
 	};
 }

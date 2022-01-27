@@ -4,8 +4,6 @@
 
 #include <wrl/client.h>
 #include <string>
-#include <d3d11_1.h>
-#include <DirectXMath.h>
 
 namespace crystal
 {
