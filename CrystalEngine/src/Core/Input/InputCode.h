@@ -2,15 +2,45 @@
 
 namespace crystal
 {
+	enum KeyMODState : int
+	{
+		CRYSTAL_MOD_SHIFT = 1 << 0, 
+		CRYSTAL_MOD_CTRL = 1 << 1,
+		CRYSTAL_MOD_ALT = 1 << 2,
+		CRYSTAL_MOD_CAPS_LOCK = 1 << 3,
+		CRYSTAL_MOD_NUM_LOCK = 1 << 3,
+	};
+
 	enum class KeyCode
 	{
-		EMPTY,
+		UNKNOWN,
 
-		CRYSTAL_W_KEY,
 		CRYSTAL_A_KEY,
-		CRYSTAL_S_KEY,
+		CRYSTAL_B_KEY,
+		CRYSTAL_C_KEY, 
 		CRYSTAL_D_KEY,
+		CRYSTAL_E_KEY,
+		CRYSTAL_F_KEY,
+		CRYSTAL_G_KEY,
+		CRYSTAL_H_KEY,
+		CRYSTAL_I_KEY,
+		CRYSTAL_J_KEY,
+		CRYSTAL_K_KEY,
+		CRYSTAL_L_KEY,
 		CRYSTAL_M_KEY,
+		CRYSTAL_N_KEY,
+		CRYSTAL_O_KEY,
+		CRYSTAL_P_KEY,
+		CRYSTAL_Q_KEY,
+		CRYSTAL_R_KEY,
+		CRYSTAL_S_KEY,
+		CRYSTAL_T_KEY,
+		CRYSTAL_U_KEY,
+		CRYSTAL_V_KEY,
+		CRYSTAL_W_KEY,
+		CRYSTAL_X_KEY,
+		CRYSTAL_Y_KEY,
+		CRYSTAL_Z_KEY,
 
 		CRYSTAL_UP_KEY,
 		CRYSTAL_DOWN_KEY,
@@ -68,13 +98,13 @@ namespace crystal
 	{
 		MouseButtonCode ButtonCode;
 		InputAction Action;
-		int mods;
+		int Mods;
 	};
 
 	struct KeyEventArgs
 	{
 		KeyCode KeyCode;
 		InputAction Action;
-		int mods;
+		KeyMODState Mods;
 	};
 }

@@ -7,6 +7,8 @@
 
 #ifdef CRYSTAL_USE_GLFW
 #include <Platforms/GLFWPlatform.h>
+#elif defined(CRYSTAL_USE_DX11)
+#include <Platforms/DX11Platform.h>
 #endif
 
 namespace crystal
@@ -23,6 +25,8 @@ namespace crystal
 
 #ifdef CRYSTAL_USE_GLFW
         _platformProvider = std::make_unique<GLFWProvider>(args);
+#elif defined(CRYSTAL_USE_DX11)
+        _platformProvider = std::make_unique<DX11Provider>(args);
 #endif
         _gameTimer = std::make_unique<GameTimer>();
 

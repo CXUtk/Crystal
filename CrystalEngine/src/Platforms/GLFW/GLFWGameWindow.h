@@ -20,7 +20,6 @@ namespace crystal
 		virtual bool ShouldClose() const override;
 		virtual void PollEvents() override;
 
-
 		Vector2i GetMousePos() const override;
 		Vector2i GetWindowSize() const override { return _windowSize; }
 
