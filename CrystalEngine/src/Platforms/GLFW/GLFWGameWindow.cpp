@@ -192,7 +192,7 @@ namespace crystal
 		if (key == -1) return;
 		args.KeyCode = keyCodeMap[key];
 		args.Action = inputActionMap[action];
-		args.mods = mods;
+		args.Mods = (KeyMODState)mods;
 		_eventOnKeyChange.Invoke(args);
 	}
 

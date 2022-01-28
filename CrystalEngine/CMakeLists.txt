@@ -4,8 +4,12 @@
 cmake_minimum_required (VERSION 3.8)
 
 set(CrystalEngineSources_Extra "src/Crystal.h" "src/Engine.cpp" "src/Engine.h")
+set(CrystalEngineSources_PlatformFactory "src/Platforms/PlatformFactory.cpp" "src/Platforms/PlatformFactory.h")
 file(GLOB_RECURSE CrystalEngineSources_Core "src/Core/*.cpp")
 
+if (CRYSTAL_USE_GLFW MATCHES ON AND CRYSTAL_USE_DX11 MATCHES ON)
+    message(FATAL_ERROR "CRYSTAL_USE_GLFW and CRYSTAL_USE_DX11 cannot both be true")
+endif()
 
 if (CRYSTAL_USE_GLFW)
     file(GLOB_RECURSE CrystalEngineSources_Platform "src/Platforms/GLFW/*.cpp")
@@ -19,11 +23,14 @@ if (CRYSTAL_USE_DX11)
     list(APPEND CrystalEngineSources_Platform "src/Platforms/DX11Platform.h")
 endif()
 
+message(${CrystalEngineSources_Platform})
+
 # 将源代码添加到此项目的可执行文件。
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
 ${CrystalEngineSources_Core}
-${CrystalEngineSources_Platform})
+${CrystalEngineSources_Platform}
+${CrystalEngineSources_PlatformFactory})
 
 set_target_properties(CrystalEngine PROPERTIES
             CXX_STANDARD 17

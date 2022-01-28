@@ -37,6 +37,8 @@ namespace crystal
 
 		virtual void Exit() = 0;
 
+		virtual bool Paused() = 0;
+
 	protected:
 		Engine* _engine = nullptr;
 	};

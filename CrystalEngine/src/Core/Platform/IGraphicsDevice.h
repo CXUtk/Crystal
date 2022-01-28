@@ -151,34 +151,34 @@ namespace crystal
 	};
 
 
-	struct VertexElement
-	{
-		int Offset;
-		int NumberOfElements;
-		VertexDataType DataType;
-		bool Normalized;
+	//struct VertexElement
+	//{
+	//	int Offset;
+	//	int NumberOfElements;
+	//	VertexDataType DataType;
+	//	bool Normalized;
 
-		VertexElement(int offset, int size, EngineDataType dataType, bool normalized)
-			: Offset(offset), NumberOfElements(size), DataType(dataType), Normalized(normalized)
-		{
+	//	VertexElement(int offset, int size, EngineDataType dataType, bool normalized)
+	//		: Offset(offset), NumberOfElements(size), DataType(dataType), Normalized(normalized)
+	//	{
 
-		}
-	};
+	//	}
+	//};
 
-	class VertexLayout
-	{
-	public:
-		VertexLayout();
-		~VertexLayout();
+	//class VertexLayout
+	//{
+	//public:
+	//	VertexLayout();
+	//	~VertexLayout();
 
-		void Add(const VertexElement& element);
-		size_t GetSize() const;
-		const std::vector<VertexElement>& GetVertexElements() const { return _vertexElements; }
+	//	void Add(const VertexElement& element);
+	//	size_t GetSize() const;
+	//	const std::vector<VertexElement>& GetVertexElements() const { return _vertexElements; }
 
-	private:
-		size_t _size = 0;
-		std::vector<VertexElement> _vertexElements{};
-	};
+	//private:
+	//	size_t _size = 0;
+	//	std::vector<VertexElement> _vertexElements{};
+	//};
 
 
 	/**

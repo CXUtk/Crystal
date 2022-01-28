@@ -4,12 +4,8 @@
 #include "Core/Utils/GameTimer.h"
 #include "Core/Input/InputController.h"
 #include "Core/Utils/Logger.h"
-
-#ifdef CRYSTAL_USE_GLFW
-#include <Platforms/GLFWPlatform.h>
-#elif defined(CRYSTAL_USE_DX11)
-#include <Platforms/DX11Platform.h>
-#endif
+#include "Core/Platform/Platforms.h"
+#include "Platforms/PlatformFactory.h"
 
 namespace crystal
 {
@@ -23,13 +19,7 @@ namespace crystal
 
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
 
-#ifdef CRYSTAL_USE_GLFW
-        _platformProvider = std::make_unique<GLFWProvider>(args);
-#elif defined(CRYSTAL_USE_DX11)
-        _platformProvider = std::make_unique<DX11Provider>(args);
-#endif
-        _gameTimer = std::make_unique<GameTimer>();
-
+        _platformProvider = PlatformFactory::GetPlatformProvider(args);
     }
     
     Engine::~Engine()
@@ -58,18 +48,25 @@ namespace crystal
         _inputController = std::make_unique<InputController>(window);
 
         double cappedElapsedTime = 1.0 / 60.0;
-        double prevTime = _gameTimer->GetTimeFromGameStartInSeconds();
-        double deltaTime = 0.0;
+        double frameBeginTime = 0.0;
+        _gameTimer = std::make_unique<GameTimer>();
         while (!window->ShouldClose())
         {
-            double curTime = _gameTimer->GetTimeFromGameStartInSeconds();
-            deltaTime = curTime - prevTime;
-            prevTime = curTime;
+            frameBeginTime = _gameTimer->GetCurrentTime();
+            if (_application->Paused())
+            {
+                _gameTimer->Stop();
+            }
+            else
+            {
+                _gameTimer->Start();
+            }
+            _gameTimer->Tick();
 
             window->BeginFrame();
             {
+                auto deltaTime = _gameTimer->GetDeltaTime();
                 _application->Update(deltaTime);
-
                 _application->Draw(deltaTime);
             }
             window->EndFrame();
@@ -78,7 +75,7 @@ namespace crystal
             do
             {
                 window->PollEvents();
-            } while (_gameTimer->GetTimeFromGameStartInSeconds() - prevTime < cappedElapsedTime);
+            } while (_gameTimer->GetCurrentTime() - frameBeginTime < cappedElapsedTime);
         }
 
         _application->Exit();

@@ -16,5 +16,7 @@ namespace tracer
 		virtual void Draw(double deltaTime) override;
 
 		virtual void Exit() override;
+
+		virtual bool Paused() override;
 	};
 }

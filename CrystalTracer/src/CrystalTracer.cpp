@@ -32,4 +32,8 @@ namespace tracer
 	{
 		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer exit");
 	}
+	bool CrystalTracer::Paused()
+	{
+		return false;
+	}
 }
