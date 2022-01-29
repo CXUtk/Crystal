@@ -11,7 +11,7 @@ namespace crystal
 {
     Engine::Engine()
     {
-        InitArgs args;
+        InitArgs args{};
         args.WindowWidth = 800;
         args.WindowHeight = 600;
         args.WindowResizable = false;

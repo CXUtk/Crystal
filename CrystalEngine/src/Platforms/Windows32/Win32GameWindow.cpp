@@ -80,6 +80,8 @@ namespace crystal
 
 	bool Win32GameWindow::initMainWindow()
 	{
+		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
 		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = MainWndProc;
@@ -116,6 +118,8 @@ namespace crystal
 
 		ShowWindow(m_hMainWnd, SW_SHOW);
 		UpdateWindow(m_hMainWnd);
+
+		printf("DPI: %d\n", GetDpiForWindow(m_hMainWnd));
 		return true;
 	}
 

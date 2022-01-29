@@ -30,6 +30,7 @@ namespace tracer
 		if (inputController->IsKeyJustPressed(crystal::KeyCode::CRYSTAL_S_KEY))
 		{
 			printf("Time: %lf\n", gameTimer.GetLogicTime());
+			printf("Time: %lf\n", gameTimer.GetLogicalDeltaTime());
 		}
 	}
 	void CrystalTracer::Draw(const crystal::GameTimer& gameTimer)

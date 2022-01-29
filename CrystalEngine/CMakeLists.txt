@@ -23,8 +23,6 @@ if (CRYSTAL_USE_DX11)
     list(APPEND CrystalEngineSources_Platform "src/Platforms/DX11Platform.h")
 endif()
 
-message(${CrystalEngineSources_Platform})
-
 # 将源代码添加到此项目的可执行文件。
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
