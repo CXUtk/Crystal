@@ -12,7 +12,7 @@ namespace crystal
 		/**
 		 * @brief Set engine pointer
 		*/
-		virtual void SetEngine(Engine* engine) final { _engine = engine; }
+		virtual void SetEngine(Engine* engine) final { m_engine = engine; }
 
 
 		/**
@@ -25,14 +25,14 @@ namespace crystal
 		 * @brief Specify how to update each frame, execute once per frame
 		 * @param deltaTime How much time was elapsed during the last frame
 		*/
-		virtual void Update(double deltaTime) = 0;
+		virtual void Update(const GameTimer& gameTimer) = 0;
 
 
 		/**
 		 * @brief Specify how to draw each frame, execute once per frame, after each Update
 		 * @param deltaTime How much time was elapsed during the last frame
 		*/
-		virtual void Draw(double deltaTime) = 0;
+		virtual void Draw(const GameTimer& gameTimer) = 0;
 
 
 		virtual void Exit() = 0;
@@ -40,6 +40,6 @@ namespace crystal
 		virtual bool Paused() = 0;
 
 	protected:
-		Engine* _engine = nullptr;
+		Engine* m_engine = nullptr;
 	};
 }

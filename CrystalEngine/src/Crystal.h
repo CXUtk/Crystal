@@ -26,7 +26,6 @@ namespace crystal
 	// For creating all other objects (textures, buffers, etc.)
 	class IGraphicsDevice;
 	class IGraphicsContext;
-	class IGraphicsProvider;
 
 	class IGameWindow;
 	class IPlatformProvider;

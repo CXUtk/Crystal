@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <CrystalEngine/src/Core/Application.h>
-#include <CrystalEngine/src/Crystal.h>
+#include <CrystalEngine/src/Engine.h>
 namespace tracer
 {
 	class CrystalTracer : public crystal::Application
@@ -11,12 +11,15 @@ namespace tracer
 
 		virtual void Initialize() override;
 
-		virtual void Update(double deltaTime) override;
+		virtual void Update(const crystal::GameTimer& gameTimer) override;
 
-		virtual void Draw(double deltaTime) override;
+		virtual void Draw(const crystal::GameTimer& gameTimer) override;
 
 		virtual void Exit() override;
 
 		virtual bool Paused() override;
+
+	private:
+		bool m_renderPause = false;
 	};
 }

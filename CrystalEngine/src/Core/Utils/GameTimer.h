@@ -7,28 +7,38 @@ namespace crystal
 	class GameTimer
 	{
 	public:
-		GameTimer();
-		double GetTimeFromGameStartInSeconds() const;
-		double GetCurrentTime() const;
-		double GetDeltaTime() const;
+		static double GetCurrentTime();
 
+		GameTimer();
+		double GetLogicTime() const;
+		double GetPhysicalTime() const;
+		double GetLogicalDeltaTime() const;
+		double GetPhysicalDeltaTime() const;
+		bool isStopped() const { return m_stopped; }
+
+		void Sample();
 		void Tick();
 		void Stop();
+		void Resume();
 		void Start();
 
 	private:
 		// Time since last frame
-		std::chrono::nanoseconds m_deltaTime;
+		std::chrono::nanoseconds m_physDeltaTime;
 		// Current time stamp
-		std::chrono::steady_clock::time_point m_curTime;
-		// Time stamp of last frame
-		std::chrono::steady_clock::time_point m_prevTime;
-		// Time stamp at initialization
-		std::chrono::steady_clock::time_point m_initTime;
-		// Time stamp at pause
-		std::chrono::steady_clock::time_point m_stopTime;
+		std::chrono::steady_clock::time_point m_logicalCurTime{};
+		// Logical time stamp of last frame
+		std::chrono::steady_clock::time_point m_logicalPrevTime{};
+		// Logical time stamp at initialization
+		std::chrono::steady_clock::time_point m_physStartTime{};
+		// Physical time stamp at pause
+		std::chrono::steady_clock::time_point m_physStopTime{};
+		// Physical time stamp at sampling stage
+		std::chrono::steady_clock::time_point m_physCurTime{};
+		// Physical time stamp of last frame
+		std::chrono::steady_clock::time_point m_physPrevTime{};
 		// Total time at pause
-		std::chrono::nanoseconds m_totalStopTime;
+		std::chrono::nanoseconds m_totalStopDuration;
 
 		
 		bool m_stopped = false;		// Is the timer paused?

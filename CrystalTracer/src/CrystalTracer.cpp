@@ -3,6 +3,7 @@
 #include <CrystalEngine/src/Core/Platform/Platforms.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>
 #include <CrystalEngine/src/Core/Input/InputController.h>
+#include <CrystalEngine/src/Core/Utils/GameTimer.h>
 
 namespace tracer
 {
@@ -18,15 +19,20 @@ namespace tracer
 	{
 		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer initialize");
 	}
-	void CrystalTracer::Update(double deltaTime)
+	void CrystalTracer::Update(const crystal::GameTimer& gameTimer)
 	{
-		auto inputController = _engine->GetInstance()->GetInputController();
+		auto inputController = m_engine->GetInstance()->GetInputController();
 		if (inputController->IsKeyJustPressed(crystal::KeyCode::CRYSTAL_A_KEY))
 		{
-			printf("A pressed\n");
+			m_renderPause = !m_renderPause;
+			printf("%s\n", m_renderPause ? "Paused" : "Resumed");
+		}
+		if (inputController->IsKeyJustPressed(crystal::KeyCode::CRYSTAL_S_KEY))
+		{
+			printf("Time: %lf\n", gameTimer.GetLogicTime());
 		}
 	}
-	void CrystalTracer::Draw(double deltaTime)
+	void CrystalTracer::Draw(const crystal::GameTimer& gameTimer)
 	{}
 	void CrystalTracer::Exit()
 	{
@@ -34,6 +40,6 @@ namespace tracer
 	}
 	bool CrystalTracer::Paused()
 	{
-		return false;
+		return m_renderPause;
 	}
 }

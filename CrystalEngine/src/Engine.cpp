@@ -15,7 +15,10 @@ namespace crystal
         args.WindowWidth = 800;
         args.WindowHeight = 600;
         args.WindowResizable = false;
+        args.FPSLimit = 60;
         strcpy(args.WindowTitle, "Test");
+
+        m_fpsCap = 1.0 / args.FPSLimit;
 
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
 
@@ -47,27 +50,27 @@ namespace crystal
         auto window = this->GetWindow();
         _inputController = std::make_unique<InputController>(window);
 
-        double cappedElapsedTime = 1.0 / 60.0;
+        m_gameTimer.Start();
         double frameBeginTime = 0.0;
-        _gameTimer = std::make_unique<GameTimer>();
         while (!window->ShouldClose())
         {
-            frameBeginTime = _gameTimer->GetCurrentTime();
+            frameBeginTime = GameTimer::GetCurrentTime();
+
+            m_gameTimer.Sample();
             if (_application->Paused())
             {
-                _gameTimer->Stop();
+                m_gameTimer.Stop();
             }
             else
             {
-                _gameTimer->Start();
+                m_gameTimer.Resume();
             }
-            _gameTimer->Tick();
+            m_gameTimer.Tick();
 
             window->BeginFrame();
             {
-                auto deltaTime = _gameTimer->GetDeltaTime();
-                _application->Update(deltaTime);
-                _application->Draw(deltaTime);
+                _application->Update(m_gameTimer);
+                _application->Draw(m_gameTimer);
             }
             window->EndFrame();
 
@@ -75,7 +78,7 @@ namespace crystal
             do
             {
                 window->PollEvents();
-            } while (_gameTimer->GetCurrentTime() - frameBeginTime < cappedElapsedTime);
+            } while (GameTimer::GetCurrentTime() - frameBeginTime < m_fpsCap);
         }
 
         _application->Exit();

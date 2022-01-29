@@ -2,52 +2,73 @@
 using namespace std::chrono;
 namespace crystal
 {
-	GameTimer::GameTimer()
-	{
-		m_totalStopTime = m_deltaTime = nanoseconds(0LL);
-		auto now = steady_clock::now();
-		m_initTime = m_prevTime = m_curTime = now;
-	}
-	double GameTimer::GetTimeFromGameStartInSeconds() const
-	{
-		return duration_cast<duration<double>>(steady_clock::now() - m_initTime - m_totalStopTime).count();
-	}
-	double GameTimer::GetCurrentTime() const
+	double GameTimer::GetCurrentTime()
 	{
 		return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
 	}
-	double GameTimer::GetDeltaTime() const
+	GameTimer::GameTimer()
 	{
-		return duration_cast<duration<double>>(m_deltaTime).count();
+		m_totalStopDuration = m_physDeltaTime = nanoseconds(0LL);
 	}
+
+	double GameTimer::GetLogicTime() const
+	{
+		return duration_cast<duration<double>>(m_logicalCurTime - m_physStartTime).count();
+	}
+
+	double GameTimer::GetPhysicalTime() const
+	{
+		return duration_cast<duration<double>>(m_physCurTime - m_physStartTime).count();
+	}
+
+	double GameTimer::GetLogicalDeltaTime() const
+	{
+		return duration_cast<duration<double>>(m_logicalCurTime - m_logicalPrevTime).count();
+	}
+
+	double GameTimer::GetPhysicalDeltaTime() const
+	{
+		return duration_cast<duration<double>>(m_physDeltaTime).count();
+	}
+
+	void GameTimer::Sample()
+	{
+		m_physCurTime = steady_clock::now();
+		m_physDeltaTime = m_physCurTime - m_physPrevTime;
+		m_physPrevTime = m_physCurTime;
+		if (m_physDeltaTime.count() < 0)
+		{
+			m_physDeltaTime = nanoseconds(0LL);
+		}
+	}
+
 	void GameTimer::Tick()
 	{
 		if (m_stopped)
 		{
-			m_deltaTime = nanoseconds(0LL);
 			return;
 		}
-		m_curTime = steady_clock::now();
-		m_deltaTime = m_curTime - m_prevTime;
-		m_prevTime = m_curTime;
-
-		if (m_deltaTime.count() < 0)
-		{
-			m_deltaTime = nanoseconds(0LL);
-		}
+		m_logicalPrevTime = m_logicalCurTime;
+		m_logicalCurTime += m_physDeltaTime;
 	}
+
 	void GameTimer::Stop()
 	{
 		if (m_stopped) return;
-		m_stopTime = steady_clock::now();
+		m_physStopTime = m_physCurTime;
 		m_stopped = true;
 	}
-	void GameTimer::Start()
+
+	void GameTimer::Resume()
 	{
 		if (!m_stopped) return;
+		m_totalStopDuration += m_physCurTime - m_physStopTime;
 		m_stopped = false;
-		auto stopTime = m_curTime - m_stopTime;
-		m_totalStopTime += stopTime;
-		m_prevTime += stopTime;
+	}
+
+	void GameTimer::Start()
+	{
+		m_physPrevTime = m_physCurTime = m_logicalCurTime = 
+			m_logicalPrevTime = m_physStartTime = m_physStopTime = steady_clock::now();
 	}
 }

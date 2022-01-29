@@ -1,5 +1,6 @@
 #pragma once
 #include "Crystal.h"
+#include "Core/Utils/GameTimer.h"
 #include <functional>
 
 namespace crystal
@@ -44,8 +45,11 @@ namespace crystal
 	private:
 		std::unique_ptr<Application>			_application;
 		std::unique_ptr<IPlatformProvider>		_platformProvider;
-		std::unique_ptr<GameTimer>				_gameTimer;
+
 		std::unique_ptr<InputController>		_inputController;
+
+		double		m_fpsCap;			// Maximum FPS
+		GameTimer	m_gameTimer;		// Game timer
 	
 		Engine();
 	};
