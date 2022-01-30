@@ -19,6 +19,7 @@ namespace crystal
 		virtual void EndFrame() = 0;
 
 		virtual bool ShouldClose() const = 0;
+		virtual bool IsPaused() const = 0;
 		virtual void PollEvents() = 0;
 
 		virtual Point2i GetMousePos() const = 0;

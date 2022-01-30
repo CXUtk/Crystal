@@ -25,9 +25,8 @@ namespace crystal
     using Vector2i = glm::ivec2;
     using Vector2f = glm::vec2;
     using Vector3f = glm::vec3;
+    using Vector4f = glm::vec4;
     using Normal3f = glm::vec3;
-    using Spectrum = glm::vec3;
-    using Color3f = glm::vec3;
 
     template<glm::length_t L, typename T, glm::qualifier Q>
     class Ray

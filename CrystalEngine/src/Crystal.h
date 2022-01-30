@@ -12,6 +12,8 @@ namespace crystal
 	using Float = double;
 #endif
 
+	
+
 	// Core
 	class Engine;
 	class Application;
@@ -26,6 +28,10 @@ namespace crystal
 	// For creating all other objects (textures, buffers, etc.)
 	class IGraphicsDevice;
 	class IGraphicsContext;
+
+	// Graphics Resources
+	class IVertexBuffer;
+	class IInputLayout;
 
 	class IGameWindow;
 	class IPlatformProvider;

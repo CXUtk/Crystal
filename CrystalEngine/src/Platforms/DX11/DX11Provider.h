@@ -2,8 +2,7 @@
 #include <Core/Platform/Platforms.h>
 #include <Crystal.h>
 
-#include <wrl/client.h>
-#include <d3d11_1.h>
+#include "DX11Common.h"
 
 namespace crystal
 {
@@ -18,9 +17,10 @@ namespace crystal
 
 		virtual IGameWindow* GetGameWindow() const override;
 		virtual IFileSystem* GetFileSystem() const override;
+		virtual IGraphicsDevice* GetGraphicsDevice() const override;
 
 	private:
 		std::unique_ptr<Win32GameWindow> _gameWindow;
-		std::unique_ptr<DX11GraphicsDevice> _dx11GraphicsDevice;
+		std::unique_ptr<DX11GraphicsDevice> m_dx11GraphicsDevice;
 	};
 }

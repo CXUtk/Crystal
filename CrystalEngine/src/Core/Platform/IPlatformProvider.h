@@ -8,5 +8,6 @@ namespace crystal
 		virtual ~IPlatformProvider() = 0 {};
 		virtual IGameWindow* GetGameWindow() const = 0;
 		virtual IFileSystem* GetFileSystem() const = 0;
+		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
 	};
 }

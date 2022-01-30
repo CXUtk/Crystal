@@ -39,6 +39,11 @@ namespace crystal
     {
         return ptr(_inputController);
     }
+    
+    IGraphicsDevice* Engine::GetGraphicsDevice() const
+    {
+        return _platformProvider->GetGraphicsDevice();
+    }
 
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
@@ -48,6 +53,7 @@ namespace crystal
         _application->Initialize();
 
         auto window = this->GetWindow();
+        auto graphicsDevice = this->GetGraphicsDevice();
         _inputController = std::make_unique<InputController>(window);
 
         m_gameTimer.Start();
@@ -57,7 +63,7 @@ namespace crystal
             frameBeginTime = GameTimer::GetCurrentTime();
 
             m_gameTimer.Sample();
-            if (_application->Paused())
+            if (_application->Paused() || window->IsPaused())
             {
                 m_gameTimer.Stop();
             }
@@ -71,6 +77,7 @@ namespace crystal
             {
                 _application->Update(m_gameTimer);
                 _application->Draw(m_gameTimer);
+                graphicsDevice->Present();
             }
             window->EndFrame();
 

@@ -164,3 +164,19 @@ inline void DXGISetDebugObjectName(_In_ IDXGIObject* object, _In_ std::nullptr_t
 #endif
 }
 #endif
+
+HRESULT CreateShaderFromFile(
+	const WCHAR* csoFileNameInOut,
+	const WCHAR* hlslFileName,
+	LPCSTR entryPoint,
+	LPCSTR shaderModel,
+	ID3DBlob** ppBlobOut);
+
+HRESULT CreateShaderFromMemory(
+	const char* src,
+	size_t size,
+	LPCSTR sourceName,
+	LPCSTR entryPoint,
+	LPCSTR shaderModel,
+	ID3DBlob** ppBlobOut);
+

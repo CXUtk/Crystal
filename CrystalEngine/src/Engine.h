@@ -36,6 +36,9 @@ namespace crystal
 		*/
 		InputController* GetInputController() const;
 
+
+		IGraphicsDevice* GetGraphicsDevice() const;
+
 		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 
@@ -45,7 +48,6 @@ namespace crystal
 	private:
 		std::unique_ptr<Application>			_application;
 		std::unique_ptr<IPlatformProvider>		_platformProvider;
-
 		std::unique_ptr<InputController>		_inputController;
 
 		double		m_fpsCap;			// Maximum FPS

@@ -18,3 +18,14 @@ inline std::string string_format(const std::string& format, Args&& ... args)
     std::snprintf(buf.get(), size, format.c_str(), args ...);
     return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
+
+inline std::string GetNameByIndex(int index)
+{
+    std::string name;
+    while (index)
+    {
+        name.push_back('a' + (index % 26));
+        index /= 26;
+    }
+    return name;
+}

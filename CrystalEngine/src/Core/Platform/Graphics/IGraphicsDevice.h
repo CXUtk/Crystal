@@ -1,9 +1,17 @@
 #pragma once
 #include <Crystal.h>
 #include <vector>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace crystal
 {
+	using Spectrum = glm::vec3;
+	using Color3f = glm::vec3;
+	using Color4f = glm::vec4;
+
+	template<typename T>
+	inline float* value_ptr(T x) { return glm::value_ptr(T); }
+
 	enum class VertexDataType
 	{
 		FLOAT,
@@ -17,10 +25,11 @@ namespace crystal
 		__COUNT
 	};
 
-	enum class BufferHint
+	enum class BufferUsage
 	{
-		STATIC_DRAW,
-		DYNAMIC_DRAW,
+		GPU_DYNAMIC_DRAW,
+		IMMUTABLE_DRAW,
+		CPU_DYNAMIC_DRAW,
 
 		__COUNT
 	};
@@ -150,6 +159,58 @@ namespace crystal
 		__COUNT
 	};
 
+	enum class VertexElementFormat
+	{
+		Single,
+		Vector2,
+		Vector3,
+		Vector4,
+
+		R8_UINT,
+		R32G32B32_UINT,
+		R8G8B8A8_UINT,
+
+		__COUNT
+	};
+
+
+	enum class SemanticType
+	{
+		POSITION,
+		NORMAL,
+		TEXCOORD,
+		COLOR,
+
+		__COUNT
+	};
+
+	enum ClearOptions : int
+	{
+		Target = 1 << 0,
+		Depth = 1 << 1,
+		Stencil = 1 << 2
+	};
+
+	inline ClearOptions operator|(ClearOptions a, ClearOptions b)
+	{
+		return static_cast<ClearOptions>(static_cast<int>(a) | static_cast<int>(b));
+	}
+
+
+	struct BufferDescription
+	{
+		BufferType		Type;
+		BufferUsage		Usage;
+	};
+
+	struct ElementDescription
+	{
+		SemanticType		Semantic;
+		uint32_t			SemanticIndex;
+		VertexElementFormat	Format;
+		uint32_t			ByteOffset;
+	};
+
 
 	//struct VertexElement
 	//{
@@ -165,20 +226,14 @@ namespace crystal
 	//	}
 	//};
 
-	//class VertexLayout
-	//{
-	//public:
-	//	VertexLayout();
-	//	~VertexLayout();
+	struct VertexLayout
+	{
+		VertexLayout(const std::vector<ElementDescription>& elementDescs)
+			: Elements(elementDescs)
+		{}
 
-	//	void Add(const VertexElement& element);
-	//	size_t GetSize() const;
-	//	const std::vector<VertexElement>& GetVertexElements() const { return _vertexElements; }
-
-	//private:
-	//	size_t _size = 0;
-	//	std::vector<VertexElement> _vertexElements{};
-	//};
+		std::vector<ElementDescription> Elements{};
+	};
 
 
 	/**
@@ -189,6 +244,19 @@ namespace crystal
 	public:
 		virtual ~IGraphicsDevice() = 0 {};
 
+		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) = 0;
+		virtual void Present() = 0;
+		virtual std::shared_ptr<IVertexBuffer> CreateBuffer(const BufferDescription& desc, void* src, uint64_t size) = 0;
+	};
+
+
+
+	class IVertexBuffer
+	{
+	public:
+		virtual ~IVertexBuffer() = 0 {};
+
+		virtual void BindVertexLayout(const VertexLayout& layout) = 0;
 	};
 
 }

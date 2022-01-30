@@ -1,6 +1,7 @@
 #include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
+#include "DX11VertexBuffer.h"
 
 #include <Core/InitArgs.h>
 
@@ -9,7 +10,7 @@ namespace crystal
 	DX11GraphicsDevice::DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window)
 		: m_Window(window), m_Enable4xMsaa(args.Enable4xMSAA)
 	{
-		if (!initD3DX11())
+		if (!m_initD3DX11())
 		{
 			throw std::exception("[DX11GraphicsDevice::DX11GraphicsDevice] Unable to start Dx11");
 		}
@@ -18,7 +19,51 @@ namespace crystal
 	DX11GraphicsDevice::~DX11GraphicsDevice()
 	{}
 
-	bool DX11GraphicsDevice::initD3DX11()
+	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)
+	{
+		if (options & ClearOptions::Target)
+		{
+			m_pd3dImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(),
+				value_ptr(color));
+		}
+
+		int clearFlag = 0;
+		if (options & ClearOptions::Depth)
+		{
+			clearFlag |= D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH;
+		}
+		if (options & ClearOptions::Stencil)
+		{
+			clearFlag |= D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL;
+		}
+		m_pd3dImmediateContext->ClearDepthStencilView(m_pDepthStencilView.Get(), clearFlag, depth, stencil);
+	}
+
+	void DX11GraphicsDevice::Present()
+	{
+		m_pSwapChain->Present(0, 0);
+	}
+
+	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice::CreateBuffer(const BufferDescription& desc, void* src, uint64_t size)
+	{
+		// 设置顶点缓冲区描述
+		D3D11_BUFFER_DESC vbd;
+		ZeroMemory(&vbd, sizeof(vbd));
+		vbd.Usage = D3D11_USAGE_IMMUTABLE;
+		vbd.ByteWidth = size;
+		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA initData;
+		ZeroMemory(&initData, sizeof(initData));
+		initData.pSysMem = src;
+
+		ComPtr<ID3D11Buffer> vertexBuffer;
+		HR(m_pd3dDevice->CreateBuffer(&vbd, &initData, vertexBuffer.GetAddressOf()));
+		return std::make_shared<DX11VertexBuffer>(this, vertexBuffer);
+	}
+
+	bool DX11GraphicsDevice::m_initD3DX11()
 	{
 		HRESULT hr = S_OK;
 
@@ -107,6 +152,8 @@ namespace crystal
 		sd.Flags = 0;
 
 		HR(dxgiFactory->CreateSwapChain(m_pd3dDevice.Get(), &sd, m_pSwapChain.GetAddressOf()));
+
+		dxgiFactory->MakeWindowAssociation(m_Window->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
 		// 设置调试对象名
 		D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
