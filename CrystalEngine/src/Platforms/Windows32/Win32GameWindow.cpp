@@ -10,20 +10,20 @@ namespace crystal
 	// This is just used to forward Windows messages from a global window
 	// procedure to our member function window procedure because we cannot
 	// assign a member function to WNDCLASS::lpfnWndProc.
-	Win32GameWindow* g_dx11Window = nullptr;
+	Win32GameWindow* g_win32Window = nullptr;
 
 	LRESULT CALLBACK
 		MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 		// before CreateWindow returns, and thus before m_hMainWnd is valid.
-		return g_dx11Window->_msgProc(hwnd, msg, wParam, lParam);
+		return g_win32Window->_msgProc(hwnd, msg, wParam, lParam);
 	}
 
 	Win32GameWindow::Win32GameWindow(const InitArgs& args, HINSTANCE hInstance)
 		: m_hWindowInstance(hInstance)
 	{
-		g_dx11Window = this;
+		g_win32Window = this;
 
 		m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 

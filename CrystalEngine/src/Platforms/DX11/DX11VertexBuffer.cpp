@@ -3,12 +3,10 @@
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include <Core/Utils/Misc.h>
-#include <array>
+
 
 namespace crystal
 {
-
-
 	DX11VertexBuffer::DX11VertexBuffer(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11Buffer> buffer)
 		: m_pGraphicsDevice(graphicsDevice), m_pBuffer(buffer)
 	{
@@ -61,16 +59,24 @@ return vout;\
 	void DX11VertexBuffer::BindVertexLayout(const VertexLayout& layout)
 	{
 		auto device = m_pGraphicsDevice->GetD3DDevice();
-		
 		auto d3dInputElements = ConvertToD3D11InputElements(layout);
+		m_strides = layout.Stride;
 
 		// Hack: create a dummy vertex shader to genereate InputLayout
 		auto dummyShader = CreateDummyVertexShader(layout);
 
-		ComPtr<ID3DBlob> pBlob;
-		HR(CreateShaderFromMemory(dummyShader.c_str(), dummyShader.size(), "dummyVS", "VS", 
+		ComPtr<ID3DBlob> pBlob = nullptr;
+		HR(d3dUtils::CreateShaderFromMemory(dummyShader.c_str(), dummyShader.size(), "dummyVS", "VS", 
 			ShaderModelConvert(ShaderType::VERTEX_SHADER), pBlob.GetAddressOf()));
 		HR(device->CreateInputLayout(d3dInputElements.get(), layout.Elements.size(),
 			pBlob->GetBufferPointer(), pBlob->GetBufferSize(), m_pInputLayout.GetAddressOf()));
+	}
+
+	void DX11VertexBuffer::Bind(size_t offset)
+	{
+		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
+		UINT offsetU = offset;
+		deviceContext->IASetVertexBuffers(0, 1, m_pBuffer.GetAddressOf(), &m_strides, &offsetU);
+		deviceContext->IASetInputLayout(m_pInputLayout.Get());
 	}
 }

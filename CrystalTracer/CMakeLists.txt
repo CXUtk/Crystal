@@ -20,3 +20,5 @@ target_include_directories(CrystalTracer SYSTEM PRIVATE "..")
 
 target_link_libraries(CrystalTracer PRIVATE CrystalEngine)
 add_dependencies(CrystalTracer CrystalEngine)
+
+execute_process(COMMAND python ${PROJECT_SOURCE_DIR}/build.py "${PROJECT_SOURCE_DIR}/resources" "${PROJECT_BINARY_DIR}")

@@ -2,6 +2,7 @@
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include "DX11VertexBuffer.h"
+#include "DX11Shaders.h"
 
 #include <Core/InitArgs.h>
 
@@ -41,15 +42,15 @@ namespace crystal
 
 	void DX11GraphicsDevice::Present()
 	{
-		m_pSwapChain->Present(0, 0);
+		HR(m_pSwapChain->Present(0, 0));
 	}
 
-	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice::CreateBuffer(const BufferDescription& desc, void* src, uint64_t size)
+	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
 	{
 		// 设置顶点缓冲区描述
 		D3D11_BUFFER_DESC vbd;
 		ZeroMemory(&vbd, sizeof(vbd));
-		vbd.Usage = D3D11_USAGE_IMMUTABLE;
+		vbd.Usage = BufferUsageToDX11Convert(desc.Usage);
 		vbd.ByteWidth = size;
 		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vbd.CPUAccessFlags = 0;
@@ -60,7 +61,37 @@ namespace crystal
 
 		ComPtr<ID3D11Buffer> vertexBuffer;
 		HR(m_pd3dDevice->CreateBuffer(&vbd, &initData, vertexBuffer.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(vertexBuffer.Get(), "VertexBuffer");
 		return std::make_shared<DX11VertexBuffer>(this, vertexBuffer);
+	}
+
+	std::shared_ptr<IVertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
+	{
+		auto pBlob = m_getShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::VERTEX_SHADER);
+		ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
+		HR(m_pd3dDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(),
+			nullptr, pVertexShader.GetAddressOf()));
+		return std::make_shared<DX11VertexShader>(this, pVertexShader);
+	}
+
+	std::shared_ptr<IFragmentShader> DX11GraphicsDevice::CreateFragmentShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
+	{
+		auto pBlob = m_getShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::FRAGMENT_SHADER);
+		ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
+		HR(m_pd3dDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(),
+			nullptr, pPixelShader.GetAddressOf()));
+		return std::make_shared<DX11FragmentShader>(this, pPixelShader);
+	}
+
+	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader, std::shared_ptr<IFragmentShader> fragmentShader)
+	{
+		return std::make_shared<DX11ShaderProgram>(vertexShader, fragmentShader);
+	}
+
+	void DX11GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
+	{
+		m_pd3dImmediateContext->IASetPrimitiveTopology(PrimitiveTypeToTopologyConvert(primitiveType));
+		m_pd3dImmediateContext->Draw(numVertices, offset);
 	}
 
 	bool DX11GraphicsDevice::m_initD3DX11()
@@ -156,8 +187,8 @@ namespace crystal
 		dxgiFactory->MakeWindowAssociation(m_Window->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
 		// 设置调试对象名
-		D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
-		DXGISetDebugObjectName(m_pSwapChain.Get(), "SwapChain");
+		d3dUtils::D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
+		d3dUtils::DXGISetDebugObjectName(m_pSwapChain.Get(), "SwapChain");
 
 		m_resizeBuffer();
 		return true;
@@ -190,7 +221,7 @@ namespace crystal
 			m_pd3dDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, m_pRenderTargetView.GetAddressOf());
 
 			// Set DEBUG name
-			D3D11SetDebugObjectName(backBuffer.Get(), "BackBuffer[0]");
+			d3dUtils::D3D11SetDebugObjectName(backBuffer.Get(), "BackBuffer[0]");
 		}
 
 		D3D11_TEXTURE2D_DESC depthStencilDesc;
@@ -235,8 +266,16 @@ namespace crystal
 		m_pd3dImmediateContext->RSSetViewports(1, &m_ScreenViewport);
 
 		// Set DEBUG name
-		D3D11SetDebugObjectName(m_pDepthStencilBuffer.Get(), "DepthStencilBuffer");
-		D3D11SetDebugObjectName(m_pDepthStencilView.Get(), "DepthStencilView");
-		D3D11SetDebugObjectName(m_pRenderTargetView.Get(), "BackBufferRTV[0]");
+		d3dUtils::D3D11SetDebugObjectName(m_pDepthStencilBuffer.Get(), "DepthStencilBuffer");
+		d3dUtils::D3D11SetDebugObjectName(m_pDepthStencilView.Get(), "DepthStencilView");
+		d3dUtils::D3D11SetDebugObjectName(m_pRenderTargetView.Get(), "BackBufferRTV[0]");
+	}
+
+
+	ComPtr<ID3DBlob> DX11GraphicsDevice::m_getShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type)
+	{
+		ComPtr<ID3DBlob> pBlob = nullptr;
+		HR(d3dUtils::CreateShaderFromMemory(src, size, name.c_str(), entryPoint.c_str(), ShaderModelConvert(type), pBlob.GetAddressOf()));
+		return pBlob;
 	}
 }

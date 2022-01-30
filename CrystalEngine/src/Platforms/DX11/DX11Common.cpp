@@ -20,6 +20,17 @@ namespace crystal
 	constexpr auto VertexElementFormatMapping = GenerateVertexElementFormatMapping<(size_t)VertexElementFormat::__COUNT>();
 
 	template<size_t N>
+	constexpr std::array<D3D11_USAGE, N> GenerateBufferUsageToDX11Mapping()
+	{
+		std::array<D3D11_USAGE, N> M{};
+		M[(int)BufferUsage::GPU_DYNAMIC_DRAW] = D3D11_USAGE_DEFAULT;
+		M[(int)BufferUsage::IMMUTABLE_DRAW] = D3D11_USAGE_IMMUTABLE;
+		M[(int)BufferUsage::CPU_DYNAMIC_DRAW] = D3D11_USAGE_DYNAMIC;
+		return M;
+	}
+	constexpr auto BufferUsageToDX11Mapping = GenerateBufferUsageToDX11Mapping<(size_t)BufferUsage::__COUNT>();
+
+	template<size_t N>
 	constexpr std::array<const char*, N> GenerateVertexElementFormatToShaderVarMapping()
 	{
 		std::array<const char*, N> M{};
@@ -58,6 +69,19 @@ namespace crystal
 	}
 	constexpr auto SemanticNameMapping = GenerateSemanticNameMapping<(size_t)SemanticType::__COUNT>();
 
+	template<size_t N>
+	constexpr std::array<D3D11_PRIMITIVE_TOPOLOGY, N> GeneratePrimititveTopologyMapping()
+	{
+		std::array<D3D11_PRIMITIVE_TOPOLOGY, N> M{};
+		M[(int)PrimitiveType::POINTS] = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+		M[(int)PrimitiveType::LINE_LIST] = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+		M[(int)PrimitiveType::LINE_STRIP] = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+		M[(int)PrimitiveType::TRIANGLE_LIST] = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		M[(int)PrimitiveType::TRIANGLE_STRIP] = D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+		return M;
+	}
+	constexpr auto PrimititveTopologyMapping = GeneratePrimititveTopologyMapping<(size_t)PrimitiveType::__COUNT>();
+
 	const char* VertexElementFormatToShaderVarConvert(VertexElementFormat format)
 	{
 		return VertexElementFormatToShaderVarMapping[(int)format];
@@ -68,6 +92,11 @@ namespace crystal
 		return VertexElementFormatMapping[(int)format];
 	}
 
+	D3D11_USAGE BufferUsageToDX11Convert(BufferUsage usage)
+	{
+		return BufferUsageToDX11Mapping[(int)usage];
+	}
+
 	const char* SemanticNameConvert(SemanticType semanticType)
 	{
 		return SemanticNameMapping[(int)semanticType];
@@ -76,6 +105,11 @@ namespace crystal
 	const char* ShaderModelConvert(ShaderType shaderType)
 	{
 		return ShaderTypeToModelStringMapping[(int)shaderType];
+	}
+
+	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type)
+	{
+		return PrimititveTopologyMapping[(int)type];
 	}
 
 }

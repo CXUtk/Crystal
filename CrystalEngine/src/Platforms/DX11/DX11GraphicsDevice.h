@@ -15,7 +15,16 @@ namespace crystal
 
 		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) override;
 		virtual void Present() override;
-		virtual std::shared_ptr<IVertexBuffer> CreateBuffer(const BufferDescription& desc, void* src, uint64_t size) override;
+		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) override;
+
+		virtual std::shared_ptr<IVertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) override;
+		virtual std::shared_ptr<IVertexShader> CreateVertexShaderFromMemory(const char* src, size_t size,
+			const std::string& name, const std::string& entryPoint) override;
+		virtual std::shared_ptr<IFragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
+			const std::string& name, const std::string& entryPoint) override;
+		virtual std::shared_ptr<IShaderProgram> CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader,
+			std::shared_ptr<IFragmentShader> fragmentShader) override;
+
 	
 		ComPtr<ID3D11Device> GetD3DDevice() const { return m_pd3dDevice; }
 		ComPtr<ID3D11DeviceContext> GetD3DDeviceContext() const { return m_pd3dImmediateContext; }
@@ -37,5 +46,6 @@ namespace crystal
 
 		bool m_initD3DX11();
 		void m_resizeBuffer();
+		ComPtr<ID3DBlob> m_getShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type);
 	};
 }

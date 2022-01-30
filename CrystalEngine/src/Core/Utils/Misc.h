@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <sstream>
+#include <fstream>
 
 /**
  * @brief Get the formatted std::string
@@ -17,6 +19,32 @@ inline std::string string_format(const std::string& format, Args&& ... args)
     auto buf = std::make_unique<char[]>(size);
     std::snprintf(buf.get(), size, format.c_str(), args ...);
     return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
+
+
+/**
+ * @brief Read all string from a text file
+ * @param fileName Name of the file
+ * @return All string in file
+*/
+inline std::string ReadAllStringFromFile(const std::string& fileName)
+{
+    std::ifstream iFile;
+    iFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    std::string str;
+    try
+    {
+        iFile.open(fileName);
+        std::stringstream strStream;
+        strStream << iFile.rdbuf();
+        iFile.close();
+        str = strStream.str();
+    }
+    catch (std::ifstream::failure e)
+    {
+        throw std::exception(string_format("Failed to read file %s: %s", fileName.c_str(), e.what()).c_str());
+    }
+    return str;
 }
 
 inline std::string GetNameByIndex(int index)
