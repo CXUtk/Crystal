@@ -48,7 +48,7 @@ namespace crystal
 		Vector2i	m_oldClientSize{};			// History window size, used to detect change
 
 
-		Win32GameWindow* m_Window;
+		Win32GameWindow*	m_pWindow;			// Win32 ¥∞ÃÂ∂‘œÛ
 
 		bool m_initD3DX11();
 		void m_resizeBuffer();

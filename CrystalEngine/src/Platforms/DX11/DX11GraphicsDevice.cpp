@@ -12,7 +12,7 @@
 namespace crystal
 {
 	DX11GraphicsDevice::DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window)
-		: m_Window(window), m_Enable4xMsaa(args.Enable4xMSAA)
+		: m_pWindow(window), m_Enable4xMsaa(args.Enable4xMSAA)
 	{
 		if (!m_initD3DX11())
 		{
@@ -202,7 +202,7 @@ namespace crystal
 		HR(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
 		HR(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(dxgiFactory.GetAddressOf())));
 
-		auto clientSize = m_Window->GetWindowSize();
+		auto clientSize = m_pWindow->GetWindowSize();
 		m_oldClientSize = clientSize;
 
 		DXGI_SWAP_CHAIN_DESC sd;
@@ -229,20 +229,23 @@ namespace crystal
 
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = 1;
-		sd.OutputWindow = m_Window->GetHWND();
+		sd.OutputWindow = m_pWindow->GetHWND();
 		sd.Windowed = TRUE;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		sd.Flags = 0;
 
 		HR(dxgiFactory->CreateSwapChain(m_pd3dDevice.Get(), &sd, m_pSwapChain.GetAddressOf()));
 
-		dxgiFactory->MakeWindowAssociation(m_Window->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
+		dxgiFactory->MakeWindowAssociation(m_pWindow->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
 		// 设置调试对象名
 		d3dUtils::D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
 		d3dUtils::DXGISetDebugObjectName(m_pSwapChain.Get(), "SwapChain");
 
 		m_resizeBuffer();
+		m_pWindow->AppendOnResizeEvent([this](Vector2i size) {
+			m_resizeBuffer();
+		});
 		return true;
 	}
 
@@ -258,7 +261,7 @@ namespace crystal
 		m_pDepthStencilBuffer.Reset();
 
 		// Resize the buffer if window size was changed
-		auto newWindowSize = m_Window->GetWindowSize();
+		auto newWindowSize = m_pWindow->GetWindowSize();
 		if (m_oldClientSize != newWindowSize)
 		{
 			HR(m_pSwapChain->ResizeBuffers(1, newWindowSize.x, newWindowSize.y, DXGI_FORMAT_R8G8B8A8_UNORM, 0));

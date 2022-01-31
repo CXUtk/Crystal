@@ -52,6 +52,7 @@ namespace crystal
 		size = (size + 15) / 16 * 16;
 		m_pConstantBuffer = m_pGraphicsDevice->CreateBuffer(nullptr, size, 
 			BufferUsage::CPUWrite, D3D11_BIND_CONSTANT_BUFFER);
+		d3dUtils::D3D11SetDebugObjectName(m_pConstantBuffer.Get(), "Shader Constant Buffer");
 		m_pConstantBufferData = std::make_unique<char[]>(size);
 		m_constBufferSize = size;
 	}
@@ -61,13 +62,17 @@ namespace crystal
 
 	void DX11ShaderProgram::Apply()
 	{
-		// Map const buffer data to GPU
 		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
-		D3D11_MAPPED_SUBRESOURCE mappedData;
-		HR(context->Map(m_pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-		memcpy_s(mappedData.pData, m_constBufferSize, &m_pConstantBufferData[0], m_constBufferSize);
-		context->Unmap(m_pConstantBuffer.Get(), 0);
-		m_constBufferDirty = false;
+
+		// Map const buffer data to GPU
+		if (m_constBufferDirty)
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedData;
+			HR(context->Map(m_pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+			memcpy_s(mappedData.pData, m_constBufferSize, &m_pConstantBufferData[0], m_constBufferSize);
+			context->Unmap(m_pConstantBuffer.Get(), 0);
+			m_constBufferDirty = false;
+		}
 
 		for (auto& shader : m_shaders)
 		{
@@ -83,6 +88,7 @@ namespace crystal
 			}
 		}
 	}
+
 	void DX11ShaderProgram::SetUniform1f(const std::string& name, float value)
 	{
 		auto iter = m_uniformMap.find(name);
@@ -90,7 +96,7 @@ namespace crystal
 		{
 			throw std::exception("Cannot find uniform variable");
 		}
-		memcpy(&m_pConstantBufferData[iter->second], &value, sizeof(float));
+		memcpy_s(&m_pConstantBufferData[iter->second], sizeof(float), &value, sizeof(float));
 		m_constBufferDirty = true;
 	}
 }

@@ -8,6 +8,7 @@ namespace crystal
 	{
 		_gameWindow = std::make_unique<Win32GameWindow>(args, GetModuleHandle(NULL));
 		m_dx11GraphicsDevice = std::make_unique<DX11GraphicsDevice>(args, ptr(_gameWindow));
+		InitDX11Commons();
 	}
 
 	DX11Provider::~DX11Provider()

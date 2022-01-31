@@ -2,6 +2,7 @@
 cbuffer ConstantBuffer : register(b0)
 {
 	float uLuminance;
+	float uBase;
 }
 
 struct VertexIn
@@ -27,5 +28,5 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_Target
 {
-	return pIn.color * uLuminance;
+	return uBase + pIn.color;
 }

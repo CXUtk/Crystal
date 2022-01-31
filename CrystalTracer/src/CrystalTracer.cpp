@@ -89,6 +89,7 @@ namespace tracer
 			| crystal::ClearOptions::Depth,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 		m_pShader->SetUniform1f("uLuminance", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
+		m_pShader->SetUniform1f("uBase", 1.0f);
 		m_pShader->Apply();
 		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
 	}

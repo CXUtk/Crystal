@@ -49,7 +49,7 @@ namespace crystal
 		std::unique_ptr<char[]>					m_pConstantBufferData{};
 		std::map<std::string, size_t>			m_uniformMap{};
 
-		bool	m_constBufferDirty = false;
+		bool	m_constBufferDirty = true;
 		size_t	m_constBufferSize = 0;
 	};
 }

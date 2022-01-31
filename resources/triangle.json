@@ -6,6 +6,10 @@
     {
       "name": "uLuminance",
       "type": "float"
+    },
+    {
+      "name": "uBase",
+      "type": "float"
     }
   ]
 }

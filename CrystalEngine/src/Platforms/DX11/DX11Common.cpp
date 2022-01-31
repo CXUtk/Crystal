@@ -183,7 +183,12 @@ namespace crystal
 
 	ComponentFormat StringToComponentFormatConvert(const std::string& type)
 	{
-		return StringToComponentFormatMapping[type];
+		auto iter = StringToComponentFormatMapping.find(type);
+		if (iter == StringToComponentFormatMapping.end())
+		{
+			throw std::exception("Unknown data type");
+		}
+		return iter->second;
 	}
 
 	size_t ComponentFormatToSizeConvert(ComponentFormat format)
