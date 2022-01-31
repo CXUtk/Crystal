@@ -1,5 +1,6 @@
 #include "DX11Common.h"
 #include <array>
+#include <map>
 
 namespace crystal
 {
@@ -23,9 +24,11 @@ namespace crystal
 	constexpr std::array<D3D11_USAGE, N> GenerateBufferUsageToDX11Mapping()
 	{
 		std::array<D3D11_USAGE, N> M{};
-		M[(int)BufferUsage::GPU_DYNAMIC_DRAW] = D3D11_USAGE_DEFAULT;
-		M[(int)BufferUsage::IMMUTABLE_DRAW] = D3D11_USAGE_IMMUTABLE;
-		M[(int)BufferUsage::CPU_DYNAMIC_DRAW] = D3D11_USAGE_DYNAMIC;
+		M[(int)BufferUsage::Default] = D3D11_USAGE_DEFAULT;
+		M[(int)BufferUsage::Immutable] = D3D11_USAGE_IMMUTABLE;
+		M[(int)BufferUsage::CPURead] = D3D11_USAGE_DYNAMIC;
+		M[(int)BufferUsage::CPUWrite] = D3D11_USAGE_DYNAMIC;
+		M[(int)BufferUsage::CPURWrite] = D3D11_USAGE_DYNAMIC;
 		return M;
 	}
 	constexpr auto BufferUsageToDX11Mapping = GenerateBufferUsageToDX11Mapping<(size_t)BufferUsage::__COUNT>();
@@ -44,6 +47,21 @@ namespace crystal
 		return M;
 	}
 	constexpr auto VertexElementFormatToShaderVarMapping = GenerateVertexElementFormatToShaderVarMapping<(size_t)VertexElementFormat::__COUNT>();
+
+	template<size_t N>
+	constexpr std::array<DXGI_FORMAT, N> GenerateDataFormatToShaderVarMapping()
+	{
+		std::array<DXGI_FORMAT, N> M{};
+		M[(int)DataFormat::Byte8] = DXGI_FORMAT::DXGI_FORMAT_R8_UINT;
+		M[(int)DataFormat::SByte8] = DXGI_FORMAT::DXGI_FORMAT_R8_SINT;
+		M[(int)DataFormat::UShort16] = DXGI_FORMAT::DXGI_FORMAT_R16_UINT;
+		M[(int)DataFormat::Short16] = DXGI_FORMAT::DXGI_FORMAT_R16_SINT;
+		M[(int)DataFormat::UInt32] = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
+		M[(int)DataFormat::Int32] = DXGI_FORMAT::DXGI_FORMAT_R32_SINT;		
+		M[(int)DataFormat::Float32] = DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT;
+		return M;
+	}
+	constexpr auto DataFormatMapping = GenerateDataFormatToShaderVarMapping<(size_t)DataFormat::__COUNT>();
 
 	template<size_t N>
 	constexpr std::array<const char*, N> GenerateShaderTypeToModelStringMapping()
@@ -82,6 +100,52 @@ namespace crystal
 	}
 	constexpr auto PrimititveTopologyMapping = GeneratePrimititveTopologyMapping<(size_t)PrimitiveType::__COUNT>();
 
+	template<size_t N>
+	constexpr std::array<size_t, N> GenerateComponentFormatToSizeMapping()
+	{
+		std::array<size_t, N> M{};
+		M[(int)ComponentFormat::Int] = sizeof(int);
+		M[(int)ComponentFormat::Single] = sizeof(float);
+		M[(int)ComponentFormat::Vector2f] = 2 * sizeof(float);
+		M[(int)ComponentFormat::Vector2i] = 2 * sizeof(int);
+		M[(int)ComponentFormat::Vector3f] = 3 * sizeof(float);
+		M[(int)ComponentFormat::Vector3i] = 3 * sizeof(int);
+		M[(int)ComponentFormat::Vector4f] = 4 * sizeof(float);
+		M[(int)ComponentFormat::Vector4i] = 4 * sizeof(int);
+		M[(int)ComponentFormat::Mat2f] = 4 * sizeof(float);
+		M[(int)ComponentFormat::Mat3f] = 9 * sizeof(float);
+		M[(int)ComponentFormat::Mat4f] = 16 * sizeof(float);
+		return M;
+	}
+	constexpr auto ComponentFormatToSizeMapping = GenerateComponentFormatToSizeMapping<(size_t)ComponentFormat::__COUNT>();
+
+	std::map<std::string, ComponentFormat> StringToComponentFormatMapping;
+	void GenerateStringToComponentFormatMapping()
+	{
+		StringToComponentFormatMapping["float"] = ComponentFormat::Single;
+		StringToComponentFormatMapping["vec2"] = ComponentFormat::Vector2f;
+		StringToComponentFormatMapping["vec3"] = ComponentFormat::Vector3f;
+		StringToComponentFormatMapping["vec4"] = ComponentFormat::Vector4f;
+		StringToComponentFormatMapping["int"] = ComponentFormat::Int;
+		StringToComponentFormatMapping["ivec2"] = ComponentFormat::Vector2i;
+		StringToComponentFormatMapping["ivec3"] = ComponentFormat::Vector3i;
+		StringToComponentFormatMapping["ivec4"] = ComponentFormat::Vector4i;
+		StringToComponentFormatMapping["mat2"] = ComponentFormat::Mat2f;
+		StringToComponentFormatMapping["mat3"] = ComponentFormat::Mat3f;
+		StringToComponentFormatMapping["mat4"] = ComponentFormat::Mat4f;
+	}
+
+	void InitDX11Commons()
+	{
+		static bool initialized = false;
+		if (initialized) return;
+		{
+			GenerateStringToComponentFormatMapping();
+		}
+		initialized = true;
+	}
+
+
 	const char* VertexElementFormatToShaderVarConvert(VertexElementFormat format)
 	{
 		return VertexElementFormatToShaderVarMapping[(int)format];
@@ -90,6 +154,11 @@ namespace crystal
 	DXGI_FORMAT VertexElementFormatConvert(VertexElementFormat format)
 	{
 		return VertexElementFormatMapping[(int)format];
+	}
+
+	DXGI_FORMAT DataFormatConvert(DataFormat format)
+	{
+		return DataFormatMapping[(int)format];
 	}
 
 	D3D11_USAGE BufferUsageToDX11Convert(BufferUsage usage)
@@ -110,6 +179,16 @@ namespace crystal
 	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type)
 	{
 		return PrimititveTopologyMapping[(int)type];
+	}
+
+	ComponentFormat StringToComponentFormatConvert(const std::string& type)
+	{
+		return StringToComponentFormatMapping[type];
+	}
+
+	size_t ComponentFormatToSizeConvert(ComponentFormat format)
+	{
+		return ComponentFormatToSizeMapping[(int)format];
 	}
 
 }

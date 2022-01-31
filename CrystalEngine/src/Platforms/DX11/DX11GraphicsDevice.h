@@ -16,18 +16,24 @@ namespace crystal
 		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) override;
 		virtual void Present() override;
 		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) override;
+		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices,
+			size_t indexOffset, size_t vertexOffset) override;
 
-		virtual std::shared_ptr<IVertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) override;
+		virtual std::shared_ptr<IVertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc,
+			void* src, size_t size) override;
+		virtual std::shared_ptr<IIndexBuffer> CreateIndexBuffer(const IndexBufferDescription& desc,
+			void* src, size_t size) override;
 		virtual std::shared_ptr<IVertexShader> CreateVertexShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) override;
 		virtual std::shared_ptr<IFragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) override;
-		virtual std::shared_ptr<IShaderProgram> CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader,
-			std::shared_ptr<IFragmentShader> fragmentShader) override;
+		virtual std::shared_ptr<IShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
 
 	
 		ComPtr<ID3D11Device> GetD3DDevice() const { return m_pd3dDevice; }
 		ComPtr<ID3D11DeviceContext> GetD3DDeviceContext() const { return m_pd3dImmediateContext; }
+		ComPtr<ID3D11Buffer> CreateBuffer(void* src, size_t size,
+			BufferUsage usage, UINT bindFlags);
 	private:
 		ComPtr<ID3D11Device> m_pd3dDevice;						// D3D11设备
 		ComPtr<ID3D11DeviceContext> m_pd3dImmediateContext;		// D3D11设备上下文
@@ -46,6 +52,7 @@ namespace crystal
 
 		bool m_initD3DX11();
 		void m_resizeBuffer();
-		ComPtr<ID3DBlob> m_getShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type);
+		ComPtr<ID3DBlob> m_getShaderBlobFromMemory(const char* src, size_t size, 
+			const std::string& name, const std::string& entryPoint, ShaderType type);
 	};
 }

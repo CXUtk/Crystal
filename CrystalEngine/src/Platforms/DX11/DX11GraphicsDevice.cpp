@@ -3,8 +3,11 @@
 #include "dxTrace.h"
 #include "DX11VertexBuffer.h"
 #include "DX11Shaders.h"
+#include "DX11IndexBuffer.h"
 
 #include <Core/InitArgs.h>
+#include <Core/Utils/Misc.h>
+#include <SJson/SJson.h>
 
 namespace crystal
 {
@@ -47,22 +50,17 @@ namespace crystal
 
 	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
 	{
-		// …Ë÷√∂•µ„ª∫≥Â«¯√Ë ˆ
-		D3D11_BUFFER_DESC vbd;
-		ZeroMemory(&vbd, sizeof(vbd));
-		vbd.Usage = BufferUsageToDX11Convert(desc.Usage);
-		vbd.ByteWidth = size;
-		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vbd.CPUAccessFlags = 0;
-
-		D3D11_SUBRESOURCE_DATA initData;
-		ZeroMemory(&initData, sizeof(initData));
-		initData.pSysMem = src;
-
-		ComPtr<ID3D11Buffer> vertexBuffer;
-		HR(m_pd3dDevice->CreateBuffer(&vbd, &initData, vertexBuffer.GetAddressOf()));
+		ComPtr<ID3D11Buffer> vertexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_VERTEX_BUFFER);
 		d3dUtils::D3D11SetDebugObjectName(vertexBuffer.Get(), "VertexBuffer");
 		return std::make_shared<DX11VertexBuffer>(this, vertexBuffer);
+	}
+
+	std::shared_ptr<IIndexBuffer> DX11GraphicsDevice::CreateIndexBuffer(const IndexBufferDescription& desc, 
+		void* src, size_t size)
+	{
+		ComPtr<ID3D11Buffer> indexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_INDEX_BUFFER);
+		d3dUtils::D3D11SetDebugObjectName(indexBuffer.Get(), "IndexBuffer");
+		return std::make_shared<DX11IndexBuffer>(this, indexBuffer, DataFormatConvert(desc.Format));
 	}
 
 	std::shared_ptr<IVertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
@@ -83,9 +81,56 @@ namespace crystal
 		return std::make_shared<DX11FragmentShader>(this, pPixelShader);
 	}
 
-	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader, std::shared_ptr<IFragmentShader> fragmentShader)
+
+	std::string GetDirectoryPath(const std::string& path)
 	{
-		return std::make_shared<DX11ShaderProgram>(vertexShader, fragmentShader);
+		auto last_slash_idx = path.rfind('\\');
+		if (std::string::npos != last_slash_idx)
+		{
+			return path.substr(0, last_slash_idx);
+		}
+		last_slash_idx = path.rfind('/');
+		if (std::string::npos != last_slash_idx)
+		{
+			return path.substr(0, last_slash_idx);
+		}
+		throw std::exception("Invalid file path");
+	}
+
+
+
+	UniformVariable ParseUniformVariable(const std::string& name, const std::string& type)
+	{
+		UniformVariable varb;
+		varb.Name = name;
+		varb.Format = StringToComponentFormatConvert(type);
+		return varb;
+	}
+
+	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
+	{
+		auto source = ReadAllStringFromFile(path);
+		auto root = SJson::SJsonParse(source);
+		auto dx11Src = root->GetMember("dx11Src");
+		auto directory = GetDirectoryPath(path);
+
+		auto filePath = directory + "/" + dx11Src->GetString();
+		auto shaderSrc = ReadAllStringFromFile(filePath);
+
+		UniformVariableCollection variables;
+		auto uniforms = root->GetMember("uniforms");
+		uniforms->ForEachElements([&variables](const SJson::SJsonNode* node)
+		{
+			UniformVariable variable = ParseUniformVariable(node->GetMember("name")->GetString(),
+				node->GetMember("type")->GetString());
+			variables.Add(variable);
+		});
+		auto vs = this->CreateVertexShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(), 
+			dx11Src->GetString(), root->GetMember("vsEntry")->GetString());
+		auto fs = this->CreateFragmentShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(),
+			dx11Src->GetString(), root->GetMember("fsEntry")->GetString());
+
+		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
 	}
 
 	void DX11GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
@@ -93,6 +138,13 @@ namespace crystal
 		m_pd3dImmediateContext->IASetPrimitiveTopology(PrimitiveTypeToTopologyConvert(primitiveType));
 		m_pd3dImmediateContext->Draw(numVertices, offset);
 	}
+
+	void DX11GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices, size_t indexOffset, size_t vertexOffset)
+	{
+		m_pd3dImmediateContext->IASetPrimitiveTopology(PrimitiveTypeToTopologyConvert(primitiveType));
+		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
+	}
+
 
 	bool DX11GraphicsDevice::m_initD3DX11()
 	{
@@ -271,11 +323,41 @@ namespace crystal
 		d3dUtils::D3D11SetDebugObjectName(m_pRenderTargetView.Get(), "BackBufferRTV[0]");
 	}
 
-
 	ComPtr<ID3DBlob> DX11GraphicsDevice::m_getShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type)
 	{
 		ComPtr<ID3DBlob> pBlob = nullptr;
 		HR(d3dUtils::CreateShaderFromMemory(src, size, name.c_str(), entryPoint.c_str(), ShaderModelConvert(type), pBlob.GetAddressOf()));
 		return pBlob;
+	}
+
+	ComPtr<ID3D11Buffer> DX11GraphicsDevice::CreateBuffer(void* src, size_t size, BufferUsage usage, UINT bindFlags)
+	{
+		D3D11_BUFFER_DESC vbd;
+		ZeroMemory(&vbd, sizeof(vbd));
+		vbd.Usage = BufferUsageToDX11Convert(usage);
+		vbd.ByteWidth = size;
+		vbd.BindFlags = bindFlags;
+		vbd.CPUAccessFlags = 0;
+
+		if (usage == BufferUsage::CPURead)
+		{
+			vbd.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ;
+		}
+		else if (usage == BufferUsage::CPUWrite)
+		{
+			vbd.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
+		}
+		else if (usage == BufferUsage::CPURWrite)
+		{
+			vbd.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
+		}
+
+		D3D11_SUBRESOURCE_DATA initData;
+		ZeroMemory(&initData, sizeof(initData));
+		initData.pSysMem = src;
+
+		ComPtr<ID3D11Buffer> pBuffer;
+		HR(m_pd3dDevice->CreateBuffer(&vbd, src ? &initData : nullptr, pBuffer.GetAddressOf()));
+		return pBuffer;
 	}
 }

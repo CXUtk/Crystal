@@ -13,24 +13,46 @@ namespace crystal
 	template<typename T>
 	inline float* value_ptr(T x) { return glm::value_ptr(x); }
 
-	enum class VertexDataType
+	enum class DataFormat
 	{
-		FLOAT,
-		INT,
-		UNSIGNED_INT,
-		SHORT,
-		UNSIGNED_SHORT,
-		BYTE,
-		UNSIGNED_BYTE,
+		Float32,
+		Int32,
+		UInt32,
+		Short16,
+		UShort16,
+		Byte8,
+		SByte8,
 
 		__COUNT
 	};
 
+	enum class ComponentFormat
+	{
+		Single,
+		Vector2f,
+		Vector3f,
+		Vector4f,
+
+		Int,
+		Vector2i,
+		Vector3i,
+		Vector4i,
+
+		Mat2f,
+		Mat3f,
+		Mat4f,
+
+		__COUNT
+	};
+
+
 	enum class BufferUsage
 	{
-		GPU_DYNAMIC_DRAW,
-		IMMUTABLE_DRAW,
-		CPU_DYNAMIC_DRAW,
+		Default,
+		Immutable,
+		CPUWrite,
+		CPURead,
+		CPURWrite,
 
 		__COUNT
 	};
@@ -168,8 +190,8 @@ namespace crystal
 		Vector4,
 
 		R8_UINT,
+		R8G8B8A8_UINT, 
 		R32G32B32_UINT,
-		R8G8B8A8_UINT,
 
 		__COUNT
 	};
@@ -203,6 +225,12 @@ namespace crystal
 		BufferUsage	Usage;
 	};
 
+	struct IndexBufferDescription
+	{
+		BufferUsage	Usage;
+		DataFormat	Format;
+	};
+
 	struct ElementDescription
 	{
 		SemanticType		Semantic;
@@ -234,5 +262,18 @@ namespace crystal
 
 		std::vector<ElementDescription> Elements{};
 		size_t Stride = 0;
+	};
+
+	struct UniformVariable
+	{
+		std::string		Name;
+		ComponentFormat	Format;
+	};
+
+	struct UniformVariableCollection
+	{
+		void Add(const UniformVariable& var) { Variables.push_back(var); }
+		void Clear() { Variables.clear(); }
+		std::vector<UniformVariable> Variables;
 	};
 }

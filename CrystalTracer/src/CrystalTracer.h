@@ -21,5 +21,6 @@ namespace tracer
 
 	private:
 		bool m_renderPause = false;
+		std::shared_ptr<crystal::IShaderProgram> m_pShader = nullptr;
 	};
 }

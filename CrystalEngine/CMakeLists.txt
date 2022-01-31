@@ -62,6 +62,8 @@ endif()
 
 
 # 操作系统和图形接口判定
+add_subdirectory("external/SJson")
+target_link_libraries(CrystalEngine PRIVATE SJson)
 
 if (CRYSTAL_USE_GLFW)
 	add_compile_definitions(CRYSTAL_USE_GLFW)
@@ -81,15 +83,13 @@ if (CRYSTAL_USE_GLFW)
     add_subdirectory("external/glad")
     find_package(OpenGL REQUIRED)
     target_link_libraries(CrystalEngine PRIVATE OpenGL::GL)
-    target_link_libraries(CrystalEngine PRIVATE glad SJson)
+    target_link_libraries(CrystalEngine PRIVATE glad)
 endif()
 
 if (CRYSTAL_USE_DX11)
 	add_compile_definitions(CRYSTAL_USE_DX11)
     target_link_libraries(CrystalEngine PRIVATE d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib d2d1.lib dwrite.lib winmm.lib)
 endif()
-
-add_subdirectory("external/SJson")
 
 target_include_directories(CrystalEngine SYSTEM PUBLIC "external")
 target_include_directories(CrystalEngine SYSTEM PUBLIC "src")

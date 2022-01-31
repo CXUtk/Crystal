@@ -1,0 +1,11 @@
+{
+  "dx11Src": "triangle.hlsl",
+  "vsEntry": "VS",
+  "fsEntry": "PS",
+  "uniforms": [
+    {
+      "name": "uLuminance",
+      "type": "float"
+    }
+  ]
+}

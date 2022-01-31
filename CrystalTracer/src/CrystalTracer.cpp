@@ -38,6 +38,10 @@ namespace tracer
 			{ Vector3f(0.5f, -0.5f, 0.5f), Vector4f(0.0f, 0.0f, 1.0f, 1.0f) },
 			{ Vector3f(-0.5f, -0.5f, 0.5f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
 		};
+		int indices[] = 
+		{
+			0, 1, 2
+		};
 		std::vector<ElementDescription> elements = {
 			{ SemanticType::POSITION, 0, VertexElementFormat::Vector3, 0 },
 			{ SemanticType::COLOR, 0, VertexElementFormat::Vector4, 12 },
@@ -46,19 +50,18 @@ namespace tracer
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
 
 		VertexBufferDescription bufferDesc{};
-		bufferDesc.Usage = BufferUsage::IMMUTABLE_DRAW;
+		bufferDesc.Usage = BufferUsage::Immutable;
+		IndexBufferDescription ibufferDesc{};
+		ibufferDesc.Usage = BufferUsage::Immutable;
+		ibufferDesc.Format = DataFormat::UInt32;
 		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, vertices, sizeof(vertices));
+		auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, indices, sizeof(indices));
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		vertexBuffer->Bind(0);
+		indexBuffer->Bind(0);
 
-		auto content = ReadAllStringFromFile("resources/triangle.hlsl");
-		std::shared_ptr<IVertexShader> vertexShader = graphicsDevice->CreateVertexShaderFromMemory(
-			content.c_str(), content.size(), "triangle", "VS");
-		std::shared_ptr<IFragmentShader> fragmentShader = graphicsDevice->CreateFragmentShaderFromMemory(
-			content.c_str(), content.size(), "triangle", "PS");
-		auto shaderProgram = graphicsDevice->CreateShaderProgram(vertexShader, fragmentShader);
-		shaderProgram->Apply();
+		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/triangle.json");
 	}
 
 
@@ -85,7 +88,9 @@ namespace tracer
 			| crystal::ClearOptions::Stencil
 			| crystal::ClearOptions::Depth,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-		graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
+		m_pShader->SetUniform1f("uLuminance", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
+		m_pShader->Apply();
+		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
 	}
 	void CrystalTracer::Exit()
 	{
