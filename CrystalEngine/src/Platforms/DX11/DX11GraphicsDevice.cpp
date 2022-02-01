@@ -18,7 +18,6 @@ namespace crystal
 	{
 		if (!m_initD3DX11())
 		{
-			glm::toMat4
 			throw std::exception("[DX11GraphicsDevice::DX11GraphicsDevice] Unable to start Dx11");
 		}
 	}
