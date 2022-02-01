@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <CrystalEngine/src/Core/Application.h>
 #include <CrystalEngine/src/Engine.h>
+#include "Camera.h"
+
 namespace tracer
 {
 	class CrystalTracer : public crystal::Application
@@ -22,5 +24,6 @@ namespace tracer
 	private:
 		bool m_renderPause = false;
 		std::shared_ptr<crystal::IShaderProgram> m_pShader = nullptr;
+		std::shared_ptr<Camera> m_pCamera = nullptr;
 	};
 }

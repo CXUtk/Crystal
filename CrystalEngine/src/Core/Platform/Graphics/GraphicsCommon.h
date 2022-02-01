@@ -3,15 +3,23 @@
 #include <vector>
 #include <string>
 #include <glm/gtc/type_ptr.hpp>
+#include <Core/Utils/Geometry.h>
 
 namespace crystal
 {
 	using Spectrum = glm::vec3;
 	using Color3f = glm::vec3;
 	using Color4f = glm::vec4;
+	using Matrix2f = glm::mat2;
+	using Matrix3f = glm::mat3;
+	using Matrix4f = glm::mat4;
 
 	template<typename T>
-	inline float* value_ptr(T x) { return glm::value_ptr(x); }
+	inline float* crystal_value_ptr(T x) { return glm::value_ptr(x); }
+
+	// Graphics API dependent
+	Matrix4f crystal_look_at(const Point3f& eye, const Point3f& center, const Vector3f& up);
+	Matrix4f crystal_perspective(Float fovY, Float aspectRatio, Float zNear, Float zFar);
 
 	enum class DataFormat
 	{

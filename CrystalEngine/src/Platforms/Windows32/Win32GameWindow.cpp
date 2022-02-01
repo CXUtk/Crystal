@@ -133,9 +133,6 @@ namespace crystal
 		m_eventOnMouseScroll.Invoke(offset);
 	}
 
-	void Win32GameWindow::mouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam)
-	{}
-
 	constexpr size_t MAX_KEYS = 512;
 	template<size_t N>
 	constexpr std::array<KeyCode, N> generateKeyCodeMapper()
@@ -218,6 +215,51 @@ namespace crystal
 		if (GetKeyState(VK_NUMLOCK) & 1)
 			mods |= KeyMODState::CRYSTAL_MOD_SHIFT;
 		return (KeyMODState)mods;
+	}
+
+	void Win32GameWindow::mouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		MouseButtonCode button;
+		InputAction action;
+
+		if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP)
+			button = MouseButtonCode::LEFT_BUTTON;
+		else if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP)
+			button = MouseButtonCode::RIGHT_BUTTON;
+		else if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP)
+			button = MouseButtonCode::MIDDLE_BUTTON;
+		else if (GET_XBUTTON_WPARAM(wParam) == XBUTTON1)
+			button = MouseButtonCode::X_BUTTON;
+		else
+			button = MouseButtonCode::X_BUTTON;
+
+		if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN ||
+			msg == WM_MBUTTONDOWN || msg == WM_XBUTTONDOWN)
+		{
+			action = InputAction::PRESS;
+		}
+		else
+		{
+			action = InputAction::RELEASE;
+		}
+
+		// 鼠标按下后就一直捕获窗口
+		if (!m_mouseDowned.any() && action == InputAction::PRESS)
+		{
+			SetCapture(m_hMainWnd);
+		}
+
+		m_mouseDowned[(int)button] = (action == InputAction::PRESS);
+		MouseButtonEventArgs args;
+		args.Action = action;
+		args.ButtonCode = button;
+		args.Mods = getKeyMods();
+		m_eventOnMouseButtonChange.Invoke(args);
+
+		if (!m_mouseDowned.any() && action == InputAction::RELEASE)
+		{
+			ReleaseCapture();
+		}
 	}
 
 	void Win32GameWindow::keyChange(UINT msg, WPARAM wParam, LPARAM lParam)
@@ -356,12 +398,16 @@ namespace crystal
 			return 0;
 
 		case WM_LBUTTONDOWN:
-		case WM_MBUTTONDOWN:
 		case WM_RBUTTONDOWN:
-			return 0;
+		case WM_MBUTTONDOWN:
+		case WM_XBUTTONDOWN:
 		case WM_LBUTTONUP:
-		case WM_MBUTTONUP:
 		case WM_RBUTTONUP:
+		case WM_MBUTTONUP:
+		case WM_XBUTTONUP:
+		{
+			mouseButtonChange(msg, wParam, lParam);
+		}
 			return 0;
 		case WM_MOUSEMOVE:
 		{

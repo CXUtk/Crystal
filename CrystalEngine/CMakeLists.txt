@@ -41,26 +41,6 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 
-option(CRYSTAL_USE_GLFW "Use GLFW for platform" OFF)
-option(CRYSTAL_USE_DX11 "Use DX11 for platform" ON)
-option(CRYSTAL_USE_DEBUG "Enable debug infomation and outputs" ON)
-
-
-if (UNIX)
-	add_compile_definitions(CRYSTAL_USE_UNIX)
-elseif(WIN32)
-	add_compile_definitions(CRYSTAL_USE_WIN32)
-else()
-	message("Unsupported operating system")
-endif()
-
-add_compile_definitions(CRYSTAL_USE_FLOAT32)
-
-if (CRYSTAL_USE_DEBUG)
-    add_compile_definitions(CRYSTAL_USE_DEBUG)
-endif()
-
-
 # 操作系统和图形接口判定
 add_subdirectory("external/SJson")
 target_link_libraries(CrystalEngine PRIVATE SJson)

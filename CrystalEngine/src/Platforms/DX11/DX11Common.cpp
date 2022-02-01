@@ -1,9 +1,20 @@
 #include "DX11Common.h"
 #include <array>
 #include <map>
+#include <Core/Platform/Graphics/GraphicsCommon.h>
+#include <Core/Utils/Geometry.h>
 
 namespace crystal
 {
+
+	Matrix4f crystal_look_at(const Point3f& eye, const Point3f& center, const Vector3f& up)
+	{
+		return glm::lookAtLH(eye, center, up);
+	}
+	Matrix4f crystal_perspective(Float fovY, Float aspectRatio, Float zNear, Float zFar)
+	{
+		return glm::perspectiveLH_ZO(fovY, aspectRatio, zNear, zFar);
+	}
 
 	template<size_t N>
 	constexpr std::array<DXGI_FORMAT, N> GenerateVertexElementFormatMapping()

@@ -6,14 +6,13 @@ namespace crystal
 {
 	using Float32 = float;
 	using Float64 = double;
-#ifdef CRYSTAL_USE_FLOAT32
-	using Float = float;
-#else
+#ifdef CRYSTAL_USE_FLOAT64
 	using Float = double;
+#else
+	using Float = float;
 #endif
 
 	
-
 	// Core
 	class Engine;
 	class Application;

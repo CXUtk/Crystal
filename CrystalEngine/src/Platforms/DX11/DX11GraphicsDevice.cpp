@@ -4,6 +4,7 @@
 #include "DX11VertexBuffer.h"
 #include "DX11Shaders.h"
 #include "DX11IndexBuffer.h"
+#include "DX11ShaderProgram.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>

@@ -4,6 +4,7 @@
 
 #include <wrl/client.h>
 #include <string>
+#include <bitset>
 
 namespace crystal
 {
@@ -53,11 +54,12 @@ namespace crystal
 		std::string m_windowTitle{};				// ¥∞ÃÂ±ÍÃ‚
 		Vector2i	m_mousePos{};
 
-
 		OnResizeEvent				m_eventOnWindowResize;		// Event when framebuffer size needs to change
 		OnKeyChangeEvent			m_eventOnKeyChange;			// Keyboard event
 		OnMouseScrollEvent			m_eventOnMouseScroll;		// Mouse scroll event
 		OnMouseButtonChangeEvent	m_eventOnMouseButtonChange;	// Mouse button press event
+
+		std::bitset<10>				m_mouseDowned{};
 
 
 		bool initMainWindow();

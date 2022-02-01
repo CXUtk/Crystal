@@ -5,6 +5,22 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("CrystalTracer")
 
+option(CRYSTAL_USE_GLFW "Use GLFW for platform" OFF)
+option(CRYSTAL_USE_DX11 "Use DX11 for platform" ON)
+option(CRYSTAL_USE_DEBUG "Enable debug infomation and outputs" ON)
+
+
+if (UNIX)
+	add_compile_definitions(CRYSTAL_USE_UNIX)
+elseif(WIN32)
+	add_compile_definitions(CRYSTAL_USE_WIN32)
+else()
+	message("Unsupported operating system")
+endif()
+
+if (CRYSTAL_USE_DEBUG)
+    add_compile_definitions(CRYSTAL_USE_DEBUG)
+endif()
 
 # 包含子项目。
 add_subdirectory ("CrystalTracer")

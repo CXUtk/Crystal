@@ -15,6 +15,7 @@ namespace crystal
 	class DX11VertexShader;
 	class DX11FragmentShader;
 	class DX11VertexBuffer;
+	class DX11ShaderProgram;
 
 	void InitDX11Commons();
 

@@ -12,6 +12,7 @@ namespace crystal
 
 		window->AppendOnMouseButtonChangeEvent([this](MouseButtonEventArgs args) {
 			bool downed = (args.Action == InputAction::PRESS);
+			printf("%d\n", downed);
 			_curMouseButtonDown[(int)args.ButtonCode] = downed;
 		});
 

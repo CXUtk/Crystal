@@ -81,6 +81,7 @@ namespace crystal
 		LEFT_BUTTON,
 		RIGHT_BUTTON,
 		MIDDLE_BUTTON,
+		X_BUTTON,
 
 		__COUNT,
 	};

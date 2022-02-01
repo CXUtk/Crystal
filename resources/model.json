@@ -1,0 +1,19 @@
+{
+  "dx11Src": "model.hlsl",
+  "vsEntry": "VS",
+  "fsEntry": "PS",
+  "uniforms": [
+    {
+      "name": "M",
+      "type": "mat4"
+    },
+    {
+      "name": "MN",
+      "type": "mat4"
+    },
+    {
+      "name": "VP",
+      "type": "mat4"
+    }
+  ]
+}
