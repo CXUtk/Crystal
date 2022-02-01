@@ -1,4 +1,4 @@
-﻿#include "CrystalTracer.h"
+#include "CrystalTracer.h"
 #include <CrystalEngine/src/Engine.h>
 #include <CrystalEngine/src/Core/Platform/Platforms.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>

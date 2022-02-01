@@ -16,19 +16,19 @@ advanced computer graphics projects.
 
 ## Architecture
 ```
-©À©¤©¤ Crystal Engine          
-©¦   ©À©¤©¤ Core			   Platform indenpendent contents, rendering systems  
-|   |   ©À©¤©¤ Assets		   Resource managment
-©¦   ©¦   ©À©¤©¤ Platform	   Platform interfaces, graphics API interfaces  
-©¦   |   ©À©¤©¤ Input          Input controls
-©¦   |   ©À©¤©¤ Render         Rendering algorithms
-|   |   ©¸©¤©¤ Utils		   Utility functions, math, geometry, etc.
+â”œâ”€â”€ Crystal Engine          
+|   â”œâ”€â”€ Core			   Platform indenpendent contents, rendering systems  
+|   |   â”œâ”€â”€ Assets		   Resource managment
+|   |   â”œâ”€â”€ Platform	   Platform interfaces, graphics API interfaces  
+|   |   â”œâ”€â”€ Input          Input controls
+|   |   â”œâ”€â”€ Render         Rendering algorithms
+|   |   â””â”€â”€ Utils		   Utility functions, math, geometry, etc.
 |   |
-|   ©¸©¤©¤ Platforms          Platform dependent contents and implementations
-|       ©À©¤©¤ DX11           DX11 graphics interface related implementations
-|       ©À©¤©¤ GLFW		   GLFW subsystem
-|		©À©¤©¤ OpenGL		   OpenGL4.5 graphics interface related implementations
-|       ©¸©¤©¤ Win32		   Win32 operating system related contents
+|   â””â”€â”€ Platforms          Platform dependent contents and implementations
+|       â”œâ”€â”€ DX11           DX11 graphics interface related implementations
+|       â”œâ”€â”€ GLFW		   GLFW subsystem
+|		â”œâ”€â”€ OpenGL		   OpenGL4.5 graphics interface related implementations
+|       â””â”€â”€ Win32		   Win32 operating system related contents
 |
-©¸©¤©¤ resources			   Resources
+â””â”€â”€ resources			   Resources
 ```

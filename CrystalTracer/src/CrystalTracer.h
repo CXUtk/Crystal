@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <CrystalEngine/src/Core/Application.h>
 #include <CrystalEngine/src/Engine.h>
 #include "Camera.h"
