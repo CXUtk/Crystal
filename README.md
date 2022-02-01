@@ -27,7 +27,7 @@ advanced computer graphics projects.
 |   └── Platforms          Platform dependent contents and implementations
 |       ├── DX11           DX11 graphics interface related implementations
 |       ├── GLFW		   GLFW subsystem
-|		├── OpenGL		   OpenGL4.5 graphics interface related implementations
+|       ├── OpenGL		   OpenGL4.5 graphics interface related implementations
 |       └── Win32		   Win32 operating system related contents
 |
 └── resources			   Resources
