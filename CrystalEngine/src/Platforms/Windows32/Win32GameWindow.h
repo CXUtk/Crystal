@@ -38,20 +38,21 @@ namespace crystal
 			MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-		// Ê¹ÓÃÄ£°å±ğÃû(C++11)¼ò»¯ÀàĞÍÃû
+		// ä½¿ç”¨æ¨¡æ¿åˆ«å(C++11)ç®€åŒ–ç±»å‹å
 		template <class T>
 		using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-		HINSTANCE	m_hWindowInstance = nullptr;	// Ó¦ÓÃÊµÀı¾ä±ú
-		HWND		m_hMainWnd = nullptr;			// Ö÷´°¿Ú¾ä±ú
-		bool		m_AppPaused = false;			// Ó¦ÓÃÊÇ·ñÔİÍ£
-		bool		m_Minimized = false;			// Ó¦ÓÃÊÇ·ñ×îĞ¡»¯
-		bool		m_Maximized = false;			// Ó¦ÓÃÊÇ·ñ×î´ó»¯
-		bool		m_Resizing = false;				// ´°¿Ú´óĞ¡ÊÇ·ñ±ä»¯
+		HINSTANCE	m_hWindowInstance = nullptr;	// åº”ç”¨å®ä¾‹å¥æŸ„
+		HWND		m_hMainWnd = nullptr;			// ä¸»çª—å£å¥æŸ„
+		bool		m_AppPaused = false;			// åº”ç”¨æ˜¯å¦æš‚åœ
+		bool		m_Minimized = false;			// åº”ç”¨æ˜¯å¦æœ€å°åŒ–
+		bool		m_Maximized = false;			// åº”ç”¨æ˜¯å¦æœ€å¤§åŒ–
+		bool		m_Resizing = false;				// çª—å£å¤§å°æ˜¯å¦å˜åŒ–
 		bool		m_shouldClose = false;			// Window should close
 
-		Vector2i	m_windowSize{};					// ´°Ìå´óĞ¡
-		std::string m_windowTitle{};				// ´°Ìå±êÌâ
+		Vector2i	m_windowSize{};					// çª—ä½“å¤§å°
+		Vector2i	m_tmpWindowSize{};
+		std::string m_windowTitle{};				// çª—ä½“æ ‡é¢˜
 		Vector2i	m_mousePos{};
 
 		OnResizeEvent				m_eventOnWindowResize;		// Event when framebuffer size needs to change
@@ -59,15 +60,15 @@ namespace crystal
 		OnMouseScrollEvent			m_eventOnMouseScroll;		// Mouse scroll event
 		OnMouseButtonChangeEvent	m_eventOnMouseButtonChange;	// Mouse button press event
 
-		std::bitset<10>				m_mouseDowned{};
+		std::bitset<(int)MouseButtonCode::__COUNT>				m_mouseDowned{};
 
 
-		bool initMainWindow();
+		bool m_InitMainWindow();
 
 		LRESULT _msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		void resize();
-		void mouseScroll(Vector2f offset);
-		void mouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam);
-		void keyChange(UINT msg, WPARAM wParam, LPARAM lParam);
+		void m_Resize(Vector2i size);
+		void m_MouseScroll(Vector2f offset);
+		void m_MouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam);
+		void m_KeyChange(UINT msg, WPARAM wParam, LPARAM lParam);
 	};
 }

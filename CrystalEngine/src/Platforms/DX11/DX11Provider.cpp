@@ -6,8 +6,8 @@ namespace crystal
 {
 	DX11Provider::DX11Provider(const InitArgs& args)
 	{
-		_gameWindow = std::make_unique<Win32GameWindow>(args, GetModuleHandle(NULL));
-		m_dx11GraphicsDevice = std::make_unique<DX11GraphicsDevice>(args, ptr(_gameWindow));
+		m_gameWindow = std::make_unique<Win32GameWindow>(args, GetModuleHandle(NULL));
+		m_dx11GraphicsDevice = std::make_unique<DX11GraphicsDevice>(args, ptr(m_gameWindow));
 		InitDX11Commons();
 	}
 
@@ -16,7 +16,7 @@ namespace crystal
 
 	IGameWindow* DX11Provider::GetGameWindow() const
 	{
-		return ptr(_gameWindow);
+		return ptr(m_gameWindow);
 	}
 
 	IFileSystem* DX11Provider::GetFileSystem() const

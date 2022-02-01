@@ -35,20 +35,20 @@ namespace crystal
 		ComPtr<ID3D11Buffer> CreateBuffer(void* src, size_t size,
 			BufferUsage usage, UINT bindFlags);
 	private:
-		ComPtr<ID3D11Device> m_pd3dDevice;						// D3D11Éè±¸
-		ComPtr<ID3D11DeviceContext> m_pd3dImmediateContext;		// D3D11Éè±¸ÉÏÏÂÎÄ
-		ComPtr<IDXGISwapChain> m_pSwapChain;					// D3D11½»»»Á´
+		ComPtr<ID3D11Device> m_pd3dDevice;						// D3D11è®¾å¤‡
+		ComPtr<ID3D11DeviceContext> m_pd3dImmediateContext;		// D3D11è®¾å¤‡ä¸Šä¸‹æ–‡
+		ComPtr<IDXGISwapChain> m_pSwapChain;					// D3D11äº¤æ¢é“¾
 		ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;		// D3D11 Rendertarget view
 		ComPtr<ID3D11Texture2D> m_pDepthStencilBuffer;			// D3D11 Depth Stencil buffer
 		ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;		// D3D11 Depth Stencil buffer
-		D3D11_VIEWPORT m_ScreenViewport;						// ÊÓ¿Ú
+		D3D11_VIEWPORT m_ScreenViewport;						// è§†å£
 
-		bool		m_Enable4xMsaa = false;		// ÊÇ·ñ¿ªÆô4±¶¶àÖØ²ÉÑù
-		UINT		m_4xMsaaQuality = 1;		// MSAAÖ§³ÖµÄÖÊÁ¿µÈ¼¶
+		bool		m_Enable4xMsaa = false;		// æ˜¯å¦å¼€å¯4å€å¤šé‡é‡‡æ ·
+		UINT		m_4xMsaaQuality = 1;		// MSAAæ”¯æŒçš„è´¨é‡ç­‰çº§
 		Vector2i	m_oldClientSize{};			// History window size, used to detect change
 
 
-		Win32GameWindow*	m_pWindow;			// Win32 ´°Ìå¶ÔÏó
+		Win32GameWindow*	m_pWindow;			// Win32 çª—ä½“å¯¹è±¡
 
 		bool m_initD3DX11();
 		void m_resizeBuffer();

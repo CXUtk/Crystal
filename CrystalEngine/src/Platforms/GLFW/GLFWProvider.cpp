@@ -29,7 +29,7 @@ namespace crystal
 #endif
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFW construct");
 
-		_gameWindow = std::make_unique<GLFWGameWindow>(args);
+		m_gameWindow = std::make_unique<GLFWGameWindow>(args);
 
         // Initialize GLAD and configs
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -43,13 +43,13 @@ namespace crystal
 
 	GLFWProvider::~GLFWProvider()
 	{
-		_gameWindow.reset();
+		m_gameWindow.reset();
 		glfwTerminate();
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFW destruct");
 	}
 	IGameWindow* GLFWProvider::GetGameWindow() const
 	{
-		return ptr(_gameWindow);
+		return ptr(m_gameWindow);
 	}
 	IFileSystem* GLFWProvider::GetFileSystem() const
 	{

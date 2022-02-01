@@ -46,9 +46,9 @@ namespace crystal
 		void Start(std::unique_ptr<Application>&& application);
 
 	private:
-		std::unique_ptr<Application>			_application;
-		std::unique_ptr<IPlatformProvider>		_platformProvider;
-		std::unique_ptr<InputController>		_inputController;
+		std::unique_ptr<Application>			m_application;
+		std::unique_ptr<IPlatformProvider>		m_platformProvider;
+		std::unique_ptr<InputController>		m_inputController;
 
 		double		m_fpsCap;			// Maximum FPS
 		GameTimer	m_gameTimer;		// Game timer

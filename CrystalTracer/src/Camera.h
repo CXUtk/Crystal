@@ -1,6 +1,6 @@
 #pragma once
 #include <CrystalEngine/src/Crystal.h>
-#include <CrystalEngine/src/Core/Utils/Geometry.h>
+#include <CrystalEngine/src/Core/Utils/Math.h>
 #include <CrystalEngine/src/Core/Platform/Graphics/GraphicsCommon.h>
 
 using namespace crystal;

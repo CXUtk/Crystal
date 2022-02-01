@@ -22,7 +22,7 @@ namespace crystal
 
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
 
-        _platformProvider = PlatformFactory::GetPlatformProvider(args);
+        m_platformProvider = PlatformFactory::GetPlatformProvider(args);
     }
     
     Engine::~Engine()
@@ -32,29 +32,29 @@ namespace crystal
 
     IGameWindow* Engine::GetWindow() const
     {
-        return _platformProvider->GetGameWindow();
+        return m_platformProvider->GetGameWindow();
     }
 
     InputController* Engine::GetInputController() const
     {
-        return ptr(_inputController);
+        return ptr(m_inputController);
     }
     
     IGraphicsDevice* Engine::GetGraphicsDevice() const
     {
-        return _platformProvider->GetGraphicsDevice();
+        return m_platformProvider->GetGraphicsDevice();
     }
 
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
-        _application = std::move(application);
-        _application->SetEngine(this);
+        m_application = std::move(application);
+        m_application->SetEngine(this);
 
-        _application->Initialize();
+        m_application->Initialize();
 
         auto window = this->GetWindow();
         auto graphicsDevice = this->GetGraphicsDevice();
-        _inputController = std::make_unique<InputController>(window);
+        m_inputController = std::make_unique<InputController>(window);
 
         m_gameTimer.Start();
         double frameBeginTime = 0.0;
@@ -63,7 +63,7 @@ namespace crystal
             frameBeginTime = GameTimer::GetCurrentTime();
 
             m_gameTimer.Sample();
-            if (_application->Paused() || window->IsPaused())
+            if (m_application->Paused() || window->IsPaused())
             {
                 m_gameTimer.Stop();
             }
@@ -75,19 +75,19 @@ namespace crystal
 
             window->BeginFrame();
             {
-                _application->Update(m_gameTimer);
-                _application->Draw(m_gameTimer);
+                m_application->Update(m_gameTimer);
+                m_application->Draw(m_gameTimer);
                 graphicsDevice->Present();
             }
             window->EndFrame();
 
-            _inputController->SampleNewInput();
+            m_inputController->SampleNewInput();
             do
             {
                 window->PollEvents();
             } while (GameTimer::GetCurrentTime() - frameBeginTime < m_fpsCap);
         }
 
-        _application->Exit();
+        m_application->Exit();
     }
 }

@@ -29,7 +29,7 @@ namespace crystal
 		if (options & ClearOptions::Target)
 		{
 			m_pd3dImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(),
-				value_ptr(color));
+				crystal_value_ptr(color));
 		}
 
 		int clearFlag = 0;
@@ -156,7 +156,7 @@ namespace crystal
 #if defined(DEBUG) || defined(_DEBUG)  
 		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-		// Çı¶¯ÀàĞÍÊı×é
+		// é©±åŠ¨ç±»å‹æ•°ç»„
 		D3D_DRIVER_TYPE driverTypes[] =
 		{
 			D3D_DRIVER_TYPE_HARDWARE,
@@ -165,7 +165,7 @@ namespace crystal
 		};
 		UINT numDriverTypes = ARRAYSIZE(driverTypes);
 
-		// ÌØĞÔµÈ¼¶Êı×é
+		// ç‰¹æ€§ç­‰çº§æ•°ç»„
 		D3D_FEATURE_LEVEL featureLevels[1] = { D3D_FEATURE_LEVEL_11_0 };
 		UINT numFeatureLevels = 1;
 
@@ -183,14 +183,14 @@ namespace crystal
 			return false;
 		}
 
-		// ¼ì²âÊÇ·ñÖ§³ÖÌØĞÔµÈ¼¶11.0
+		// æ£€æµ‹æ˜¯å¦æ”¯æŒç‰¹æ€§ç­‰çº§11.0
 		if (curFeatureLevel != D3D_FEATURE_LEVEL_11_0 && curFeatureLevel != D3D_FEATURE_LEVEL_11_1)
 		{
 			MessageBox(0, "Direct3D Feature Level 11 unsupported.", 0, 0);
 			return false;
 		}
 
-		// ¼ì²â MSAAÖ§³ÖµÄÖÊÁ¿µÈ¼¶
+		// æ£€æµ‹ MSAAæ”¯æŒçš„è´¨é‡ç­‰çº§
 		m_pd3dDevice->CheckMultisampleQualityLevels(
 			DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_4xMsaaQuality);
 		assert(m_4xMsaaQuality > 0);
@@ -216,7 +216,7 @@ namespace crystal
 		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-		// ÊÇ·ñ¿ªÆô4±¶¶àÖØ²ÉÑù£¿
+		// æ˜¯å¦å¼€å¯4å€å¤šé‡é‡‡æ ·ï¼Ÿ
 		if (m_Enable4xMsaa)
 		{
 			sd.SampleDesc.Count = 4;
@@ -239,7 +239,7 @@ namespace crystal
 
 		dxgiFactory->MakeWindowAssociation(m_pWindow->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
-		// ÉèÖÃµ÷ÊÔ¶ÔÏóÃû
+		// è®¾ç½®è°ƒè¯•å¯¹è±¡å
 		d3dUtils::D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
 		d3dUtils::DXGISetDebugObjectName(m_pSwapChain.Get(), "SwapChain");
 

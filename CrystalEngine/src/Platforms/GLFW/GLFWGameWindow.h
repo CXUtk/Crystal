@@ -49,13 +49,13 @@ namespace crystal
 		friend void glfw_key_callback_function(GLFWwindow* window, int key, int scancode, int action, int mods);
 		friend void glfw_mousebutton_callback_function(GLFWwindow* window, int button, int action, int mods);
 
-		GLFWwindow*		_window = nullptr;
-		Vector2i		_windowSize{};
+		GLFWwindow*		m_window = nullptr;
+		Vector2i		m_windowSize{};
 
-		OnResizeEvent				_eventOnWindowResize;
-		OnKeyChangeEvent			_eventOnKeyChange;
-		OnMouseScrollEvent			_eventOnMouseScroll;
-		OnMouseButtonChangeEvent	_eventOnMouseButtonChange;
+		OnResizeEvent				m_eventOnWindowResize;
+		OnKeyChangeEvent			m_eventOnKeyChange;
+		OnMouseScrollEvent			m_eventOnMouseScroll;
+		OnMouseButtonChangeEvent	m_eventOnMouseButtonChange;
 
 
 		void _resize(Vector2i newSize);

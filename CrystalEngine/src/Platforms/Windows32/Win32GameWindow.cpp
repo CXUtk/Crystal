@@ -27,7 +27,7 @@ namespace crystal
 
 		m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 
-		if (!initMainWindow())
+		if (!m_InitMainWindow())
 		{
 			throw std::exception("[Win32GameWindow::Win32GameWindow] Unable to start Win32 window");
 		}
@@ -78,7 +78,7 @@ namespace crystal
 		m_eventOnKeyChange += eventHandler;
 	}
 
-	bool Win32GameWindow::initMainWindow()
+	bool Win32GameWindow::m_InitMainWindow()
 	{
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
@@ -123,12 +123,13 @@ namespace crystal
 		return true;
 	}
 
-	void Win32GameWindow::resize()
+	void Win32GameWindow::m_Resize(Vector2i size)
 	{
+		m_windowSize = size;
 		m_eventOnWindowResize.Invoke(m_windowSize);
 	}
 
-	void Win32GameWindow::mouseScroll(Vector2f offset)
+	void Win32GameWindow::m_MouseScroll(Vector2f offset)
 	{
 		m_eventOnMouseScroll.Invoke(offset);
 	}
@@ -217,7 +218,7 @@ namespace crystal
 		return (KeyMODState)mods;
 	}
 
-	void Win32GameWindow::mouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam)
+	void Win32GameWindow::m_MouseButtonChange(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		MouseButtonCode button;
 		InputAction action;
@@ -243,7 +244,7 @@ namespace crystal
 			action = InputAction::RELEASE;
 		}
 
-		// Êó±ê°´ÏÂºó¾ÍÒ»Ö±²¶»ñ´°¿Ú
+		// é¼ æ ‡æŒ‰ä¸‹åŽå°±ä¸€ç›´æ•èŽ·çª—å£
 		if (!m_mouseDowned.any() && action == InputAction::PRESS)
 		{
 			SetCapture(m_hMainWnd);
@@ -262,7 +263,7 @@ namespace crystal
 		}
 	}
 
-	void Win32GameWindow::keyChange(UINT msg, WPARAM wParam, LPARAM lParam)
+	void Win32GameWindow::m_KeyChange(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		const InputAction action = (HIWORD(lParam) & KF_UP) ? InputAction::RELEASE : InputAction::PRESS;
 		const KeyMODState mods = getKeyMods();
@@ -307,10 +308,8 @@ namespace crystal
 			// WM_SIZE is sent when the user resizes the window.  
 		case WM_SIZE:
 			// Save the new client area dimensions.
-			m_windowSize.x = LOWORD(lParam);
-			m_windowSize.y = HIWORD(lParam);
-
-			printf("%d, %d\n", m_windowSize.x, m_windowSize.y);
+			m_tmpWindowSize.x = LOWORD(lParam);
+			m_tmpWindowSize.y = HIWORD(lParam);
 
 			if (wParam == SIZE_MINIMIZED)
 			{
@@ -323,7 +322,7 @@ namespace crystal
 				m_AppPaused = false;
 				m_Minimized = false;
 				m_Maximized = true;
-				resize();
+				m_Resize(m_tmpWindowSize);
 			}
 			else if (wParam == SIZE_RESTORED)
 			{
@@ -332,7 +331,7 @@ namespace crystal
 				{
 					m_AppPaused = false;
 					m_Minimized = false;
-					resize();
+					m_Resize(m_tmpWindowSize);
 				}
 
 				// Restoring from maximized state?
@@ -340,7 +339,7 @@ namespace crystal
 				{
 					m_AppPaused = false;
 					m_Maximized = false;
-					resize();
+					m_Resize(m_tmpWindowSize);
 				}
 				else if (m_Resizing)
 				{
@@ -355,7 +354,7 @@ namespace crystal
 				}
 				else // API call such as SetWindowPos or m_pSwapChain->SetFullscreenState.
 				{
-					resize();
+					m_Resize(m_tmpWindowSize);
 				}
 
 			}
@@ -374,7 +373,7 @@ namespace crystal
 			m_AppPaused = false;
 			m_Resizing = false;
 			// m_Timer.Start();
-			resize();
+			m_Resize(m_tmpWindowSize);
 			return 0;
 
 			// WM_DESTROY is sent when the window is being destroyed.
@@ -406,7 +405,7 @@ namespace crystal
 		case WM_MBUTTONUP:
 		case WM_XBUTTONUP:
 		{
-			mouseButtonChange(msg, wParam, lParam);
+			m_MouseButtonChange(msg, wParam, lParam);
 		}
 			return 0;
 		case WM_MOUSEMOVE:
@@ -423,19 +422,19 @@ namespace crystal
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			keyChange(msg, wParam, lParam);
+			m_KeyChange(msg, wParam, lParam);
 			return 0;
 		}
 
 		case WM_MOUSEWHEEL:
 		{
-			mouseScroll(Vector2f(0.0, (SHORT)HIWORD(wParam) / (double)WHEEL_DELTA));
+			m_MouseScroll(Vector2f(0.0, (SHORT)HIWORD(wParam) / (double)WHEEL_DELTA));
 			return 0;
 		}
 
 		case WM_MOUSEHWHEEL:
 		{
-			mouseScroll(Vector2f(-(SHORT)HIWORD(wParam) / (double)WHEEL_DELTA, 0.0));
+			m_MouseScroll(Vector2f(-(SHORT)HIWORD(wParam) / (double)WHEEL_DELTA, 0.0));
 			return 0;
 		}
 		}

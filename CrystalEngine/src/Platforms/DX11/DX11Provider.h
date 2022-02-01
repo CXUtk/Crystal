@@ -20,7 +20,7 @@ namespace crystal
 		virtual IGraphicsDevice* GetGraphicsDevice() const override;
 
 	private:
-		std::unique_ptr<Win32GameWindow> _gameWindow;
+		std::unique_ptr<Win32GameWindow> m_gameWindow;
 		std::unique_ptr<DX11GraphicsDevice> m_dx11GraphicsDevice;
 	};
 }

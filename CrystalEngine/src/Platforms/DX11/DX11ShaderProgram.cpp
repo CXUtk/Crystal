@@ -81,7 +81,7 @@ namespace crystal
 			throw std::exception("Cannot find uniform variable");
 		}
 		memcpy_s(&m_pConstantBufferData[iter->second], sizeof(Matrix4f), 
-			value_ptr(glm::transpose(value)), sizeof(Matrix4f));
+			crystal_value_ptr(glm::transpose(value)), sizeof(Matrix4f));
 		m_constBufferDirty = true;
 	}
 }

@@ -16,7 +16,7 @@ namespace crystal
 		virtual IFileSystem* GetFileSystem() const override;
 
 	private:
-		std::unique_ptr<GLFWGameWindow> _gameWindow;
+		std::unique_ptr<GLFWGameWindow> m_gameWindow;
 		//std::unique_ptr<IFileSystem> _fileSystem;
 
 		void mountDebugErrorLog();

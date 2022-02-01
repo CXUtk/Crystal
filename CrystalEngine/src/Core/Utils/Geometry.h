@@ -1,5 +1,5 @@
 #pragma once
-#include <Crystal.h>
+#include "Math.h"
 
 namespace crystal
 {
@@ -18,15 +18,6 @@ namespace crystal
     using Bound2f = BoundingBox<2, Float, glm::qualifier::defaultp>;
     using Bound3i = BoundingBox<3, int, glm::qualifier::defaultp>;
     using Bound2i = BoundingBox<2, int, glm::qualifier::defaultp>;
-
-    using Point2f = glm::vec2;
-    using Point2i = glm::ivec2;
-    using Point3f = glm::vec3;
-    using Vector2i = glm::ivec2;
-    using Vector2f = glm::vec2;
-    using Vector3f = glm::vec3;
-    using Vector4f = glm::vec4;
-    using Normal3f = glm::vec3;
 
     template<glm::length_t L, typename T, glm::qualifier Q>
     class Ray
