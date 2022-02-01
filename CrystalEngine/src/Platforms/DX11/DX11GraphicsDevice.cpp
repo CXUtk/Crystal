@@ -9,6 +9,7 @@
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
 #include <SJson/SJson.h>
+#include <glm/gtx/quaternion.hpp>
 
 namespace crystal
 {
@@ -17,6 +18,7 @@ namespace crystal
 	{
 		if (!m_initD3DX11())
 		{
+			glm::toMat4
 			throw std::exception("[DX11GraphicsDevice::DX11GraphicsDevice] Unable to start Dx11");
 		}
 	}
