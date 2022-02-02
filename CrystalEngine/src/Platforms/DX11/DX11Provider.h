@@ -7,7 +7,6 @@
 namespace crystal
 {
 	class Win32GameWindow;
-	class DX11GraphicsDevice;
 
 	class DX11Provider : public IPlatformProvider
 	{

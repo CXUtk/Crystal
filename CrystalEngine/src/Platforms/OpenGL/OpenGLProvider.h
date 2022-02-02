@@ -1,23 +1,22 @@
 #pragma once
-#include <Core/Platform/Platforms.h>
-#include <Crystal.h>
-
+#include "OpenGLCommon.h"
 namespace crystal
 {
 	class GLFWGameWindow;
-
-	class GLFWProvider : public IPlatformProvider
+	class OpenGLProvider : public IPlatformProvider
 	{
 	public:
-		GLFWProvider(const InitArgs& args);
-		~GLFWProvider() override;
+		OpenGLProvider(const InitArgs& args);
+		~OpenGLProvider() override;
 
 		virtual IGameWindow* GetGameWindow() const override;
 		virtual IFileSystem* GetFileSystem() const override;
+		virtual IGraphicsDevice* GetGraphicsDevice() const override;
 
 	private:
 		std::unique_ptr<GLFWGameWindow> m_gameWindow;
 		//std::unique_ptr<IFileSystem> _fileSystem;
+		std::unique_ptr<OpenGLGraphicsDevice> m_graphicsDevice;
 
 		void mountDebugErrorLog();
 	};

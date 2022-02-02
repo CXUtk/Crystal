@@ -230,6 +230,8 @@ namespace crystal
 
 	struct VertexBufferDescription
 	{
+		size_t		Size;
+		const void* Memory;
 		BufferUsage	Usage;
 	};
 

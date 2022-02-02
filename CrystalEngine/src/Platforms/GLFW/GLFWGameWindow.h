@@ -1,6 +1,6 @@
 #pragma once
-#include <Core/Platform/Platforms.h>
 #include <Crystal.h>
+#include <Core/Platform/Platforms.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,30 +18,21 @@ namespace crystal
 		virtual void EndFrame() override;
 
 		virtual bool ShouldClose() const override;
+		virtual bool IsPaused() const override;
 		virtual void PollEvents() override;
 
 		Vector2i GetMousePos() const override;
-		Vector2i GetWindowSize() const override { return _windowSize; }
+		Vector2i GetWindowSize() const override { return m_windowSize; }
 
-		virtual void AppendOnResizeEvent(OnResizeEvent::Func eventHandler) override
-		{
-			_eventOnWindowResize += eventHandler;
-		}
+		GLFWwindow* GetGLFWWindow() const { return m_window; }
 
-		virtual void AppendOnMouseScrollEvent(OnMouseScrollEvent::Func eventHandler) override
-		{
-			_eventOnMouseScroll += eventHandler;
-		}
+		virtual void AppendOnResizeEvent(OnResizeEvent::Func eventHandler) override;
 
-		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) override
-		{
-			_eventOnMouseButtonChange += eventHandler;
-		}
+		virtual void AppendOnMouseScrollEvent(OnMouseScrollEvent::Func eventHandler) override;
 
-		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) override
-		{
-			_eventOnKeyChange += eventHandler;
-		}
+		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) override;
+
+		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) override;
 
 	private:
 		friend void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -51,6 +42,7 @@ namespace crystal
 
 		GLFWwindow*		m_window = nullptr;
 		Vector2i		m_windowSize{};
+		bool			m_isPaused;
 
 		OnResizeEvent				m_eventOnWindowResize;
 		OnKeyChangeEvent			m_eventOnKeyChange;

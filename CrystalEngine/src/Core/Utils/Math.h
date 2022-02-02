@@ -4,10 +4,10 @@
 
 namespace crystal
 {
-#ifdef CRYSTAL_USE_FLOAT32
-	constexpr Float OneMinusEpsilon = 0x1.fffffep-1;
+#ifdef CRYSTAL_USE_FLOAT64
+    constexpr Float OneMinusEpsilon = 0x1.fffffffffffffp-1;
 #else
-	constexpr Float OneMinusEpsilon = 0x1.fffffffffffffp-1;
+    constexpr Float OneMinusEpsilon = 0x1.fffffep-1;
 #endif
 
     using Point2f = glm::vec2;
@@ -18,5 +18,4 @@ namespace crystal
     using Vector3f = glm::vec3;
     using Vector4f = glm::vec4;
     using Normal3f = glm::vec3;
-
 }

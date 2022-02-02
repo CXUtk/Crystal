@@ -1,3 +1,4 @@
+#include "..\OpenGL\OpenGLCommon.h"
 #include "DX11Common.h"
 #include <array>
 #include <map>
@@ -155,7 +156,6 @@ namespace crystal
 		}
 		initialized = true;
 	}
-
 
 	const char* VertexElementFormatToShaderVarConvert(VertexElementFormat format)
 	{

@@ -5,8 +5,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("CrystalTracer")
 
-option(CRYSTAL_USE_GLFW "Use GLFW for platform" OFF)
-option(CRYSTAL_USE_DX11 "Use DX11 for platform" ON)
+option(CRYSTAL_USE_OPENGL "Use OpenGL and GLFW for graphics interface" OFF)
+option(CRYSTAL_USE_DX11 "Use DX11 and Win32 for graphics interface" ON)
 option(CRYSTAL_USE_DEBUG "Enable debug infomation and outputs" ON)
 
 

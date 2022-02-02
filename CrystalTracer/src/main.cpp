@@ -2,6 +2,7 @@
 #include "CrystalTracer.h"
 
 #include <CrystalEngine/src/Core/Utils/Logger.h>
+#include <glm/gtx/quaternion.hpp>
 using namespace crystal;
 
 int main()

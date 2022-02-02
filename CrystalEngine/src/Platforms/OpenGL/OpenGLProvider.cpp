@@ -1,8 +1,10 @@
-#include "GLFWProvider.h"
-#include "GLFWGameWindow.h"
+#include "OpenGLProvider.h"
+#include "OpenGLGraphicsDevice.h"
+#include <Platforms/GLFW/GLFWGameWindow.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <Core/InitArgs.h>
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Misc.h>
@@ -17,7 +19,7 @@ namespace crystal
                                    const char* message,
                                    const void* userParam);
 
-	GLFWProvider::GLFWProvider(const InitArgs& args)
+    OpenGLProvider::OpenGLProvider(const InitArgs& args)
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -30,33 +32,33 @@ namespace crystal
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFW construct");
 
 		m_gameWindow = std::make_unique<GLFWGameWindow>(args);
-
-        // Initialize GLAD and configs
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            throw std::exception("Failed to load glad!");
-        }
+        m_graphicsDevice = std::make_unique<OpenGLGraphicsDevice>(args, ptr(m_gameWindow));
 
         mountDebugErrorLog();
 	}
 
 
-	GLFWProvider::~GLFWProvider()
+    OpenGLProvider::~OpenGLProvider()
 	{
 		m_gameWindow.reset();
 		glfwTerminate();
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFW destruct");
 	}
-	IGameWindow* GLFWProvider::GetGameWindow() const
+	IGameWindow* OpenGLProvider::GetGameWindow() const
 	{
 		return ptr(m_gameWindow);
 	}
-	IFileSystem* GLFWProvider::GetFileSystem() const
+	IFileSystem* OpenGLProvider::GetFileSystem() const
 	{
 		return nullptr;
 	}
 
-    void GLFWProvider::mountDebugErrorLog()
+    IGraphicsDevice* OpenGLProvider::GetGraphicsDevice() const
+    {
+        return ptr(m_graphicsDevice);
+    }
+
+    void OpenGLProvider::mountDebugErrorLog()
     {
 #ifdef _DEBUG
         int flags;

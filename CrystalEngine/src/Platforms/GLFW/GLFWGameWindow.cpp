@@ -83,8 +83,6 @@ namespace crystal
 	{
 		auto gameWindow = (GLFWGameWindow*)glfwGetWindowUserPointer(window);
 		gameWindow->_resize(glm::ivec2(width, height));
-
-		glViewport(0, 0, width, height);
 	}
 
 	void glfw_mousescroll_callback_function(GLFWwindow* window, double xoffset, double yoffset)
@@ -111,46 +109,51 @@ namespace crystal
 
 	GLFWGameWindow::GLFWGameWindow(const InitArgs& args)
 	{
-		_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
+		m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 
-		_window = glfwCreateWindow(_windowSize.x, _windowSize.y,
+		m_window = glfwCreateWindow(m_windowSize.x, m_windowSize.y,
 			args.WindowTitle, nullptr, nullptr);
-		if (!_window)
+		if (!m_window)
 		{
 			throw std::exception("Failed to create window");
 		}
 
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFWWindow construct");
 
-		glfwMakeContextCurrent(_window);
-		glfwSetWindowUserPointer(_window, this);
+		glfwMakeContextCurrent(m_window);
+		glfwSetWindowUserPointer(m_window, this);
 
-		glfwSetFramebufferSizeCallback(_window, glfw_framebuffer_size_callback);
-		glfwSetScrollCallback(_window, glfw_mousescroll_callback_function);
-		glfwSetMouseButtonCallback(_window, glfw_mousebutton_callback_function);
-		glfwSetKeyCallback(_window, glfw_key_callback_function);
+		glfwSetFramebufferSizeCallback(m_window, glfw_framebuffer_size_callback);
+		glfwSetScrollCallback(m_window, glfw_mousescroll_callback_function);
+		glfwSetMouseButtonCallback(m_window, glfw_mousebutton_callback_function);
+		glfwSetKeyCallback(m_window, glfw_key_callback_function);
 	}
 	GLFWGameWindow::~GLFWGameWindow()
 	{
-		if (_window)
+		if (m_window)
 		{
-			glfwDestroyWindow(_window);
+			glfwDestroyWindow(m_window);
 		}
-		_window = nullptr;
+		m_window = nullptr;
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFWWindow destruct");
 	}
 
 	void GLFWGameWindow::BeginFrame()
-	{}
+	{
+	}
 
 	void GLFWGameWindow::EndFrame()
 	{
-		glfwSwapBuffers(_window);
 	}
 
 	bool GLFWGameWindow::ShouldClose() const
 	{
-		return glfwWindowShouldClose(_window);
+		return glfwWindowShouldClose(m_window);
+	}
+
+	bool GLFWGameWindow::IsPaused() const
+	{
+		return false;
 	}
 
 	void GLFWGameWindow::PollEvents()
@@ -161,20 +164,40 @@ namespace crystal
 	Vector2i GLFWGameWindow::GetMousePos() const
 	{
 		double x, y;
-		glfwGetCursorPos(_window, &x, &y);
+		glfwGetCursorPos(m_window, &x, &y);
 
-		return Vector2i(x, _windowSize.y - y - 1);
+		return Vector2i(x, m_windowSize.y - y - 1);
+	}
+
+	void GLFWGameWindow::AppendOnResizeEvent(OnResizeEvent::Func eventHandler)
+	{
+		m_eventOnWindowResize += eventHandler;
+	}
+
+	void GLFWGameWindow::AppendOnMouseScrollEvent(OnMouseScrollEvent::Func eventHandler)
+	{
+		m_eventOnMouseScroll += eventHandler;
+	}
+
+	void GLFWGameWindow::AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler)
+	{
+		m_eventOnMouseButtonChange += eventHandler;
+	}
+
+	void GLFWGameWindow::AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler)
+	{
+		m_eventOnKeyChange += eventHandler;
 	}
 
 	void GLFWGameWindow::_resize(Vector2i newSize)
 	{
-		_windowSize = newSize;
-		_eventOnWindowResize.Invoke(newSize);
+		m_windowSize = newSize;
+		m_eventOnWindowResize.Invoke(newSize);
 	}
 
 	void GLFWGameWindow::_mouseScroll(Vector2f offset)
 	{
-		_eventOnMouseScroll.Invoke(offset);
+		m_eventOnMouseScroll.Invoke(offset);
 	}
 
 	void GLFWGameWindow::_mouseButtonChange(int button, int action, int mods)
@@ -182,7 +205,7 @@ namespace crystal
 		MouseButtonEventArgs args{};
 		args.ButtonCode = mouseButtonCodeMap[button];
 		args.Action = inputActionMap[action];
-		_eventOnMouseButtonChange.Invoke(args);
+		m_eventOnMouseButtonChange.Invoke(args);
 	}
 
 	void GLFWGameWindow::_keyChange(int key, int scancode, int action, int mods)
@@ -193,7 +216,7 @@ namespace crystal
 		args.KeyCode = keyCodeMap[key];
 		args.Action = inputActionMap[action];
 		args.Mods = (KeyMODState)mods;
-		_eventOnKeyChange.Invoke(args);
+		m_eventOnKeyChange.Invoke(args);
 	}
 
 }

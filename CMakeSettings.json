@@ -12,12 +12,17 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "CRYSTAL_USE_GLFW",
+          "name": "CRYSTAL_USE_DX11",
+          "value": "False",
+          "type": "BOOL"
+        },
+        {
+          "name": "CRYSTAL_USE_OPENGL",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "CRYSTAL_USE_DX11",
+          "name": "CRYSTAL_USE_OpenGL",
           "value": "False",
           "type": "BOOL"
         }
