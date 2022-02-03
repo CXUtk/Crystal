@@ -139,7 +139,7 @@ namespace crystal
 			crystal::ClearOptions::Target 
 			| crystal::ClearOptions::Stencil
 			| crystal::ClearOptions::Depth,
-			crystal::Color4f(1.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
+			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 		//m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
 		//m_pShader->SetUniform1f("uBase", 1.0f);
 		m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());

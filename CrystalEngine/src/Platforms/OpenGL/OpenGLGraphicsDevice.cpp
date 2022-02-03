@@ -36,6 +36,7 @@ namespace crystal
 	{
 		glBindVertexArray(pso->GetHandle());
 		glEnableVertexAttribArray(0);
+		glEnable(GL_DEPTH_TEST);
 		pso->GetShaderProgram()->Apply();
 	}
 

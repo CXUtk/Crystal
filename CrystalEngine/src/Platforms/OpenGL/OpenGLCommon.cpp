@@ -59,11 +59,11 @@ namespace crystal
 
 	Matrix4f crystal_look_at(const Point3f& eye, const Point3f& center, const Vector3f& up)
 	{
-		return glm::lookAtRH(eye, center, up);
+		return glm::lookAtLH(eye, center, up);
 	}
 	Matrix4f crystal_perspective(Float fovY, Float aspectRatio, Float zNear, Float zFar)
 	{
-		return glm::perspectiveRH_NO(fovY, aspectRatio, zNear, zFar);
+		return glm::perspectiveLH_NO(fovY, aspectRatio, zNear, zFar);
 	}
 
 
