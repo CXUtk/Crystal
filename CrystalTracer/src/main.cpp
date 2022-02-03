@@ -1,8 +1,7 @@
 #include <CrystalEngine/src/Engine.h>
-#include "CrystalTracer.h"
+#include <CrystalEngine/src/Tests/TriangleTest.h>
 
 #include <CrystalEngine/src/Core/Utils/Logger.h>
-#include <glm/gtx/quaternion.hpp>
 using namespace crystal;
 
 int main()
@@ -10,7 +9,7 @@ int main()
 	Engine* engine = Engine::GetInstance();
 	try
 	{
-		engine->Start(std::make_unique<tracer::CrystalTracer>());
+		engine->Start(std::make_unique<TriangleTest>());
 	}
 	catch (std::exception ex)
 	{

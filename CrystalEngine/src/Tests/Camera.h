@@ -1,7 +1,7 @@
 #pragma once
-#include <CrystalEngine/src/Crystal.h>
-#include <CrystalEngine/src/Core/Utils/Math.h>
-#include <CrystalEngine/src/Core/Platform/Graphics/GraphicsCommon.h>
+#include <Crystal.h>
+#include <Core/Utils/Math.h>
+#include <Core/Platform/Graphics/GraphicsCommon.h>
 
 using namespace crystal;
 

@@ -1,15 +1,15 @@
 #pragma once
-#include <CrystalEngine/src/Core/Application.h>
-#include <CrystalEngine/src/Engine.h>
+#include <Core/Application.h>
+#include "Engine.h"
 #include "Camera.h"
 
-namespace tracer
+namespace crystal
 {
-	class CrystalTracer : public crystal::Application
+	class OrbitControllerTest : public Application
 	{
 	public:
-		CrystalTracer();
-		virtual ~CrystalTracer() override;
+		OrbitControllerTest();
+		virtual ~OrbitControllerTest() override;
 
 		virtual void Initialize() override;
 
@@ -23,7 +23,8 @@ namespace tracer
 
 	private:
 		bool m_renderPause = false;
-		std::shared_ptr<crystal::IShaderProgram> m_pShader = nullptr;
+		std::shared_ptr<crystal::ShaderProgram> m_pShader = nullptr;
 		std::shared_ptr<Camera> m_pCamera = nullptr;
+		std::shared_ptr<crystal::PipelineStateObject> m_PSO = nullptr;
 	};
 }

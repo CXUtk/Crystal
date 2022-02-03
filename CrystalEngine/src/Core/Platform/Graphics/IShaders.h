@@ -7,9 +7,6 @@ namespace crystal
 	{
 	public:
 		virtual ~IShader() = 0 {};
-
-		virtual ShaderType GetShaderType() const = 0;
-		virtual void Apply() = 0;
 	};
 
 

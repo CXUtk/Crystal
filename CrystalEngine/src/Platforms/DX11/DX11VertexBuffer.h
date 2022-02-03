@@ -7,7 +7,7 @@ namespace crystal
 	{
 	public:
 		DX11VertexBuffer(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11Buffer> buffer);
-		~DX11VertexBuffer();
+		~DX11VertexBuffer() override;
 
 		void BindVertexLayout(const VertexLayout& layout) override;
 		virtual void Bind(size_t offset) override;

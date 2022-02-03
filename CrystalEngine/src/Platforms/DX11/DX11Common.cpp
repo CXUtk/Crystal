@@ -112,47 +112,12 @@ namespace crystal
 	}
 	constexpr auto PrimititveTopologyMapping = GeneratePrimititveTopologyMapping<(size_t)PrimitiveType::__COUNT>();
 
-	template<size_t N>
-	constexpr std::array<size_t, N> GenerateComponentFormatToSizeMapping()
-	{
-		std::array<size_t, N> M{};
-		M[(int)ComponentFormat::Int] = sizeof(int);
-		M[(int)ComponentFormat::Single] = sizeof(float);
-		M[(int)ComponentFormat::Vector2f] = 2 * sizeof(float);
-		M[(int)ComponentFormat::Vector2i] = 2 * sizeof(int);
-		M[(int)ComponentFormat::Vector3f] = 3 * sizeof(float);
-		M[(int)ComponentFormat::Vector3i] = 3 * sizeof(int);
-		M[(int)ComponentFormat::Vector4f] = 4 * sizeof(float);
-		M[(int)ComponentFormat::Vector4i] = 4 * sizeof(int);
-		M[(int)ComponentFormat::Mat2f] = 4 * sizeof(float);
-		M[(int)ComponentFormat::Mat3f] = 9 * sizeof(float);
-		M[(int)ComponentFormat::Mat4f] = 16 * sizeof(float);
-		return M;
-	}
-	constexpr auto ComponentFormatToSizeMapping = GenerateComponentFormatToSizeMapping<(size_t)ComponentFormat::__COUNT>();
-
-	std::map<std::string, ComponentFormat> StringToComponentFormatMapping;
-	void GenerateStringToComponentFormatMapping()
-	{
-		StringToComponentFormatMapping["float"] = ComponentFormat::Single;
-		StringToComponentFormatMapping["vec2"] = ComponentFormat::Vector2f;
-		StringToComponentFormatMapping["vec3"] = ComponentFormat::Vector3f;
-		StringToComponentFormatMapping["vec4"] = ComponentFormat::Vector4f;
-		StringToComponentFormatMapping["int"] = ComponentFormat::Int;
-		StringToComponentFormatMapping["ivec2"] = ComponentFormat::Vector2i;
-		StringToComponentFormatMapping["ivec3"] = ComponentFormat::Vector3i;
-		StringToComponentFormatMapping["ivec4"] = ComponentFormat::Vector4i;
-		StringToComponentFormatMapping["mat2"] = ComponentFormat::Mat2f;
-		StringToComponentFormatMapping["mat3"] = ComponentFormat::Mat3f;
-		StringToComponentFormatMapping["mat4"] = ComponentFormat::Mat4f;
-	}
 
 	void InitDX11Commons()
 	{
 		static bool initialized = false;
 		if (initialized) return;
 		{
-			GenerateStringToComponentFormatMapping();
 		}
 		initialized = true;
 	}
@@ -191,20 +156,4 @@ namespace crystal
 	{
 		return PrimititveTopologyMapping[(int)type];
 	}
-
-	ComponentFormat StringToComponentFormatConvert(const std::string& type)
-	{
-		auto iter = StringToComponentFormatMapping.find(type);
-		if (iter == StringToComponentFormatMapping.end())
-		{
-			throw std::exception("Unknown data type");
-		}
-		return iter->second;
-	}
-
-	size_t ComponentFormatToSizeConvert(ComponentFormat format)
-	{
-		return ComponentFormatToSizeMapping[(int)format];
-	}
-
 }

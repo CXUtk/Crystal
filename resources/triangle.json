@@ -1,5 +1,7 @@
 {
   "dx11Src": "triangle.hlsl",
+  "openGLVSSrc": "triangle.vert",
+  "openGLFSSrc": "triangle.frag",
   "vsEntry": "VS",
   "fsEntry": "PS",
   "uniforms": [

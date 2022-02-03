@@ -30,6 +30,7 @@ namespace crystal
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
 		GlobalLogger::Log(SeverityLevel::Debug, "GLFW construct");
+        InitOpenGLCommons();
 
 		m_gameWindow = std::make_unique<GLFWGameWindow>(args);
         m_graphicsDevice = std::make_unique<OpenGLGraphicsDevice>(args, ptr(m_gameWindow));

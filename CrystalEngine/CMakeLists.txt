@@ -3,9 +3,11 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-set(CrystalEngineSources_Extra "src/Crystal.h" "src/Engine.cpp" "src/Engine.h")
+file(GLOB CrystalEngineSources_Extra "src/*.cpp")
 set(CrystalEngineSources_PlatformFactory "src/Platforms/PlatformFactory.cpp" "src/Platforms/PlatformFactory.h")
 file(GLOB_RECURSE CrystalEngineSources_Core "src/Core/*.cpp")
+file(GLOB_RECURSE CrystalEngineHeaders_Core "src/Core/*.h")
+file(GLOB_RECURSE CrystalEngineTests "src/Tests/*.cpp")
 
 if (CRYSTAL_USE_OPENGL MATCHES ON AND CRYSTAL_USE_DX11 MATCHES ON)
     message(FATAL_ERROR "CRYSTAL_USE_GLFW and CRYSTAL_USE_DX11 cannot both be true")
@@ -15,22 +17,22 @@ if (CRYSTAL_USE_OPENGL)
     file(GLOB_RECURSE CrystalEngineSources_Platform "src/Platforms/OpenGL/*.cpp")
     file(GLOB_RECURSE tmp "src/Platforms/GLFW/*.cpp")
     list(APPEND CrystalEngineSources_Platform ${tmp})
-    list(APPEND CrystalEngineSources_Platform "src/Platforms/OpenGLPlatform.h")
 endif()
 
 if (CRYSTAL_USE_DX11)
     file(GLOB_RECURSE CrystalEngineSources_Platform "src/Platforms/DX11/*.cpp")
     file(GLOB_RECURSE tmp "src/Platforms/Windows32/*.cpp")
     list(APPEND CrystalEngineSources_Platform ${tmp})
-    list(APPEND CrystalEngineSources_Platform "src/Platforms/DX11Platform.h")
 endif()
 
 # 将源代码添加到此项目的可执行文件。
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
 ${CrystalEngineSources_Core}
+${CrystalEngineHeaders_Core}
 ${CrystalEngineSources_Platform}
-${CrystalEngineSources_PlatformFactory})
+${CrystalEngineSources_PlatformFactory}
+${CrystalEngineTests})
 
 set_target_properties(CrystalEngine PROPERTIES
             CXX_STANDARD 17
@@ -48,7 +50,6 @@ add_subdirectory("external/SJson")
 target_link_libraries(CrystalEngine PRIVATE SJson)
 
 if (CRYSTAL_USE_OPENGL)
-	add_compile_definitions(CRYSTAL_USE_OPENGL)
     if (UNIX)
         FIND_PACKAGE (glfw3)
         if (glfw3_FOUND)
@@ -70,7 +71,6 @@ if (CRYSTAL_USE_OPENGL)
 endif()
 
 if (CRYSTAL_USE_DX11)
-	add_compile_definitions(CRYSTAL_USE_DX11)
     target_link_libraries(CrystalEngine PRIVATE d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib d2d1.lib dwrite.lib winmm.lib)
 endif()
 

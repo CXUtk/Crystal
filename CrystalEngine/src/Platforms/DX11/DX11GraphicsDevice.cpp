@@ -84,23 +84,6 @@ namespace crystal
 	}
 
 
-	std::string GetDirectoryPath(const std::string& path)
-	{
-		auto last_slash_idx = path.rfind('\\');
-		if (std::string::npos != last_slash_idx)
-		{
-			return path.substr(0, last_slash_idx);
-		}
-		last_slash_idx = path.rfind('/');
-		if (std::string::npos != last_slash_idx)
-		{
-			return path.substr(0, last_slash_idx);
-		}
-		throw std::exception("Invalid file path");
-	}
-
-
-
 	UniformVariable ParseUniformVariable(const std::string& name, const std::string& type)
 	{
 		UniformVariable varb;

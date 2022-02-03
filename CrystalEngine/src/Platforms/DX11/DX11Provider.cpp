@@ -23,7 +23,7 @@ namespace crystal
 	{
 		return nullptr;
 	}
-	IGraphicsDevice* DX11Provider::GetGraphicsDevice() const
+	GraphicsDevice* DX11Provider::GetGraphicsDevice() const
 	{
 		return ptr(m_dx11GraphicsDevice);
 	}

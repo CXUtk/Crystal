@@ -26,6 +26,4 @@ namespace crystal
 	const char* SemanticNameConvert(SemanticType semanticType);
 	const char* ShaderModelConvert(ShaderType shaderType);
 	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type);
-	ComponentFormat StringToComponentFormatConvert(const std::string& type);
-	size_t ComponentFormatToSizeConvert(ComponentFormat format);
 }

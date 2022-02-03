@@ -1,5 +1,7 @@
 {
   "dx11Src": "model.hlsl",
+  "openGLVSSrc": "model.vert",
+  "openGLFSSrc": "model.frag",
   "vsEntry": "VS",
   "fsEntry": "PS",
   "uniforms": [

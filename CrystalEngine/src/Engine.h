@@ -36,7 +36,6 @@ namespace crystal
 		*/
 		InputController* GetInputController() const;
 
-
 		IGraphicsDevice* GetGraphicsDevice() const;
 
 		/**

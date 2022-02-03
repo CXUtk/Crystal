@@ -26,7 +26,7 @@ VertexOut VS(VertexIn vIn)
 	VertexOut vout;
 	vout.posH = mul(mul(float4(vIn.pos, 1.0), M), VP);
 	vout.texCoord = vIn.texCoord;
-	vout.normal = mul(float4(vIn.normal, 1.0), MN);
+	vout.normal = mul(float4(vIn.normal, 0.0), MN);
 	return vout;
 }
 

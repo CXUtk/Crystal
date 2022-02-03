@@ -1,55 +1,63 @@
-#include "CrystalTracer.h"
-#include <CrystalEngine/src/Engine.h>
-#include <CrystalEngine/src/Core/Platform/Platforms.h>
-#include <CrystalEngine/src/Core/Utils/Logger.h>
-#include <CrystalEngine/src/Core/Utils/Geometry.h>
-#include <CrystalEngine/src/Core/Input/InputController.h>
-#include <CrystalEngine/src/Core/Utils/GameTimer.h>
+#include "TriangleTest.h"
+#include <Engine.h>
+#include <Core/Platform/Platforms.h>
+#include <Core/Utils/Logger.h>
+#include <Core/Utils/Geometry.h>
+#include <Core/Input/InputController.h>
+#include <Core/Utils/GameTimer.h>
 
-#include <CrystalEngine/src/Core/Utils/Misc.h>
-#include <CrystalEngine/src/Core/Utils/ObjLoader.h>
+#include <Core/Utils/Misc.h>
+#include <Core/Utils/ObjLoader.h>
 
-using namespace crystal;
+#ifdef CRYSTAL_USE_OPENGL
+#include <Platforms/OpenGL/OpenGLPlatform.h>
+#elif defined(CRYSTAL_USE_DX11)
+#include <Platforms/DX11/DX11Platform.h>
+#endif
 
-namespace tracer
+namespace crystal
 {
-	CrystalTracer::CrystalTracer()
+	TriangleTest::TriangleTest()
 	{
 
 	}
 	
 	
-	CrystalTracer::~CrystalTracer()
+	TriangleTest::~TriangleTest()
 	{
 		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer destruct");
 	}
 
+	struct Vertex
+	{
+		Vector3f pos;
+		Vector4f color;
+	};
+
 	static int indices;
-	void CrystalTracer::Initialize()
+	void TriangleTest::Initialize()
 	{
 		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer initialize");
 
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
 		m_pCamera = std::make_shared<Camera>(1.0f, windowSize.x / windowSize.y, 0.5f, 100.f);
-		//Vertex vertices[] =
-		//{
-		//	{ Vector3f(0.0f, 0.5f, 0.5f), Vector4f(0.0f, 1.0f, 0.0f, 1.0f) },
-		//	{ Vector3f(0.5f, -0.5f, 0.5f), Vector4f(0.0f, 0.0f, 1.0f, 1.0f) },
-		//	{ Vector3f(-0.5f, -0.5f, 0.5f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
-		//};
-		//int indices[] = 
-		//{
-		//	0, 1, 2
-		//};
-		objloader::ObjLoader loader;
-		loader.load("resources/cube.obj");
+		Vertex vertices[] =
+		{
+			{ Vector3f(0.0f, 0.5f, 0.5f), Vector4f(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ Vector3f(0.5f, -0.5f, 0.5f), Vector4f(0.0f, 0.0f, 1.0f, 1.0f) },
+			{ Vector3f(-0.5f, -0.5f, 0.5f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
+		};
+		int indices[] = 
+		{
+			0, 1, 2
+		};
+
 		std::vector<ElementDescription> elements = {
 			{ SemanticType::POSITION, 0, VertexElementFormat::Vector3, 0 },
-			{ SemanticType::TEXCOORD, 0, VertexElementFormat::Vector2, 12 },
-			{ SemanticType::NORMAL, 0, VertexElementFormat::Vector3, 20 },
+			{ SemanticType::COLOR, 0, VertexElementFormat::Vector4, 12 },
 		};
-		VertexLayout vLayout(elements, sizeof(objloader::VertexData));
+		VertexLayout vLayout(elements, sizeof(Vertex));
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
 
 		VertexBufferDescription bufferDesc{};
@@ -58,23 +66,24 @@ namespace tracer
 		ibufferDesc.Usage = BufferUsage::Immutable;
 		ibufferDesc.Format = DataFormat::UInt32;
 
+		m_PSO = graphicsDevice->CreatePipelineStateObject();
 		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, 
-			loader.Vertices.data(), sizeof(objloader::VertexData) * loader.Vertices.size());
+			vertices, sizeof(vertices));
 		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
 		//	loader.Triangles.data(), sizeof(float) * 3 * loader.Triangles.size());
-		indices = loader.Triangles.size() * 3;
+
+		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/triangle.json");
 
 		vertexBuffer->BindVertexLayout(vLayout);
-		vertexBuffer->Bind(0);
+		m_PSO->BindVertexBuffer(vertexBuffer);
+		m_PSO->BindShaderProgram(m_pShader);
 		//indexBuffer->Bind(0);
-
-		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
 	}
 
 
 	static Vector2f orbitControl = Vector2f(0.f, glm::half_pi<float>());
 	static Point2i oldMousePos;
-	void CrystalTracer::Update(const crystal::GameTimer& gameTimer)
+	void TriangleTest::Update(const crystal::GameTimer& gameTimer)
 	{
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
@@ -125,7 +134,7 @@ namespace tracer
 		m_pCamera->SetAspectRatio(static_cast<crystal::Float>(windowSize.x) / windowSize.y);
 	}
 
-	void CrystalTracer::Draw(const crystal::GameTimer& gameTimer)
+	void TriangleTest::Draw(const crystal::GameTimer& gameTimer)
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
@@ -134,23 +143,20 @@ namespace tracer
 			| crystal::ClearOptions::Stencil
 			| crystal::ClearOptions::Depth,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-		//m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
-		//m_pShader->SetUniform1f("uBase", 1.0f);
-		m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
-		m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
-		auto P = m_pCamera->GetProjectionMatrix();
-		auto V = m_pCamera->GetViewMatrix();
-		m_pShader->SetUniformMat4f("VP", P * V);
+		m_pShader->SetUniform1f("uLuminance", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
+		m_pShader->SetUniform1f("uBase", 0.0f);
 		m_pShader->Apply();
-		graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+		
+		graphicsDevice->SetPipelineStateObject(m_PSO);
+		graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
 	}
 
-	void CrystalTracer::Exit()
+	void TriangleTest::Exit()
 	{
 		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer exit");
 	}
 
-	bool CrystalTracer::Paused()
+	bool TriangleTest::Paused()
 	{
 		return m_renderPause;
 	}

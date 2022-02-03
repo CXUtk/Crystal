@@ -20,11 +20,6 @@
           "name": "CRYSTAL_USE_OPENGL",
           "value": "True",
           "type": "BOOL"
-        },
-        {
-          "name": "CRYSTAL_USE_OpenGL",
-          "value": "False",
-          "type": "BOOL"
         }
       ]
     },
@@ -37,7 +32,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ]
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": [
+        {
+          "name": "CRYSTAL_USE_GLFW",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
     }
   ]
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include <Core/Platform/IPlatformProvider.h>
+#include <Core/Platform/Platforms.h>
+
 namespace crystal
 {
 	class PlatformFactory

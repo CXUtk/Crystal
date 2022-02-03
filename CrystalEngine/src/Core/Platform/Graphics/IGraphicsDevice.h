@@ -3,6 +3,7 @@
 
 namespace crystal
 {
+
 	/**
 	 * @brief Graphics device interface. Includes platform independent operations to create and draw rendering objects.
 	*/
@@ -16,14 +17,18 @@ namespace crystal
 		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) = 0;
 		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices, 
 			size_t indexOffset, size_t vertexOffset) = 0;
+		virtual void SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) = 0;
 		
-		virtual std::shared_ptr<IVertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) = 0;
-		virtual std::shared_ptr<IIndexBuffer> CreateIndexBuffer(const IndexBufferDescription& desc, void* src, size_t size) = 0;
-		virtual std::shared_ptr<IVertexShader> CreateVertexShaderFromMemory(const char* src, size_t size,
+		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() = 0;
+		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) = 0;
+		virtual std::shared_ptr<IndexBuffer> CreateIndexBuffer(const IndexBufferDescription& desc, void* src, size_t size) = 0;
+		virtual std::shared_ptr<VertexShader> CreateVertexShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) = 0;
-		virtual std::shared_ptr<IFragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
+		virtual std::shared_ptr<FragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) = 0;
-		virtual std::shared_ptr<IShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
+		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
+
+		
 	};
 
 	class IVertexBuffer
@@ -32,7 +37,6 @@ namespace crystal
 		virtual ~IVertexBuffer() = 0 {};
 
 		virtual void BindVertexLayout(const VertexLayout& layout) = 0;
-		virtual void Bind(size_t offset) = 0;
 	};
 
 
@@ -40,8 +44,6 @@ namespace crystal
 	{
 	public:
 		virtual ~IIndexBuffer() = 0 {};
-
-		virtual void Bind(size_t offset) = 0;
 	};
 
 	class IShaderProgram
@@ -52,5 +54,25 @@ namespace crystal
 		virtual void Apply() = 0;
 		virtual void SetUniform1f(const std::string& name, float value) = 0;
 		virtual void SetUniformMat4f(const std::string& name, const glm::mat4& value) = 0;
+	};
+
+	class IPipelineStateObject
+	{
+	public:
+		virtual ~IPipelineStateObject() = 0 {};
+
+		virtual void BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
+		virtual void BindIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
+		virtual void BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram) = 0;
+	};
+
+	class IPlatformProvider
+	{
+	public:
+		virtual ~IPlatformProvider() = 0 {};
+
+		virtual IGameWindow* GetGameWindow() const = 0;
+		virtual IFileSystem* GetFileSystem() const = 0;
+		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
 	};
 }

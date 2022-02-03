@@ -7,6 +7,13 @@
 #include "Core/Platform/Platforms.h"
 #include "Platforms/PlatformFactory.h"
 
+#include <Core/Platform/Graphics/GraphicsCommon.h>
+#ifdef CRYSTAL_USE_OPENGL
+#include "Platforms/OpenGL/OpenGLPlatform.h"
+#elif defined(CRYSTAL_USE_DX11)
+#include "Platforms/DX11/DX11Platform.h"
+#endif
+
 namespace crystal
 {
     Engine::Engine()
@@ -22,6 +29,7 @@ namespace crystal
 
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
 
+        InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(args);
     }
     
@@ -39,11 +47,16 @@ namespace crystal
     {
         return ptr(m_inputController);
     }
-    
+
     IGraphicsDevice* Engine::GetGraphicsDevice() const
     {
         return m_platformProvider->GetGraphicsDevice();
     }
+    
+    //IGraphicsDevice* Engine::GetGraphicsDevice() const
+    //{
+    //    return m_platformProvider->GetGraphicsDevice();
+    //}
 
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
@@ -53,7 +66,7 @@ namespace crystal
         m_application->Initialize();
 
         auto window = this->GetWindow();
-        auto graphicsDevice = this->GetGraphicsDevice();
+        auto graphicsDevice = m_platformProvider->GetGraphicsDevice();
         m_inputController = std::make_unique<InputController>(window);
 
         m_gameTimer.Start();

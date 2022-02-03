@@ -35,6 +35,7 @@ namespace crystal
 	class IVertexShader;
 	class IFragmentShader;
 	class IShaderProgram;
+	class IPipelineStateObject;
 
 	class IGameWindow;
 	class IPlatformProvider;

@@ -2,11 +2,38 @@
 #include <Crystal.h>
 #include <vector>
 #include <string>
+#include <map>
 #include <glm/gtc/type_ptr.hpp>
 #include <Core/Utils/Geometry.h>
 
 namespace crystal
 {
+#ifdef CRYSTAL_USE_OPENGL
+	class OpenGLGraphicsDevice;
+	using GraphicsDevice = OpenGLGraphicsDevice;
+
+	class OpenGLVertexBuffer;
+	using VertexBuffer = OpenGLVertexBuffer;
+
+	class OpenGLIndexBuffer;
+	using IndexBuffer = OpenGLIndexBuffer;
+
+	class OpenGLVertexShader;
+	using VertexShader = OpenGLVertexShader;
+
+	class OpenGLFragmentShader;
+	using FragmentShader = OpenGLFragmentShader;
+
+	class OpenGLShaderProgram;
+	using ShaderProgram = OpenGLShaderProgram;
+
+	class OpenGLPipelineStateObject;
+	using PipelineStateObject = OpenGLPipelineStateObject;
+#elif defined(CRYSTAL_USE_DX11)
+	class DX11GraphicsDevice;
+	using GraphicsDevice = DX11GraphicsDevice;
+#endif
+
 	using Spectrum = glm::vec3;
 	using Color3f = glm::vec3;
 	using Color4f = glm::vec4;
@@ -230,8 +257,6 @@ namespace crystal
 
 	struct VertexBufferDescription
 	{
-		size_t		Size;
-		const void* Memory;
 		BufferUsage	Usage;
 	};
 
@@ -266,6 +291,7 @@ namespace crystal
 
 	struct VertexLayout
 	{
+		VertexLayout() {}
 		VertexLayout(const std::vector<ElementDescription>& elementDescs, size_t stride)
 			: Elements(elementDescs), Stride(stride)
 		{}
@@ -286,4 +312,9 @@ namespace crystal
 		void Clear() { Variables.clear(); }
 		std::vector<UniformVariable> Variables;
 	};
+
+	void InitGraphicsCommons();
+	ComponentFormat StringToComponentFormatConvert(const std::string& type);
+	DataFormat StringToDataFormatConvert(const std::string& type);
+	size_t ComponentFormatToSizeConvert(ComponentFormat format);
 }
