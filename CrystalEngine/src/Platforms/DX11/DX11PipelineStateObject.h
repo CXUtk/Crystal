@@ -16,11 +16,14 @@ namespace crystal
 		VertexBuffer* GetVertexBuffer() const { return ptr(m_vertexBuffer); }
 		IndexBuffer* GetIndexBuffer() const { return ptr(m_indexBuffer); }
 		ShaderProgram* GetShaderProgram() const { return ptr(m_shaderProgram); }
+		ID3D11RasterizerState* GetRasterizerState() const { return m_currentRasterizerState.Get(); }
 	private:
 		std::shared_ptr<VertexBuffer>	m_vertexBuffer = nullptr;
 		std::shared_ptr<IndexBuffer>	m_indexBuffer = nullptr;
 		std::shared_ptr<ShaderProgram>	m_shaderProgram = nullptr;
 
-		DX11GraphicsDevice*			m_pGraphicsDevice = nullptr;
+		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
+		D3D11_RASTERIZER_DESC			m_rasterStateDesc{};
+		ComPtr<ID3D11RasterizerState>	m_currentRasterizerState = nullptr;
 	};
 }

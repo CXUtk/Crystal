@@ -78,7 +78,7 @@ namespace crystal
 	}
 
 
-	static Vector2f orbitControl = Vector2f(0.f, glm::half_pi<float>());
+	static Vector2f orbitControl = Vector2f(-glm::half_pi<float>(), glm::half_pi<float>());
 	static Point2i oldMousePos;
 	void OrbitControllerTest::Update(const crystal::GameTimer& gameTimer)
 	{

@@ -4,7 +4,8 @@
 Crystal Engine is a rendering engine that provides graphics infrastructures to complete
 advanced computer graphics projects.
 
-- Support OpenGL and DirectX 11
+- Utilized Modern C++ (STD C++ 17)
+- Provided wrapper for both OpenGL and DirectX 11
 - Cross-Platform Design
 - Asset Management
 - Rendering Algorithms

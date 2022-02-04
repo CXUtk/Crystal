@@ -38,6 +38,8 @@ namespace crystal
 			indexBuffer->Bind(0);
 		}
 		pso->GetShaderProgram()->Apply();
+
+		m_pd3dImmediateContext->RSSetState(pso->GetRasterizerState());
 	}
 
 	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)
