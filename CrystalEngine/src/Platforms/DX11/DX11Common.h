@@ -25,4 +25,7 @@ namespace crystal
 	const char* SemanticNameConvert(SemanticType semanticType);
 	const char* ShaderModelConvert(ShaderType shaderType);
 	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type);
+
+	D3D11_CULL_MODE CullModeConvert(CullingMode mode);
+	D3D11_FILL_MODE FillModeConvert(FillMode mode);
 }

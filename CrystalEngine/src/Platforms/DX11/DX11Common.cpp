@@ -9,11 +9,11 @@ namespace crystal
 
 	Matrix4f crystal_look_at(const Point3f& eye, const Point3f& center, const Vector3f& up)
 	{
-		return glm::lookAtLH(eye, center, up);
+		return glm::lookAtRH(eye, center, up);
 	}
 	Matrix4f crystal_perspective(Float fovY, Float aspectRatio, Float zNear, Float zFar)
 	{
-		return glm::perspectiveLH_ZO(fovY, aspectRatio, zNear, zFar);
+		return glm::perspectiveRH_ZO(fovY, aspectRatio, zNear, zFar);
 	}
 
 	template<size_t N>
@@ -112,6 +112,27 @@ namespace crystal
 	constexpr auto PrimititveTopologyMapping = GeneratePrimititveTopologyMapping<(size_t)PrimitiveType::__COUNT>();
 
 
+	template<size_t N>
+	constexpr std::array<D3D11_CULL_MODE, N> GenerateCullModeMapping()
+	{
+		std::array<D3D11_CULL_MODE, N> M{};
+		M[(int)CullingMode::None] = D3D11_CULL_MODE::D3D11_CULL_NONE;
+		M[(int)CullingMode::CullCCW] = D3D11_CULL_MODE::D3D11_CULL_BACK;
+		M[(int)CullingMode::CullCW] = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+		return M;
+	}
+	constexpr auto CullModeMapping = GenerateCullModeMapping<(size_t)CullingMode::__COUNT>();
+
+	template<size_t N>
+	constexpr std::array<D3D11_FILL_MODE, N> GenerateFillModeMapping()
+	{
+		std::array<D3D11_FILL_MODE, N> M{};
+		M[(int)FillMode::SOLID] = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+		M[(int)FillMode::WIREFRAME] = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+		return M;
+	}
+	constexpr auto FillModeMapping = GenerateFillModeMapping<(size_t)FillMode::__COUNT>();
+
 	void InitDX11Commons()
 	{
 		static bool initialized = false;
@@ -154,5 +175,15 @@ namespace crystal
 	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type)
 	{
 		return PrimititveTopologyMapping[(int)type];
+	}
+
+	D3D11_CULL_MODE CullModeConvert(CullingMode mode)
+	{
+		return CullModeMapping[(int)mode];
+	}
+
+	D3D11_FILL_MODE FillModeConvert(FillMode mode)
+	{
+		return FillModeMapping[(int)mode];
 	}
 }

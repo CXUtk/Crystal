@@ -64,6 +64,12 @@ namespace crystal
 		virtual void BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
 		virtual void BindIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
 		virtual void BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram) = 0;
+
+		virtual CullingMode GetCullMode() const = 0;
+		virtual FillMode GetFillMode() const = 0;
+
+		virtual void SetCullMode(CullingMode mode) = 0;
+		virtual void SetFillMode(FillMode mode) = 0;
 	};
 
 	class IPlatformProvider

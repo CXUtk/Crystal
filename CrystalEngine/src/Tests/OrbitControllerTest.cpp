@@ -74,6 +74,7 @@ namespace crystal
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PSO->BindVertexBuffer(vertexBuffer);
 		m_PSO->BindShaderProgram(m_pShader);
+		m_PSO->SetCullMode(CullingMode::CullCW);
 		//indexBuffer->Bind(0);
 	}
 

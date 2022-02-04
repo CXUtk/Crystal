@@ -19,8 +19,7 @@ namespace crystal
 		m_rasterStateDesc.ScissorEnable = false;
 		m_rasterStateDesc.MultisampleEnable = false;
 		m_rasterStateDesc.AntialiasedLineEnable = false;
-		graphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc, 
-			m_currentRasterizerState.GetAddressOf());
+
 	}
 
 	DX11PipelineStateObject::~DX11PipelineStateObject()
@@ -39,5 +38,50 @@ namespace crystal
 	void DX11PipelineStateObject::BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram)
 	{
 		m_shaderProgram = shaderProgram;
+	}
+	CullingMode DX11PipelineStateObject::GetCullMode() const
+	{
+		if (m_rasterStateDesc.CullMode == D3D11_CULL_MODE::D3D11_CULL_NONE)
+		{
+			return CullingMode::None;
+		}
+		if (m_rasterStateDesc.FrontCounterClockwise)
+		{
+			return (m_rasterStateDesc.CullMode == D3D11_CULL_MODE::D3D11_CULL_FRONT) ?
+				CullingMode::CullCCW : CullingMode::CullCW;
+		}
+		else
+		{
+			return (m_rasterStateDesc.CullMode == D3D11_CULL_MODE::D3D11_CULL_FRONT) ?
+				CullingMode::CullCW : CullingMode::CullCCW;
+		}
+	}
+	FillMode DX11PipelineStateObject::GetFillMode() const
+	{
+		return (m_rasterStateDesc.FillMode == D3D11_FILL_MODE::D3D11_FILL_SOLID)
+			? FillMode::SOLID : FillMode::WIREFRAME;
+	}
+
+	void DX11PipelineStateObject::SetCullMode(CullingMode mode)
+	{
+		m_rasterStateDesc.CullMode = CullModeConvert(mode);
+		m_needsRefreshRasterState = true;
+	}
+
+	void DX11PipelineStateObject::SetFillMode(FillMode mode)
+	{
+		m_rasterStateDesc.FillMode = FillModeConvert(mode);
+		m_needsRefreshRasterState = true;
+	}
+
+	ID3D11RasterizerState* DX11PipelineStateObject::GetRasterizerState()
+	{
+		if (m_needsRefreshRasterState)
+		{
+			m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
+				m_currentRasterizerState.GetAddressOf());
+			m_needsRefreshRasterState = false;
+		}
+		return m_currentRasterizerState.Get();
 	}
 }

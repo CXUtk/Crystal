@@ -212,10 +212,10 @@ namespace crystal
 		__COUNT
 	};
 
-	enum class PolygonMode
+	enum class FillMode
 	{
 		WIREFRAME,
-		FILL,
+		SOLID,
 
 		__COUNT
 	};
