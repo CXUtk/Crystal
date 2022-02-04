@@ -1,8 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include <d3d11_1.h>
-#include <Core/Platform/Graphics/IGraphicsDevice.h>
-#include <Core/Platform/Graphics/IShaders.h>
+#include <Core/Platform/Platforms.h>
 
 namespace crystal
 {

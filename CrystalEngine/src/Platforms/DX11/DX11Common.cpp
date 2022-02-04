@@ -1,4 +1,3 @@
-#include "..\OpenGL\OpenGLCommon.h"
 #include "DX11Common.h"
 #include <array>
 #include <map>

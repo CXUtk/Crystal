@@ -7,8 +7,8 @@ namespace crystal
 	class DX11ShaderProgram : public IShaderProgram
 	{
 	public:
-		DX11ShaderProgram(DX11GraphicsDevice* graphicsDevice, std::shared_ptr<IVertexShader> vertexShader,
-			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& uniforms);
+		DX11ShaderProgram(DX11GraphicsDevice* graphicsDevice, std::shared_ptr<VertexShader> vertexShader,
+			std::shared_ptr<FragmentShader> fragmentShader, const UniformVariableCollection& uniforms);
 		~DX11ShaderProgram();
 
 		virtual void Apply() override;
@@ -18,9 +18,13 @@ namespace crystal
 	private:
 		DX11GraphicsDevice* m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11Buffer>					m_pConstantBuffer = nullptr;
-		std::vector<std::shared_ptr<IShader>>	m_shaders{};
 		std::unique_ptr<char[]>					m_pConstantBufferData{};
 		std::map<std::string, size_t>			m_uniformMap{};
+
+		std::shared_ptr<VertexShader>			m_vertexShader = nullptr;
+		std::shared_ptr<FragmentShader>			m_fragmentShader = nullptr;
+		//std::shared_ptr<VertexShader>			m_vertexShader = nullptr;
+		//std::shared_ptr<VertexShader>			m_vertexShader = nullptr;
 
 		bool	m_constBufferDirty = true;
 		size_t	m_constBufferSize = 0;

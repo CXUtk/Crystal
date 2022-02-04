@@ -32,6 +32,24 @@ namespace crystal
 #elif defined(CRYSTAL_USE_DX11)
 	class DX11GraphicsDevice;
 	using GraphicsDevice = DX11GraphicsDevice;
+
+	class DX11VertexBuffer;
+	using VertexBuffer = DX11VertexBuffer;
+
+	class DX11IndexBuffer;
+	using IndexBuffer = DX11IndexBuffer;
+
+	class DX11VertexShader;
+	using VertexShader = DX11VertexShader;
+
+	class DX11FragmentShader;
+	using FragmentShader = DX11FragmentShader;
+
+	class DX11ShaderProgram;
+	using ShaderProgram = DX11ShaderProgram;
+
+	class DX11PipelineStateObject;
+	using PipelineStateObject = DX11PipelineStateObject;
 #endif
 
 	using Spectrum = glm::vec3;

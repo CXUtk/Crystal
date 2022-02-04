@@ -8,10 +8,9 @@ namespace crystal
 	public:
 		DX11IndexBuffer(DX11GraphicsDevice* graphicsDevice, 
 			ComPtr<ID3D11Buffer> indexBuffer, DXGI_FORMAT indexFormat);
-		~DX11IndexBuffer();
+		~DX11IndexBuffer() override;
 
-		virtual void Bind(size_t offset) override;
-
+		void Bind(size_t offset);
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice{};
 		ComPtr<ID3D11Buffer>		m_pBuffer{};

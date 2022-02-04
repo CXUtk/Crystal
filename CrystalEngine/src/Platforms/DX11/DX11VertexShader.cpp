@@ -1,4 +1,4 @@
-#include "DX11Shaders.h"
+#include "DX11VertexShader.h"
 #include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
@@ -16,20 +16,8 @@ namespace crystal
 	DX11VertexShader::~DX11VertexShader()
 	{}
 
-	void DX11VertexShader::Apply()
+	void DX11VertexShader::Bind()
 	{
 		m_pGraphicsDevice->GetD3DDeviceContext()->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
-	}
-
-	DX11FragmentShader::DX11FragmentShader(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11PixelShader> pixelShader)
-		: m_pGraphicsDevice(graphicsDevice), m_pPixelShader(pixelShader)
-	{}
-
-	DX11FragmentShader::~DX11FragmentShader()
-	{}
-
-	void DX11FragmentShader::Apply()
-	{
-		m_pGraphicsDevice->GetD3DDeviceContext()->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
 	}
 }

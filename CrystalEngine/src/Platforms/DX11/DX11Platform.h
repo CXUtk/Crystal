@@ -1,4 +1,10 @@
 #pragma once
-#include "DX11/DX11GraphicsDevice.h"
-#include "DX11/DX11Provider.h"
-#include "Windows32/Win32GameWindow.h"
+#include <Platforms/Windows32/Win32GameWindow.h>
+#include "DX11FragmentShader.h"
+#include "DX11VertexShader.h"
+#include "DX11VertexBuffer.h"
+#include "DX11IndexBuffer.h"
+#include "DX11ShaderProgram.h"
+#include "DX11GraphicsDevice.h"
+#include "DX11PipelineStateObject.h"
+#include "DX11Provider.h"

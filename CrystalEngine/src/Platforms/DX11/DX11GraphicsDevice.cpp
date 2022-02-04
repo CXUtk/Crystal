@@ -1,10 +1,13 @@
 #include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
+
 #include "DX11VertexBuffer.h"
-#include "DX11Shaders.h"
 #include "DX11IndexBuffer.h"
+#include "DX11VertexShader.h"
+#include "DX11FragmentShader.h"
 #include "DX11ShaderProgram.h"
+#include "DX11PipelineStateObject.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
@@ -24,6 +27,18 @@ namespace crystal
 
 	DX11GraphicsDevice::~DX11GraphicsDevice()
 	{}
+
+	void DX11GraphicsDevice::SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)
+	{
+		pso->GetVertexBuffer()->Bind(0);
+
+		auto indexBuffer = pso->GetIndexBuffer();
+		if (indexBuffer)
+		{
+			indexBuffer->Bind(0);
+		}
+		pso->GetShaderProgram()->Apply();
+	}
 
 	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)
 	{
@@ -50,14 +65,19 @@ namespace crystal
 		HR(m_pSwapChain->Present(0, 0));
 	}
 
-	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
+	std::shared_ptr<PipelineStateObject> DX11GraphicsDevice::CreatePipelineStateObject()
+	{
+		return std::make_shared<DX11PipelineStateObject>(this);
+	}
+
+	std::shared_ptr<VertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
 	{
 		ComPtr<ID3D11Buffer> vertexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_VERTEX_BUFFER);
 		d3dUtils::D3D11SetDebugObjectName(vertexBuffer.Get(), "VertexBuffer");
 		return std::make_shared<DX11VertexBuffer>(this, vertexBuffer);
 	}
 
-	std::shared_ptr<IIndexBuffer> DX11GraphicsDevice::CreateIndexBuffer(const IndexBufferDescription& desc, 
+	std::shared_ptr<IndexBuffer> DX11GraphicsDevice::CreateIndexBuffer(const IndexBufferDescription& desc, 
 		void* src, size_t size)
 	{
 		ComPtr<ID3D11Buffer> indexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_INDEX_BUFFER);
@@ -65,7 +85,7 @@ namespace crystal
 		return std::make_shared<DX11IndexBuffer>(this, indexBuffer, DataFormatConvert(desc.Format));
 	}
 
-	std::shared_ptr<IVertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
+	std::shared_ptr<VertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
 	{
 		auto pBlob = m_getShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::VERTEX_SHADER);
 		ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
@@ -74,7 +94,7 @@ namespace crystal
 		return std::make_shared<DX11VertexShader>(this, pVertexShader);
 	}
 
-	std::shared_ptr<IFragmentShader> DX11GraphicsDevice::CreateFragmentShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
+	std::shared_ptr<FragmentShader> DX11GraphicsDevice::CreateFragmentShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
 	{
 		auto pBlob = m_getShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::FRAGMENT_SHADER);
 		ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
@@ -92,7 +112,7 @@ namespace crystal
 		return varb;
 	}
 
-	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
+	std::shared_ptr<ShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
 	{
 		auto source = ReadAllStringFromFile(path);
 		auto root = SJson::SJsonParse(source);

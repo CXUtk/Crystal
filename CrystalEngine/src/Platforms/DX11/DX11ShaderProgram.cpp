@@ -1,5 +1,8 @@
 #include "DX11ShaderProgram.h"
 #include "DX11GraphicsDevice.h"
+#include "DX11VertexShader.h"
+#include "DX11FragmentShader.h"
+
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include <Core/Utils/Misc.h>
@@ -7,14 +10,11 @@
 namespace crystal
 {
 	DX11ShaderProgram::DX11ShaderProgram(DX11GraphicsDevice* graphicsDevice,
-		std::shared_ptr<IVertexShader> vertexShader,
-		std::shared_ptr<IFragmentShader> fragmentShader,
+		std::shared_ptr<VertexShader> vertexShader,
+		std::shared_ptr<FragmentShader> fragmentShader,
 		const UniformVariableCollection& uniforms)
-		: m_pGraphicsDevice(graphicsDevice)
+		: m_pGraphicsDevice(graphicsDevice), m_vertexShader(vertexShader), m_fragmentShader(fragmentShader)
 	{
-		m_shaders.push_back(vertexShader);
-		m_shaders.push_back(fragmentShader);
-
 		size_t size = 0;
 		for (auto& var : uniforms.Variables)
 		{
@@ -46,19 +46,15 @@ namespace crystal
 			context->Unmap(m_pConstantBuffer.Get(), 0);
 			m_constBufferDirty = false;
 		}
-
-		for (auto& shader : m_shaders)
+		if (m_vertexShader != nullptr)
 		{
-			shader->Apply();
-			auto type = shader->GetShaderType();
-			if (type == ShaderType::VERTEX_SHADER)
-			{
-				context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-			}
-			else if (type == ShaderType::FRAGMENT_SHADER)
-			{
-				context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-			}
+			m_vertexShader->Bind();
+			context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+		}
+		if (m_fragmentShader != nullptr)
+		{
+			m_fragmentShader->Bind();
+			context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
 		}
 	}
 

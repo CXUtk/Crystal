@@ -28,5 +28,5 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_Target
 {
-	return uBase + pIn.color;
+	return uBase + pIn.color * uLuminance;
 }
