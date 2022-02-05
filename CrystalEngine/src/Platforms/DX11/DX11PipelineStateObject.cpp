@@ -25,6 +25,26 @@ namespace crystal
 		m_rasterStateDesc.MultisampleEnable = false;
 		m_rasterStateDesc.AntialiasedLineEnable = false;
 
+
+		m_depthStencilStateDesc.DepthEnable = true;
+		m_depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		m_depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+
+		m_depthStencilStateDesc.StencilEnable = false;
+		m_depthStencilStateDesc.StencilReadMask = 0xFF;
+		m_depthStencilStateDesc.StencilWriteMask = 0xFF;
+
+		// Stencil operations if pixel is front-facing
+		m_depthStencilStateDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		m_depthStencilStateDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		m_depthStencilStateDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		m_depthStencilStateDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		// Stencil operations if pixel is back-facing
+		m_depthStencilStateDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		m_depthStencilStateDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		m_depthStencilStateDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		m_depthStencilStateDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	}
 
 	DX11PipelineStateObject::~DX11PipelineStateObject()
@@ -98,6 +118,18 @@ namespace crystal
 		m_needsRefreshScissorRect = true;
 	}
 
+	void DX11PipelineStateObject::SetDepthTestState(bool enable)
+	{
+		m_depthStencilStateDesc.DepthEnable = enable;
+		m_needsRefreshDepthStencilState = true;
+	}
+
+	void DX11PipelineStateObject::SetStencilTestState(bool enable)
+	{
+		m_depthStencilStateDesc.StencilEnable = enable;
+		m_needsRefreshDepthStencilState = true;
+	}
+
 	void DX11PipelineStateObject::Apply()
 	{
 		m_vertexBuffer->Bind(0);
@@ -116,6 +148,13 @@ namespace crystal
 		if (m_needsRefreshScissorRect)
 		{
 			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetScissorRects(1, &m_scissorRect);
+		}
+
+		if (m_needsRefreshDepthStencilState)
+		{
+			m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&m_depthStencilStateDesc,
+				m_currentDepthStencilState.GetAddressOf());
+			m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
 		}
 	}
 

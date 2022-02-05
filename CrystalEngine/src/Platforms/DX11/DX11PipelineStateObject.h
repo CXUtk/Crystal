@@ -22,6 +22,9 @@ namespace crystal
 		virtual void SetScissorState(bool enable) override;
 		virtual void SetScissorRect(const Bound2i& rect) override;
 
+		virtual void SetDepthTestState(bool enable) override;
+		virtual void SetStencilTestState(bool enable) override;
+
 		virtual void Apply() override;
 	private:
 		std::shared_ptr<VertexBuffer>	m_vertexBuffer = nullptr;
@@ -29,13 +32,17 @@ namespace crystal
 		std::shared_ptr<ShaderProgram>	m_shaderProgram = nullptr;
 
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
+
 		D3D11_RASTERIZER_DESC			m_rasterStateDesc{};
 		ComPtr<ID3D11RasterizerState>	m_currentRasterizerState = nullptr;
+		bool							m_needsRefreshRasterState = true;
+
+		D3D11_DEPTH_STENCIL_DESC		m_depthStencilStateDesc{};
+		ComPtr<ID3D11DepthStencilState>	m_currentDepthStencilState = nullptr;
+		bool							m_needsRefreshDepthStencilState = true;
 
 
-		bool		m_needsRefreshRasterState = true;
 		bool		m_needsRefreshScissorRect = false;
-		
 		RECT		m_scissorRect{};
 	};
 }

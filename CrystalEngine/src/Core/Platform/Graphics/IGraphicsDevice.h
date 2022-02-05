@@ -74,6 +74,9 @@ namespace crystal
 		virtual void SetScissorState(bool enable) = 0;
 		virtual void SetScissorRect(const Bound2i& rect) = 0;
 
+		virtual void SetDepthTestState(bool enable) = 0;
+		virtual void SetStencilTestState(bool enable) = 0;
+
 		virtual void Apply() = 0;
 	};
 
