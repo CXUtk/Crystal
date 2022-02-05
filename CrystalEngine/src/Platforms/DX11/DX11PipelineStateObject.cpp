@@ -1,5 +1,10 @@
 #include "DX11PipelineStateObject.h"
 #include "DX11GraphicsDevice.h"
+#include "DX11VertexBuffer.h"
+#include "DX11IndexBuffer.h"
+#include "DX11VertexShader.h"
+#include "DX11FragmentShader.h"
+#include "DX11ShaderProgram.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include <Core/Utils/Misc.h>
@@ -74,14 +79,44 @@ namespace crystal
 		m_needsRefreshRasterState = true;
 	}
 
-	ID3D11RasterizerState* DX11PipelineStateObject::GetRasterizerState()
+	void DX11PipelineStateObject::SetScissorState(bool enable)
 	{
+		m_rasterStateDesc.ScissorEnable = enable;
+		m_needsRefreshRasterState = true;
+	}
+
+	void DX11PipelineStateObject::SetScissorRect(const Bound2i& rect)
+	{
+		auto minpos = rect.GetMinPos();
+		auto maxpos = rect.GetMaxPos();
+		auto bufferSize = m_pGraphicsDevice->GetBackBufferSize();
+		m_scissorRect.left = minpos.x;
+		m_scissorRect.top = bufferSize.y - maxpos.y - 1;
+		m_scissorRect.right = maxpos.x;
+		m_scissorRect.bottom = bufferSize.y - minpos.y - 1;
+
+		m_needsRefreshScissorRect = true;
+	}
+
+	void DX11PipelineStateObject::Apply()
+	{
+		m_vertexBuffer->Bind(0);
+		if (m_indexBuffer)
+		{
+			m_indexBuffer->Bind(0);
+		}
+		m_shaderProgram->Apply();
 		if (m_needsRefreshRasterState)
 		{
 			m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
 				m_currentRasterizerState.GetAddressOf());
+			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetState(m_currentRasterizerState.Get());
 			m_needsRefreshRasterState = false;
 		}
-		return m_currentRasterizerState.Get();
+		if (m_needsRefreshScissorRect)
+		{
+			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetScissorRects(1, &m_scissorRect);
+		}
 	}
+
 }

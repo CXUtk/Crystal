@@ -30,16 +30,7 @@ namespace crystal
 
 	void DX11GraphicsDevice::SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)
 	{
-		pso->GetVertexBuffer()->Bind(0);
-
-		auto indexBuffer = pso->GetIndexBuffer();
-		if (indexBuffer)
-		{
-			indexBuffer->Bind(0);
-		}
-		pso->GetShaderProgram()->Apply();
-
-		m_pd3dImmediateContext->RSSetState(pso->GetRasterizerState());
+		pso->Apply();
 	}
 
 	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)

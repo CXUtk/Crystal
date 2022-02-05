@@ -70,6 +70,11 @@ namespace crystal
 
 		virtual void SetCullMode(CullingMode mode) = 0;
 		virtual void SetFillMode(FillMode mode) = 0;
+
+		virtual void SetScissorState(bool enable) = 0;
+		virtual void SetScissorRect(const Bound2i& rect) = 0;
+
+		virtual void Apply() = 0;
 	};
 
 	class IPlatformProvider
