@@ -69,12 +69,13 @@ namespace crystal
 		m_PSO = graphicsDevice->CreatePipelineStateObject();
 		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, 
 			vertices, sizeof(vertices));
-		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
-		//	loader.Triangles.data(), sizeof(float) * 3 * loader.Triangles.size());
+		auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
+			indices, sizeof(indices));
 
 		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/triangle.json");
 
 		vertexBuffer->BindVertexLayout(vLayout);
+		m_PSO->BindIndexBuffer(indexBuffer);
 		m_PSO->BindVertexBuffer(vertexBuffer);
 		m_PSO->BindShaderProgram(m_pShader);
 		//indexBuffer->Bind(0);
@@ -148,7 +149,8 @@ namespace crystal
 		m_pShader->Apply();
 		
 		graphicsDevice->SetPipelineStateObject(m_PSO);
-		graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
+		//graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
+		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
 	}
 
 	void TriangleTest::Exit()
