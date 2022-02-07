@@ -16,16 +16,19 @@ namespace crystal
 	class DX11VertexBuffer;
 	class DX11ShaderProgram;
 
-	void InitDX11Commons();
+	class DX11Common{
+	public:
+		static void InitDX11Commons();
 
-	const char* VertexElementFormatToShaderVarConvert(VertexElementFormat format);
-	DXGI_FORMAT VertexElementFormatConvert(VertexElementFormat format);
-	DXGI_FORMAT DataFormatConvert(DataFormat format);
-	D3D11_USAGE BufferUsageToDX11Convert(BufferUsage usage);
-	const char* SemanticNameConvert(SemanticType semanticType);
-	const char* ShaderModelConvert(ShaderType shaderType);
-	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type);
+		static const char* VertexElementFormatToShaderVarConvert(RenderFormat format);
+		static DXGI_FORMAT RenderFormatConvert(RenderFormat format);
+		static DXGI_FORMAT DataFormatConvert(DataFormat format);
+		static D3D11_USAGE BufferUsageToDX11Convert(BufferUsage usage);
+		static const char* SemanticNameConvert(SemanticType semanticType);
+		static const char* ShaderModelConvert(ShaderType shaderType);
+		static D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type);
 
-	D3D11_CULL_MODE CullModeConvert(CullingMode mode);
-	D3D11_FILL_MODE FillModeConvert(FillMode mode);
+		static D3D11_CULL_MODE CullModeConvert(CullingMode mode);
+		static D3D11_FILL_MODE FillModeConvert(FillMode mode);
+	};
 }

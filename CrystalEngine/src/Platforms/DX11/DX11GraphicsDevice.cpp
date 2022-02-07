@@ -8,9 +8,11 @@
 #include "DX11FragmentShader.h"
 #include "DX11ShaderProgram.h"
 #include "DX11PipelineStateObject.h"
+#include "DX11Texture2D.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
+#include <Core/Utils/IO.h>
 #include <SJson/SJson.h>
 #include <glm/gtx/quaternion.hpp>
 
@@ -75,7 +77,7 @@ namespace crystal
 	{
 		ComPtr<ID3D11Buffer> indexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_INDEX_BUFFER);
 		d3dUtils::D3D11SetDebugObjectName(indexBuffer.Get(), "IndexBuffer");
-		return std::make_shared<DX11IndexBuffer>(this, indexBuffer, DataFormatConvert(desc.Format));
+		return std::make_shared<DX11IndexBuffer>(this, indexBuffer, DX11Common::DataFormatConvert(desc.Format));
 	}
 
 	std::shared_ptr<VertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
@@ -131,15 +133,61 @@ namespace crystal
 		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
 	}
 
+	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc)
+	{
+		D3D11_TEXTURE2D_DESC textureDesc;
+		ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+		textureDesc.Width = texDesc.Size.x;
+		textureDesc.Height = texDesc.Size.y;
+		textureDesc.MipLevels = texDesc.MipmapLevels;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format);
+		textureDesc.Usage = DX11Common::BufferUsageToDX11Convert(texDesc.Usage);
+		textureDesc.MiscFlags = 0;
+		textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = 0;
+		if (texDesc.Usage == BufferUsage::CPURead)
+		{
+			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ;
+		}
+		else if (texDesc.Usage == BufferUsage::CPUWrite)
+		{
+			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
+		}
+		else if (texDesc.Usage == BufferUsage::CPURWrite)
+		{
+			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
+		}
+
+		ImageInfo imageinfo;
+		LoadDescription loadDesc;
+		loadDesc.FlipVertical = false;
+		IOUtils::ReadImage(path.c_str(), loadDesc, &imageinfo);
+
+		D3D11_SUBRESOURCE_DATA initData;
+		ZeroMemory(&initData, sizeof(initData));
+		initData.pSysMem = &imageinfo.Data[0];
+
+		ComPtr<ID3D11Texture2D> texture2D;
+		HR(m_pd3dDevice->CreateTexture2D(&textureDesc, &initData, texture2D.GetAddressOf()));
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
+		SRVDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format);
+		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
+		ComPtr<ID3D11ShaderResourceView> srv;
+		HR(m_pd3dDevice->CreateShaderResourceView(texture2D.Get(), &SRVDesc, srv.GetAddressOf()));
+		return std::make_shared<Texture2D>(this, texture2D, srv);
+	}
+
 	void DX11GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
 	{
-		m_pd3dImmediateContext->IASetPrimitiveTopology(PrimitiveTypeToTopologyConvert(primitiveType));
+		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
 		m_pd3dImmediateContext->Draw(numVertices, offset);
 	}
 
 	void DX11GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices, size_t indexOffset, size_t vertexOffset)
 	{
-		m_pd3dImmediateContext->IASetPrimitiveTopology(PrimitiveTypeToTopologyConvert(primitiveType));
+		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
 		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
 	}
 
@@ -327,7 +375,7 @@ namespace crystal
 	ComPtr<ID3DBlob> DX11GraphicsDevice::m_getShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type)
 	{
 		ComPtr<ID3DBlob> pBlob = nullptr;
-		HR(d3dUtils::CreateShaderFromMemory(src, size, name.c_str(), entryPoint.c_str(), ShaderModelConvert(type), pBlob.GetAddressOf()));
+		HR(d3dUtils::CreateShaderFromMemory(src, size, name.c_str(), entryPoint.c_str(), DX11Common::ShaderModelConvert(type), pBlob.GetAddressOf()));
 		return pBlob;
 	}
 
@@ -335,7 +383,7 @@ namespace crystal
 	{
 		D3D11_BUFFER_DESC vbd;
 		ZeroMemory(&vbd, sizeof(vbd));
-		vbd.Usage = BufferUsageToDX11Convert(usage);
+		vbd.Usage = DX11Common::BufferUsageToDX11Convert(usage);
 		vbd.ByteWidth = size;
 		vbd.BindFlags = bindFlags;
 		vbd.CPUAccessFlags = 0;

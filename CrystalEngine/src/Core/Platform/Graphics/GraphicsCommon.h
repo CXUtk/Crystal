@@ -50,6 +50,9 @@ namespace crystal
 
 	class DX11PipelineStateObject;
 	using PipelineStateObject = DX11PipelineStateObject;
+
+	class DX11Texture2D;
+	using Texture2D = DX11Texture2D;
 #endif
 
 	using Spectrum = glm::vec3;
@@ -153,20 +156,6 @@ namespace crystal
 	};
 
 
-	enum class PixelFormat
-	{
-		RED,
-		RG,
-		RGB,
-		RGBA,
-		RGB16F,
-		DEPTH,
-		STENCIL,
-		DEPTH_STENCIL,
-
-		__COUNT
-	};
-
 	enum class TextureSampleMethod
 	{
 		NEAREST,
@@ -235,16 +224,22 @@ namespace crystal
 		__COUNT
 	};
 
-	enum class VertexElementFormat
+	enum class RenderFormat
 	{
-		Single,
-		Vector2,
-		Vector3,
-		Vector4,
+		R32f,
+		RG32f,
+		RGB32f,
+		RGBA32f,
 
-		R8_UINT,
-		R8G8B8A8_UINT, 
-		R32G32B32_UINT,
+		R32ui,
+		RG32ui,
+		RGB32ui,
+		RGBA32ui,
+
+		R8ub,
+		RG8ub,
+		RGB8ub,
+		RGBA8ub,
 
 		__COUNT
 	};
@@ -288,7 +283,7 @@ namespace crystal
 	{
 		SemanticType		Semantic;
 		uint32_t			SemanticIndex;
-		VertexElementFormat	Format;
+		RenderFormat		Format;
 		uint32_t			ByteOffset;
 	};
 
@@ -306,6 +301,14 @@ namespace crystal
 
 	//	}
 	//};
+
+	struct Texture2DDescription
+	{
+		Vector2i		Size;
+		int				MipmapLevels;
+		RenderFormat	Format;
+		BufferUsage		Usage;
+	};
 
 	struct VertexLayout
 	{

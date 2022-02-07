@@ -11,6 +11,7 @@ namespace crystal
 #else
 	using Float = float;
 #endif
+	using Byte = unsigned char;
 
 	
 	// Core

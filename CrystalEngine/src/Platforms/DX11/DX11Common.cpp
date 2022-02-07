@@ -17,19 +17,24 @@ namespace crystal
 	}
 
 	template<size_t N>
-	constexpr std::array<DXGI_FORMAT, N> GenerateVertexElementFormatMapping()
+	constexpr std::array<DXGI_FORMAT, N> GenerateRenderFormatMapping()
 	{
 		std::array<DXGI_FORMAT, N> M{};
-		M[(int)VertexElementFormat::Single] = DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT;
-		M[(int)VertexElementFormat::Vector2] = DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT;
-		M[(int)VertexElementFormat::Vector3] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT;
-		M[(int)VertexElementFormat::Vector4] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
-		M[(int)VertexElementFormat::R8_UINT] = DXGI_FORMAT::DXGI_FORMAT_R8_UINT;
-		M[(int)VertexElementFormat::R8G8B8A8_UINT] = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UINT;
-		M[(int)VertexElementFormat::R32G32B32_UINT] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_UINT;
+		M[(int)RenderFormat::R32f] = DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT;
+		M[(int)RenderFormat::RG32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT;
+		M[(int)RenderFormat::RGB32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT;
+		M[(int)RenderFormat::RGBA32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+		M[(int)RenderFormat::R8ub] = DXGI_FORMAT::DXGI_FORMAT_R8_UINT;
+		M[(int)RenderFormat::RG8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8_UINT;
+		M[(int)RenderFormat::RGB8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UINT;
+		M[(int)RenderFormat::RGBA8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UINT;
+		M[(int)RenderFormat::R32ui] = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
+		M[(int)RenderFormat::RG32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32_UINT;
+		M[(int)RenderFormat::RGB32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_UINT;
+		M[(int)RenderFormat::RGBA32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_UINT;
 		return M;
 	}
-	constexpr auto VertexElementFormatMapping = GenerateVertexElementFormatMapping<(size_t)VertexElementFormat::__COUNT>();
+	constexpr auto RenderFormatMapping = GenerateRenderFormatMapping<(size_t)RenderFormat::__COUNT>();
 
 	template<size_t N>
 	constexpr std::array<D3D11_USAGE, N> GenerateBufferUsageToDX11Mapping()
@@ -48,16 +53,21 @@ namespace crystal
 	constexpr std::array<const char*, N> GenerateVertexElementFormatToShaderVarMapping()
 	{
 		std::array<const char*, N> M{};
-		M[(int)VertexElementFormat::Single] = "float";
-		M[(int)VertexElementFormat::Vector2] = "float2";
-		M[(int)VertexElementFormat::Vector3] = "float3";
-		M[(int)VertexElementFormat::Vector4] = "float4";
-		M[(int)VertexElementFormat::R8_UINT] = "float2";
-		M[(int)VertexElementFormat::R8G8B8A8_UINT] = "uint4";
-		M[(int)VertexElementFormat::R32G32B32_UINT] = "uint3";
+		M[(int)RenderFormat::R32f] = "float";
+		M[(int)RenderFormat::RG32f] = "float2";
+		M[(int)RenderFormat::RGB32f] = "float3";
+		M[(int)RenderFormat::RGBA32f] = "float4";
+		M[(int)RenderFormat::R8ub] = "byte";
+		M[(int)RenderFormat::RG8ub] = "byte2";
+		M[(int)RenderFormat::RGB8ub] = "byte3";
+		M[(int)RenderFormat::RGBA8ub] = "byte4";
+		M[(int)RenderFormat::R32ui] = "uint";
+		M[(int)RenderFormat::RG32ui] = "uint2";
+		M[(int)RenderFormat::RGB32ui] = "uint3";
+		M[(int)RenderFormat::RGBA32ui] = "uint4";
 		return M;
 	}
-	constexpr auto VertexElementFormatToShaderVarMapping = GenerateVertexElementFormatToShaderVarMapping<(size_t)VertexElementFormat::__COUNT>();
+	constexpr auto VertexElementFormatToShaderVarMapping = GenerateVertexElementFormatToShaderVarMapping<(size_t)RenderFormat::__COUNT>();
 
 	template<size_t N>
 	constexpr std::array<DXGI_FORMAT, N> GenerateDataFormatToShaderVarMapping()
@@ -133,7 +143,7 @@ namespace crystal
 	}
 	constexpr auto FillModeMapping = GenerateFillModeMapping<(size_t)FillMode::__COUNT>();
 
-	void InitDX11Commons()
+	void DX11Common::InitDX11Commons()
 	{
 		static bool initialized = false;
 		if (initialized) return;
@@ -142,47 +152,47 @@ namespace crystal
 		initialized = true;
 	}
 
-	const char* VertexElementFormatToShaderVarConvert(VertexElementFormat format)
+	const char* DX11Common::VertexElementFormatToShaderVarConvert(RenderFormat format)
 	{
 		return VertexElementFormatToShaderVarMapping[(int)format];
 	}
 
-	DXGI_FORMAT VertexElementFormatConvert(VertexElementFormat format)
+	DXGI_FORMAT DX11Common::RenderFormatConvert(RenderFormat format)
 	{
-		return VertexElementFormatMapping[(int)format];
+		return RenderFormatMapping[(int)format];
 	}
 
-	DXGI_FORMAT DataFormatConvert(DataFormat format)
+	DXGI_FORMAT DX11Common::DataFormatConvert(DataFormat format)
 	{
 		return DataFormatMapping[(int)format];
 	}
 
-	D3D11_USAGE BufferUsageToDX11Convert(BufferUsage usage)
+	D3D11_USAGE DX11Common::BufferUsageToDX11Convert(BufferUsage usage)
 	{
 		return BufferUsageToDX11Mapping[(int)usage];
 	}
 
-	const char* SemanticNameConvert(SemanticType semanticType)
+	const char* DX11Common::SemanticNameConvert(SemanticType semanticType)
 	{
 		return SemanticNameMapping[(int)semanticType];
 	}
 
-	const char* ShaderModelConvert(ShaderType shaderType)
+	const char* DX11Common::ShaderModelConvert(ShaderType shaderType)
 	{
 		return ShaderTypeToModelStringMapping[(int)shaderType];
 	}
 
-	D3D11_PRIMITIVE_TOPOLOGY PrimitiveTypeToTopologyConvert(PrimitiveType type)
+	D3D11_PRIMITIVE_TOPOLOGY DX11Common::PrimitiveTypeToTopologyConvert(PrimitiveType type)
 	{
 		return PrimititveTopologyMapping[(int)type];
 	}
 
-	D3D11_CULL_MODE CullModeConvert(CullingMode mode)
+	D3D11_CULL_MODE DX11Common::CullModeConvert(CullingMode mode)
 	{
 		return CullModeMapping[(int)mode];
 	}
 
-	D3D11_FILL_MODE FillModeConvert(FillMode mode)
+	D3D11_FILL_MODE DX11Common::FillModeConvert(FillMode mode)
 	{
 		return FillModeMapping[(int)mode];
 	}

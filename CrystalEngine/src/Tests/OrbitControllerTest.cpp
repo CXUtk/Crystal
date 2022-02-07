@@ -49,9 +49,9 @@ namespace crystal
 		objloader::ObjLoader loader;
 		loader.load("resources/cube.obj");
 		std::vector<ElementDescription> elements = {
-			{ SemanticType::POSITION, 0, VertexElementFormat::Vector3, 0 },
-			{ SemanticType::TEXCOORD, 0, VertexElementFormat::Vector2, 12 },
-			{ SemanticType::NORMAL, 0, VertexElementFormat::Vector3, 20 },
+			{ SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
+			{ SemanticType::TEXCOORD, 0, RenderFormat::RG32f, 12 },
+			{ SemanticType::NORMAL, 0, RenderFormat::RGB32f, 20 },
 		};
 		VertexLayout vLayout(elements, sizeof(objloader::VertexData));
 		auto graphicsDevice = m_engine->GetGraphicsDevice();

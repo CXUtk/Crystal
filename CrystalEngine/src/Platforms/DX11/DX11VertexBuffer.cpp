@@ -21,8 +21,8 @@ namespace crystal
 		for (auto& element : layout.Elements)
 		{
 			index++;
-			auto name = VertexElementFormatToShaderVarConvert(element.Format);
-			auto semantic = SemanticNameConvert(element.Semantic);
+			auto name = DX11Common::VertexElementFormatToShaderVarConvert(element.Format);
+			auto semantic = DX11Common::SemanticNameConvert(element.Semantic);
 			components.append(string_format("%s %s:%s%d; ", name, GetNameByIndex(index).c_str(), semantic, element.SemanticIndex));
 		}
 		return string_format("struct VIn { %s };\
@@ -49,8 +49,8 @@ return vout;\
 			auto& layoutElement = layout.Elements[i];
 
 			elementDesc.AlignedByteOffset = layoutElement.ByteOffset;
-			elementDesc.Format = VertexElementFormatConvert(layoutElement.Format);
-			elementDesc.SemanticName = SemanticNameConvert(layoutElement.Semantic);
+			elementDesc.Format = DX11Common::RenderFormatConvert(layoutElement.Format);
+			elementDesc.SemanticName = DX11Common::SemanticNameConvert(layoutElement.Semantic);
 			elementDesc.SemanticIndex = layoutElement.SemanticIndex;
 		}
 		return result;
@@ -67,7 +67,7 @@ return vout;\
 
 		ComPtr<ID3DBlob> pBlob = nullptr;
 		HR(d3dUtils::CreateShaderFromMemory(dummyShader.c_str(), dummyShader.size(), "dummyVS", "VS", 
-			ShaderModelConvert(ShaderType::VERTEX_SHADER), pBlob.GetAddressOf()));
+			DX11Common::ShaderModelConvert(ShaderType::VERTEX_SHADER), pBlob.GetAddressOf()));
 		HR(device->CreateInputLayout(d3dInputElements.get(), layout.Elements.size(),
 			pBlob->GetBufferPointer(), pBlob->GetBufferSize(), m_pInputLayout.GetAddressOf()));
 	}

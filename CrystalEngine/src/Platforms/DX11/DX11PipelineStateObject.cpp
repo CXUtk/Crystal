@@ -89,13 +89,13 @@ namespace crystal
 
 	void DX11PipelineStateObject::SetCullMode(CullingMode mode)
 	{
-		m_rasterStateDesc.CullMode = CullModeConvert(mode);
+		m_rasterStateDesc.CullMode = DX11Common::CullModeConvert(mode);
 		m_needsRefreshRasterState = true;
 	}
 
 	void DX11PipelineStateObject::SetFillMode(FillMode mode)
 	{
-		m_rasterStateDesc.FillMode = FillModeConvert(mode);
+		m_rasterStateDesc.FillMode = DX11Common::FillModeConvert(mode);
 		m_needsRefreshRasterState = true;
 	}
 

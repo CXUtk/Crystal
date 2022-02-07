@@ -54,8 +54,8 @@ namespace crystal
 		};
 
 		std::vector<ElementDescription> elements = {
-			{ SemanticType::POSITION, 0, VertexElementFormat::Vector3, 0 },
-			{ SemanticType::COLOR, 0, VertexElementFormat::Vector4, 12 },
+			{ SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
+			{ SemanticType::COLOR, 0, RenderFormat::RGBA32f, 12 },
 		};
 		VertexLayout vLayout(elements, sizeof(Vertex));
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
