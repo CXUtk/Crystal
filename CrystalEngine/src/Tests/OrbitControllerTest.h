@@ -26,5 +26,6 @@ namespace crystal
 		std::shared_ptr<crystal::ShaderProgram> m_pShader = nullptr;
 		std::shared_ptr<Camera> m_pCamera = nullptr;
 		std::shared_ptr<crystal::PipelineStateObject> m_PSO = nullptr;
+		std::shared_ptr<crystal::Texture2D> m_texture2D = nullptr;
 	};
 }

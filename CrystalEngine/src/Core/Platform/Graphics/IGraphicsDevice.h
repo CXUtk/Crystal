@@ -27,7 +27,7 @@ namespace crystal
 		virtual std::shared_ptr<FragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) = 0;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
-
+		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) = 0;
 		
 	};
 

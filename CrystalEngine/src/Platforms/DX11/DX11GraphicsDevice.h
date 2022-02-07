@@ -31,7 +31,7 @@ namespace crystal
 			const std::string& name, const std::string& entryPoint) override;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
 
-		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc);
+		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) override;
 
 		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
 		ComPtr<ID3D11Device> GetD3DDevice() const { return m_pd3dDevice; }

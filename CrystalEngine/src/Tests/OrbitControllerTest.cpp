@@ -71,12 +71,20 @@ namespace crystal
 
 		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
 
+		Texture2DDescription texturedesc;
+		texturedesc.Format = RenderFormat::RGBA8ub;
+		texturedesc.MipmapLevels = 1;
+		texturedesc.Usage = BufferUsage::Default;
+
+		m_texture2D = graphicsDevice->CreateTexture2D("resources/dots.png", texturedesc);
+
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PSO->BindVertexBuffer(vertexBuffer);
 		m_PSO->BindShaderProgram(m_pShader);
 		m_PSO->SetCullMode(CullingMode::CullCCW);
 		m_PSO->SetFillMode(FillMode::SOLID);
 		m_PSO->SetDepthTestState(true);
+		m_PSO->BindShaderResource(m_texture2D->GetShaderResourceView(), 0);
 		//indexBuffer->Bind(0);
 	}
 

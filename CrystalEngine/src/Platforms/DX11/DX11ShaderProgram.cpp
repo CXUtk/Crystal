@@ -33,6 +33,19 @@ namespace crystal
 	DX11ShaderProgram::~DX11ShaderProgram()
 	{}
 
+	void DX11ShaderProgram::SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* buffer)
+	{
+		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
+		if (m_vertexShader != nullptr)
+		{
+			context->VSSetShaderResources(startSlot, count, buffer);
+		}
+		if (m_fragmentShader != nullptr)
+		{
+			context->PSSetShaderResources(startSlot, count, buffer);
+		}
+	}
+
 	void DX11ShaderProgram::Apply()
 	{
 		auto context = m_pGraphicsDevice->GetD3DDeviceContext();

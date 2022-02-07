@@ -135,10 +135,15 @@ namespace crystal
 
 	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc)
 	{
+		ImageInfo imageinfo;
+		LoadDescription loadDesc;
+		loadDesc.FlipVertical = false;
+		IOUtils::ReadImage(path.c_str(), loadDesc, &imageinfo);
+
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		textureDesc.Width = texDesc.Size.x;
-		textureDesc.Height = texDesc.Size.y;
+		textureDesc.Width = imageinfo.Size.x;
+		textureDesc.Height = imageinfo.Size.y;
 		textureDesc.MipLevels = texDesc.MipmapLevels;
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format);
@@ -158,11 +163,6 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
-
-		ImageInfo imageinfo;
-		LoadDescription loadDesc;
-		loadDesc.FlipVertical = false;
-		IOUtils::ReadImage(path.c_str(), loadDesc, &imageinfo);
 
 		D3D11_SUBRESOURCE_DATA initData;
 		ZeroMemory(&initData, sizeof(initData));

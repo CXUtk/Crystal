@@ -137,7 +137,15 @@ namespace crystal
 		{
 			m_indexBuffer->Bind(0);
 		}
+		static ID3D11ShaderResourceView* viewArray[NUM_SRV_SLOTS]{};
+
+		for (int i = 0; i < NUM_SRV_SLOTS; i++)
+		{
+			viewArray[i] = m_SRVSlots[i].Get();
+		}
+		m_shaderProgram->SetShaderResources(0, NUM_SRV_SLOTS, viewArray);
 		m_shaderProgram->Apply();
+
 		if (m_needsRefreshRasterState)
 		{
 			m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
@@ -156,6 +164,12 @@ namespace crystal
 				m_currentDepthStencilState.GetAddressOf());
 			m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
 		}
+	}
+
+	void DX11PipelineStateObject::BindShaderResource(ComPtr<ID3D11ShaderResourceView> srv, int index)
+	{
+		assert(index >= 0 && index < NUM_SRV_SLOTS);
+		m_SRVSlots[index] = srv;
 	}
 
 }
