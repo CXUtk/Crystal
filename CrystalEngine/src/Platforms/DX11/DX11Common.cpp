@@ -4,6 +4,8 @@
 #include <Core/Platform/Graphics/GraphicsCommon.h>
 #include <Core/Utils/Geometry.h>
 
+#include "DX11SamplerState.h"
+
 namespace crystal
 {
 
@@ -26,7 +28,6 @@ namespace crystal
 		M[(int)RenderFormat::RGBA32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
 		M[(int)RenderFormat::R8ub] = DXGI_FORMAT::DXGI_FORMAT_R8_UINT;
 		M[(int)RenderFormat::RG8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8_UINT;
-		M[(int)RenderFormat::RGB8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UINT;
 		M[(int)RenderFormat::RGBA8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UINT;
 		M[(int)RenderFormat::R32ui] = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
 		M[(int)RenderFormat::RG32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32_UINT;
@@ -35,6 +36,25 @@ namespace crystal
 		return M;
 	}
 	constexpr auto RenderFormatMapping = GenerateRenderFormatMapping<(size_t)RenderFormat::__COUNT>();
+
+	template<size_t N>
+	constexpr std::array<DXGI_FORMAT, N> GenerateRenderFormatMappingNormal()
+	{
+		std::array<DXGI_FORMAT, N> M{};
+		M[(int)RenderFormat::R32f] = DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT;
+		M[(int)RenderFormat::RG32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT;
+		M[(int)RenderFormat::RGB32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT;
+		M[(int)RenderFormat::RGBA32f] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+		M[(int)RenderFormat::R8ub] = DXGI_FORMAT::DXGI_FORMAT_R8_UNORM;
+		M[(int)RenderFormat::RG8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8_UNORM;
+		M[(int)RenderFormat::RGBA8ub] = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
+		M[(int)RenderFormat::R32ui] = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
+		M[(int)RenderFormat::RG32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32_UINT;
+		M[(int)RenderFormat::RGB32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_UINT;
+		M[(int)RenderFormat::RGBA32ui] = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_UINT;
+		return M;
+	}
+	constexpr auto RenderFormatMapping_Normal = GenerateRenderFormatMappingNormal<(size_t)RenderFormat::__COUNT>();
 
 	template<size_t N>
 	constexpr std::array<D3D11_USAGE, N> GenerateBufferUsageToDX11Mapping()
@@ -50,7 +70,26 @@ namespace crystal
 	constexpr auto BufferUsageToDX11Mapping = GenerateBufferUsageToDX11Mapping<(size_t)BufferUsage::__COUNT>();
 
 	template<size_t N>
-	constexpr std::array<const char*, N> GenerateVertexElementFormatToShaderVarMapping()
+	constexpr std::array<size_t, N> GenerateRenderFormatToSizeInBytesMapping()
+	{
+		std::array<size_t, N> M{};
+		M[(int)RenderFormat::R32f] = sizeof(float) * 1;
+		M[(int)RenderFormat::RG32f] = sizeof(float) * 2;
+		M[(int)RenderFormat::RGB32f] = sizeof(float) * 3;
+		M[(int)RenderFormat::RGBA32f] = sizeof(float) * 4;
+		M[(int)RenderFormat::R8ub] = sizeof(char) * 1;
+		M[(int)RenderFormat::RG8ub] = sizeof(char) * 2;
+		M[(int)RenderFormat::RGBA8ub] = sizeof(char) * 4;
+		M[(int)RenderFormat::R32ui] = sizeof(int) * 1;
+		M[(int)RenderFormat::RG32ui] = sizeof(int) * 2;
+		M[(int)RenderFormat::RGB32ui] = sizeof(int) * 3;
+		M[(int)RenderFormat::RGBA32ui] = sizeof(int) * 4;
+		return M;
+	}
+	constexpr auto RenderFormatToSizeInBytesMapping = GenerateRenderFormatToSizeInBytesMapping<(size_t)RenderFormat::__COUNT>();
+
+	template<size_t N>
+	constexpr std::array<const char*, N> GenerateRenderFormatToShaderVarMapping()
 	{
 		std::array<const char*, N> M{};
 		M[(int)RenderFormat::R32f] = "float";
@@ -59,7 +98,6 @@ namespace crystal
 		M[(int)RenderFormat::RGBA32f] = "float4";
 		M[(int)RenderFormat::R8ub] = "byte";
 		M[(int)RenderFormat::RG8ub] = "byte2";
-		M[(int)RenderFormat::RGB8ub] = "byte3";
 		M[(int)RenderFormat::RGBA8ub] = "byte4";
 		M[(int)RenderFormat::R32ui] = "uint";
 		M[(int)RenderFormat::RG32ui] = "uint2";
@@ -67,7 +105,7 @@ namespace crystal
 		M[(int)RenderFormat::RGBA32ui] = "uint4";
 		return M;
 	}
-	constexpr auto VertexElementFormatToShaderVarMapping = GenerateVertexElementFormatToShaderVarMapping<(size_t)RenderFormat::__COUNT>();
+	constexpr auto RenderFormatToShaderVarMapping = GenerateRenderFormatToShaderVarMapping<(size_t)RenderFormat::__COUNT>();
 
 	template<size_t N>
 	constexpr std::array<DXGI_FORMAT, N> GenerateDataFormatToShaderVarMapping()
@@ -143,23 +181,29 @@ namespace crystal
 	}
 	constexpr auto FillModeMapping = GenerateFillModeMapping<(size_t)FillMode::__COUNT>();
 
-	void DX11Common::InitDX11Commons()
+	void DX11Common::InitDX11Commons(DX11GraphicsDevice* graphicsDevice)
 	{
 		static bool initialized = false;
 		if (initialized) return;
 		{
+			DX11SamplerState::Init(graphicsDevice);
 		}
 		initialized = true;
 	}
 
-	const char* DX11Common::VertexElementFormatToShaderVarConvert(RenderFormat format)
+	const char* DX11Common::RenderFormatToShaderVarConvert(RenderFormat format)
 	{
-		return VertexElementFormatToShaderVarMapping[(int)format];
+		return RenderFormatToShaderVarMapping[(int)format];
 	}
 
-	DXGI_FORMAT DX11Common::RenderFormatConvert(RenderFormat format)
+	DXGI_FORMAT DX11Common::RenderFormatConvert(RenderFormat format, bool normalized)
 	{
-		return RenderFormatMapping[(int)format];
+		return  normalized ? RenderFormatMapping_Normal[(int)format] : RenderFormatMapping[(int)format];
+	}
+
+	size_t DX11Common::RenderFormatToBytes(RenderFormat format)
+	{
+		return RenderFormatToSizeInBytesMapping[(int)format];
 	}
 
 	DXGI_FORMAT DX11Common::DataFormatConvert(DataFormat format)

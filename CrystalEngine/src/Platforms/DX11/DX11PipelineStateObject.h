@@ -27,7 +27,8 @@ namespace crystal
 
 		virtual void Apply() override;
 
-		virtual void BindShaderResource(ComPtr<ID3D11ShaderResourceView> srv, int index);
+		virtual void BindTexture(std::shared_ptr<Texture2D> texture, int index) override;
+		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) override;
 	private:
 		std::shared_ptr<VertexBuffer>	m_vertexBuffer = nullptr;
 		std::shared_ptr<IndexBuffer>	m_indexBuffer = nullptr;
@@ -43,8 +44,9 @@ namespace crystal
 		ComPtr<ID3D11DepthStencilState>	m_currentDepthStencilState = nullptr;
 		bool							m_needsRefreshDepthStencilState = true;
 
-		static constexpr int NUM_SRV_SLOTS = 8;
-		ComPtr<ID3D11ShaderResourceView>	m_SRVSlots[NUM_SRV_SLOTS];
+		static constexpr int NUM_TEXTURE_SLOTS = 8;
+		ComPtr<ID3D11ShaderResourceView>	m_SRVSlots[NUM_TEXTURE_SLOTS];
+		ComPtr<ID3D11SamplerState>			m_samplerStates[NUM_TEXTURE_SLOTS];
 
 		bool		m_needsRefreshScissorRect = false;
 		RECT		m_scissorRect{};

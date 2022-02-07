@@ -28,7 +28,6 @@ namespace crystal
 			const std::string& name, const std::string& entryPoint) = 0;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
 		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) = 0;
-		
 	};
 
 	class IVertexBuffer
@@ -76,6 +75,9 @@ namespace crystal
 
 		virtual void SetDepthTestState(bool enable) = 0;
 		virtual void SetStencilTestState(bool enable) = 0;
+
+		virtual void BindTexture(std::shared_ptr<Texture2D> texture, int index) = 0;
+		virtual void BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index) = 0;
 
 		virtual void Apply() = 0;
 	};

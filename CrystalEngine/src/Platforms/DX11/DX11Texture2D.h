@@ -9,7 +9,7 @@ namespace crystal
 		DX11Texture2D(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11Texture2D> tex2d, ComPtr<ID3D11ShaderResourceView> SRV);
 		~DX11Texture2D();
 
-		ComPtr<ID3D11ShaderResourceView> GetShaderResourceView() const { return m_pSRV; }
+		ComPtr<ID3D11ShaderResourceView> GetSRVDX11Ptr() const { return m_pSRV; }
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11Texture2D>		m_texture2D = nullptr;

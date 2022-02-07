@@ -21,7 +21,7 @@ namespace crystal
 		for (auto& element : layout.Elements)
 		{
 			index++;
-			auto name = DX11Common::VertexElementFormatToShaderVarConvert(element.Format);
+			auto name = DX11Common::RenderFormatToShaderVarConvert(element.Format);
 			auto semantic = DX11Common::SemanticNameConvert(element.Semantic);
 			components.append(string_format("%s %s:%s%d; ", name, GetNameByIndex(index).c_str(), semantic, element.SemanticIndex));
 		}
@@ -49,7 +49,7 @@ return vout;\
 			auto& layoutElement = layout.Elements[i];
 
 			elementDesc.AlignedByteOffset = layoutElement.ByteOffset;
-			elementDesc.Format = DX11Common::RenderFormatConvert(layoutElement.Format);
+			elementDesc.Format = DX11Common::RenderFormatConvert(layoutElement.Format, false);
 			elementDesc.SemanticName = DX11Common::SemanticNameConvert(layoutElement.Semantic);
 			elementDesc.SemanticIndex = layoutElement.SemanticIndex;
 		}

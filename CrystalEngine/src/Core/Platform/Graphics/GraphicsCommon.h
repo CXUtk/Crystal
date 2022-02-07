@@ -53,6 +53,9 @@ namespace crystal
 
 	class DX11Texture2D;
 	using Texture2D = DX11Texture2D;
+
+	class DX11SamplerState;
+	using SamplerState = DX11SamplerState;
 #endif
 
 	using Spectrum = glm::vec3;
@@ -238,7 +241,6 @@ namespace crystal
 
 		R8ub,
 		RG8ub,
-		RGB8ub,
 		RGBA8ub,
 
 		__COUNT

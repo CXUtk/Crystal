@@ -5,6 +5,8 @@
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
 #include "DX11ShaderProgram.h"
+#include "DX11Texture2D.h"
+#include "DX11SamplerState.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include <Core/Utils/Misc.h>
@@ -45,6 +47,9 @@ namespace crystal
 		m_depthStencilStateDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 		m_depthStencilStateDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 		m_depthStencilStateDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		memset(m_SRVSlots, 0, sizeof(m_SRVSlots));
+		memset(m_samplerStates, 0, sizeof(m_samplerStates));
 	}
 
 	DX11PipelineStateObject::~DX11PipelineStateObject()
@@ -137,13 +142,15 @@ namespace crystal
 		{
 			m_indexBuffer->Bind(0);
 		}
-		static ID3D11ShaderResourceView* viewArray[NUM_SRV_SLOTS]{};
+		static ID3D11ShaderResourceView* viewArray[NUM_TEXTURE_SLOTS]{};
+		static ID3D11SamplerState* samplerArray[NUM_TEXTURE_SLOTS]{};
 
-		for (int i = 0; i < NUM_SRV_SLOTS; i++)
+		for (int i = 0; i < NUM_TEXTURE_SLOTS; i++)
 		{
 			viewArray[i] = m_SRVSlots[i].Get();
+			samplerArray[i] = m_samplerStates[i].Get();
 		}
-		m_shaderProgram->SetShaderResources(0, NUM_SRV_SLOTS, viewArray);
+		m_shaderProgram->SetShaderResources(0, NUM_TEXTURE_SLOTS, viewArray, samplerArray);
 		m_shaderProgram->Apply();
 
 		if (m_needsRefreshRasterState)
@@ -166,10 +173,15 @@ namespace crystal
 		}
 	}
 
-	void DX11PipelineStateObject::BindShaderResource(ComPtr<ID3D11ShaderResourceView> srv, int index)
+	void DX11PipelineStateObject::BindTexture(std::shared_ptr<Texture2D> texture, int index)
 	{
-		assert(index >= 0 && index < NUM_SRV_SLOTS);
-		m_SRVSlots[index] = srv;
+		assert(index >= 0 && index < NUM_TEXTURE_SLOTS);
+		m_SRVSlots[index] = texture->GetSRVDX11Ptr();
 	}
 
+	void DX11PipelineStateObject::BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index)
+	{
+		assert(index >= 0 && index < NUM_TEXTURE_SLOTS);
+		m_samplerStates[index] = samplerState->GetDX11Ptr();
+	}
 }

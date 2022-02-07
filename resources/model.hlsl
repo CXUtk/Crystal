@@ -1,4 +1,6 @@
 Texture2D diffuseTexture : register(t0);
+SamplerState mySampler0 : register(s0);
+
 cbuffer ConstantBuffer : register(b0)
 {
 	float4x4 M;
@@ -32,5 +34,5 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_Target
 {
-	return float4(0.5 + 0.5 * pIn.normal, 1.0) * Texture.Sample(diffuseTexture, pIn.texCoord);
+	return float4(0.5 + 0.5 * pIn.normal, 1.0) * diffuseTexture.Sample(mySampler0, pIn.texCoord);
 }

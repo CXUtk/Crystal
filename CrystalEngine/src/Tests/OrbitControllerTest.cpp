@@ -84,7 +84,8 @@ namespace crystal
 		m_PSO->SetCullMode(CullingMode::CullCCW);
 		m_PSO->SetFillMode(FillMode::SOLID);
 		m_PSO->SetDepthTestState(true);
-		m_PSO->BindShaderResource(m_texture2D->GetShaderResourceView(), 0);
+		m_PSO->BindTexture(m_texture2D, 0);
+		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::PointClamp), 0);
 		//indexBuffer->Bind(0);
 	}
 

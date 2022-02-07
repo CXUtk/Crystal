@@ -9,6 +9,7 @@
 #include "DX11ShaderProgram.h"
 #include "DX11PipelineStateObject.h"
 #include "DX11Texture2D.h"
+#include "WICTextureLoader.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
@@ -135,22 +136,17 @@ namespace crystal
 
 	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc)
 	{
-		ImageInfo imageinfo;
-		LoadDescription loadDesc;
-		loadDesc.FlipVertical = false;
-		IOUtils::ReadImage(path.c_str(), loadDesc, &imageinfo);
-
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		textureDesc.Width = imageinfo.Size.x;
-		textureDesc.Height = imageinfo.Size.y;
 		textureDesc.MipLevels = texDesc.MipmapLevels;
 		textureDesc.ArraySize = 1;
-		textureDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format);
+		textureDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format, true);
 		textureDesc.Usage = DX11Common::BufferUsageToDX11Convert(texDesc.Usage);
 		textureDesc.MiscFlags = 0;
 		textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
 		textureDesc.CPUAccessFlags = 0;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
 		if (texDesc.Usage == BufferUsage::CPURead)
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ;
@@ -163,20 +159,12 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
+		ComPtr<ID3D11ShaderResourceView> textureSRV;
+		DirectX::CreateWICTextureFromFileEx(m_pd3dDevice.Get(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
+			0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
+			textureDesc.MiscFlags, 0, nullptr, textureSRV.GetAddressOf());
 
-		D3D11_SUBRESOURCE_DATA initData;
-		ZeroMemory(&initData, sizeof(initData));
-		initData.pSysMem = &imageinfo.Data[0];
-
-		ComPtr<ID3D11Texture2D> texture2D;
-		HR(m_pd3dDevice->CreateTexture2D(&textureDesc, &initData, texture2D.GetAddressOf()));
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-		SRVDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format);
-		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2D;
-		ComPtr<ID3D11ShaderResourceView> srv;
-		HR(m_pd3dDevice->CreateShaderResourceView(texture2D.Get(), &SRVDesc, srv.GetAddressOf()));
-		return std::make_shared<Texture2D>(this, texture2D, srv);
+		return std::make_shared<Texture2D>(this, nullptr, textureSRV);
 	}
 
 	void DX11GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
