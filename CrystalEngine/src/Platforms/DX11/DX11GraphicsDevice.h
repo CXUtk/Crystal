@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Core/Platform/Platforms.h>
 #include <Platforms/Windows32/Win32GameWindow.h>
 
@@ -19,6 +19,8 @@ namespace crystal
 		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) override;
 		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices,
 			size_t indexOffset, size_t vertexOffset) override;
+		virtual void PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D) override;
+		virtual void PopRenderTarget2D() override;
 
 		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() override;
 		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc,
@@ -30,8 +32,8 @@ namespace crystal
 		virtual std::shared_ptr<FragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) override;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
-
 		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) override;
+		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
 		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
 		ComPtr<ID3D11Device> GetD3DDevice() const { return m_pd3dDevice; }
@@ -51,6 +53,9 @@ namespace crystal
 		UINT		m_4xMsaaQuality = 1;		// MSAA支持的质量等级
 		Vector2i	m_oldClientSize{};			// History window size, used to detect change
 
+		static constexpr int NUM_RENDERTARGETS = 32;
+		std::shared_ptr<RenderTarget2D>		m_renderTarget2DStack[NUM_RENDERTARGETS];
+		size_t								m_renderTargetStackPtr = 0;
 
 		Win32GameWindow*	m_pWindow;			// Win32 窗体对象
 

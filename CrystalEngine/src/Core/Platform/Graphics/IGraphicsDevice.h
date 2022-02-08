@@ -15,10 +15,12 @@ namespace crystal
 		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) = 0;
 		virtual void Present() = 0;
 		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) = 0;
-		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices, 
+		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices,
 			size_t indexOffset, size_t vertexOffset) = 0;
 		virtual void SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) = 0;
-		
+		virtual void PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D) = 0;
+		virtual void PopRenderTarget2D() = 0;
+
 		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() = 0;
 		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) = 0;
 		virtual std::shared_ptr<IndexBuffer> CreateIndexBuffer(const IndexBufferDescription& desc, void* src, size_t size) = 0;
@@ -28,6 +30,7 @@ namespace crystal
 			const std::string& name, const std::string& entryPoint) = 0;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
 		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) = 0;
+		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;
 	};
 
 	class IVertexBuffer
@@ -76,7 +79,7 @@ namespace crystal
 		virtual void SetDepthTestState(bool enable) = 0;
 		virtual void SetStencilTestState(bool enable) = 0;
 
-		virtual void BindTexture(std::shared_ptr<Texture2D> texture, int index) = 0;
+		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) = 0;
 		virtual void BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index) = 0;
 
 		virtual void Apply() = 0;

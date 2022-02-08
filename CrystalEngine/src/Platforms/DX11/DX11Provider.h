@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Core/Platform/Platforms.h>
 #include <Crystal.h>
 

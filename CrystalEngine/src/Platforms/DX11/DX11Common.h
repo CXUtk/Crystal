@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <wrl/client.h>
 #include <d3d11_1.h>
 #include <Core/Platform/Platforms.h>
@@ -15,6 +15,14 @@ namespace crystal
 	class DX11FragmentShader;
 	class DX11VertexBuffer;
 	class DX11ShaderProgram;
+
+	class IDX11ShaderResource
+	{
+	public:
+		virtual ~IDX11ShaderResource() = 0 {};
+
+		virtual ComPtr<ID3D11ShaderResourceView> GetShaderResourceView() const = 0;
+	};
 
 	class DX11Common{
 	public:

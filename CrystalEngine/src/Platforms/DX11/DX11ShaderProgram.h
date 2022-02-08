@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DX11Common.h"
 #include <map>
 

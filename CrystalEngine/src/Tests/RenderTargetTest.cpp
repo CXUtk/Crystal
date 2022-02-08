@@ -1,4 +1,4 @@
-#include "OrbitControllerTest.h"
+#include "RenderTargetTest.h"
 #include <Engine.h>
 #include <Core/Platform/Platforms.h>
 #include <Core/Utils/Logger.h>
@@ -17,21 +17,28 @@
 
 namespace crystal
 {
-	OrbitControllerTest::OrbitControllerTest()
+	RenderTargetTest::RenderTargetTest()
 	{
 
 	}
-	
-	
-	OrbitControllerTest::~OrbitControllerTest()
+
+
+	RenderTargetTest::~RenderTargetTest()
 	{
-		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer destruct");
+		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "RenderTargetTest destruct");
 	}
+
+	struct Vertex
+	{
+		Vector3f pos;
+		Vector2f texCoord;
+		Vector4f color;
+	};
 
 	static int indices;
-	void OrbitControllerTest::Initialize()
+	void RenderTargetTest::Initialize()
 	{
-		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer initialize");
+		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "RenderTargetTest initialize");
 
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
@@ -46,6 +53,7 @@ namespace crystal
 		//{
 		//	0, 1, 2
 		//};
+
 		objloader::ObjLoader loader;
 		loader.load("resources/cube.obj");
 		std::vector<ElementDescription> elements = {
@@ -63,13 +71,16 @@ namespace crystal
 		ibufferDesc.Format = DataFormat::UInt32;
 
 		m_PSO = graphicsDevice->CreatePipelineStateObject();
-		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, 
+		m_PSOScreen = graphicsDevice->CreatePipelineStateObject();
+		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc,
 			loader.Vertices.data(), sizeof(objloader::VertexData) * loader.Vertices.size());
 		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
 		//	loader.Triangles.data(), sizeof(float) * 3 * loader.Triangles.size());
 		indices = loader.Triangles.size() * 3;
 
+
 		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
+		m_pScreenShader = graphicsDevice->CreateShaderProgramFromFile("resources/grayscale.json");
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;
@@ -77,6 +88,44 @@ namespace crystal
 		texturedesc.Usage = BufferUsage::Default;
 
 		m_texture2D = graphicsDevice->CreateTexture2D("resources/dots.png", texturedesc);
+
+		Vertex vertices[] =
+		{
+			{ Vector3f(-0.5f, -0.5f, 0.5f), Vector2f(0.0f, 0.0f), Vector4f(0.0f, 1.0f, 0.0f, 1.0f) },
+			{ Vector3f(0.5f, -0.5f, 0.5f), Vector2f(1.0f, 0.0f), Vector4f(0.0f, 0.0f, 1.0f, 1.0f) },
+			{ Vector3f(0.5f, 0.5f, 0.5f), Vector2f(1.0f, 1.0f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
+			{ Vector3f(-0.5f, 0.5f, 0.5f), Vector2f(0.0f, 1.0f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
+		};
+		int indices[] =
+		{
+			0, 1, 2,
+			0, 2, 3
+		};
+
+		std::vector<ElementDescription> elements1 = {
+			{ SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
+			{ SemanticType::TEXCOORD, 0, RenderFormat::RGB32f, 12 },
+			{ SemanticType::COLOR, 0, RenderFormat::RGBA32f, 24 },
+		};
+		VertexLayout vLayout1(elements1, sizeof(Vertex));
+
+		VertexBufferDescription bufferDesc1{};
+		bufferDesc1.Usage = BufferUsage::Immutable;
+		IndexBufferDescription indexDesc1;
+		indexDesc1.Format = DataFormat::UInt32;
+		indexDesc1.Usage = BufferUsage::Immutable;
+		auto indexBuffer1 = graphicsDevice->CreateIndexBuffer(indexDesc1, indices, sizeof(indices));
+		auto vertexBuffer1 = graphicsDevice->CreateVertexBuffer(bufferDesc1, vertices, sizeof(vertices));
+		vertexBuffer1->BindVertexLayout(vLayout1);
+
+
+		RenderTarget2DDescription renderTargetDesc;
+		renderTargetDesc.TargetFormat = RenderFormat::RGBA8ub;
+		renderTargetDesc.RTFlags = RenderTargetFlags::CRYSTAL_TEXTURE_TARGET;
+		renderTargetDesc.Size = windowSize;
+		renderTargetDesc.MipmapLevels = 1;
+
+		m_renderTarget2D = graphicsDevice->CreateRenderTarget2D(renderTargetDesc);
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PSO->BindVertexBuffer(vertexBuffer);
@@ -87,12 +136,19 @@ namespace crystal
 		m_PSO->BindShaderResource(m_texture2D, 0);
 		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::PointClamp), 0);
 		//indexBuffer->Bind(0);
+
+
+		m_PSOScreen->BindVertexBuffer(vertexBuffer1);
+		m_PSOScreen->BindIndexBuffer(indexBuffer1);
+		m_PSOScreen->BindShaderProgram(m_pScreenShader);
+		m_PSOScreen->BindShaderResource(m_renderTarget2D, 0);
+		m_PSOScreen->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::PointClamp), 0);
 	}
 
 
 	static Vector2f orbitControl = Vector2f(-glm::half_pi<float>(), glm::half_pi<float>());
 	static Point2i oldMousePos;
-	void OrbitControllerTest::Update(const crystal::GameTimer& gameTimer)
+	void RenderTargetTest::Update(const crystal::GameTimer& gameTimer)
 	{
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
@@ -118,18 +174,6 @@ namespace crystal
 		{
 			orbitControl.y = glm::pi<float>() - 0.01f;
 		}
-		//if (inputController->IsKeyDowned(crystal::KeyCode::CRYSTAL_A_KEY))
-		//{
-		//	orbitControl.x += 0.01f;
-		//	//m_renderPause = !m_renderPause;
-		//	//printf("%s\n", m_renderPause ? "Paused" : "Resumed");
-		//}
-		//if (inputController->IsKeyDowned(crystal::KeyCode::CRYSTAL_D_KEY))
-		//{
-		//	orbitControl.x -= 0.01f;
-		//	//printf("Time: %lf\n", gameTimer.GetLogicTime());
-		//	//printf("Time: %lf\n", gameTimer.GetLogicalDeltaTime());
-		//}
 
 		auto sinTheta = std::sin(orbitControl.y);
 		auto cosTheta = std::sqrt(1.f - sinTheta * sinTheta);
@@ -143,34 +187,47 @@ namespace crystal
 		m_pCamera->SetAspectRatio(static_cast<crystal::Float>(windowSize.x) / windowSize.y);
 	}
 
-	void OrbitControllerTest::Draw(const crystal::GameTimer& gameTimer)
+	void RenderTargetTest::Draw(const crystal::GameTimer& gameTimer)
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
+
+		graphicsDevice->PushRenderTarget2D(m_renderTarget2D);
+		{
+			graphicsDevice->Clear(
+				crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+				| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+				| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
+				crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
+			//m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
+			//m_pShader->SetUniform1f("uBase", 1.0f);
+			m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
+			m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
+			auto P = m_pCamera->GetProjectionMatrix();
+			auto V = m_pCamera->GetViewMatrix();
+			m_pShader->SetUniformMat4f("VP", P * V);
+			m_pShader->Apply();
+
+			graphicsDevice->SetPipelineStateObject(m_PSO);
+			graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+		}
+		graphicsDevice->PopRenderTarget2D();
+
 		graphicsDevice->Clear(
-			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET 
+			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
 			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-		//m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
-		//m_pShader->SetUniform1f("uBase", 1.0f);
-		m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
-		m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
-		auto P = m_pCamera->GetProjectionMatrix();
-		auto V = m_pCamera->GetViewMatrix();
-		m_pShader->SetUniformMat4f("VP", P * V);
-		m_pShader->Apply();
-		
-		graphicsDevice->SetPipelineStateObject(m_PSO);
-		graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+		graphicsDevice->SetPipelineStateObject(m_PSOScreen);
+		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
 	}
 
-	void OrbitControllerTest::Exit()
+	void RenderTargetTest::Exit()
 	{
-		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "CrystalTracer exit");
+		crystal::GlobalLogger::Log(crystal::SeverityLevel::Debug, "RenderTargetTest exit");
 	}
 
-	bool OrbitControllerTest::Paused()
+	bool RenderTargetTest::Paused()
 	{
 		return m_renderPause;
 	}

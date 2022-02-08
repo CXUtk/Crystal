@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Platforms/Windows32/Win32GameWindow.h>
 #include "DX11FragmentShader.h"
 #include "DX11VertexShader.h"
@@ -9,4 +9,5 @@
 #include "DX11PipelineStateObject.h"
 #include "DX11Texture2D.h"
 #include "DX11SamplerState.h"
+#include "DX11RenderTarget2D.h"
 #include "DX11Provider.h"

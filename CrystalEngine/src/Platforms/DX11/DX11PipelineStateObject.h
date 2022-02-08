@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DX11Common.h"
 
 namespace crystal
@@ -27,7 +27,7 @@ namespace crystal
 
 		virtual void Apply() override;
 
-		virtual void BindTexture(std::shared_ptr<Texture2D> texture, int index) override;
+		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) override;
 		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) override;
 	private:
 		std::shared_ptr<VertexBuffer>	m_vertexBuffer = nullptr;

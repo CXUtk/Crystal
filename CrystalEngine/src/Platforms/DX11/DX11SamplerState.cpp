@@ -1,4 +1,4 @@
-#include "DX11SamplerState.h"
+﻿#include "DX11SamplerState.h"
 #include "DX11Texture2D.h"
 #include "DX11ShaderProgram.h"
 #include "DX11GraphicsDevice.h"

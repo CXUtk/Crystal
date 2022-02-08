@@ -1,4 +1,4 @@
-#include "DX11GraphicsDevice.h"
+﻿#include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 
@@ -9,6 +9,7 @@
 #include "DX11ShaderProgram.h"
 #include "DX11PipelineStateObject.h"
 #include "DX11Texture2D.h"
+#include "DX11RenderTarget2D.h"
 #include "WICTextureLoader.h"
 
 #include <Core/InitArgs.h>
@@ -38,18 +39,18 @@ namespace crystal
 
 	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)
 	{
-		if (options & ClearOptions::Target)
+		if (options & ClearOptions::CRYSTAL_CLEAR_TARGET)
 		{
 			m_pd3dImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(),
 				crystal_value_ptr(color));
 		}
 
 		int clearFlag = 0;
-		if (options & ClearOptions::Depth)
+		if (options & ClearOptions::CRYSTAL_CLEAR_DEPTH)
 		{
 			clearFlag |= D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH;
 		}
-		if (options & ClearOptions::Stencil)
+		if (options & ClearOptions::CRYSTAL_CLEAR_STENCIL)
 		{
 			clearFlag |= D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL;
 		}
@@ -165,6 +166,12 @@ namespace crystal
 		return std::make_shared<Texture2D>(this, nullptr, textureSRV);
 	}
 
+	std::shared_ptr<RenderTarget2D> DX11GraphicsDevice::CreateRenderTarget2D(const RenderTarget2DDescription& desc)
+	{
+		return std::make_shared<DX11RenderTarget2D>(this, desc);
+		
+	}
+
 	void DX11GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
 	{
 		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
@@ -175,6 +182,20 @@ namespace crystal
 	{
 		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
 		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
+	}
+
+	void DX11GraphicsDevice::PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D)
+	{
+		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
+		m_renderTarget2DStack[m_renderTargetStackPtr++] = renderTarget2D;
+
+		renderTarget2D->SetToCurrent();
+	}
+
+	void DX11GraphicsDevice::PopRenderTarget2D()
+	{
+		assert(m_renderTargetStackPtr > 0 && m_renderTargetStackPtr <= NUM_RENDERTARGETS);
+		m_renderTarget2DStack[--m_renderTargetStackPtr]->SetToCurrent();
 	}
 
 

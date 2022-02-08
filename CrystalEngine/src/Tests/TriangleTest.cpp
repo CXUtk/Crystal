@@ -140,9 +140,9 @@ namespace crystal
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
 		graphicsDevice->Clear(
-			crystal::ClearOptions::Target 
-			| crystal::ClearOptions::Stencil
-			| crystal::ClearOptions::Depth,
+			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 		m_pShader->SetUniform1f("uLuminance", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
 		m_pShader->SetUniform1f("uBase", 0.0f);

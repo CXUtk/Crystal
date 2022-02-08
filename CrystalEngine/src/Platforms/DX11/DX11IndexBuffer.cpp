@@ -1,4 +1,4 @@
-#include "DX11IndexBuffer.h"
+﻿#include "DX11IndexBuffer.h"
 #include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"

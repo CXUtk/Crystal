@@ -82,7 +82,7 @@ namespace crystal
 		texturedesc.Usage = BufferUsage::Default;
 
 		m_texture2D = graphicsDevice->CreateTexture2D("resources/dots.png", texturedesc);
-		m_PSO->BindTexture(m_texture2D, 0);
+		m_PSO->BindShaderResource(m_texture2D, 0);
 		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::LinearClamp), 0);
 	}
 
@@ -94,9 +94,9 @@ namespace crystal
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
 		graphicsDevice->Clear(
-			crystal::ClearOptions::Target
-			| crystal::ClearOptions::Stencil
-			| crystal::ClearOptions::Depth,
+			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 
 		graphicsDevice->SetPipelineStateObject(m_PSO);

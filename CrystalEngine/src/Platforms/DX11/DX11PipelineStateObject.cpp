@@ -1,4 +1,4 @@
-#include "DX11PipelineStateObject.h"
+﻿#include "DX11PipelineStateObject.h"
 #include "DX11GraphicsDevice.h"
 #include "DX11VertexBuffer.h"
 #include "DX11IndexBuffer.h"
@@ -157,28 +157,24 @@ namespace crystal
 		{
 			m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
 				m_currentRasterizerState.ReleaseAndGetAddressOf());
-			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetState(m_currentRasterizerState.Get());
 			m_needsRefreshRasterState = false;
 		}
-		if (m_needsRefreshScissorRect)
-		{
-			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetScissorRects(1, &m_scissorRect);
-			m_needsRefreshScissorRect = false;
-		}
+		m_pGraphicsDevice->GetD3DDeviceContext()->RSSetState(m_currentRasterizerState.Get());
+		m_pGraphicsDevice->GetD3DDeviceContext()->RSSetScissorRects(1, &m_scissorRect);
 
 		if (m_needsRefreshDepthStencilState)
 		{
 			m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&m_depthStencilStateDesc,
 				m_currentDepthStencilState.ReleaseAndGetAddressOf());
-			m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
 			m_needsRefreshDepthStencilState = false;
 		}
+		m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
 	}
 
-	void DX11PipelineStateObject::BindTexture(std::shared_ptr<Texture2D> texture, int index)
+	void DX11PipelineStateObject::BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index)
 	{
 		assert(index >= 0 && index < NUM_TEXTURE_SLOTS);
-		m_SRVSlots[index] = texture->GetSRVDX11Ptr();
+		m_SRVSlots[index] = shaderResource->GetShaderResourceView();
 	}
 
 	void DX11PipelineStateObject::BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index)

@@ -1,0 +1,9 @@
+{
+  "dx11Src": "grayscale.hlsl",
+  "openGLVSSrc": "grayscale.vert",
+  "openGLFSSrc": "grayscale.frag",
+  "vsEntry": "VS",
+  "fsEntry": "PS",
+  "uniforms": [
+  ]
+}

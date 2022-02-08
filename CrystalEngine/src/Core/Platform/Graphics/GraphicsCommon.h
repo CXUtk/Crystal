@@ -56,6 +56,12 @@ namespace crystal
 
 	class DX11SamplerState;
 	using SamplerState = DX11SamplerState;
+
+	class DX11RenderTarget2D;
+	using RenderTarget2D = DX11RenderTarget2D;
+
+	class IDX11ShaderResource;
+	using IShaderResource = IDX11ShaderResource;
 #endif
 
 	using Spectrum = glm::vec3;
@@ -259,11 +265,32 @@ namespace crystal
 
 	enum ClearOptions : int
 	{
-		Target = 1 << 0,
-		Depth = 1 << 1,
-		Stencil = 1 << 2
+		CRYSTAL_CLEAR_TARGET = 1 << 0,
+		CRYSTAL_CLEAR_DEPTH = 1 << 1,
+		CRYSTAL_CLEAR_STENCIL = 1 << 2
 	};
 
+	enum RenderTargetFlags : int
+	{
+		CRYSTAL_TEXTURE_TARGET = 1 << 0,
+		CRYSTAL_DEPTH_TARGET = 1 << 1,
+		CRYSTAL_STENCIL_TARGET = 1 << 2
+	};
+
+	inline RenderTargetFlags operator|(RenderTargetFlags a, RenderTargetFlags b)
+	{
+		return static_cast<RenderTargetFlags>(static_cast<int>(a) | static_cast<int>(b));
+	}
+
+	inline RenderTargetFlags operator&(RenderTargetFlags a, RenderTargetFlags b)
+	{
+		return static_cast<RenderTargetFlags>(static_cast<int>(a) & static_cast<int>(b));
+	}
+
+	inline ClearOptions operator&(ClearOptions a, ClearOptions b)
+	{
+		return static_cast<ClearOptions>(static_cast<int>(a) & static_cast<int>(b));
+	}
 	inline ClearOptions operator|(ClearOptions a, ClearOptions b)
 	{
 		return static_cast<ClearOptions>(static_cast<int>(a) | static_cast<int>(b));
@@ -309,6 +336,14 @@ namespace crystal
 		int				MipmapLevels;
 		RenderFormat	Format;
 		BufferUsage		Usage;
+	};
+
+	struct RenderTarget2DDescription
+	{
+		Vector2i			Size;
+		int					MipmapLevels;
+		RenderFormat		TargetFormat;
+		RenderTargetFlags	RTFlags;
 	};
 
 	struct VertexLayout

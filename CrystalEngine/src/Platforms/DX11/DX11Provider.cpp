@@ -1,4 +1,4 @@
-#include "DX11Provider.h"
+﻿#include "DX11Provider.h"
 #include <Platforms/Windows32/Win32GameWindow.h>
 #include <Platforms/DX11/DX11GraphicsDevice.h>
 
