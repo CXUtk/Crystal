@@ -11,7 +11,7 @@ namespace crystal
 			ComPtr<ID3D11Buffer> indexBuffer, DXGI_FORMAT indexFormat)
 		: m_pGraphicsDevice(graphicsDevice), m_pBuffer(indexBuffer), m_indexFormat(indexFormat)
 	{
-
+		d3dUtils::D3D11SetDebugObjectName(m_pBuffer.Get(), "IndexBuffer");
 	}
 
 	DX11IndexBuffer::~DX11IndexBuffer()

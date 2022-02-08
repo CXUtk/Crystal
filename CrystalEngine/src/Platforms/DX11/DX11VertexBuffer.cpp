@@ -10,7 +10,7 @@ namespace crystal
 	DX11VertexBuffer::DX11VertexBuffer(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11Buffer> buffer)
 		: m_pGraphicsDevice(graphicsDevice), m_pBuffer(buffer)
 	{
-		
+		d3dUtils::D3D11SetDebugObjectName(m_pBuffer.Get(), "Vertex Buffer");
 	}
 
 

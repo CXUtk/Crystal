@@ -5,6 +5,7 @@
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
 #include "dxTrace.h"
+#include "d3dUtils.h"
 
 namespace crystal
 {
@@ -45,22 +46,26 @@ namespace crystal
 		sampDesc.MinLOD = 0;
 		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		HR(d3dDevice->CreateSamplerState(&sampDesc, pointClamp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(pointClamp.Get(), "Point Clamp Sampler");
 		PointClamp = std::make_shared<SamplerState>(graphicsDevice, pointClamp);
 
 		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 		HR(d3dDevice->CreateSamplerState(&sampDesc, pointWarp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(pointWarp.Get(), "Point Warp Sampler");
 		PointWarp = std::make_shared<SamplerState>(graphicsDevice, pointWarp);
 
 		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		HR(d3dDevice->CreateSamplerState(&sampDesc, linearWarp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(linearWarp.Get(), "Linear Warp Sampler");
 		LinearWarp = std::make_shared<SamplerState>(graphicsDevice, linearWarp);
 
 		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
 		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
 		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
 		HR(d3dDevice->CreateSamplerState(&sampDesc, linearClamp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(linearClamp.Get(), "Linear Clamp Sampler");
 		LinearClamp = std::make_shared<SamplerState>(graphicsDevice, linearClamp);
 	}
 

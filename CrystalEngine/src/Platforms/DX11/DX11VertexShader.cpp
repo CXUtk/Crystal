@@ -10,7 +10,7 @@ namespace crystal
 		ComPtr<ID3D11VertexShader> vertexShader)
 		: m_pGraphicsDevice(graphicsDevice), m_pVertexShader(vertexShader)
 	{
-		
+		d3dUtils::D3D11SetDebugObjectName(m_pVertexShader.Get(), "Vertex Shader");
 	}
 
 	DX11VertexShader::~DX11VertexShader()

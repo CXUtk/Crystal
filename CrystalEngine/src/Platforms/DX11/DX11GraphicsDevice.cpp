@@ -69,7 +69,6 @@ namespace crystal
 	std::shared_ptr<VertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
 	{
 		ComPtr<ID3D11Buffer> vertexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_VERTEX_BUFFER);
-		d3dUtils::D3D11SetDebugObjectName(vertexBuffer.Get(), "VertexBuffer");
 		return std::make_shared<DX11VertexBuffer>(this, vertexBuffer);
 	}
 
@@ -77,7 +76,6 @@ namespace crystal
 		void* src, size_t size)
 	{
 		ComPtr<ID3D11Buffer> indexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_INDEX_BUFFER);
-		d3dUtils::D3D11SetDebugObjectName(indexBuffer.Get(), "IndexBuffer");
 		return std::make_shared<DX11IndexBuffer>(this, indexBuffer, DX11Common::DataFormatConvert(desc.Format));
 	}
 
