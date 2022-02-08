@@ -82,7 +82,8 @@ namespace crystal
 		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) = 0;
 		virtual void BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index) = 0;
 
-		virtual void Apply() = 0;
+		virtual void Begin() = 0;
+		virtual void End() = 0;
 	};
 
 	class IPlatformProvider

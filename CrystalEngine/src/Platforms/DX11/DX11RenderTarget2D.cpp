@@ -27,30 +27,24 @@ namespace crystal
 		bool shaderResource = desc.RTFlags & RenderTargetFlags::CRYSTAL_TEXTURE_TARGET;
 		bool depthStencil = (desc.RTFlags & RenderTargetFlags::CRYSTAL_DEPTH_TARGET) || (desc.RTFlags & RenderTargetFlags::CRYSTAL_STENCIL_TARGET);
 
-		D3D11_TEXTURE2D_DESC textureDesc;
-		ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		textureDesc.Width = desc.Size.x;
-		textureDesc.Height = desc.Size.y;
-		textureDesc.MipLevels = desc.MipmapLevels;
-		textureDesc.ArraySize = 1;
-		textureDesc.Format = DX11Common::RenderFormatConvert(desc.TargetFormat, true);
-		textureDesc.Usage = D3D11_USAGE_DEFAULT;
-		textureDesc.MiscFlags = 0;
-		textureDesc.BindFlags = 0;
 		if (shaderResource)
 		{
-			textureDesc.BindFlags |= D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
-		}
-		if (depthStencil)
-		{
-			textureDesc.BindFlags |= D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
-		}
-		textureDesc.CPUAccessFlags = 0;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
+			D3D11_TEXTURE2D_DESC textureDesc;
+			ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+			textureDesc.Width = desc.Size.x;
+			textureDesc.Height = desc.Size.y;
+			textureDesc.MipLevels = desc.MipmapLevels;
+			textureDesc.ArraySize = 1;
+			textureDesc.Format = DX11Common::RenderFormatConvert(desc.TargetFormat, true);
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.MiscFlags = 0;
+			textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_RENDER_TARGET 
+				| D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.CPUAccessFlags = 0;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
 
-		if (shaderResource)
-		{
+
 			ComPtr<ID3D11Texture2D> renderTargetTexture = nullptr;
 			HR(device->CreateTexture2D(&textureDesc, nullptr, renderTargetTexture.GetAddressOf()));
 
@@ -70,6 +64,17 @@ namespace crystal
 		
 		if (depthStencil)
 		{
+			D3D11_TEXTURE2D_DESC textureDesc;
+			ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+			textureDesc.Width = desc.Size.x;
+			textureDesc.Height = desc.Size.y;
+			textureDesc.ArraySize = 1;
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.MiscFlags = 0;
+			textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
+			textureDesc.CPUAccessFlags = 0;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
 			textureDesc.MipLevels = 1;
 			textureDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
 

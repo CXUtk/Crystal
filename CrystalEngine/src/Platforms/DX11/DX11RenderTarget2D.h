@@ -10,6 +10,9 @@ namespace crystal
 		~DX11RenderTarget2D() override;
 
 		void SetToCurrent();
+
+		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView.Get(); }
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView.Get(); }
 		ComPtr<ID3D11ShaderResourceView> GetShaderResourceView() const override { return m_pShaderResourceView; }
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice = nullptr;

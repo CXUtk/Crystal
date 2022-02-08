@@ -77,7 +77,7 @@ namespace crystal
 		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
 		//	loader.Triangles.data(), sizeof(float) * 3 * loader.Triangles.size());
 		indices = loader.Triangles.size() * 3;
-
+		vertexBuffer->BindVertexLayout(vLayout);
 
 		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
 		m_pScreenShader = graphicsDevice->CreateShaderProgramFromFile("resources/grayscale.json");
@@ -87,7 +87,7 @@ namespace crystal
 		texturedesc.MipmapLevels = 1;
 		texturedesc.Usage = BufferUsage::Default;
 
-		m_texture2D = graphicsDevice->CreateTexture2D("resources/dots.png", texturedesc);
+		m_texture2D = graphicsDevice->CreateTexture2D("resources/result.png", texturedesc);
 
 		Vertex vertices[] =
 		{
@@ -127,7 +127,7 @@ namespace crystal
 
 		m_renderTarget2D = graphicsDevice->CreateRenderTarget2D(renderTargetDesc);
 
-		vertexBuffer->BindVertexLayout(vLayout);
+
 		m_PSO->BindVertexBuffer(vertexBuffer);
 		m_PSO->BindShaderProgram(m_pShader);
 		m_PSO->SetCullMode(CullingMode::CullCCW);
@@ -208,8 +208,10 @@ namespace crystal
 			m_pShader->SetUniformMat4f("VP", P * V);
 			m_pShader->Apply();
 
-			graphicsDevice->SetPipelineStateObject(m_PSO);
+			//graphicsDevice->SetPipelineStateObject(m_PSO);
+			m_PSO->Begin();
 			graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+			m_PSO->End();
 		}
 		graphicsDevice->PopRenderTarget2D();
 
@@ -218,8 +220,10 @@ namespace crystal
 			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-		graphicsDevice->SetPipelineStateObject(m_PSOScreen);
+		//graphicsDevice->SetPipelineStateObject(m_PSOScreen);
+		m_PSOScreen->Begin();
 		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+		m_PSOScreen->End();
 	}
 
 	void RenderTargetTest::Exit()

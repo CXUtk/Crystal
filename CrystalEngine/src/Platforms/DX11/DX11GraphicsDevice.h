@@ -55,7 +55,7 @@ namespace crystal
 
 		static constexpr int NUM_RENDERTARGETS = 32;
 		std::shared_ptr<RenderTarget2D>		m_renderTarget2DStack[NUM_RENDERTARGETS];
-		size_t								m_renderTargetStackPtr = 0;
+		int									m_renderTargetStackPtr = -1;
 
 		Win32GameWindow*	m_pWindow;			// Win32 窗体对象
 

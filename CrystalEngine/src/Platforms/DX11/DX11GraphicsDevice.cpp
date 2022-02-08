@@ -34,15 +34,24 @@ namespace crystal
 
 	void DX11GraphicsDevice::SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)
 	{
-		pso->Apply();
+		pso->Begin();
 	}
 
 	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)
 	{
 		if (options & ClearOptions::CRYSTAL_CLEAR_TARGET)
 		{
-			m_pd3dImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(),
-				crystal_value_ptr(color));
+			// On render target null
+			if (m_renderTargetStackPtr < 0)
+			{
+				m_pd3dImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(),
+					crystal_value_ptr(color));
+			}
+			else
+			{
+				m_pd3dImmediateContext->ClearRenderTargetView(m_renderTarget2DStack[m_renderTargetStackPtr]->GetRenderTargetView(),
+					crystal_value_ptr(color));
+			}
 		}
 
 		int clearFlag = 0;
@@ -54,7 +63,23 @@ namespace crystal
 		{
 			clearFlag |= D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL;
 		}
-		m_pd3dImmediateContext->ClearDepthStencilView(m_pDepthStencilView.Get(), clearFlag, depth, stencil);
+		if (clearFlag)
+		{
+			if (m_renderTargetStackPtr < 0)
+			{
+				m_pd3dImmediateContext->ClearDepthStencilView(m_pDepthStencilView.Get(), clearFlag, depth, stencil);
+			}
+			else
+			{
+				auto ptr = m_renderTarget2DStack[m_renderTargetStackPtr]->GetDepthStencilView();
+				if (ptr)
+				{
+					m_pd3dImmediateContext->ClearDepthStencilView(ptr,
+						 clearFlag, depth, stencil);
+				}
+			}
+			
+		}
 	}
 
 	void DX11GraphicsDevice::Present()
@@ -186,16 +211,23 @@ namespace crystal
 
 	void DX11GraphicsDevice::PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D)
 	{
-		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
-		m_renderTarget2DStack[m_renderTargetStackPtr++] = renderTarget2D;
+		assert(m_renderTargetStackPtr >= -1 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
+		m_renderTarget2DStack[++m_renderTargetStackPtr] = renderTarget2D;
 
 		renderTarget2D->SetToCurrent();
 	}
 
 	void DX11GraphicsDevice::PopRenderTarget2D()
 	{
-		assert(m_renderTargetStackPtr > 0 && m_renderTargetStackPtr <= NUM_RENDERTARGETS);
-		m_renderTarget2DStack[--m_renderTargetStackPtr]->SetToCurrent();
+		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
+		--m_renderTargetStackPtr;
+		if (m_renderTargetStackPtr < 0)
+		{
+			m_pd3dImmediateContext->RSSetViewports(1, &m_ScreenViewport);
+			m_pd3dImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
+			return;
+		}
+		m_renderTarget2DStack[m_renderTargetStackPtr]->SetToCurrent();
 	}
 
 

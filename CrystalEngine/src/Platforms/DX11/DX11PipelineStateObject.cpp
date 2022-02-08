@@ -135,15 +135,15 @@ namespace crystal
 		m_needsRefreshDepthStencilState = true;
 	}
 
-	void DX11PipelineStateObject::Apply()
+	void DX11PipelineStateObject::Begin()
 	{
 		m_vertexBuffer->Bind(0);
 		if (m_indexBuffer)
 		{
 			m_indexBuffer->Bind(0);
 		}
-		static ID3D11ShaderResourceView* viewArray[NUM_TEXTURE_SLOTS]{};
-		static ID3D11SamplerState* samplerArray[NUM_TEXTURE_SLOTS]{};
+		ID3D11ShaderResourceView* viewArray[NUM_TEXTURE_SLOTS]{};
+		ID3D11SamplerState* samplerArray[NUM_TEXTURE_SLOTS]{};
 
 		for (int i = 0; i < NUM_TEXTURE_SLOTS; i++)
 		{
@@ -169,6 +169,13 @@ namespace crystal
 			m_needsRefreshDepthStencilState = false;
 		}
 		m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
+	}
+
+	void DX11PipelineStateObject::End()
+	{
+		ID3D11ShaderResourceView* viewArray[1] = { nullptr };
+		ID3D11SamplerState* samplerArray[1] = { nullptr };
+		m_shaderProgram->SetShaderResources(0, 1, viewArray, samplerArray);
 	}
 
 	void DX11PipelineStateObject::BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index)

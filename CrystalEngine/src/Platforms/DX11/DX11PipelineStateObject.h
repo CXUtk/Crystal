@@ -25,7 +25,8 @@ namespace crystal
 		virtual void SetDepthTestState(bool enable) override;
 		virtual void SetStencilTestState(bool enable) override;
 
-		virtual void Apply() override;
+		virtual void Begin() override;
+		virtual void End() override;
 
 		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) override;
 		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) override;
