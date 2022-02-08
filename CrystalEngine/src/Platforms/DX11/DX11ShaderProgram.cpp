@@ -23,10 +23,13 @@ namespace crystal
 		}
 		// For const buffer the ByteWidth (value = 4) must be a multiple of 16.
 		size = (size + 15) / 16 * 16;
-		m_pConstantBuffer = m_pGraphicsDevice->CreateBuffer(nullptr, size,
-			BufferUsage::CPUWrite, D3D11_BIND_CONSTANT_BUFFER);
-		d3dUtils::D3D11SetDebugObjectName(m_pConstantBuffer.Get(), "Shader Constant Buffer");
-		m_pConstantBufferData = std::make_unique<char[]>(size);
+		if (size)
+		{
+			m_pConstantBuffer = m_pGraphicsDevice->CreateBuffer(nullptr, size,
+				BufferUsage::CPUWrite, D3D11_BIND_CONSTANT_BUFFER);
+			d3dUtils::D3D11SetDebugObjectName(m_pConstantBuffer.Get(), "Shader Constant Buffer");
+			m_pConstantBufferData = std::make_unique<char[]>(size);
+		}
 		m_constBufferSize = size;
 	}
 
@@ -53,7 +56,7 @@ namespace crystal
 		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
 
 		// Map const buffer data to GPU
-		if (m_constBufferDirty)
+		if (m_constBufferDirty && m_constBufferSize > 0)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedData;
 			HR(context->Map(m_pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
@@ -64,12 +67,21 @@ namespace crystal
 		if (m_vertexShader != nullptr)
 		{
 			m_vertexShader->Bind();
-			context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
 		}
 		if (m_fragmentShader != nullptr)
 		{
 			m_fragmentShader->Bind();
-			context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+		}
+		if (m_pConstantBuffer)
+		{
+			if (m_vertexShader != nullptr)
+			{
+				context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			}
+			if (m_fragmentShader != nullptr)
+			{
+				context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			}
 		}
 	}
 

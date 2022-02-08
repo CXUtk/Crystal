@@ -34,7 +34,7 @@ namespace objloader
         FILE* file = fopen(path.c_str(), "r");
         if (!file)
         {
-            std::cerr << "Cannot open file " << path << std::endl;
+            throw std::exception(("Cannot open file " + path).c_str());
             return;
         }
         while (fgets(lineBuffer, MAX_BUFFER, file))

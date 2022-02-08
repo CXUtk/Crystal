@@ -304,8 +304,8 @@ namespace crystal
 		{
 			ComPtr<ID3D11Texture2D> backBuffer;
 
-			m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
-			m_pd3dDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, m_pRenderTargetView.GetAddressOf());
+			m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.ReleaseAndGetAddressOf()));
+			m_pd3dDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, m_pRenderTargetView.ReleaseAndGetAddressOf());
 
 			// Set DEBUG name
 			d3dUtils::D3D11SetDebugObjectName(backBuffer.Get(), "BackBuffer[0]");
@@ -336,8 +336,8 @@ namespace crystal
 		depthStencilDesc.MiscFlags = 0;
 
 		// Create DepthStencil buffer and view
-		HR(m_pd3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, m_pDepthStencilBuffer.GetAddressOf()));
-		HR(m_pd3dDevice->CreateDepthStencilView(m_pDepthStencilBuffer.Get(), nullptr, m_pDepthStencilView.GetAddressOf()));
+		HR(m_pd3dDevice->CreateTexture2D(&depthStencilDesc, nullptr, m_pDepthStencilBuffer.ReleaseAndGetAddressOf()));
+		HR(m_pd3dDevice->CreateDepthStencilView(m_pDepthStencilBuffer.Get(), nullptr, m_pDepthStencilView.ReleaseAndGetAddressOf()));
 	
 		// Combine render targets and the depth stencil buffer to the pipeline
 		m_pd3dImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
