@@ -156,20 +156,22 @@ namespace crystal
 		if (m_needsRefreshRasterState)
 		{
 			m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
-				m_currentRasterizerState.GetAddressOf());
+				m_currentRasterizerState.ReleaseAndGetAddressOf());
 			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetState(m_currentRasterizerState.Get());
 			m_needsRefreshRasterState = false;
 		}
 		if (m_needsRefreshScissorRect)
 		{
 			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetScissorRects(1, &m_scissorRect);
+			m_needsRefreshScissorRect = false;
 		}
 
 		if (m_needsRefreshDepthStencilState)
 		{
 			m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&m_depthStencilStateDesc,
-				m_currentDepthStencilState.GetAddressOf());
+				m_currentDepthStencilState.ReleaseAndGetAddressOf());
 			m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
+			m_needsRefreshDepthStencilState = false;
 		}
 	}
 

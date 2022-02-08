@@ -1,0 +1,9 @@
+{
+  "dx11Src": "sprite.hlsl",
+  "openGLVSSrc": "sprite.vert",
+  "openGLFSSrc": "sprite.frag",
+  "vsEntry": "VS",
+  "fsEntry": "PS",
+  "uniforms": [
+  ]
+}

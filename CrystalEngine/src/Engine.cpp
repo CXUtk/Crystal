@@ -30,6 +30,9 @@ namespace crystal
     
     Engine::~Engine()
     {
+        m_application.reset();
+        m_inputController.reset();
+        m_platformProvider.reset();
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Destruct");
     }
 
