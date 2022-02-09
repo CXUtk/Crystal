@@ -10,11 +10,13 @@ namespace crystal
 			ComPtr<ID3D11Buffer> indexBuffer, DXGI_FORMAT indexFormat);
 		~DX11IndexBuffer() override;
 
-		void Bind(size_t offset);
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice{};
 		ComPtr<ID3D11Buffer>		m_pBuffer{};
 		DXGI_FORMAT					m_indexFormat;
+
+		friend DX11PipelineStateObject;
+		void m_BindToPipeline(size_t offset);
 	};
 
 }

@@ -13,7 +13,6 @@ namespace crystal
 		DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window);
 		~DX11GraphicsDevice() override;
 
-		virtual void SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) override;
 		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) override;
 		virtual void Present() override;
 		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) override;
@@ -21,6 +20,8 @@ namespace crystal
 			size_t indexOffset, size_t vertexOffset) override;
 		virtual void PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D) override;
 		virtual void PopRenderTarget2D() override;
+		virtual void PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) override;
+		virtual void PopPipelineStateObject() override;
 
 		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() override;
 		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc,
@@ -32,7 +33,8 @@ namespace crystal
 		virtual std::shared_ptr<FragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) override;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
-		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) override;
+		virtual std::shared_ptr<Texture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) override;
+		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
 		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
@@ -54,8 +56,13 @@ namespace crystal
 		Vector2i	m_oldClientSize{};			// History window size, used to detect change
 
 		static constexpr int NUM_RENDERTARGETS = 32;
-		std::shared_ptr<RenderTarget2D>		m_renderTarget2DStack[NUM_RENDERTARGETS];
-		int									m_renderTargetStackPtr = -1;
+		std::shared_ptr<RenderTarget2D>		m_renderTarget2DStack[NUM_RENDERTARGETS]{};
+		int									m_renderTargetStackPtr = 0;
+
+		static constexpr int NUM_PIPELINE_STATE_OBJECTS = 32;
+		std::shared_ptr<PipelineStateObject>	m_PSOStack[NUM_PIPELINE_STATE_OBJECTS]{};
+		int										m_PSOStackPtr = 0;
+		PipelineStateObjectDirtyFlags			m_PSODirtyFlagsStack[NUM_PIPELINE_STATE_OBJECTS]{};
 
 		Win32GameWindow*	m_pWindow;			// Win32 窗体对象
 

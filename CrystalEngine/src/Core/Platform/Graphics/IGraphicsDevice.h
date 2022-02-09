@@ -17,9 +17,10 @@ namespace crystal
 		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) = 0;
 		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices,
 			size_t indexOffset, size_t vertexOffset) = 0;
-		virtual void SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) = 0;
 		virtual void PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D) = 0;
 		virtual void PopRenderTarget2D() = 0;
+		virtual void PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) = 0;
+		virtual void PopPipelineStateObject() = 0;
 
 		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() = 0;
 		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) = 0;
@@ -29,7 +30,8 @@ namespace crystal
 		virtual std::shared_ptr<FragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) = 0;
 		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
-		virtual std::shared_ptr<Texture2D> CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc) = 0;
+		virtual std::shared_ptr<Texture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) = 0;
+		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;
 	};
 

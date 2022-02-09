@@ -277,6 +277,16 @@ namespace crystal
 		CRYSTAL_STENCIL_TARGET = 1 << 2
 	};
 
+	enum PipelineStateObjectDirtyFlags : int
+	{
+		CRYSTAL_PSO_VERTEX_BUFFER_DIRTY = 1 << 0,
+		CRYSTAL_PSO_INDEX_BUFFER_DIRTY = 1 << 1,
+		CRYSTAL_PSO_SHADER_RESOURCE_DIRTY = 1 << 2,
+		CRYSTAL_PSO_RASTERIZER_STATE_DIRTY = 1 << 3,
+		CRYSTAL_PSO_DEPTH_STENCIL_STATE_DIRTY = 1 << 4,
+		CRYSTAL_PSO_SAMPLER_STATE_DIRTY = 1 << 5
+	};
+
 	inline RenderTargetFlags operator|(RenderTargetFlags a, RenderTargetFlags b)
 	{
 		return static_cast<RenderTargetFlags>(static_cast<int>(a) | static_cast<int>(b));
@@ -294,6 +304,15 @@ namespace crystal
 	inline ClearOptions operator|(ClearOptions a, ClearOptions b)
 	{
 		return static_cast<ClearOptions>(static_cast<int>(a) | static_cast<int>(b));
+	}
+
+	inline PipelineStateObjectDirtyFlags operator&(PipelineStateObjectDirtyFlags a, PipelineStateObjectDirtyFlags b)
+	{
+		return static_cast<PipelineStateObjectDirtyFlags>(static_cast<int>(a) & static_cast<int>(b));
+	}
+	inline PipelineStateObjectDirtyFlags operator|(PipelineStateObjectDirtyFlags a, PipelineStateObjectDirtyFlags b)
+	{
+		return static_cast<PipelineStateObjectDirtyFlags>(static_cast<int>(a) | static_cast<int>(b));
 	}
 
 

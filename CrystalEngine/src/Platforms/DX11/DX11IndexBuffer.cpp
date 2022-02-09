@@ -17,7 +17,7 @@ namespace crystal
 	DX11IndexBuffer::~DX11IndexBuffer()
 	{}
 
-	void DX11IndexBuffer::Bind(size_t offset)
+	void DX11IndexBuffer::m_BindToPipeline(size_t offset)
 	{
 		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
 		deviceContext->IASetIndexBuffer(m_pBuffer.Get(), m_indexFormat, offset);

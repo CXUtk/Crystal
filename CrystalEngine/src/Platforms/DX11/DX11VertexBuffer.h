@@ -10,13 +10,14 @@ namespace crystal
 		~DX11VertexBuffer() override;
 
 		virtual void BindVertexLayout(const VertexLayout& layout) override;
-
-		void Bind(size_t offset);
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice{};
 		ComPtr<ID3D11Buffer>		m_pBuffer{};
 		ComPtr<ID3D11InputLayout>	m_pInputLayout{};
 		UINT						m_strides = 0;
+
+		friend DX11PipelineStateObject;
+		void m_BindToPipeline(size_t offset);
 	};
 
 }

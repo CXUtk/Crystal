@@ -10,7 +10,6 @@
 #include "DX11PipelineStateObject.h"
 #include "DX11Texture2D.h"
 #include "DX11RenderTarget2D.h"
-#include "WICTextureLoader.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
@@ -32,17 +31,13 @@ namespace crystal
 	DX11GraphicsDevice::~DX11GraphicsDevice()
 	{}
 
-	void DX11GraphicsDevice::SetPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)
-	{
-		pso->Begin();
-	}
 
 	void DX11GraphicsDevice::Clear(ClearOptions options, const Color4f & color, float depth, int stencil)
 	{
 		if (options & ClearOptions::CRYSTAL_CLEAR_TARGET)
 		{
 			// On render target null
-			if (m_renderTargetStackPtr < 0)
+			if (m_renderTargetStackPtr == 0)
 			{
 				m_pd3dImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(),
 					crystal_value_ptr(color));
@@ -65,7 +60,7 @@ namespace crystal
 		}
 		if (clearFlag)
 		{
-			if (m_renderTargetStackPtr < 0)
+			if (m_renderTargetStackPtr == 0)
 			{
 				m_pd3dImmediateContext->ClearDepthStencilView(m_pDepthStencilView.Get(), clearFlag, depth, stencil);
 			}
@@ -158,37 +153,14 @@ namespace crystal
 		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
 	}
 
-	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2D(const std::string& path, const Texture2DDescription& texDesc)
+	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc)
 	{
-		D3D11_TEXTURE2D_DESC textureDesc;
-		ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		textureDesc.MipLevels = texDesc.MipmapLevels;
-		textureDesc.ArraySize = 1;
-		textureDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format, true);
-		textureDesc.Usage = DX11Common::BufferUsageToDX11Convert(texDesc.Usage);
-		textureDesc.MiscFlags = 0;
-		textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
-		textureDesc.CPUAccessFlags = 0;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		if (texDesc.Usage == BufferUsage::CPURead)
-		{
-			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ;
-		}
-		else if (texDesc.Usage == BufferUsage::CPUWrite)
-		{
-			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
-		}
-		else if (texDesc.Usage == BufferUsage::CPURWrite)
-		{
-			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
-		}
-		ComPtr<ID3D11ShaderResourceView> textureSRV;
-		DirectX::CreateWICTextureFromFileEx(m_pd3dDevice.Get(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
-			0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
-			textureDesc.MiscFlags, 0, nullptr, textureSRV.GetAddressOf());
+		return std::make_shared<Texture2D>(this, path, texDesc);
+	}
 
-		return std::make_shared<Texture2D>(this, nullptr, textureSRV);
+	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
+	{
+		return std::make_shared<Texture2D>(this, src, size, texDesc);
 	}
 
 	std::shared_ptr<RenderTarget2D> DX11GraphicsDevice::CreateRenderTarget2D(const RenderTarget2DDescription& desc)
@@ -211,7 +183,7 @@ namespace crystal
 
 	void DX11GraphicsDevice::PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D)
 	{
-		assert(m_renderTargetStackPtr >= -1 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
+		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
 		m_renderTarget2DStack[++m_renderTargetStackPtr] = renderTarget2D;
 
 		renderTarget2D->SetToCurrent();
@@ -219,15 +191,34 @@ namespace crystal
 
 	void DX11GraphicsDevice::PopRenderTarget2D()
 	{
-		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
+		assert(m_renderTargetStackPtr > 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
 		--m_renderTargetStackPtr;
-		if (m_renderTargetStackPtr < 0)
+		if (m_renderTargetStackPtr == 0)
 		{
 			m_pd3dImmediateContext->RSSetViewports(1, &m_ScreenViewport);
 			m_pd3dImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
 			return;
 		}
 		m_renderTarget2DStack[m_renderTargetStackPtr]->SetToCurrent();
+	}
+
+	void DX11GraphicsDevice::PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)
+	{
+		assert(m_PSOStackPtr >= 0 && m_PSOStackPtr < NUM_PIPELINE_STATE_OBJECTS - 1);
+		auto& prevPSO = m_PSOStack[m_PSOStackPtr];
+		m_PSOStack[++m_PSOStackPtr] = pso;
+		m_PSODirtyFlagsStack[m_PSOStackPtr] = prevPSO->CheckDirtyFlag(ptr(pso));
+
+		pso->Apply(m_PSODirtyFlagsStack[m_PSOStackPtr]);
+	}
+
+	void DX11GraphicsDevice::PopPipelineStateObject()
+	{
+		assert(m_PSOStackPtr > 0 && m_PSOStackPtr < NUM_PIPELINE_STATE_OBJECTS);
+
+		auto& prevPSO = m_PSOStack[m_PSOStackPtr - 1];
+		prevPSO->Apply(m_PSODirtyFlagsStack[m_PSOStackPtr]);
+		m_PSOStackPtr--;
 	}
 
 

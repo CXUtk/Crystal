@@ -72,7 +72,7 @@ return vout;\
 			pBlob->GetBufferPointer(), pBlob->GetBufferSize(), m_pInputLayout.GetAddressOf()));
 	}
 
-	void DX11VertexBuffer::Bind(size_t offset)
+	void DX11VertexBuffer::m_BindToPipeline(size_t offset)
 	{
 		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
 		UINT offsetU = offset;

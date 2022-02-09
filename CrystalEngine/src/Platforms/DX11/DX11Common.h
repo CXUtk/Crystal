@@ -8,14 +8,6 @@ namespace crystal
 	template <class T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-	class DX11GraphicsDevice;
-	class DX11Provider;
-
-	class DX11VertexShader;
-	class DX11FragmentShader;
-	class DX11VertexBuffer;
-	class DX11ShaderProgram;
-
 	class IDX11ShaderResource
 	{
 	public:
