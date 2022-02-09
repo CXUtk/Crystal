@@ -26,6 +26,8 @@ namespace crystal
 		{
 			throw std::exception("[DX11GraphicsDevice::DX11GraphicsDevice] Unable to start Dx11");
 		}
+
+		m_PSOStack[0] = CreatePipelineStateObject();
 	}
 
 	DX11GraphicsDevice::~DX11GraphicsDevice()

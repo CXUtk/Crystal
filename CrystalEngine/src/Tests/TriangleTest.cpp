@@ -148,9 +148,12 @@ namespace crystal
 		m_pShader->SetUniform1f("uBase", 0.0f);
 		m_pShader->Apply();
 		
-		graphicsDevice->SetPipelineStateObject(m_PSO);
-		//graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
-		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
+		graphicsDevice->PushPipelineStateObject(m_PSO);
+		{
+			//graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
+			graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
+		}
+		graphicsDevice->PopPipelineStateObject();
 	}
 
 	void TriangleTest::Exit()

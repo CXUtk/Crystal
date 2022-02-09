@@ -76,7 +76,7 @@ namespace crystal
 		texturedesc.MipmapLevels = 1;
 		texturedesc.Usage = BufferUsage::Default;
 
-		m_texture2D = graphicsDevice->CreateTexture2D("resources/dots.png", texturedesc);
+		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PSO->BindVertexBuffer(vertexBuffer);
@@ -161,8 +161,11 @@ namespace crystal
 		m_pShader->SetUniformMat4f("VP", P * V);
 		m_pShader->Apply();
 		
-		graphicsDevice->SetPipelineStateObject(m_PSO);
-		graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+		graphicsDevice->PushPipelineStateObject(m_PSO);
+		{
+			graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+		}
+		graphicsDevice->PopPipelineStateObject();
 	}
 
 	void OrbitControllerTest::Exit()

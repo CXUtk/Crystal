@@ -87,7 +87,7 @@ namespace crystal
 		texturedesc.MipmapLevels = 1;
 		texturedesc.Usage = BufferUsage::Default;
 
-		m_texture2D = graphicsDevice->CreateTexture2D("resources/result.png", texturedesc);
+		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/result.png", texturedesc);
 
 		Vertex vertices[] =
 		{
@@ -209,9 +209,11 @@ namespace crystal
 			m_pShader->Apply();
 
 			//graphicsDevice->SetPipelineStateObject(m_PSO);
-			m_PSO->Begin();
-			graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
-			m_PSO->End();
+			graphicsDevice->PushPipelineStateObject(m_PSO);
+			{
+				graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+			}
+			graphicsDevice->PopPipelineStateObject();
 		}
 		graphicsDevice->PopRenderTarget2D();
 
@@ -221,9 +223,11 @@ namespace crystal
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 		//graphicsDevice->SetPipelineStateObject(m_PSOScreen);
-		m_PSOScreen->Begin();
-		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
-		m_PSOScreen->End();
+		graphicsDevice->PushPipelineStateObject(m_PSOScreen);
+		{
+			graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+		}
+		graphicsDevice->PopPipelineStateObject();
 	}
 
 	void RenderTargetTest::Exit()

@@ -220,7 +220,7 @@ namespace crystal
 
 		if (m_checkDepthStencilState(other))
 		{
-			flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_RASTERIZER_STATE_DIRTY;
+			flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_DEPTH_STENCIL_STATE_DIRTY;
 		}
 
 		for (int i = 0; i < MAX_SHADER_RESOURCES_COUNT; i++)
@@ -231,6 +231,7 @@ namespace crystal
 				break;
 			}
 		}
+		return flags;
 	}
 
 	void DX11PipelineStateObject::Apply(PipelineStateObjectDirtyFlags dirtyFlags)

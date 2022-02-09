@@ -72,7 +72,7 @@ namespace crystal
 
 
 		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/sprite.json");
-		m_PSO->BindShaderProgram(m_pShader);
+		//m_PSO->BindShaderProgram(m_pShader);
 
 		m_PSO->SetCullMode(CullingMode::CullCW);
 
@@ -81,15 +81,17 @@ namespace crystal
 		texturedesc.MipmapLevels = 1;
 		texturedesc.Usage = BufferUsage::Default;
 
-		m_texture2D = graphicsDevice->CreateTexture2D("resources/dots.png", texturedesc);
+		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
 		m_PSO->BindShaderResource(m_texture2D, 0);
 		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::LinearClamp), 0);
+
+		graphicsDevice->PushPipelineStateObject(m_PSO);
 	}
 
 	void QuadTest::Update(const crystal::GameTimer& gameTimer)
 	{}
 
-	void QuadTest::Draw(const crystal::GameTimer & gameTimer)
+	void QuadTest::Draw(const crystal::GameTimer& gameTimer)
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
@@ -99,7 +101,7 @@ namespace crystal
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 
-		graphicsDevice->SetPipelineStateObject(m_PSO);
+		m_pShader->Apply();
 		//graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
 		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
 	}
