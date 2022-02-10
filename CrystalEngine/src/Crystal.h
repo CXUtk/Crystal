@@ -19,6 +19,7 @@ namespace crystal
 	class Application;
 	class GameTimer;
 	class InputController;
+	class SpriteBatch;
 
 	// Data
 	struct InitArgs;

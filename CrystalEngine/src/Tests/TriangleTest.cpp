@@ -77,7 +77,6 @@ namespace crystal
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PSO->BindIndexBuffer(indexBuffer);
 		m_PSO->BindVertexBuffer(vertexBuffer);
-		m_PSO->BindShaderProgram(m_pShader);
 		//indexBuffer->Bind(0);
 	}
 

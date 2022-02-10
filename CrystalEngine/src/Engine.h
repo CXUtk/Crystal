@@ -38,6 +38,8 @@ namespace crystal
 
 		IGraphicsDevice* GetGraphicsDevice() const;
 
+		SpriteBatch* GetSpriteBatch() const;
+
 		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 
@@ -48,6 +50,7 @@ namespace crystal
 		std::unique_ptr<Application>			m_application;
 		std::unique_ptr<IPlatformProvider>		m_platformProvider;
 		std::unique_ptr<InputController>		m_inputController;
+		std::unique_ptr<SpriteBatch>			m_spriteBatch;
 
 		double		m_fpsCap;			// Maximum FPS
 		GameTimer	m_gameTimer;		// Game timer

@@ -62,10 +62,10 @@ namespace crystal
 		m_indexBuffer = indexBuffer;
 	}
 
-	void DX11PipelineStateObject::BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram)
-	{
-		m_shaderProgram = shaderProgram;
-	}
+	//void DX11PipelineStateObject::BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram)
+	//{
+	//	m_shaderProgram = shaderProgram;
+	//}
 	CullingMode DX11PipelineStateObject::GetCullMode() const
 	{
 		if (m_rasterStateDesc.CullMode == D3D11_CULL_MODE::D3D11_CULL_NONE)

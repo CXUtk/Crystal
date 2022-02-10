@@ -4,6 +4,7 @@
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
 #include <Core/Utils/GameTimer.h>
+#include <Core/Render/SpriteBatch.h>
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
@@ -95,15 +96,21 @@ namespace crystal
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
+		auto spriteBatch = m_engine->GetSpriteBatch();
 		graphicsDevice->Clear(
 			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
 			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 
-		m_pShader->Apply();
-		//graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
-		graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+		//m_pShader->Apply();
+		////graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
+		//graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+
+
+		spriteBatch->Begin(glm::ortho(0.f, 800.f, 0.f, 600.f));
+		spriteBatch->Draw(m_texture2D.get(), Vector2f(0.f));
+		spriteBatch->End();
 	}
 
 	void QuadTest::Exit()

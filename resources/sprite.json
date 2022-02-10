@@ -5,5 +5,9 @@
   "vsEntry": "VS",
   "fsEntry": "PS",
   "uniforms": [
+    {
+      "name": "MVP",
+      "type": "mat4"
+    }
   ]
 }

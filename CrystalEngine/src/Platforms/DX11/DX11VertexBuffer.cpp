@@ -72,6 +72,17 @@ return vout;\
 			pBlob->GetBufferPointer(), pBlob->GetBufferSize(), m_pInputLayout.GetAddressOf()));
 	}
 
+	void DX11VertexBuffer::ChangeBufferContent(const void* src, size_t size, size_t offset)
+	{
+		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
+		D3D11_MAPPED_SUBRESOURCE mapRes;
+		deviceContext->Map(m_pBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes);
+		size_t destSize = mapRes.RowPitch - offset;
+		assert(size <= destSize);
+		memcpy_s(((char*)mapRes.pData + offset), destSize, src, size);
+		deviceContext->Unmap(m_pBuffer.Get(), 0);
+	}
+
 	void DX11VertexBuffer::m_BindToPipeline(size_t offset)
 	{
 		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();

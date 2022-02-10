@@ -41,6 +41,7 @@ namespace crystal
 		virtual ~IVertexBuffer() = 0 {};
 
 		virtual void BindVertexLayout(const VertexLayout& layout) = 0;
+		virtual void ChangeBufferContent(const void* src, size_t size, size_t offset) = 0;
 	};
 
 
@@ -73,7 +74,6 @@ namespace crystal
 
 		virtual void BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
 		virtual void BindIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
-		virtual void BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram) = 0;
 
 		virtual CullingMode GetCullMode() const = 0;
 		virtual FillMode GetFillMode() const = 0;

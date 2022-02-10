@@ -4,6 +4,7 @@
 #include "Core/Utils/GameTimer.h"
 #include "Core/Input/InputController.h"
 #include "Core/Utils/Logger.h"
+#include "Core/Render/SpriteBatch.h"
 #include "Core/Platform/Platforms.h"
 #include "Platforms/PlatformFactory.h"
 
@@ -26,6 +27,8 @@ namespace crystal
 
         InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(args);
+
+        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice());
     }
     
     Engine::~Engine()
@@ -49,6 +52,11 @@ namespace crystal
     IGraphicsDevice* Engine::GetGraphicsDevice() const
     {
         return m_platformProvider->GetGraphicsDevice();
+    }
+
+    SpriteBatch* Engine::GetSpriteBatch() const
+    {
+        return ptr(m_spriteBatch);
     }
     
     //IGraphicsDevice* Engine::GetGraphicsDevice() const

@@ -129,7 +129,6 @@ namespace crystal
 
 
 		m_PSO->BindVertexBuffer(vertexBuffer);
-		m_PSO->BindShaderProgram(m_pShader);
 		m_PSO->SetCullMode(CullingMode::CullCCW);
 		m_PSO->SetFillMode(FillMode::SOLID);
 		m_PSO->SetDepthTestState(true);
@@ -140,7 +139,6 @@ namespace crystal
 
 		m_PSOScreen->BindVertexBuffer(vertexBuffer1);
 		m_PSOScreen->BindIndexBuffer(indexBuffer1);
-		m_PSOScreen->BindShaderProgram(m_pScreenShader);
 		m_PSOScreen->BindShaderResource(m_renderTarget2D, 0);
 		m_PSOScreen->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::PointClamp), 0);
 	}
@@ -225,6 +223,7 @@ namespace crystal
 		//graphicsDevice->SetPipelineStateObject(m_PSOScreen);
 		graphicsDevice->PushPipelineStateObject(m_PSOScreen);
 		{
+			m_pScreenShader->Apply();
 			graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
 		}
 		graphicsDevice->PopPipelineStateObject();

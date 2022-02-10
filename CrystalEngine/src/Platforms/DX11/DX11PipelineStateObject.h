@@ -11,7 +11,6 @@ namespace crystal
 
 		virtual void BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) override;
 		virtual void BindIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) override;
-		virtual void BindShaderProgram(std::shared_ptr<ShaderProgram> shaderProgram) override;
 
 		virtual CullingMode GetCullMode() const override;
 		virtual FillMode GetFillMode() const override;
@@ -36,7 +35,7 @@ namespace crystal
 	private:
 		std::shared_ptr<VertexBuffer>	m_vertexBuffer = nullptr;
 		std::shared_ptr<IndexBuffer>	m_indexBuffer = nullptr;
-		std::shared_ptr<ShaderProgram>	m_shaderProgram = nullptr;
+		//std::shared_ptr<ShaderProgram>	m_shaderProgram = nullptr;
 
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
 
