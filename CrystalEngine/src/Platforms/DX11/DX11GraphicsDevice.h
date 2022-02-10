@@ -38,8 +38,8 @@ namespace crystal
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
 		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
-		ComPtr<ID3D11Device> GetD3DDevice() const { return m_pd3dDevice; }
-		ComPtr<ID3D11DeviceContext> GetD3DDeviceContext() const { return m_pd3dImmediateContext; }
+		ID3D11Device* GetD3DDevice() const { return m_pd3dDevice.Get(); }
+		ID3D11DeviceContext* GetD3DDeviceContext() const { return m_pd3dImmediateContext.Get(); }
 		ComPtr<ID3D11Buffer> CreateBuffer(void* src, size_t size,
 			BufferUsage usage, UINT bindFlags);
 	private:

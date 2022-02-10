@@ -188,7 +188,7 @@ namespace crystal
 		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
 		m_renderTarget2DStack[++m_renderTargetStackPtr] = renderTarget2D;
 
-		renderTarget2D->SetToCurrent();
+		renderTarget2D->m_setToCurrentContext();
 	}
 
 	void DX11GraphicsDevice::PopRenderTarget2D()
@@ -201,7 +201,7 @@ namespace crystal
 			m_pd3dImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
 			return;
 		}
-		m_renderTarget2DStack[m_renderTargetStackPtr]->SetToCurrent();
+		m_renderTarget2DStack[m_renderTargetStackPtr]->m_setToCurrentContext();
 	}
 
 	void DX11GraphicsDevice::PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)

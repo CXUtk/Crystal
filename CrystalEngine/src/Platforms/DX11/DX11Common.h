@@ -13,7 +13,7 @@ namespace crystal
 	public:
 		virtual ~IDX11ShaderResource() = 0 {};
 
-		virtual ComPtr<ID3D11ShaderResourceView> GetShaderResourceView() const = 0;
+		virtual ID3D11ShaderResourceView* GetShaderResourceView() const = 0;
 	};
 
 	class DX11Common{

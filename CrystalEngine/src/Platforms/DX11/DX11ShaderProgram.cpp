@@ -36,20 +36,20 @@ namespace crystal
 	DX11ShaderProgram::~DX11ShaderProgram()
 	{}
 
-	void DX11ShaderProgram::SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer)
-	{
-		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
-		if (m_vertexShader != nullptr)
-		{
-			context->VSSetSamplers(startSlot, count, samplerBuffer);
-			context->VSSetShaderResources(startSlot, count, srvBuffer);
-		}
-		if (m_fragmentShader != nullptr)
-		{
-			context->PSSetSamplers(startSlot, count, samplerBuffer);
-			context->PSSetShaderResources(startSlot, count, srvBuffer);
-		}
-	}
+	//void DX11ShaderProgram::SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer)
+	//{
+	//	auto context = m_pGraphicsDevice->GetD3DDeviceContext();
+	//	if (m_vertexShader != nullptr)
+	//	{
+	//		context->VSSetSamplers(startSlot, count, samplerBuffer);
+	//		context->VSSetShaderResources(startSlot, count, srvBuffer);
+	//	}
+	//	if (m_fragmentShader != nullptr)
+	//	{
+	//		context->PSSetSamplers(startSlot, count, samplerBuffer);
+	//		context->PSSetShaderResources(startSlot, count, srvBuffer);
+	//	}
+	//}
 
 	void DX11ShaderProgram::Apply()
 	{
@@ -66,11 +66,11 @@ namespace crystal
 		}
 		if (m_vertexShader != nullptr)
 		{
-			m_vertexShader->Bind();
+			m_vertexShader->m_BindToPipeline();
 		}
 		if (m_fragmentShader != nullptr)
 		{
-			m_fragmentShader->Bind();
+			m_fragmentShader->m_BindToPipeline();
 		}
 		if (m_pConstantBuffer)
 		{

@@ -16,7 +16,7 @@ namespace crystal
 	DX11VertexShader::~DX11VertexShader()
 	{}
 
-	void DX11VertexShader::Bind()
+	void DX11VertexShader::m_BindToPipeline()
 	{
 		m_pGraphicsDevice->GetD3DDeviceContext()->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
 	}

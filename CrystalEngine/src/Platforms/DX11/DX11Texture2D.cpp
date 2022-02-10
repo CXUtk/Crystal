@@ -36,7 +36,7 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
-		HR(DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice().Get(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
+		HR(DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
 			0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
 			textureDesc.MiscFlags, 0, nullptr, m_pSRV.GetAddressOf()));
 	}
@@ -66,7 +66,7 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
-		DirectX::CreateWICTextureFromMemoryEx(graphicsDevice->GetD3DDevice().Get(), src, size, 0, textureDesc.Usage, textureDesc.BindFlags,
+		DirectX::CreateWICTextureFromMemoryEx(graphicsDevice->GetD3DDevice(), src, size, 0, textureDesc.Usage, textureDesc.BindFlags,
 			textureDesc.CPUAccessFlags, textureDesc.MiscFlags, 0, nullptr, m_pSRV.GetAddressOf());
 	}
 

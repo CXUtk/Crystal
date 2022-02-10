@@ -13,7 +13,7 @@ namespace crystal
 	DX11FragmentShader::~DX11FragmentShader()
 	{}
 
-	void DX11FragmentShader::Bind()
+	void DX11FragmentShader::m_BindToPipeline()
 	{
 		m_pGraphicsDevice->GetD3DDeviceContext()->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
 	}

@@ -11,13 +11,13 @@ namespace crystal
 			std::shared_ptr<FragmentShader> fragmentShader, const UniformVariableCollection& uniforms);
 		~DX11ShaderProgram();
 
-		void SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer);
+		//void SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer);
 		virtual void Apply() override;
 		virtual void SetUniform1f(const std::string& name, float value) override;
 		virtual void SetUniformMat4f(const std::string& name, const Matrix4f& value) override;
 
 	private:
-		DX11GraphicsDevice* m_pGraphicsDevice = nullptr;
+		DX11GraphicsDevice*						m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11Buffer>					m_pConstantBuffer = nullptr;
 		std::unique_ptr<char[]>					m_pConstantBufferData{};
 		std::map<std::string, size_t>			m_uniformMap{};

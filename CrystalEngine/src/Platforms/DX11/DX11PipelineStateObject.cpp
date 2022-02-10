@@ -187,7 +187,7 @@ namespace crystal
 	void DX11PipelineStateObject::BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index)
 	{
 		assert(index >= 0 && index < MAX_SHADER_RESOURCES_COUNT);
-		m_samplerStates[index] = samplerState->GetDX11Ptr();
+		m_samplerStates[index] = samplerState->GetDX11SamplerState();
 	}
 
 	PipelineStateObjectDirtyFlags DX11PipelineStateObject::CheckDirtyFlag(DX11PipelineStateObject* other)

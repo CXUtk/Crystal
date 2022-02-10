@@ -21,7 +21,7 @@ namespace crystal
 		static void Init(DX11GraphicsDevice* graphicsDevice);
 		static std::shared_ptr<SamplerState> GetSamplerState(SamplerStates state);
 
-		ComPtr<ID3D11SamplerState> GetDX11Ptr() const { return m_samplerState; }
+		ComPtr<ID3D11SamplerState> GetDX11SamplerState() const { return m_samplerState.Get(); }
 	private:
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11SamplerState>		m_samplerState = nullptr;

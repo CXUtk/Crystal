@@ -94,7 +94,7 @@ namespace crystal
 	DX11RenderTarget2D::~DX11RenderTarget2D()
 	{}
 
-	void DX11RenderTarget2D::SetToCurrent()
+	void DX11RenderTarget2D::m_setToCurrentContext()
 	{
 		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
 		context->RSSetViewports(1, &m_viewport);

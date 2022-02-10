@@ -9,9 +9,11 @@ namespace crystal
 		DX11FragmentShader(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11PixelShader> pixelShader);
 		~DX11FragmentShader() override;
 
-		void Bind();
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11PixelShader>	m_pPixelShader = nullptr;
+
+		friend DX11ShaderProgram;
+		void m_BindToPipeline();
 	};
 }
