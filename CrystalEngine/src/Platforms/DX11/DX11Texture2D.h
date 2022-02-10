@@ -3,7 +3,7 @@
 
 namespace crystal
 {
-	class DX11Texture2D : public IDX11ShaderResource
+	class DX11Texture2D : public ITexture2D, public IDX11ShaderResource
 	{
 	public:
 		DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const std::string& path, const Texture2DDescription& texDesc);

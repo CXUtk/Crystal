@@ -50,6 +50,12 @@ namespace crystal
 		virtual ~IIndexBuffer() = 0 {};
 	};
 
+	class ITexture2D
+	{
+	public:
+		virtual ~ITexture2D() = 0 {};
+	};
+
 	class IShaderProgram
 	{
 	public:
