@@ -88,7 +88,7 @@ namespace crystal
 		texturedesc.MipmapLevels = 1;
 		texturedesc.Usage = BufferUsage::Default;
 
-		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
+		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/test.jpg", texturedesc);
 		m_PSO->BindShaderResource(m_texture2D, 0);
 		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::LinearClamp), 0);
 
@@ -116,10 +116,17 @@ namespace crystal
 		////graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
 		//graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
 
-
-		spriteBatch->Begin(glm::orthoLH_ZO(-80.f, 80.f, -60.f, 60.f, -1.f, 1.f));
-		spriteBatch->Draw(m_texture2D, Vector2f(0, 0));
-		spriteBatch->End();
+		{
+			spriteBatch->PushBatch(glm::orthoLH_ZO(0.f, 800.f, 0.f, 600.f, 0.f, 1.f));
+			for (int i = 0; i < 100; i++)
+			{
+				for (int j = 0; j < 100; j++)
+				{
+					spriteBatch->Draw(m_texture2D, CreateBBoxFromRect(Vector2i(i * 8, j * 6), Vector2i(8, 6)), Color4f(1.f));
+				}
+			}
+			spriteBatch->PopBatch();
+		}
 	}
 
 	void QuadTest::Exit()

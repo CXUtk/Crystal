@@ -28,7 +28,7 @@ VertexOut VS(VertexIn vIn)
 {
 	VertexOut vout;
 	vout.posH = mul(float4(vIn.pos, 0.0, 1.0), MVP);
-	vout.texCoord = vIn.texCoord;
+	vout.texCoord = float2(vIn.texCoord.x, 1.0 - vIn.texCoord.y);
 	vout.color = vIn.color;
 	vout.index = vIn.index;
 	return vout;
