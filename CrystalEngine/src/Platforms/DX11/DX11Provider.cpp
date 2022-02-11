@@ -13,10 +13,12 @@ namespace crystal
 
 	DX11Provider::~DX11Provider()
 	{
+#ifdef _DEBUG
 		ComPtr<ID3D11Debug> d3dDebug;
 		m_dx11GraphicsDevice->GetD3DDevice()->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(d3dDebug.GetAddressOf()));
 
 		d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+#endif // DEBUG
 	}
 
 	IGameWindow* DX11Provider::GetGameWindow() const

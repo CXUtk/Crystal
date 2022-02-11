@@ -1,5 +1,5 @@
-Texture2D texture0 : register(t0);
-SamplerState mySampler0 : register(s0);
+Texture2D textures[8] : register(t0);
+SamplerState mySampler : register(s0);
 
 cbuffer ConstantBuffer : register(b0)
 {
@@ -9,7 +9,7 @@ cbuffer ConstantBuffer : register(b0)
 
 struct VertexIn
 {
-	float2 pos : POSITION;
+	float3 pos : POSITION;
 	float2 texCoord : TEXCOORD;
 	float4 color : COLOR;
 	float index : POSITION1;
@@ -27,7 +27,7 @@ struct VertexOut
 VertexOut VS(VertexIn vIn)
 {
 	VertexOut vout;
-	vout.posH = mul(float4(vIn.pos, 0.0, 1.0), MVP);
+	vout.posH = mul(float4(vIn.pos, 1.0), MVP);
 	vout.texCoord = float2(vIn.texCoord.x, 1.0 - vIn.texCoord.y);
 	vout.color = vIn.color;
 	vout.index = vIn.index;
@@ -36,5 +36,5 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_Target
 {
-	return texture0.Sample(mySampler0, pIn.texCoord) * pIn.color;
+	return textures[(int) pIn.index].Sample(mySampler, pIn.texCoord) * pIn.color;
 }

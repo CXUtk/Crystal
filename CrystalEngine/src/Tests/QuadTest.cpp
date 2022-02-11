@@ -89,6 +89,8 @@ namespace crystal
 		texturedesc.Usage = BufferUsage::Default;
 
 		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/test.jpg", texturedesc);
+		m_texture2D1 = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
+
 		m_PSO->BindShaderResource(m_texture2D, 0);
 		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::LinearClamp), 0);
 
@@ -98,6 +100,7 @@ namespace crystal
 	void QuadTest::Update(const crystal::GameTimer& gameTimer)
 	{}
 
+	static float R = 0.f;
 	void QuadTest::Draw(const crystal::GameTimer& gameTimer)
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
@@ -118,11 +121,24 @@ namespace crystal
 
 		{
 			spriteBatch->PushBatch(glm::orthoLH_ZO(0.f, 800.f, 0.f, 600.f, 0.f, 1.f));
-			for (int i = 0; i < 100; i++)
+			auto size = m_texture2D->GetSize();
+			R += 0.01;
+			for (int i = 0; i < 10; i++)
 			{
-				for (int j = 0; j < 100; j++)
+				for (int j = 0; j < 10; j++)
 				{
-					spriteBatch->Draw(m_texture2D, CreateBBoxFromRect(Vector2i(i * 8, j * 6), Vector2i(8, 6)), Color4f(1.f));
+					if ((i + j) % 2 == 0)
+					{
+						spriteBatch->Draw(m_texture2D, Vector2f(i * 80, j * 60), Color4f(1.f),
+							R, Vector2f(size) * 0.5f, 2.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
+							| SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL);
+					}
+					else
+					{
+						spriteBatch->Draw(m_texture2D1, Vector2f(i * 80, j * 60), Color4f(1.f),
+							R, Vector2f(size) * 0.5f, 2.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
+							| SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL);
+					}
 				}
 			}
 			spriteBatch->PopBatch();

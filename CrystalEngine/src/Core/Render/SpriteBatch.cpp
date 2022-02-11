@@ -7,6 +7,14 @@
 
 namespace crystal
 {
+	struct SpriteBatch::BatchVertex2D
+	{
+		Vector3f	Position;
+		Vector2f	TextureCoords;
+		Color4f		Color;
+		Float		TextureIndex;
+	};
+
 	class SpriteBatch::RenderState
 	{
 	public:
@@ -34,14 +42,13 @@ namespace crystal
 		size_t							m_currentTextureSlotCount = 0;
 	};
 
-	static BatchVertex2D defaultVertices[] =
+	SpriteBatch::BatchVertex2D SpriteBatch::m_defaultVertices[] =
 	{
-		{ Vector2f(-0.5f, -0.5f), Vector2f(0.0f, 0.0f), Vector4f(1.0f), 0.0f },
-		{ Vector2f(0.5f, -0.5f), Vector2f(1.0f, 0.0f), Vector4f(1.0f), 0.0f },
-		{ Vector2f(0.5f, 0.5f), Vector2f(1.0f, 1.0f), Vector4f(1.0f), 0.0f },
-		{ Vector2f(-0.5f, 0.5f), Vector2f(0.0f, 1.0f), Vector4f(1.0f), 0.0f },
+		{ Vector3f(-0.5f, -0.5f, 0.f), Vector2f(0.0f, 0.0f), Vector4f(1.0f), 0.0f },
+		{ Vector3f(0.5f, -0.5f, 0.f), Vector2f(1.0f, 0.0f), Vector4f(1.0f), 0.0f },
+		{ Vector3f(0.5f, 0.5f, 0.f), Vector2f(1.0f, 1.0f), Vector4f(1.0f), 0.0f },
+		{ Vector3f(-0.5f, 0.5f, 0.f), Vector2f(0.0f, 1.0f), Vector4f(1.0f), 0.0f },
 	};
-
 
 	SpriteBatch::SpriteBatch(IGraphicsDevice* graphicsDevice)
 		: m_pGraphicsDevice(graphicsDevice)
@@ -88,10 +95,10 @@ namespace crystal
 			sizeof(BatchVertex2D) * MAX_QUADS_PER_BATCH * 4);
 
 		std::vector<ElementDescription> elements = {
-			{ SemanticType::POSITION, 0, RenderFormat::RG32f, 0 },
-			{ SemanticType::TEXCOORD, 0, RenderFormat::RG32f, 8 },
-			{ SemanticType::COLOR, 0, RenderFormat::RGBA32f, 16 },
-			{ SemanticType::POSITION, 1, RenderFormat::R32f, 32 },
+			{ SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
+			{ SemanticType::TEXCOORD, 0, RenderFormat::RG32f, 12 },
+			{ SemanticType::COLOR, 0, RenderFormat::RGBA32f, 20 },
+			{ SemanticType::POSITION, 1, RenderFormat::R32f, 36 },
 		};
 		VertexLayout vLayout(elements, sizeof(BatchVertex2D));
 		vertexBuffer->BindVertexLayout(vLayout);
@@ -107,6 +114,7 @@ namespace crystal
 
 	void SpriteBatch::PushBatch(const Matrix4f & transform)
 	{
+		m_FlushThisBatch();
 		auto renderState = RenderState(transform, m_pDefaultRenderState->m_pPipelineStateObject, m_globalQuadIndex);
 		m_renderStateStack.push_back(renderState);
 	}
@@ -114,10 +122,6 @@ namespace crystal
 	void SpriteBatch::PopBatch()
 	{
 		m_FlushThisBatch();
-		auto& currentState = m_renderStateStack.back();
-		assert(currentState.m_currentQuadCount == m_globalQuadIndex - currentState.m_currentQuadOffset);
-		m_globalQuadIndex = currentState.m_currentQuadOffset;
-		m_currentVertexIndex = m_globalQuadIndex * 4;
 		m_renderStateStack.pop_back();
 	}
 
@@ -125,11 +129,11 @@ namespace crystal
 	{
 		m_CheckFlush();
 		int textureSlot = m_GetTextureSlot(texture);
-		auto halfSize = Vector2f(texture->GetSize()) * 0.5f;
+		auto halfSize = Vector3f(texture->GetSize(), 0.f) * 0.5f;
 		for (int i = 0; i < 4; i++)
 		{
-			m_PushOneVertex(BatchVertex2D{ center + defaultVertices[i].Position * halfSize, defaultVertices[i].TextureCoords,
-				color, (float)textureSlot });
+			m_PushOneVertex(BatchVertex2D{ Vector3f(center, 0.f) + m_defaultVertices[i].Position * halfSize,
+				m_defaultVertices[i].TextureCoords, color, (float)textureSlot });
 		}
 		m_UpdateOneQuad();
 	}
@@ -141,16 +145,22 @@ namespace crystal
 		auto minPos = drawRect.GetMinPos();
 		auto maxPos = drawRect.GetMaxPos();
 
-		m_PushOneVertex(BatchVertex2D{ minPos, defaultVertices[0].TextureCoords,
+		m_PushOneVertex(BatchVertex2D{ Vector3f(minPos, 0.f), m_defaultVertices[0].TextureCoords,
 				color, (float)textureSlot });
-		m_PushOneVertex(BatchVertex2D{ Vector2f(maxPos.x, minPos.y), defaultVertices[1].TextureCoords,
+		m_PushOneVertex(BatchVertex2D{ Vector3f(maxPos.x, minPos.y, 0.f), m_defaultVertices[1].TextureCoords,
 			color, (float)textureSlot });
-		m_PushOneVertex(BatchVertex2D{ maxPos, defaultVertices[2].TextureCoords,
+		m_PushOneVertex(BatchVertex2D{ Vector3f(maxPos, 0.f), m_defaultVertices[2].TextureCoords,
 			color, (float)textureSlot });
-		m_PushOneVertex(BatchVertex2D{ Vector2f(minPos.x, maxPos.y), defaultVertices[3].TextureCoords,
+		m_PushOneVertex(BatchVertex2D{ Vector3f(minPos.x, maxPos.y, 0.f), m_defaultVertices[3].TextureCoords,
 			color, (float)textureSlot });
 
 		m_UpdateOneQuad();
+	}
+
+	void SpriteBatch::Draw(std::shared_ptr<Texture2D> texture, const Vector2f& pos, const Color4f& color, float rotation, const Vector2f& origin, float scale, SpriteEffect effect)
+	{
+		m_GeneralDraw(texture, pos, Bound2i(Vector2i(0.f), Vector2i(texture->GetSize())),
+			color, rotation, origin, Vector2f(scale), effect, 0.f);
 	}
 
 	int SpriteBatch::m_GetTextureSlot(std::shared_ptr<Texture2D> texture)
@@ -181,7 +191,12 @@ namespace crystal
 
 	void SpriteBatch::m_FlushThisBatch()
 	{
+		if (m_renderStateStack.empty()) return;
 		auto& currentState = m_renderStateStack.back();
+		if (currentState.m_currentQuadCount == 0) return;
+		assert(currentState.m_currentQuadCount == m_globalQuadIndex - currentState.m_currentQuadOffset);
+		m_globalQuadIndex = currentState.m_currentQuadOffset;
+		m_currentVertexIndex = m_globalQuadIndex * 4;
 		{
 			m_pGraphicsDevice->PushPipelineStateObject(currentState.m_pPipelineStateObject ?
 				currentState.m_pPipelineStateObject : m_pDefaultRenderState->m_pPipelineStateObject);
@@ -202,6 +217,7 @@ namespace crystal
 
 			m_pGraphicsDevice->PopPipelineStateObject();
 		}
+		currentState.m_currentQuadCount = 0;
 	}
 
 	void SpriteBatch::m_UpdateOneQuad()
@@ -230,5 +246,83 @@ namespace crystal
 			m_vertices[m_currentVertexIndex] = vertex;
 		}
 		m_currentVertexIndex++;
+	}
+
+	void SpriteBatch::m_GeneralDraw(std::shared_ptr<Texture2D> texture, const Vector2f& pos,
+		const Bound2i& srcRect, const Color4f& color, float rotation, const Vector2f& origin,
+		const Vector2f& scale, SpriteEffect effect, float depth)
+	{
+		m_CheckFlush();
+		int textureSlot = m_GetTextureSlot(texture);
+		Vector2f texSize = Vector2f(texture->GetSize());
+
+		BatchVertex2D vertices[4];
+
+		auto srcRectMin = srcRect.GetMinPos();
+		auto srcRectMax = srcRect.GetMaxPos();
+		
+		vertices[0].TextureCoords.x = srcRectMin.x / texSize.x;
+		vertices[0].TextureCoords.y = srcRectMin.y / texSize.y;
+
+		vertices[1].TextureCoords.x = srcRectMax.x / texSize.x;
+		vertices[1].TextureCoords.y = srcRectMin.y / texSize.y;
+
+		vertices[2].TextureCoords.x = srcRectMax.x / texSize.x;
+		vertices[2].TextureCoords.y = srcRectMax.y / texSize.y;
+
+		vertices[3].TextureCoords.x = srcRectMin.x / texSize.x;
+		vertices[3].TextureCoords.y = srcRectMax.y / texSize.y;
+
+
+		if (effect & SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL)
+		{
+			std::swap(vertices[0].TextureCoords, vertices[1].TextureCoords);
+			std::swap(vertices[2].TextureCoords, vertices[3].TextureCoords);
+		}
+
+		if (effect & SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL)
+		{
+			std::swap(vertices[0].TextureCoords, vertices[3].TextureCoords);
+			std::swap(vertices[1].TextureCoords, vertices[2].TextureCoords);
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			vertices[i].Position = m_defaultVertices[i].Position * Vector3f(texSize, 0.f)
+				+ Vector3f(-origin + texSize * 0.5f, 0.f);
+			vertices[i].Color = color;
+		}
+
+		if (rotation != 0.f)
+		{
+			float cosTheta = std::cos(rotation);
+			float sinTheta = std::sin(rotation);
+
+			// rotate the vertices
+			for (int i = 0; i < 4; i++)
+			{
+				float x = vertices[i].Position.x;
+				float y = vertices[i].Position.y;
+				vertices[i].Position.x = cosTheta * x - sinTheta * y;
+				vertices[i].Position.y = sinTheta * x + cosTheta * y;
+			}
+		}
+		
+		if (depth != 0)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				vertices[i].Position.z = depth;
+			}
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			vertices[i].Position.x = vertices[i].Position.x * scale.x + pos.x;
+			vertices[i].Position.y = vertices[i].Position.y * scale.y + pos.y;
+
+			m_PushOneVertex(vertices[i]);
+		}
+		m_UpdateOneQuad();
 	}
 }
