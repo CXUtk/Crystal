@@ -25,10 +25,26 @@ namespace crystal
 
 	struct Vertex
 	{
-		Vector3f pos;
-		Vector2f texCoord;
-		Vector4f color;
+		Vector2f	pos;
+		Vector2f	texCoord;
+		Vector4f	color;
+		float		index;
 	};
+
+	static Vertex vertices[] =
+	{
+		{ Vector2f(-0.5f, -0.5f), Vector2f(0.0f, 0.0f), Vector4f(0.0f, 1.0f, 0.0f, 1.0f), 0.f },
+		{ Vector2f(0.5f, -0.5f), Vector2f(1.0f, 0.0f), Vector4f(0.0f, 0.0f, 1.0f, 1.0f), 0.f },
+		{ Vector2f(0.5f, 0.5f), Vector2f(1.0f, 1.0f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f), 0.f },
+		{ Vector2f(-0.5f, 0.5f), Vector2f(0.0f, 1.0f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f), 0.f },
+	};
+	static int indices[] =
+	{
+		0, 1, 3,
+		1, 2, 3
+	};
+
+	static std::shared_ptr<VertexBuffer> vertexBuffer;
 
 	void QuadTest::Initialize()
 	{
@@ -38,34 +54,24 @@ namespace crystal
 		auto windowSize = window->GetWindowSize();
 		auto graphicsDevice = m_engine->GetGraphicsDevice();
 
-		Vertex vertices[] =
-		{
-			{ Vector3f(-0.5f, -0.5f, 0.5f), Vector2f(0.0f, 0.0f), Vector4f(0.0f, 1.0f, 0.0f, 1.0f) },
-			{ Vector3f(0.5f, -0.5f, 0.5f), Vector2f(1.0f, 0.0f), Vector4f(0.0f, 0.0f, 1.0f, 1.0f) },
-			{ Vector3f(0.5f, 0.5f, 0.5f), Vector2f(1.0f, 1.0f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
-			{ Vector3f(-0.5f, 0.5f, 0.5f), Vector2f(0.0f, 1.0f), Vector4f(1.0f, 0.0f, 0.0f, 1.0f) },
-		};
-		int indices[] =
-		{
-			0, 1, 2,
-			0, 2, 3
-		};
-
 		std::vector<ElementDescription> elements = {
-			{ SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
-			{ SemanticType::TEXCOORD, 0, RenderFormat::RGB32f, 12 },
-			{ SemanticType::COLOR, 0, RenderFormat::RGBA32f, 24 },
+			{ SemanticType::POSITION, 0, RenderFormat::RG32f, 0 },
+			{ SemanticType::TEXCOORD, 0, RenderFormat::RG32f, 8 },
+			{ SemanticType::COLOR, 0, RenderFormat::RGBA32f, 16 },
+			{ SemanticType::POSITION, 1, RenderFormat::R32f, 32 },
 		};
 		VertexLayout vLayout(elements, sizeof(Vertex));
 
 		VertexBufferDescription bufferDesc{};
-		bufferDesc.Usage = BufferUsage::Immutable;
+		bufferDesc.Usage = BufferUsage::CPUWrite;
 		IndexBufferDescription indexDesc;
 		indexDesc.Format = DataFormat::UInt32;
 		indexDesc.Usage = BufferUsage::Immutable;
 		auto indexBuffer = graphicsDevice->CreateIndexBuffer(indexDesc, indices, sizeof(indices));
-		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, vertices, sizeof(vertices));
+		vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, nullptr, sizeof(vertices));
 		vertexBuffer->BindVertexLayout(vLayout);
+
+
 
 		m_PSO = graphicsDevice->CreatePipelineStateObject();
 		m_PSO->BindVertexBuffer(vertexBuffer);
@@ -103,13 +109,16 @@ namespace crystal
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 
+		//vertexBuffer->ChangeBufferContent(vertices, sizeof(vertices), 0);
+		//m_pShader->SetUniformMat4f("MVP", glm::orthoLH_ZO(-8.f, 8.f, -6.f, 6.f, -1.f, 1.f));
 		//m_pShader->Apply();
+
 		////graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 3);
 		//graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
 
 
-		spriteBatch->Begin(glm::ortho(0.f, 800.f, 0.f, 600.f));
-		spriteBatch->Draw(m_texture2D.get(), Vector2f(0.f));
+		spriteBatch->Begin(glm::orthoLH_ZO(-80.f, 80.f, -60.f, 60.f, -1.f, 1.f));
+		spriteBatch->Draw(m_texture2D, Vector2f(0, 0));
 		spriteBatch->End();
 	}
 

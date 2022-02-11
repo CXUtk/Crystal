@@ -37,10 +37,10 @@ namespace crystal
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
 
-		ID3D11Texture2D* pTexture2D = nullptr;
+		ComPtr<ID3D11Texture2D> pTexture2D = nullptr;
 		DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
 			0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
-			textureDesc.MiscFlags, 0, reinterpret_cast<ID3D11Resource**>(&pTexture2D), m_pSRV.GetAddressOf());
+			textureDesc.MiscFlags, 0, reinterpret_cast<ID3D11Resource**>(pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
 		pTexture2D->GetDesc(&textureDesc);
 
 		m_size.x = textureDesc.Width;

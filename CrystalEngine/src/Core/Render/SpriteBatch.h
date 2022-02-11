@@ -20,7 +20,7 @@ namespace crystal
 		void Begin(const Matrix4f& transform);
 		void End();
 
-		void Draw(Texture2D* texture, const Vector2f& center);
+		void Draw(std::shared_ptr<Texture2D> texture, const Vector2f& center);
 	private:
 		std::shared_ptr<IVertexBuffer>	m_pVertexBuffer = nullptr;
 		std::shared_ptr<IShaderProgram> m_pShaderProgram = nullptr;
@@ -30,6 +30,7 @@ namespace crystal
 
 		std::map<Texture2D*, int>		m_textureSlotMap{};
 
+		static constexpr int MAX_TEXTURE_SLOTS = 8;
 		static constexpr int MAX_QUADS_PER_BATCH = 1 << 20;
 		static constexpr int MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH << 2;
 		std::vector<BatchVertex2D>		m_vertices{};
