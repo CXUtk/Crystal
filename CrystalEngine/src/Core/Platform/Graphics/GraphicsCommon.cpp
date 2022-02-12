@@ -56,7 +56,7 @@ namespace crystal
 		StringToDataFormatMapping["mat4"] = DataFormat::Float32;
 	}
 
-	DataFormat StringToDataFormatConvert(const std::string& type)
+	DataFormat GraphicsCommons::StringToDataFormatConvert(const std::string& type)
 	{
 		auto iter = StringToDataFormatMapping.find(type);
 		if (iter == StringToDataFormatMapping.end())
@@ -66,12 +66,12 @@ namespace crystal
 		return iter->second;
 	}
 
-	size_t ComponentFormatToSizeConvert(ComponentFormat format)
+	size_t GraphicsCommons::ComponentFormatToSizeConvert(ComponentFormat format)
 	{
 		return ComponentFormatToSizeMapping[(int)format];
 	}
 
-	ComponentFormat StringToComponentFormatConvert(const std::string& type)
+	ComponentFormat GraphicsCommons::StringToComponentFormatConvert(const std::string& type)
 	{
 		auto iter = StringToComponentFormatMapping.find(type);
 		if (iter == StringToComponentFormatMapping.end())
@@ -81,7 +81,7 @@ namespace crystal
 		return iter->second;
 	}
 
-	void InitGraphicsCommons()
+	void GraphicsCommons::InitGraphicsCommons()
 	{
 		static bool initialized = false;
 		if (initialized) return;

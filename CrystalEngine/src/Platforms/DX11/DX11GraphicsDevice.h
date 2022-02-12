@@ -37,6 +37,8 @@ namespace crystal
 		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
+		virtual std::shared_ptr<SamplerState> GetSamplerState(SamplerStates state) override;
+
 		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
 		ID3D11Device* GetD3DDevice() const { return m_pd3dDevice.Get(); }
 		ID3D11DeviceContext* GetD3DDeviceContext() const { return m_pd3dImmediateContext.Get(); }
@@ -65,6 +67,9 @@ namespace crystal
 		PipelineStateObjectDirtyFlags			m_PSODirtyFlagsStack[NUM_PIPELINE_STATE_OBJECTS]{};
 
 		Win32GameWindow*	m_pWindow;			// Win32 窗体对象
+
+		class CommonStates;
+		std::unique_ptr<CommonStates>			m_commonStates;
 
 		bool m_initD3DX11();
 		void m_resizeBuffer();

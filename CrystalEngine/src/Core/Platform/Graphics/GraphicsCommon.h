@@ -263,6 +263,16 @@ namespace crystal
 		__COUNT
 	};
 
+	enum class SamplerStates
+	{
+		PointClamp,
+		PointWarp,
+		LinearClamp,
+		LinearWarp,
+
+		__COUNT
+	};
+
 	enum ClearOptions : int
 	{
 		CRYSTAL_CLEAR_TARGET = 1 << 0,
@@ -389,8 +399,12 @@ namespace crystal
 		std::vector<UniformVariable> Variables;
 	};
 
-	void InitGraphicsCommons();
-	ComponentFormat StringToComponentFormatConvert(const std::string& type);
-	DataFormat StringToDataFormatConvert(const std::string& type);
-	size_t ComponentFormatToSizeConvert(ComponentFormat format);
+	class GraphicsCommons
+	{
+	public:
+		static void InitGraphicsCommons();
+		static ComponentFormat StringToComponentFormatConvert(const std::string& type);
+		static DataFormat StringToDataFormatConvert(const std::string& type);
+		static size_t ComponentFormatToSizeConvert(ComponentFormat format);
+	};
 }

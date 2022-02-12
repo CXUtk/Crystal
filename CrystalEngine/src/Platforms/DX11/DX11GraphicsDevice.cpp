@@ -19,6 +19,21 @@
 
 namespace crystal
 {
+
+	class DX11GraphicsDevice::CommonStates
+	{
+	public:
+		CommonStates(DX11GraphicsDevice* graphicsDevice);
+
+		std::shared_ptr<SamplerState> PointClamp = nullptr;
+		std::shared_ptr<SamplerState> PointWarp = nullptr;
+		std::shared_ptr<SamplerState> LinearClamp = nullptr;
+		std::shared_ptr<SamplerState> LinearWarp = nullptr;
+
+	private:
+		DX11GraphicsDevice*		m_pGraphicsDevice;
+	};
+
 	DX11GraphicsDevice::DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window)
 		: m_pWindow(window), m_Enable4xMsaa(args.Enable4xMSAA)
 	{
@@ -28,6 +43,8 @@ namespace crystal
 		}
 
 		m_PSOStack[0] = CreatePipelineStateObject();
+		
+		m_commonStates = std::make_unique<CommonStates>(this);
 	}
 
 	DX11GraphicsDevice::~DX11GraphicsDevice()
@@ -125,7 +142,7 @@ namespace crystal
 	{
 		UniformVariable varb;
 		varb.Name = name;
-		varb.Format = StringToComponentFormatConvert(type);
+		varb.Format = GraphicsCommons::StringToComponentFormatConvert(type);
 		return varb;
 	}
 
@@ -440,5 +457,77 @@ namespace crystal
 		ComPtr<ID3D11Buffer> pBuffer;
 		HR(m_pd3dDevice->CreateBuffer(&vbd, src ? &initData : nullptr, pBuffer.GetAddressOf()));
 		return pBuffer;
+	}
+
+	std::shared_ptr<SamplerState> DX11GraphicsDevice::GetSamplerState(SamplerStates state)
+	{
+		switch (state)
+		{
+		case crystal::SamplerStates::PointClamp:
+		{
+			return m_commonStates->PointClamp;
+		}
+		break;
+		case crystal::SamplerStates::PointWarp:
+		{
+			return m_commonStates->PointWarp;
+		}
+		break;
+		case crystal::SamplerStates::LinearClamp:
+		{
+			return m_commonStates->LinearClamp;
+		}
+		break;
+		case crystal::SamplerStates::LinearWarp:
+		{
+			return m_commonStates->LinearWarp;
+		}
+		break;
+		default:
+			break;
+		}
+		throw std::exception("Unknown Sampler State");
+	}
+
+
+	DX11GraphicsDevice::CommonStates::CommonStates(DX11GraphicsDevice* graphicsDevice)
+		: m_pGraphicsDevice(graphicsDevice)
+	{
+		auto device = m_pGraphicsDevice->GetD3DDevice();
+		ComPtr<ID3D11SamplerState> pointClamp;
+		ComPtr<ID3D11SamplerState> pointWarp;
+		ComPtr<ID3D11SamplerState> linearClamp;
+		ComPtr<ID3D11SamplerState> linearWarp;
+		D3D11_SAMPLER_DESC sampDesc;
+		ZeroMemory(&sampDesc, sizeof(sampDesc));
+		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		sampDesc.MinLOD = 0;
+		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+		HR(device->CreateSamplerState(&sampDesc, pointClamp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(pointClamp.Get(), "Point Clamp Sampler");
+		PointClamp = std::make_shared<SamplerState>(graphicsDevice, pointClamp);
+
+		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+		HR(device->CreateSamplerState(&sampDesc, pointWarp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(pointWarp.Get(), "Point Warp Sampler");
+		PointWarp = std::make_shared<SamplerState>(graphicsDevice, pointWarp);
+
+		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		HR(device->CreateSamplerState(&sampDesc, linearWarp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(linearWarp.Get(), "Linear Warp Sampler");
+		LinearWarp = std::make_shared<SamplerState>(graphicsDevice, linearWarp);
+
+		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
+		HR(device->CreateSamplerState(&sampDesc, linearClamp.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(linearClamp.Get(), "Linear Clamp Sampler");
+		LinearClamp = std::make_shared<SamplerState>(graphicsDevice, linearClamp);
 	}
 }

@@ -24,11 +24,8 @@ namespace crystal
         m_fpsCap = 1.0 / args.FPSLimit;
 
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
-
-        InitGraphicsCommons();
+        GraphicsCommons::InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(args);
-
-        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice());
     }
     
     Engine::~Engine()
@@ -52,11 +49,6 @@ namespace crystal
     IGraphicsDevice* Engine::GetGraphicsDevice() const
     {
         return m_platformProvider->GetGraphicsDevice();
-    }
-
-    SpriteBatch* Engine::GetSpriteBatch() const
-    {
-        return ptr(m_spriteBatch);
     }
     
     //IGraphicsDevice* Engine::GetGraphicsDevice() const

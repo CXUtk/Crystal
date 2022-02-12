@@ -38,8 +38,6 @@ namespace crystal
 
 		IGraphicsDevice* GetGraphicsDevice() const;
 
-		SpriteBatch* GetSpriteBatch() const;
-
 		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 

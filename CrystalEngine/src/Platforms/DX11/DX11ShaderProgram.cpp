@@ -19,7 +19,7 @@ namespace crystal
 		for (auto& var : uniforms.Variables)
 		{
 			m_uniformMap[var.Name] = size;
-			size += ComponentFormatToSizeConvert(var.Format);
+			size += GraphicsCommons::ComponentFormatToSizeConvert(var.Format);
 		}
 		// For const buffer the ByteWidth (value = 4) must be a multiple of 16.
 		size = (size + 15) / 16 * 16;

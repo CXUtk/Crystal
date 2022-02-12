@@ -33,6 +33,8 @@ namespace crystal
 		virtual std::shared_ptr<Texture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;
+	
+		virtual std::shared_ptr<SamplerState> GetSamplerState(SamplerStates state) = 0;
 	};
 
 	class IVertexBuffer
@@ -67,6 +69,13 @@ namespace crystal
 		virtual void SetUniformMat4f(const std::string& name, const glm::mat4& value) = 0;
 	};
 
+
+	class ISamplerState
+	{
+	public:
+		virtual ~ISamplerState() = 0 {};
+	};
+
 	class IPipelineStateObject
 	{
 	public:
@@ -74,6 +83,8 @@ namespace crystal
 
 		virtual void BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
 		virtual void BindIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
+		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) = 0;
+		virtual void BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index) = 0;
 
 		virtual CullingMode GetCullMode() const = 0;
 		virtual FillMode GetFillMode() const = 0;
@@ -86,9 +97,12 @@ namespace crystal
 
 		virtual void SetDepthTestState(bool enable) = 0;
 		virtual void SetStencilTestState(bool enable) = 0;
+	};
 
-		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) = 0;
-		virtual void BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index) = 0;
+	class IRenderTarget2D
+	{
+	public:
+		virtual ~IRenderTarget2D() = 0 {};
 	};
 
 	class IPlatformProvider
@@ -99,5 +113,24 @@ namespace crystal
 		virtual IGameWindow* GetGameWindow() const = 0;
 		virtual IFileSystem* GetFileSystem() const = 0;
 		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
+	};
+
+	class IShader
+	{
+	public:
+		virtual ~IShader() = 0 {};
+	};
+
+
+	class IVertexShader : public IShader
+	{
+	public:
+		virtual ~IVertexShader() = 0 {};
+	};
+
+	class IFragmentShader : public IShader
+	{
+	public:
+		virtual ~IFragmentShader() = 0 {};
 	};
 }
