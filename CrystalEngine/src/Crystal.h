@@ -31,16 +31,6 @@ namespace crystal
 	// For creating all other objects (textures, buffers, etc.)
 	class IGraphicsDevice;
 
-	// Graphics Resources
-	class IIndexBuffer;
-	class IVertexBuffer;
-	class IInputLayout;
-	class IShader;
-	class IVertexShader;
-	class IFragmentShader;
-	class IShaderProgram;
-	class IPipelineStateObject;
-
 	class IGameWindow;
 	class IPlatformProvider;
 	class IFileSystem;

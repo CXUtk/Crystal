@@ -8,64 +8,26 @@
 
 namespace crystal
 {
-#ifdef CRYSTAL_USE_OPENGL
-	class OpenGLGraphicsDevice;
-	using GraphicsDevice = OpenGLGraphicsDevice;
+	class IGraphicsDevice;
+	class IPipelineResourceObject;
+	class IPipelineStateObject;
 
-	class OpenGLVertexBuffer;
-	using VertexBuffer = OpenGLVertexBuffer;
+	// Pipeline Resources
+	class IIndexBuffer;
+	class IVertexBuffer;
+	class IShader;
+	class IVertexShader;
+	class IFragmentShader;
+	class IShaderProgram;
+	class IShaderResource;
+	class IRenderTarget2D;
+	class ITexture2D;
 
-	class OpenGLIndexBuffer;
-	using IndexBuffer = OpenGLIndexBuffer;
+	// Pipeline States
+	class IPipelineState;
+	class ISamplerState;
+	class IBlendState;
 
-	class OpenGLVertexShader;
-	using VertexShader = OpenGLVertexShader;
-
-	class OpenGLFragmentShader;
-	using FragmentShader = OpenGLFragmentShader;
-
-	class OpenGLShaderProgram;
-	using ShaderProgram = OpenGLShaderProgram;
-
-	class OpenGLPipelineStateObject;
-	using PipelineStateObject = OpenGLPipelineStateObject;
-#elif defined(CRYSTAL_USE_DX11)
-	class DX11GraphicsDevice;
-	using GraphicsDevice = DX11GraphicsDevice;
-
-	class DX11VertexBuffer;
-	using VertexBuffer = DX11VertexBuffer;
-
-	class DX11IndexBuffer;
-	using IndexBuffer = DX11IndexBuffer;
-
-	class DX11VertexShader;
-	using VertexShader = DX11VertexShader;
-
-	class DX11FragmentShader;
-	using FragmentShader = DX11FragmentShader;
-
-	class DX11ShaderProgram;
-	using ShaderProgram = DX11ShaderProgram;
-
-	class DX11PipelineStateObject;
-	using PipelineStateObject = DX11PipelineStateObject;
-
-	class DX11Texture2D;
-	using Texture2D = DX11Texture2D;
-
-	class DX11SamplerState;
-	using SamplerState = DX11SamplerState;
-
-	class DX11RenderTarget2D;
-	using RenderTarget2D = DX11RenderTarget2D;
-
-	class IDX11ShaderResource;
-	using IShaderResource = IDX11ShaderResource;
-
-	class DX11BlendState;
-	using BlendState = DX11BlendState;
-#endif
 
 	using Spectrum = glm::vec3;
 	using Color3f = glm::vec3;
