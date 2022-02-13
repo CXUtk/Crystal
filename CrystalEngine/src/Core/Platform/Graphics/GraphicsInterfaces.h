@@ -21,6 +21,8 @@ namespace crystal
 		virtual void PopRenderTarget2D() = 0;
 		virtual void PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) = 0;
 		virtual void PopPipelineStateObject() = 0;
+		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) = 0;
+		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) = 0;
 
 		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() = 0;
 		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) = 0;
@@ -34,7 +36,7 @@ namespace crystal
 		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;
 	
-		virtual std::shared_ptr<SamplerState> GetSamplerState(SamplerStates state) = 0;
+		virtual std::shared_ptr<SamplerState> GetCommonSamplerState(SamplerStates state) = 0;
 	};
 
 	class IVertexBuffer
@@ -83,8 +85,6 @@ namespace crystal
 
 		virtual void BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
 		virtual void BindIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
-		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) = 0;
-		virtual void BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index) = 0;
 
 		virtual CullingMode GetCullMode() const = 0;
 		virtual FillMode GetFillMode() const = 0;
@@ -112,7 +112,8 @@ namespace crystal
 
 		virtual IGameWindow* GetGameWindow() const = 0;
 		virtual IFileSystem* GetFileSystem() const = 0;
-		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
+		virtual GraphicsDevice* GetGraphicsDevice() const = 0;
+		virtual void Present() = 0;
 	};
 
 	class IShader

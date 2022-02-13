@@ -34,11 +34,12 @@ namespace crystal
 	class SpriteBatch
 	{
 	public:
-		SpriteBatch(IGraphicsDevice* graphicsDevice);
+		SpriteBatch(GraphicsDevice* graphicsDevice);
 		~SpriteBatch();
 
-		void PushBatch(const Matrix4f& transform);
-		void PopBatch();
+		void Begin();
+		void Begin(const Matrix4f& transform);
+		void End();
 
 		void Draw(std::shared_ptr<Texture2D> texture, const Vector2f& center, const Color4f& color);
 		void Draw(std::shared_ptr<Texture2D> texture, const Bound2i& drawRect, const Color4f& color);

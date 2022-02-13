@@ -7,6 +7,7 @@
 #include "DX11ShaderProgram.h"
 #include "DX11Texture2D.h"
 #include "DX11SamplerState.h"
+#include "PipelineStates/DX11BlendState.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include <Core/Utils/Misc.h>
@@ -47,6 +48,15 @@ namespace crystal
 		m_depthStencilStateDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 		m_depthStencilStateDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 		m_depthStencilStateDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+
+		m_blendState = graphicsDevice->GetCommonBlendState(BlendStates::Opaque);
+
+
+		m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
+			m_currentRasterizerState.ReleaseAndGetAddressOf());
+		m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&m_depthStencilStateDesc,
+			m_currentDepthStencilState.ReleaseAndGetAddressOf());
 	}
 
 	DX11PipelineStateObject::~DX11PipelineStateObject()
@@ -178,126 +188,67 @@ namespace crystal
 	//	m_shaderProgram->SetShaderResources(0, 1, viewArray, samplerArray);
 	//}
 
-	void DX11PipelineStateObject::BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index)
-	{
-		assert(index >= 0 && index < MAX_SHADER_RESOURCES_COUNT);
-		m_SRVSlots[index] = shaderResource->GetShaderResourceView();
-	}
+	//PipelineStateObjectDirtyFlags DX11PipelineStateObject::CheckDirtyFlag(DX11PipelineStateObject* other)
+	//{
+	//	PipelineStateObjectDirtyFlags flags = static_cast<PipelineStateObjectDirtyFlags>(0);
+	//	
+	//	if (m_vertexBuffer != other->m_vertexBuffer)
+	//	{
+	//		flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_VERTEX_BUFFER_DIRTY;
+	//	}
 
-	void DX11PipelineStateObject::BindSamplerState(std::shared_ptr<SamplerState> samplerState, int index)
-	{
-		assert(index >= 0 && index < MAX_SHADER_RESOURCES_COUNT);
-		m_samplerStates[index] = samplerState->GetDX11SamplerState();
-	}
+	//	if (m_indexBuffer != other->m_indexBuffer)
+	//	{
+	//		flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_INDEX_BUFFER_DIRTY;
+	//	}
 
-	PipelineStateObjectDirtyFlags DX11PipelineStateObject::CheckDirtyFlag(DX11PipelineStateObject* other)
-	{
-		PipelineStateObjectDirtyFlags flags = static_cast<PipelineStateObjectDirtyFlags>(0);
-		
-		if (m_vertexBuffer != other->m_vertexBuffer)
-		{
-			flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_VERTEX_BUFFER_DIRTY;
-		}
 
-		if (m_indexBuffer != other->m_indexBuffer)
-		{
-			flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_INDEX_BUFFER_DIRTY;
-		}
+	//	if (m_checkRasterizerState(other))
+	//	{
+	//		flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_RASTERIZER_STATE_DIRTY;
+	//	}
 
-		for (int i = 0; i < MAX_SHADER_RESOURCES_COUNT; i++)
-		{
-			if (m_SRVSlots[i] != other->m_SRVSlots[i])
-			{
-				flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_SHADER_RESOURCE_DIRTY;
-				break;
-			}
-		}
+	//	if (m_checkDepthStencilState(other))
+	//	{
+	//		flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_DEPTH_STENCIL_STATE_DIRTY;
+	//	}
+	//	return flags;
+	//}
 
-		if (m_checkRasterizerState(other))
-		{
-			flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_RASTERIZER_STATE_DIRTY;
-		}
-
-		if (m_checkDepthStencilState(other))
-		{
-			flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_DEPTH_STENCIL_STATE_DIRTY;
-		}
-
-		for (int i = 0; i < MAX_SHADER_RESOURCES_COUNT; i++)
-		{
-			if (m_samplerStates[i] != other->m_samplerStates[i])
-			{
-				flags = flags | PipelineStateObjectDirtyFlags::CRYSTAL_PSO_SAMPLER_STATE_DIRTY;
-				break;
-			}
-		}
-		return flags;
-	}
-
-	void DX11PipelineStateObject::Apply(PipelineStateObjectDirtyFlags dirtyFlags)
+	void DX11PipelineStateObject::Apply()
 	{
 		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
-		if (dirtyFlags & PipelineStateObjectDirtyFlags::CRYSTAL_PSO_VERTEX_BUFFER_DIRTY)
+		if (m_vertexBuffer)
 		{
-			if (m_vertexBuffer)
-			{
-				m_vertexBuffer->m_BindToPipeline(0);
-			}
+			m_vertexBuffer->m_BindToPipeline(0);
 		}
-		if (dirtyFlags & PipelineStateObjectDirtyFlags::CRYSTAL_PSO_INDEX_BUFFER_DIRTY)
+		if (m_indexBuffer)
 		{
-			if (m_indexBuffer)
-			{
-				m_indexBuffer->m_BindToPipeline(0);
-			}
+			m_indexBuffer->m_BindToPipeline(0);
 		}
-		if (dirtyFlags & PipelineStateObjectDirtyFlags::CRYSTAL_PSO_SHADER_RESOURCE_DIRTY)
+		m_blendState->Apply();
+		if (m_needsRefreshRasterState)
 		{
-			ID3D11ShaderResourceView* viewArray[MAX_SHADER_RESOURCES_COUNT]{};
+			m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
+				m_currentRasterizerState.ReleaseAndGetAddressOf());
+			m_needsRefreshRasterState = true;
+		}
+		m_pGraphicsDevice->GetD3DDeviceContext()->RSSetState(m_currentRasterizerState.Get());
 
-			for (int i = 0; i < MAX_SHADER_RESOURCES_COUNT; i++)
-			{
-				viewArray[i] = m_SRVSlots[i].Get();
-			}
-
-			context->VSSetShaderResources(0, MAX_SHADER_RESOURCES_COUNT, viewArray);
-			context->PSSetShaderResources(0, MAX_SHADER_RESOURCES_COUNT, viewArray);
-			context->GSSetShaderResources(0, MAX_SHADER_RESOURCES_COUNT, viewArray);
-		}
-		if (dirtyFlags & PipelineStateObjectDirtyFlags::CRYSTAL_PSO_RASTERIZER_STATE_DIRTY)
+		if (m_needsRefreshScissorRect)
 		{
-			if (m_needsRefreshRasterState)
-			{
-				m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&m_rasterStateDesc,
-					m_currentRasterizerState.ReleaseAndGetAddressOf());
-				m_needsRefreshRasterState = false;
-			}
-			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetState(m_currentRasterizerState.Get());
 			m_pGraphicsDevice->GetD3DDeviceContext()->RSSetScissorRects(1, &m_scissorRect);
+			m_needsRefreshScissorRect = false;
 		}
-		if (dirtyFlags & PipelineStateObjectDirtyFlags::CRYSTAL_PSO_DEPTH_STENCIL_STATE_DIRTY)
-		{
-			if (m_needsRefreshDepthStencilState)
-			{
-				m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&m_depthStencilStateDesc,
-					m_currentDepthStencilState.ReleaseAndGetAddressOf());
-				m_needsRefreshDepthStencilState = false;
-			}
-			m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
-		}
-		if (dirtyFlags & PipelineStateObjectDirtyFlags::CRYSTAL_PSO_SAMPLER_STATE_DIRTY)
-		{
-			ID3D11SamplerState* samplerArray[MAX_SHADER_RESOURCES_COUNT]{};
 
-			for (int i = 0; i < MAX_SHADER_RESOURCES_COUNT; i++)
-			{
-				samplerArray[i] = m_samplerStates[i].Get();
-			}
-
-			context->VSSetSamplers(0, MAX_SHADER_RESOURCES_COUNT, samplerArray);
-			context->PSSetSamplers(0, MAX_SHADER_RESOURCES_COUNT, samplerArray);
-			context->GSSetSamplers(0, MAX_SHADER_RESOURCES_COUNT, samplerArray);
+		if (m_needsRefreshDepthStencilState)
+		{
+			m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&m_depthStencilStateDesc,
+				m_currentDepthStencilState.ReleaseAndGetAddressOf());
+			m_needsRefreshDepthStencilState = false;
 		}
+
+		m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
 	}
 
 	bool DX11PipelineStateObject::m_checkRasterizerState(DX11PipelineStateObject* other)

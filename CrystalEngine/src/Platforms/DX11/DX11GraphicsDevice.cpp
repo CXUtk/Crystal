@@ -10,6 +10,8 @@
 #include "DX11PipelineStateObject.h"
 #include "DX11Texture2D.h"
 #include "DX11RenderTarget2D.h"
+#include "DX11SamplerState.h"
+#include "PipelineStates/DX11BlendState.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
@@ -29,6 +31,11 @@ namespace crystal
 		std::shared_ptr<SamplerState> PointWarp = nullptr;
 		std::shared_ptr<SamplerState> LinearClamp = nullptr;
 		std::shared_ptr<SamplerState> LinearWarp = nullptr;
+
+
+		std::shared_ptr<BlendState>		Blend_Opaque = nullptr;
+		std::shared_ptr<BlendState>		Blend_Alpha = nullptr;
+		std::shared_ptr<BlendState>		Blend_Additive = nullptr;
 
 	private:
 		DX11GraphicsDevice*		m_pGraphicsDevice;
@@ -226,9 +233,8 @@ namespace crystal
 		assert(m_PSOStackPtr >= 0 && m_PSOStackPtr < NUM_PIPELINE_STATE_OBJECTS - 1);
 		auto& prevPSO = m_PSOStack[m_PSOStackPtr];
 		m_PSOStack[++m_PSOStackPtr] = pso;
-		m_PSODirtyFlagsStack[m_PSOStackPtr] = prevPSO->CheckDirtyFlag(ptr(pso));
 
-		pso->Apply(m_PSODirtyFlagsStack[m_PSOStackPtr]);
+		pso->Apply();
 	}
 
 	void DX11GraphicsDevice::PopPipelineStateObject()
@@ -236,9 +242,15 @@ namespace crystal
 		assert(m_PSOStackPtr > 0 && m_PSOStackPtr < NUM_PIPELINE_STATE_OBJECTS);
 
 		auto& prevPSO = m_PSOStack[m_PSOStackPtr - 1];
-		prevPSO->Apply(m_PSODirtyFlagsStack[m_PSOStackPtr]);
+		prevPSO->Apply();
 		m_PSOStackPtr--;
 	}
+
+	void DX11GraphicsDevice::BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index)
+	{}
+
+	void DX11GraphicsDevice::BindSamplerState(std::shared_ptr<SamplerState> texture, int index)
+	{}
 
 
 	bool DX11GraphicsDevice::m_initD3DX11()
@@ -459,7 +471,7 @@ namespace crystal
 		return pBuffer;
 	}
 
-	std::shared_ptr<SamplerState> DX11GraphicsDevice::GetSamplerState(SamplerStates state)
+	std::shared_ptr<SamplerState> DX11GraphicsDevice::GetCommonSamplerState(SamplerStates state)
 	{
 		switch (state)
 		{
@@ -487,6 +499,31 @@ namespace crystal
 			break;
 		}
 		throw std::exception("Unknown Sampler State");
+	}
+
+	std::shared_ptr<BlendState> DX11GraphicsDevice::GetCommonBlendState(BlendStates state)
+	{
+		switch (state)
+		{
+		case crystal::BlendStates::Opaque:
+		{
+			return m_commonStates->Blend_Opaque;
+		}
+		break;
+		case crystal::BlendStates::AlphaBlend:
+		{
+			return m_commonStates->Blend_Alpha;
+		}
+		break;
+		case crystal::BlendStates::Additive:
+		{
+			return m_commonStates->Blend_Additive;
+		}
+		break;
+		default:
+			break;
+		}
+		throw std::exception("Unknown Blend State");
 	}
 
 
@@ -529,5 +566,38 @@ namespace crystal
 		HR(device->CreateSamplerState(&sampDesc, linearClamp.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(linearClamp.Get(), "Linear Clamp Sampler");
 		LinearClamp = std::make_shared<SamplerState>(graphicsDevice, linearClamp);
+
+
+		ComPtr<ID3D11BlendState> blendOpaque;
+		ComPtr<ID3D11BlendState> blendAlpha;
+		ComPtr<ID3D11BlendState> blendAdditive;
+
+		// Opaque, no blending
+		D3D11_BLEND_DESC blendDesc = {};
+		blendDesc.AlphaToCoverageEnable = false;
+		blendDesc.IndependentBlendEnable = false;
+		blendDesc.RenderTarget[0].BlendEnable = false;
+		HR(device->CreateBlendState(&blendDesc, blendOpaque.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(blendOpaque.Get(), "Blend Opaque");
+		Blend_Opaque = std::make_shared<BlendState>(this, blendOpaque);
+
+		// Alpha Blending	src * alpha_s + dest * (1 - alpha_s)
+		blendDesc.RenderTarget[0].BlendEnable = true;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		HR(device->CreateBlendState(&blendDesc, blendAlpha.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(blendAlpha.Get(), "Blend Alpha");
+		Blend_Alpha = std::make_shared<BlendState>(this, blendAlpha);
+
+		// Additive Blending  src + dest
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+		HR(device->CreateBlendState(&blendDesc, blendAdditive.GetAddressOf()));
+		d3dUtils::D3D11SetDebugObjectName(blendAdditive.Get(), "Blend Additive");
+		Blend_Additive = std::make_shared<BlendState>(this, blendAdditive);
 	}
 }

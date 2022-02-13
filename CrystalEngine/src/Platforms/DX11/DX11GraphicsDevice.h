@@ -22,6 +22,8 @@ namespace crystal
 		virtual void PopRenderTarget2D() override;
 		virtual void PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) override;
 		virtual void PopPipelineStateObject() override;
+		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) override;
+		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) override;
 
 		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() override;
 		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc,
@@ -37,7 +39,8 @@ namespace crystal
 		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
-		virtual std::shared_ptr<SamplerState> GetSamplerState(SamplerStates state) override;
+		virtual std::shared_ptr<SamplerState> GetCommonSamplerState(SamplerStates state) override;
+		virtual std::shared_ptr<BlendState> GetCommonBlendState(BlendStates state);
 
 		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
 		ID3D11Device* GetD3DDevice() const { return m_pd3dDevice.Get(); }
@@ -64,7 +67,6 @@ namespace crystal
 		static constexpr int NUM_PIPELINE_STATE_OBJECTS = 32;
 		std::shared_ptr<PipelineStateObject>	m_PSOStack[NUM_PIPELINE_STATE_OBJECTS]{};
 		int										m_PSOStackPtr = 0;
-		PipelineStateObjectDirtyFlags			m_PSODirtyFlagsStack[NUM_PIPELINE_STATE_OBJECTS]{};
 
 		Win32GameWindow*	m_pWindow;			// Win32 窗体对象
 

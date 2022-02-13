@@ -186,7 +186,6 @@ namespace crystal
 		static bool initialized = false;
 		if (initialized) return;
 		{
-			DX11SamplerState::Init(graphicsDevice);
 		}
 		initialized = true;
 	}

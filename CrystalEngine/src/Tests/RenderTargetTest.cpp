@@ -133,14 +133,14 @@ namespace crystal
 		m_PSO->SetFillMode(FillMode::SOLID);
 		m_PSO->SetDepthTestState(true);
 		m_PSO->BindShaderResource(m_texture2D, 0);
-		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::PointClamp), 0);
+		m_PSO->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
 		//indexBuffer->Bind(0);
 
 
 		m_PSOScreen->BindVertexBuffer(vertexBuffer1);
 		m_PSOScreen->BindIndexBuffer(indexBuffer1);
 		m_PSOScreen->BindShaderResource(m_renderTarget2D, 0);
-		m_PSOScreen->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::PointClamp), 0);
+		m_PSOScreen->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
 	}
 
 

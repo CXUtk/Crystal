@@ -1,6 +1,7 @@
 #pragma once
 #include "Crystal.h"
 #include "Core/Utils/GameTimer.h"
+#include "Core/Platform/Graphics/GraphicsCommon.h"
 #include <functional>
 
 namespace crystal
@@ -36,7 +37,9 @@ namespace crystal
 		*/
 		InputController* GetInputController() const;
 
-		IGraphicsDevice* GetGraphicsDevice() const;
+		GraphicsDevice* GetGraphicsDevice() const;
+
+		SpriteBatch* GetSpriteBatch() const;
 
 		/**
 		 * @brief Take control on the application and start the main game loop

@@ -62,6 +62,9 @@ namespace crystal
 
 	class IDX11ShaderResource;
 	using IShaderResource = IDX11ShaderResource;
+
+	class DX11BlendState;
+	using BlendState = DX11BlendState;
 #endif
 
 	using Spectrum = glm::vec3;
@@ -269,6 +272,15 @@ namespace crystal
 		PointWarp,
 		LinearClamp,
 		LinearWarp,
+
+		__COUNT
+	};
+
+	enum class BlendStates
+	{
+		Opaque,
+		AlphaBlend,
+		Additive,
 
 		__COUNT
 	};

@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include <set>
+#include <map>
 #include <glm/glm.hpp>
 
 namespace crystal

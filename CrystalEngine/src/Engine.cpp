@@ -26,6 +26,8 @@ namespace crystal
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
         GraphicsCommons::InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(args);
+
+        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice());
     }
     
     Engine::~Engine()
@@ -46,9 +48,14 @@ namespace crystal
         return ptr(m_inputController);
     }
 
-    IGraphicsDevice* Engine::GetGraphicsDevice() const
+    GraphicsDevice* Engine::GetGraphicsDevice() const
     {
         return m_platformProvider->GetGraphicsDevice();
+    }
+
+    SpriteBatch* Engine::GetSpriteBatch() const
+    {
+        return ptr(m_spriteBatch);
     }
     
     //IGraphicsDevice* Engine::GetGraphicsDevice() const
@@ -64,7 +71,6 @@ namespace crystal
         m_application->Initialize();
 
         auto window = this->GetWindow();
-        auto graphicsDevice = m_platformProvider->GetGraphicsDevice();
         m_inputController = std::make_unique<InputController>(window);
 
         m_gameTimer.Start();
@@ -88,7 +94,7 @@ namespace crystal
             {
                 m_application->Update(m_gameTimer);
                 m_application->Draw(m_gameTimer);
-                graphicsDevice->Present();
+                m_platformProvider->Present();
             }
             window->EndFrame();
 

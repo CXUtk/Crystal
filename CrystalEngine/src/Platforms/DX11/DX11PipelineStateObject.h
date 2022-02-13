@@ -27,11 +27,7 @@ namespace crystal
 		//virtual void Begin() override;
 		//virtual void End() override;
 
-		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) override;
-		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) override;
-
-		virtual PipelineStateObjectDirtyFlags CheckDirtyFlag(DX11PipelineStateObject* other);
-		virtual void Apply(PipelineStateObjectDirtyFlags dirtyFlags);
+		virtual void Apply();
 	private:
 		std::shared_ptr<VertexBuffer>	m_vertexBuffer = nullptr;
 		std::shared_ptr<IndexBuffer>	m_indexBuffer = nullptr;
@@ -41,15 +37,13 @@ namespace crystal
 
 		D3D11_RASTERIZER_DESC			m_rasterStateDesc{};
 		ComPtr<ID3D11RasterizerState>	m_currentRasterizerState = nullptr;
-		bool							m_needsRefreshRasterState = true;
+		bool							m_needsRefreshRasterState = false;
 
 		D3D11_DEPTH_STENCIL_DESC		m_depthStencilStateDesc{};
 		ComPtr<ID3D11DepthStencilState>	m_currentDepthStencilState = nullptr;
-		bool							m_needsRefreshDepthStencilState = true;
+		bool							m_needsRefreshDepthStencilState = false;
 
-		static constexpr int MAX_SHADER_RESOURCES_COUNT = 8;
-		ComPtr<ID3D11ShaderResourceView>	m_SRVSlots[MAX_SHADER_RESOURCES_COUNT]{};
-		ComPtr<ID3D11SamplerState>			m_samplerStates[MAX_SHADER_RESOURCES_COUNT]{};
+		std::shared_ptr<BlendState>		m_blendState = nullptr;
 
 		bool		m_needsRefreshScissorRect = false;
 		RECT		m_scissorRect{};

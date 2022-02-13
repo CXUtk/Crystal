@@ -74,14 +74,14 @@ namespace crystal
 
 
 		m_PSO = graphicsDevice->CreatePipelineStateObject();
-		m_PSO->BindVertexBuffer(vertexBuffer);
-		m_PSO->BindIndexBuffer(indexBuffer);
+		//m_PSO->BindVertexBuffer(vertexBuffer);
+		//m_PSO->BindIndexBuffer(indexBuffer);
 
 
 		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/sprite.json");
 		//m_PSO->BindShaderProgram(m_pShader);
 
-		m_PSO->SetCullMode(CullingMode::CullCW);
+		//m_PSO->SetCullMode(CullingMode::CullCW);
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;
@@ -91,10 +91,10 @@ namespace crystal
 		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/test.jpg", texturedesc);
 		m_texture2D1 = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
 
-		m_PSO->BindShaderResource(m_texture2D, 0);
-		m_PSO->BindSamplerState(SamplerState::GetSamplerState(SamplerStates::LinearClamp), 0);
+		//m_PSO->BindShaderResource(m_texture2D, 0);
+		//m_PSO->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
 
-		graphicsDevice->PushPipelineStateObject(m_PSO);
+
 	}
 
 	void QuadTest::Update(const crystal::GameTimer& gameTimer)
@@ -120,7 +120,8 @@ namespace crystal
 		//graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
 
 		{
-			spriteBatch->PushBatch(glm::orthoLH_ZO(0.f, 800.f, 0.f, 600.f, 0.f, 1.f));
+			//graphicsDevice->PushPipelineStateObject(m_PSO);
+			spriteBatch->Begin();
 			auto size = m_texture2D->GetSize();
 			R += 0.01;
 			for (int i = 0; i < 10; i++)
@@ -130,18 +131,19 @@ namespace crystal
 					if ((i + j) % 2 == 0)
 					{
 						spriteBatch->Draw(m_texture2D, Vector2f(i * 80, j * 60), Color4f(1.f),
-							R, Vector2f(size) * 0.5f, 2.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
+							R, Vector2f(0.f), 1.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
 							| SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL);
 					}
 					else
 					{
-						spriteBatch->Draw(m_texture2D1, Vector2f(i * 80, j * 60), Color4f(1.f),
-							R, Vector2f(size) * 0.5f, 2.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
+						spriteBatch->Draw(m_texture2D, Vector2f(i * 80, j * 60), Color4f(1.f, 0.f, 0.f, 1.f),
+							R, Vector2f(0.f), 1.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
 							| SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL);
 					}
 				}
 			}
-			spriteBatch->PopBatch();
+			spriteBatch->End();
+			//graphicsDevice->PopPipelineStateObject();
 		}
 	}
 

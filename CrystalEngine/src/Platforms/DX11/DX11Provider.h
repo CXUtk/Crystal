@@ -16,7 +16,8 @@ namespace crystal
 
 		virtual IGameWindow* GetGameWindow() const override;
 		virtual IFileSystem* GetFileSystem() const override;
-		virtual IGraphicsDevice* GetGraphicsDevice() const override;
+		virtual GraphicsDevice* GetGraphicsDevice() const override;
+		virtual void Present() override;
 
 	private:
 		std::unique_ptr<Win32GameWindow> m_gameWindow;
