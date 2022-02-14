@@ -1,7 +1,7 @@
 #pragma once
 #include "Crystal.h"
 #include "Core/Utils/GameTimer.h"
-#include "Core/Platform/Graphics/GraphicsCommon.h"
+#include "Core/Interfaces/Graphics/GraphicsInterfaces.h"
 #include <functional>
 
 namespace crystal
@@ -37,7 +37,7 @@ namespace crystal
 		*/
 		InputController* GetInputController() const;
 
-		GraphicsDevice* GetGraphicsDevice() const;
+		IGraphicsDevice* GetGraphicsDevice() const;
 
 		SpriteBatch* GetSpriteBatch() const;
 

@@ -1,12 +1,16 @@
 ﻿#pragma once
 #include <wrl/client.h>
 #include <d3d11_1.h>
-#include <Core/Platform/Platforms.h>
+#include <Interfaces/Interfaces.h>
 
 namespace crystal
 {
 	template <class T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+	class DX11GraphicsDevice;
+	class DX11GraphicsContext;
+	class DX11RenderTarget2D;
 
 	class IDX11ShaderResource
 	{

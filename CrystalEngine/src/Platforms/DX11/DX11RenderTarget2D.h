@@ -3,7 +3,7 @@
 
 namespace crystal
 {
-	class DX11RenderTarget2D : public IDX11ShaderResource
+	class DX11RenderTarget2D : public IRenderTarget2D, public IShaderResource
 	{
 	public:
 		DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice, const RenderTarget2DDescription& desc);
@@ -11,7 +11,7 @@ namespace crystal
 
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView.Get(); }
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView.Get(); }
-		ID3D11ShaderResourceView* GetShaderResourceView() const override { return m_pShaderResourceView.Get(); }
+		virtual void GetShaderResourceHandle(void** pHandle) override;
 	private:
 		DX11GraphicsDevice*					m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11RenderTargetView>		m_pRenderTargetView = nullptr;

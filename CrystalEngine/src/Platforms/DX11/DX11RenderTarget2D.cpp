@@ -94,6 +94,11 @@ namespace crystal
 	DX11RenderTarget2D::~DX11RenderTarget2D()
 	{}
 
+	void DX11RenderTarget2D::GetShaderResourceHandle(void** pHandle)
+	{
+		*pHandle = m_pShaderResourceView.Get();
+	}
+
 	void DX11RenderTarget2D::m_setToCurrentContext()
 	{
 		auto context = m_pGraphicsDevice->GetD3DDeviceContext();

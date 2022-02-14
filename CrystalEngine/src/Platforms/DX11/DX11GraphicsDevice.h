@@ -1,80 +1,46 @@
 ﻿#pragma once
-#include <Core/Platform/Platforms.h>
-#include <Platforms/Windows32/Win32GameWindow.h>
-
 #include "DX11Common.h"
 
 namespace crystal
 {
+	class Win32GameWindow;
+
 	class DX11GraphicsDevice : public IGraphicsDevice
 	{
 	public:
-
 		DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window);
 		~DX11GraphicsDevice() override;
 
-		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) override;
-		virtual void Present() override;
-		virtual void DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices) override;
-		virtual void DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices,
-			size_t indexOffset, size_t vertexOffset) override;
-		virtual void PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D) override;
-		virtual void PopRenderTarget2D() override;
-		virtual void PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso) override;
-		virtual void PopPipelineStateObject() override;
-		virtual void BindShaderResource(std::shared_ptr<IShaderResource> shaderResource, int index) override;
-		virtual void BindSamplerState(std::shared_ptr<SamplerState> texture, int index) override;
-
-		virtual std::shared_ptr<PipelineStateObject> CreatePipelineStateObject() override;
-		virtual std::shared_ptr<VertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc,
-			void* src, size_t size) override;
-		virtual std::shared_ptr<IndexBuffer> CreateIndexBuffer(const IndexBufferDescription& desc,
-			void* src, size_t size) override;
-		virtual std::shared_ptr<VertexShader> CreateVertexShaderFromMemory(const char* src, size_t size,
-			const std::string& name, const std::string& entryPoint) override;
-		virtual std::shared_ptr<FragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
-			const std::string& name, const std::string& entryPoint) override;
-		virtual std::shared_ptr<ShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
-		virtual std::shared_ptr<Texture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) override;
-		virtual std::shared_ptr<Texture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
-		virtual std::shared_ptr<RenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
-
-		virtual std::shared_ptr<SamplerState> GetCommonSamplerState(SamplerStates state) override;
-		virtual std::shared_ptr<BlendState> GetCommonBlendState(BlendStates state);
-
-		Vector2i GetBackBufferSize() const { return m_oldClientSize; }
 		ID3D11Device* GetD3DDevice() const { return m_pd3dDevice.Get(); }
-		ID3D11DeviceContext* GetD3DDeviceContext() const { return m_pd3dImmediateContext.Get(); }
 		ComPtr<ID3D11Buffer> CreateBuffer(void* src, size_t size,
 			BufferUsage usage, UINT bindFlags);
+
+		virtual std::shared_ptr<IGraphicsContext> GetContext() override;
+
+		virtual std::shared_ptr<IVertexBuffer> CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size) override;
+		virtual std::shared_ptr<IIndexBuffer> CreateIndexBuffer(const IndexBufferDescription& desc, void* src, size_t size) override;
+		virtual std::shared_ptr<IVertexShader> CreateVertexShaderFromMemory(const char* src, size_t size,
+			const std::string& name, const std::string& entryPoint) override;
+		virtual std::shared_ptr<IFragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
+			const std::string& name, const std::string& entryPoint) override;
+		virtual std::shared_ptr<IShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
+		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) override;
+		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
+		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
+
+		virtual std::shared_ptr<IPipelineStateObject> CreatePipelineStateObject() override;
+		virtual std::shared_ptr<ISamplerState> GetCommonSamplerState(SamplerStates state) override;
+		virtual std::shared_ptr<IBlendState> GetCommonBlengState(BlendStates state) override;
 	private:
-		ComPtr<ID3D11Device> m_pd3dDevice;						// D3D11设备
-		ComPtr<ID3D11DeviceContext> m_pd3dImmediateContext;		// D3D11设备上下文
-		ComPtr<IDXGISwapChain> m_pSwapChain;					// D3D11交换链
-		ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;		// D3D11 Rendertarget view
-		ComPtr<ID3D11Texture2D> m_pDepthStencilBuffer;			// D3D11 Depth Stencil buffer
-		ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;		// D3D11 Depth Stencil buffer
-		D3D11_VIEWPORT m_ScreenViewport;						// 视口
+		std::shared_ptr<DX11GraphicsContext>	m_pGraphicsContext = nullptr;
 
-		bool		m_Enable4xMsaa = false;		// 是否开启4倍多重采样
-		UINT		m_4xMsaaQuality = 1;		// MSAA支持的质量等级
-		Vector2i	m_oldClientSize{};			// History window size, used to detect change
-
-		static constexpr int NUM_RENDERTARGETS = 32;
-		std::shared_ptr<RenderTarget2D>		m_renderTarget2DStack[NUM_RENDERTARGETS]{};
-		int									m_renderTargetStackPtr = 0;
-
-		static constexpr int NUM_PIPELINE_STATE_OBJECTS = 32;
-		std::shared_ptr<PipelineStateObject>	m_PSOStack[NUM_PIPELINE_STATE_OBJECTS]{};
-		int										m_PSOStackPtr = 0;
-
-		Win32GameWindow*	m_pWindow;			// Win32 窗体对象
+		ComPtr<ID3D11Device>					m_pd3dDevice = nullptr;
+		Win32GameWindow*						m_pWindow = nullptr;			
 
 		class CommonStates;
-		std::unique_ptr<CommonStates>			m_commonStates;
+		std::unique_ptr<CommonStates>			m_commonStates = nullptr;
 
-		bool m_initD3DX11();
-		void m_resizeBuffer();
+		bool m_InitD3DX11(const InitArgs& args);
 		ComPtr<ID3DBlob> m_getShaderBlobFromMemory(const char* src, size_t size, 
 			const std::string& name, const std::string& entryPoint, ShaderType type);
 	};

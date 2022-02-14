@@ -9,6 +9,7 @@
 namespace crystal
 {
 	class IGraphicsDevice;
+	class IGraphicsContext;
 	class IPipelineResourceObject;
 	class IPipelineStateObject;
 
@@ -22,11 +23,13 @@ namespace crystal
 	class IShaderResource;
 	class IRenderTarget2D;
 	class ITexture2D;
+	class ISamplerState;
 
 	// Pipeline States
 	class IPipelineState;
-	class ISamplerState;
 	class IBlendState;
+	class IRasterState;
+	class IDepthStencilState;
 
 
 	using Spectrum = glm::vec3;
@@ -270,6 +273,23 @@ namespace crystal
 		CRYSTAL_PSO_DEPTH_STENCIL_STATE_DIRTY = 1 << 4,
 		CRYSTAL_PSO_SAMPLER_STATE_DIRTY = 1 << 5
 	};
+
+	enum ShaderMask : int
+	{
+		CRYSTAL_HAS_VERTEX_SHADER = 1 << 0,
+		CRYSTAL_HAS_FRAGMENT_SHADER = 1 << 1,
+		CRYSTAL_HAS_GEOMETRY_SHADER = 1 << 2,
+		CRYSTAL_HAS_COMPUTE_SHADER = 1 << 3
+	};
+
+	inline ShaderMask operator&(ShaderMask a, ShaderMask b)
+	{
+		return static_cast<ShaderMask>(static_cast<int>(a) & static_cast<int>(b));
+	}
+	inline ShaderMask operator|(ShaderMask a, ShaderMask b)
+	{
+		return static_cast<ShaderMask>(static_cast<int>(a) | static_cast<int>(b));
+	}
 
 	inline RenderTargetFlags operator|(RenderTargetFlags a, RenderTargetFlags b)
 	{
