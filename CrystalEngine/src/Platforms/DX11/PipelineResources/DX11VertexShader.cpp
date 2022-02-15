@@ -1,7 +1,7 @@
 ﻿#include "DX11VertexShader.h"
-#include "DX11GraphicsDevice.h"
-#include "d3dUtils.h"
-#include "dxTrace.h"
+#include "../DX11GraphicsDevice.h"
+#include "../d3dUtils.h"
+#include "../dxTrace.h"
 #include <Core/Utils/Misc.h>
 
 namespace crystal
@@ -16,8 +16,8 @@ namespace crystal
 	DX11VertexShader::~DX11VertexShader()
 	{}
 
-	void DX11VertexShader::m_BindToPipeline()
+	void DX11VertexShader::SetToCurrentContext(ID3D11DeviceContext * context)
 	{
-		m_pGraphicsDevice->GetD3DDeviceContext()->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
+		context->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
 	}
 }

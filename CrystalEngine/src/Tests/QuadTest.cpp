@@ -1,5 +1,4 @@
 #include "QuadTest.h"
-#include <Core/Platform/Platforms.h>
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>

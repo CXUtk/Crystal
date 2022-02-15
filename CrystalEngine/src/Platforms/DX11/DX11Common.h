@@ -10,15 +10,15 @@ namespace crystal
 
 	class DX11GraphicsDevice;
 	class DX11GraphicsContext;
+
+	class IDX11ShaderResource;
 	class DX11RenderTarget2D;
-
-	class IDX11ShaderResource
-	{
-	public:
-		virtual ~IDX11ShaderResource() = 0 {};
-
-		virtual ID3D11ShaderResourceView* GetShaderResourceView() const = 0;
-	};
+	class DX11VertexShader;
+	class DX11FragmentShader;
+	class DX11VertexBuffer;
+	class DX11IndexBuffer;
+	class DX11ShaderProgram;
+	class IDX11SamplerState;
 
 	class DX11Common{
 	public:

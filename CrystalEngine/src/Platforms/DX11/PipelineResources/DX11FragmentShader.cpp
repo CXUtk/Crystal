@@ -1,6 +1,6 @@
 ﻿#include "DX11FragmentShader.h"
-#include "DX11GraphicsDevice.h"
-#include "d3dUtils.h"
+#include "../DX11GraphicsDevice.h"
+#include "../d3dUtils.h"
 
 namespace crystal
 {
@@ -13,8 +13,8 @@ namespace crystal
 	DX11FragmentShader::~DX11FragmentShader()
 	{}
 
-	void DX11FragmentShader::m_BindToPipeline()
+	void DX11FragmentShader::SetToCurrentContext(ID3D11DeviceContext * context)
 	{
-		m_pGraphicsDevice->GetD3DDeviceContext()->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
+		context->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
 	}
 }

@@ -2,7 +2,7 @@
 #include <Core/Application.h>
 #include "Engine.h"
 #include <Core/Utils/Math.h>
-#include <Core/Platform/Graphics/GraphicsCommon.h>
+#include <Interfaces/Interfaces.h>
 
 namespace crystal
 {

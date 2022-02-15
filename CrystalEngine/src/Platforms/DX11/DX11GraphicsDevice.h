@@ -41,7 +41,7 @@ namespace crystal
 		std::unique_ptr<CommonStates>			m_commonStates = nullptr;
 
 		bool m_InitD3DX11(const InitArgs& args);
-		ComPtr<ID3DBlob> m_getShaderBlobFromMemory(const char* src, size_t size, 
+		ComPtr<ID3DBlob> m_GetShaderBlobFromMemory(const char* src, size_t size, 
 			const std::string& name, const std::string& entryPoint, ShaderType type);
 	};
 }

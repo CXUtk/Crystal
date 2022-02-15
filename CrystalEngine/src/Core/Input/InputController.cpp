@@ -1,5 +1,5 @@
 #include "InputController.h"
-#include <Core/Platform/Platforms.h>
+#include <Interfaces/Interfaces.h>
 #include <Core/Utils/Logger.h>
 
 namespace crystal

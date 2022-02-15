@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Platform/Graphics/GraphicsCommon.h>
+#include <Interfaces/Graphics/GraphicsCommon.h>
 #include <Core/Utils/Geometry.h>
 #include "RenderCommon.h"
 

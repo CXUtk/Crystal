@@ -1,6 +1,7 @@
 ﻿#include "DX11Provider.h"
 #include <Platforms/Windows32/Win32GameWindow.h>
 #include <Platforms/DX11/DX11GraphicsDevice.h>
+#include <Platforms/DX11/DX11GraphicsContext.h>
 
 namespace crystal
 {
@@ -8,6 +9,7 @@ namespace crystal
 	{
 		m_gameWindow = std::make_unique<Win32GameWindow>(args, GetModuleHandle(NULL));
 		m_dx11GraphicsDevice = std::make_unique<DX11GraphicsDevice>(args, ptr(m_gameWindow));
+		m_pDX11GraphicsContext = m_dx11GraphicsDevice->GetContext().get();
 		DX11Common::InitDX11Commons(ptr(m_dx11GraphicsDevice));
 	}
 
@@ -30,12 +32,19 @@ namespace crystal
 	{
 		return nullptr;
 	}
-	GraphicsDevice* DX11Provider::GetGraphicsDevice() const
+
+	IGraphicsDevice* DX11Provider::GetGraphicsDevice() const
 	{
 		return ptr(m_dx11GraphicsDevice);
 	}
+
+	IGraphicsContext* DX11Provider::GetGraphicsContext() const
+	{
+		return m_pDX11GraphicsContext;
+	}
+
 	void DX11Provider::Present()
 	{
-		m_dx11GraphicsDevice->Present();
+		m_pDX11GraphicsContext->Present();
 	}
 }

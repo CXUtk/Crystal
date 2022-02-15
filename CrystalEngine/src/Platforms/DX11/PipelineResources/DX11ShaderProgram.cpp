@@ -1,20 +1,24 @@
 ﻿#include "DX11ShaderProgram.h"
-#include "DX11GraphicsDevice.h"
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
 
-#include "d3dUtils.h"
-#include "dxTrace.h"
+#include "../DX11GraphicsDevice.h"
+#include "../d3dUtils.h"
+#include "../dxTrace.h"
+
 #include <Core/Utils/Misc.h>
 
 namespace crystal
 {
 	DX11ShaderProgram::DX11ShaderProgram(DX11GraphicsDevice* graphicsDevice,
-		std::shared_ptr<VertexShader> vertexShader,
-		std::shared_ptr<FragmentShader> fragmentShader,
+		std::shared_ptr<IVertexShader> vertexShader,
+		std::shared_ptr<IFragmentShader> fragmentShader,
 		const UniformVariableCollection& uniforms)
-		: m_pGraphicsDevice(graphicsDevice), m_vertexShader(vertexShader), m_fragmentShader(fragmentShader)
+		: m_pGraphicsDevice(graphicsDevice), m_shaderMask(CRYSTAL_SHADERMASK_VERTEX_SHADER | CRYSTAL_SHADERMASK_FRAGMENT_SHADER)
 	{
+		m_vertexShader = std::dynamic_pointer_cast<DX11VertexShader>(vertexShader);
+		m_fragmentShader = std::dynamic_pointer_cast<DX11FragmentShader>(fragmentShader);
+
 		size_t size = 0;
 		for (auto& var : uniforms.Variables)
 		{
@@ -51,40 +55,6 @@ namespace crystal
 	//	}
 	//}
 
-	void DX11ShaderProgram::Apply()
-	{
-		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
-
-		// Map const buffer data to GPU
-		if (m_constBufferDirty && m_constBufferSize > 0)
-		{
-			D3D11_MAPPED_SUBRESOURCE mappedData;
-			HR(context->Map(m_pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-			memcpy_s(mappedData.pData, m_constBufferSize, &m_pConstantBufferData[0], m_constBufferSize);
-			context->Unmap(m_pConstantBuffer.Get(), 0);
-			m_constBufferDirty = false;
-		}
-		if (m_vertexShader != nullptr)
-		{
-			m_vertexShader->m_BindToPipeline();
-		}
-		if (m_fragmentShader != nullptr)
-		{
-			m_fragmentShader->m_BindToPipeline();
-		}
-		if (m_pConstantBuffer)
-		{
-			if (m_vertexShader != nullptr)
-			{
-				context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-			}
-			if (m_fragmentShader != nullptr)
-			{
-				context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-			}
-		}
-	}
-
 	void DX11ShaderProgram::SetUniform1f(const std::string& name, float value)
 	{
 		auto iter = m_uniformMap.find(name);
@@ -106,5 +76,36 @@ namespace crystal
 		memcpy_s(&m_pConstantBufferData[iter->second], sizeof(Matrix4f), 
 			crystal_value_ptr(glm::transpose(value)), sizeof(Matrix4f));
 		m_constBufferDirty = true;
+	}
+	void DX11ShaderProgram::SetToCurrentContext(ID3D11DeviceContext* context)
+	{
+		// Map const buffer data to GPU
+		if (m_constBufferDirty && m_constBufferSize > 0)
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedData;
+			HR(context->Map(m_pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+			memcpy_s(mappedData.pData, m_constBufferSize, &m_pConstantBufferData[0], m_constBufferSize);
+			context->Unmap(m_pConstantBuffer.Get(), 0);
+			m_constBufferDirty = false;
+		}
+		if (m_vertexShader != nullptr)
+		{
+			m_vertexShader->SetToCurrentContext(context);
+		}
+		if (m_fragmentShader != nullptr)
+		{
+			m_fragmentShader->SetToCurrentContext(context);
+		}
+		if (m_pConstantBuffer)
+		{
+			if (m_vertexShader != nullptr)
+			{
+				context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			}
+			if (m_fragmentShader != nullptr)
+			{
+				context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+			}
+		}
 	}
 }

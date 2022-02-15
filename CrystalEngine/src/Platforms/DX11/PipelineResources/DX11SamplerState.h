@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "DX11Common.h"
+#include "../DX11Common.h"
 
 namespace crystal
 {
-	class DX11SamplerState
+	class DX11SamplerState : public ISamplerState
 	{
 	public:
 		DX11SamplerState(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11SamplerState> samplerState);

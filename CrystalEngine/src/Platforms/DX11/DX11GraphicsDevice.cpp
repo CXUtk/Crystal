@@ -2,17 +2,17 @@
 #include "d3dUtils.h"
 #include "dxTrace.h"
 
-#include "DX11VertexBuffer.h"
-#include "DX11IndexBuffer.h"
-#include "DX11VertexShader.h"
-#include "DX11FragmentShader.h"
-#include "DX11ShaderProgram.h"
+#include "PipelineResources/DX11VertexBuffer.h"
+#include "PipelineResources/DX11IndexBuffer.h"
+#include "PipelineResources/DX11VertexShader.h"
+#include "PipelineResources/DX11FragmentShader.h"
+#include "PipelineResources/DX11ShaderProgram.h"
 #include "DX11PipelineStateObject.h"
-#include "DX11Texture2D.h"
-#include "DX11RenderTarget2D.h"
-#include "DX11SamplerState.h"
-#include "DX11GraphicsContext.h"
+#include "PipelineResources/DX11Texture2D.h"
+#include "PipelineResources/DX11RenderTarget2D.h"
+#include "PipelineResources/DX11SamplerState.h"
 #include "PipelineStates/DX11BlendState.h"
+#include "DX11GraphicsContext.h"
 
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
@@ -28,15 +28,15 @@ namespace crystal
 	public:
 		CommonStates(DX11GraphicsDevice* graphicsDevice);
 
-		std::shared_ptr<SamplerState> PointClamp = nullptr;
-		std::shared_ptr<SamplerState> PointWarp = nullptr;
-		std::shared_ptr<SamplerState> LinearClamp = nullptr;
-		std::shared_ptr<SamplerState> LinearWarp = nullptr;
+		std::shared_ptr<DX11SamplerState> PointClamp = nullptr;
+		std::shared_ptr<DX11SamplerState> PointWarp = nullptr;
+		std::shared_ptr<DX11SamplerState> LinearClamp = nullptr;
+		std::shared_ptr<DX11SamplerState> LinearWarp = nullptr;
 
 
-		std::shared_ptr<BlendState>		Blend_Opaque = nullptr;
-		std::shared_ptr<BlendState>		Blend_Alpha = nullptr;
-		std::shared_ptr<BlendState>		Blend_Additive = nullptr;
+		std::shared_ptr<DX11BlendState>		Blend_Opaque = nullptr;
+		std::shared_ptr<DX11BlendState>		Blend_Alpha = nullptr;
+		std::shared_ptr<DX11BlendState>		Blend_Additive = nullptr;
 
 	private:
 		DX11GraphicsDevice*		m_pGraphicsDevice;
@@ -49,8 +49,6 @@ namespace crystal
 		{
 			throw std::exception("[DX11GraphicsDevice::DX11GraphicsDevice] Unable to start Dx11");
 		}
-
-		m_PSOStack[0] = CreatePipelineStateObject();
 		m_commonStates = std::make_unique<CommonStates>(this);
 	}
 
@@ -62,42 +60,36 @@ namespace crystal
 		return m_pGraphicsContext;
 	}
 
-
-	void DX11GraphicsDevice::Present()
-	{
-		HR(m_pSwapChain->Present(0, 0));
-	}
-
-	std::shared_ptr<PipelineStateObject> DX11GraphicsDevice::CreatePipelineStateObject()
+	std::shared_ptr<IPipelineStateObject> DX11GraphicsDevice::CreatePipelineStateObject()
 	{
 		return std::make_shared<DX11PipelineStateObject>(this);
 	}
 
-	std::shared_ptr<VertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
+	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
 	{
 		ComPtr<ID3D11Buffer> vertexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_VERTEX_BUFFER);
 		return std::make_shared<DX11VertexBuffer>(this, vertexBuffer);
 	}
 
-	std::shared_ptr<IndexBuffer> DX11GraphicsDevice::CreateIndexBuffer(const IndexBufferDescription& desc, 
+	std::shared_ptr<IIndexBuffer> DX11GraphicsDevice::CreateIndexBuffer(const IndexBufferDescription& desc, 
 		void* src, size_t size)
 	{
 		ComPtr<ID3D11Buffer> indexBuffer = CreateBuffer(src, size, desc.Usage, D3D11_BIND_INDEX_BUFFER);
 		return std::make_shared<DX11IndexBuffer>(this, indexBuffer, DX11Common::DataFormatConvert(desc.Format));
 	}
 
-	std::shared_ptr<VertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
+	std::shared_ptr<IVertexShader> DX11GraphicsDevice::CreateVertexShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
 	{
-		auto pBlob = m_getShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::VERTEX_SHADER);
+		auto pBlob = m_GetShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::VERTEX_SHADER);
 		ComPtr<ID3D11VertexShader> pVertexShader = nullptr;
 		HR(m_pd3dDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(),
 			nullptr, pVertexShader.GetAddressOf()));
 		return std::make_shared<DX11VertexShader>(this, pVertexShader);
 	}
 
-	std::shared_ptr<FragmentShader> DX11GraphicsDevice::CreateFragmentShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
+	std::shared_ptr<IFragmentShader> DX11GraphicsDevice::CreateFragmentShaderFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint)
 	{
-		auto pBlob = m_getShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::FRAGMENT_SHADER);
+		auto pBlob = m_GetShaderBlobFromMemory(src, size, name, entryPoint, ShaderType::FRAGMENT_SHADER);
 		ComPtr<ID3D11PixelShader> pPixelShader = nullptr;
 		HR(m_pd3dDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(),
 			nullptr, pPixelShader.GetAddressOf()));
@@ -113,7 +105,7 @@ namespace crystal
 		return varb;
 	}
 
-	std::shared_ptr<ShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
+	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
 	{
 		auto source = ReadAllStringFromFile(path);
 		auto root = SJson::SJsonParse(source);
@@ -139,73 +131,20 @@ namespace crystal
 		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
 	}
 
-	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc)
+	std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc)
 	{
-		return std::make_shared<Texture2D>(this, path, texDesc);
+		return std::make_shared<DX11Texture2D>(this, path, texDesc);
 	}
 
-	std::shared_ptr<Texture2D> DX11GraphicsDevice::CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
+	std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
 	{
-		return std::make_shared<Texture2D>(this, src, size, texDesc);
+		return std::make_shared<DX11Texture2D>(this, src, size, texDesc);
 	}
 
-	std::shared_ptr<RenderTarget2D> DX11GraphicsDevice::CreateRenderTarget2D(const RenderTarget2DDescription& desc)
+	std::shared_ptr<IRenderTarget2D> DX11GraphicsDevice::CreateRenderTarget2D(const RenderTarget2DDescription& desc)
 	{
-		return std::make_shared<DX11RenderTarget2D>(this, desc);
-		
+		return std::make_shared<DX11RenderTarget2D>(this, desc);	
 	}
-
-	void DX11GraphicsDevice::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
-	{
-		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
-		m_pd3dImmediateContext->Draw(numVertices, offset);
-	}
-
-	void DX11GraphicsDevice::DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices, size_t indexOffset, size_t vertexOffset)
-	{
-		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
-		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
-	}
-
-	void DX11GraphicsDevice::PushRenderTarget2D(std::shared_ptr<RenderTarget2D> renderTarget2D)
-	{
-		assert(m_renderTargetStackPtr >= 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
-		m_renderTarget2DStack[++m_renderTargetStackPtr] = renderTarget2D;
-
-		renderTarget2D->m_setToCurrentContext();
-	}
-
-	void DX11GraphicsDevice::PopRenderTarget2D()
-	{
-		assert(m_renderTargetStackPtr > 0 && m_renderTargetStackPtr < NUM_RENDERTARGETS);
-		--m_renderTargetStackPtr;
-		if (m_renderTargetStackPtr == 0)
-		{
-			m_pd3dImmediateContext->RSSetViewports(1, &m_ScreenViewport);
-			m_pd3dImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
-			return;
-		}
-		m_renderTarget2DStack[m_renderTargetStackPtr]->m_setToCurrentContext();
-	}
-
-	void DX11GraphicsDevice::PushPipelineStateObject(std::shared_ptr<PipelineStateObject> pso)
-	{
-		assert(m_PSOStackPtr >= 0 && m_PSOStackPtr < NUM_PIPELINE_STATE_OBJECTS - 1);
-		auto& prevPSO = m_PSOStack[m_PSOStackPtr];
-		m_PSOStack[++m_PSOStackPtr] = pso;
-
-		pso->Apply();
-	}
-
-	void DX11GraphicsDevice::PopPipelineStateObject()
-	{
-		assert(m_PSOStackPtr > 0 && m_PSOStackPtr < NUM_PIPELINE_STATE_OBJECTS);
-
-		auto& prevPSO = m_PSOStack[m_PSOStackPtr - 1];
-		prevPSO->Apply();
-		m_PSOStackPtr--;
-	}
-
 
 	bool DX11GraphicsDevice::m_InitD3DX11(const InitArgs& args)
 	{
@@ -256,7 +195,7 @@ namespace crystal
 		return true;
 	}
 
-	ComPtr<ID3DBlob> DX11GraphicsDevice::m_getShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type)
+	ComPtr<ID3DBlob> DX11GraphicsDevice::m_GetShaderBlobFromMemory(const char* src, size_t size, const std::string& name, const std::string& entryPoint, ShaderType type)
 	{
 		ComPtr<ID3DBlob> pBlob = nullptr;
 		HR(d3dUtils::CreateShaderFromMemory(src, size, name.c_str(), entryPoint.c_str(), DX11Common::ShaderModelConvert(type), pBlob.GetAddressOf()));
@@ -294,7 +233,7 @@ namespace crystal
 		return pBuffer;
 	}
 
-	std::shared_ptr<SamplerState> DX11GraphicsDevice::GetCommonSamplerState(SamplerStates state)
+	std::shared_ptr<ISamplerState> DX11GraphicsDevice::GetCommonSamplerState(SamplerStates state)
 	{
 		switch (state)
 		{
@@ -324,7 +263,7 @@ namespace crystal
 		throw std::exception("Unknown Sampler State");
 	}
 
-	std::shared_ptr<BlendState> DX11GraphicsDevice::GetCommonBlendState(BlendStates state)
+	std::shared_ptr<IBlendState> DX11GraphicsDevice::GetCommonBlengState(BlendStates state)
 	{
 		switch (state)
 		{
@@ -350,6 +289,7 @@ namespace crystal
 	}
 
 
+
 	DX11GraphicsDevice::CommonStates::CommonStates(DX11GraphicsDevice* graphicsDevice)
 		: m_pGraphicsDevice(graphicsDevice)
 	{
@@ -369,26 +309,26 @@ namespace crystal
 		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		HR(device->CreateSamplerState(&sampDesc, pointClamp.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(pointClamp.Get(), "Point Clamp Sampler");
-		PointClamp = std::make_shared<SamplerState>(graphicsDevice, pointClamp);
+		PointClamp = std::make_shared<DX11SamplerState>(graphicsDevice, pointClamp);
 
 		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
 		HR(device->CreateSamplerState(&sampDesc, pointWarp.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(pointWarp.Get(), "Point Warp Sampler");
-		PointWarp = std::make_shared<SamplerState>(graphicsDevice, pointWarp);
+		PointWarp = std::make_shared<DX11SamplerState>(graphicsDevice, pointWarp);
 
 		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		HR(device->CreateSamplerState(&sampDesc, linearWarp.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(linearWarp.Get(), "Linear Warp Sampler");
-		LinearWarp = std::make_shared<SamplerState>(graphicsDevice, linearWarp);
+		LinearWarp = std::make_shared<DX11SamplerState>(graphicsDevice, linearWarp);
 
 		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
 		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
 		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_CLAMP;
 		HR(device->CreateSamplerState(&sampDesc, linearClamp.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(linearClamp.Get(), "Linear Clamp Sampler");
-		LinearClamp = std::make_shared<SamplerState>(graphicsDevice, linearClamp);
+		LinearClamp = std::make_shared<DX11SamplerState>(graphicsDevice, linearClamp);
 
 
 		ComPtr<ID3D11BlendState> blendOpaque;
@@ -402,7 +342,7 @@ namespace crystal
 		blendDesc.RenderTarget[0].BlendEnable = false;
 		HR(device->CreateBlendState(&blendDesc, blendOpaque.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(blendOpaque.Get(), "Blend Opaque");
-		Blend_Opaque = std::make_shared<BlendState>(this, blendOpaque);
+		Blend_Opaque = std::make_shared<DX11BlendState>(this, blendOpaque);
 
 		// Alpha Blending	src * alpha_s + dest * (1 - alpha_s)
 		blendDesc.RenderTarget[0].BlendEnable = true;
@@ -414,13 +354,13 @@ namespace crystal
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		HR(device->CreateBlendState(&blendDesc, blendAlpha.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(blendAlpha.Get(), "Blend Alpha");
-		Blend_Alpha = std::make_shared<BlendState>(this, blendAlpha);
+		Blend_Alpha = std::make_shared<DX11BlendState>(this, blendAlpha);
 
 		// Additive Blending  src + dest
 		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
 		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 		HR(device->CreateBlendState(&blendDesc, blendAdditive.GetAddressOf()));
 		d3dUtils::D3D11SetDebugObjectName(blendAdditive.Get(), "Blend Additive");
-		Blend_Additive = std::make_shared<BlendState>(this, blendAdditive);
+		Blend_Additive = std::make_shared<DX11BlendState>(this, blendAdditive);
 	}
 }

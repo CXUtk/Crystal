@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Platform/Platforms.h>
+#include <Interfaces/IGameWindow.h>
 #include <Crystal.h>
 
 #include <wrl/client.h>

@@ -13,17 +13,11 @@
 #include "PipelineResources/IVertexShader.h"
 #include "PipelineResources/IVertexBuffer.h"
 #include "PipelineResources/IIndexBuffer.h"
+#include "PipelineResources/ISamplerState.h"
+#include "PipelineStates/IBlendState.h"
 
 namespace crystal
 {
-	class ISamplerState
-	{
-	public:
-		
-		virtual ~ISamplerState() = 0 {};
-	};
-
-
 	class IPlatformProvider
 	{
 	public:
@@ -32,6 +26,7 @@ namespace crystal
 		virtual IGameWindow* GetGameWindow() const = 0;
 		virtual IFileSystem* GetFileSystem() const = 0;
 		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
+		virtual IGraphicsContext* GetGraphicsContext() const = 0;
 		virtual void Present() = 0;
 	};
 }

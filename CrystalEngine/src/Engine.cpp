@@ -5,10 +5,7 @@
 #include "Core/Input/InputController.h"
 #include "Core/Utils/Logger.h"
 #include "Core/Render/SpriteBatch.h"
-#include "Core/Platform/Platforms.h"
 #include "Platforms/PlatformFactory.h"
-
-#include <Core/Platform/Graphics/GraphicsCommon.h>
 
 namespace crystal
 {
@@ -48,7 +45,7 @@ namespace crystal
         return ptr(m_inputController);
     }
 
-    GraphicsDevice* Engine::GetGraphicsDevice() const
+    IGraphicsDevice* Engine::GetGraphicsDevice() const
     {
         return m_platformProvider->GetGraphicsDevice();
     }

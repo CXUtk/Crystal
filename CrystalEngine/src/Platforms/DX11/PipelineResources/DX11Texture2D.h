@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "DX11Common.h"
+#include "../DX11Common.h"
 
 namespace crystal
 {

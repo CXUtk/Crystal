@@ -1,12 +1,1 @@
 ﻿#pragma once
-#include "DX11FragmentShader.h"
-#include "DX11VertexShader.h"
-#include "DX11VertexBuffer.h"
-#include "DX11IndexBuffer.h"
-#include "DX11ShaderProgram.h"
-#include "DX11GraphicsDevice.h"
-#include "DX11PipelineStateObject.h"
-#include "DX11Texture2D.h"
-#include "DX11SamplerState.h"
-#include "DX11RenderTarget2D.h"
-#include "DX11Provider.h"

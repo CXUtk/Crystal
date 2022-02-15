@@ -27,27 +27,25 @@ namespace crystal
 		virtual void PopRenderTarget2D() override;
 
 	private:
-		static constexpr int MAX_RENDERTARGETS = 32;
-		static constexpr int MAX_PIPELINE_STATE_OBJECTS = 32;
 
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11DeviceContext>		m_pd3dImmediateContext = nullptr;
 
 		ComPtr<IDXGISwapChain>			m_pSwapChain = nullptr;
-		ComPtr<ID3D11RenderTargetView>	m_pRenderTargetView = nullptr;
-		ComPtr<ID3D11Texture2D>			m_pDepthStencilBuffer = nullptr;
-		ComPtr<ID3D11DepthStencilView>	m_pDepthStencilView = nullptr;
+		//ComPtr<ID3D11RenderTargetView>	m_pRenderTargetView = nullptr;
+		//ComPtr<ID3D11Texture2D>			m_pDepthStencilBuffer = nullptr;
+		//ComPtr<ID3D11DepthStencilView>	m_pDepthStencilView = nullptr;
 
 		D3D11_VIEWPORT					m_ScreenViewport{};
 		UINT							m_MSAAQuality = 0;
 		bool							m_Enable4xMsaa = false;
 		Vector2i						m_backBufferSize{};
 
-		std::shared_ptr<DX11RenderTarget2D>		m_renderTargets[MAX_RENDERTARGETS]{};
-		int										m_renderTargetStackPtr = 0;
+		std::vector<std::shared_ptr<DX11RenderTarget2D>>	m_renderTargets;
 
 		Win32GameWindow*				m_pWindow = nullptr;
 
 		void m_resizeBuffer();
+		void m_CreateSwapChainAndLink(const InitArgs& args);
 	};
 }

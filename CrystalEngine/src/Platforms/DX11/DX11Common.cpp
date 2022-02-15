@@ -1,10 +1,8 @@
 #include "DX11Common.h"
 #include <array>
 #include <map>
-#include <Core/Platform/Graphics/GraphicsCommon.h>
+#include <Interfaces/Graphics/GraphicsCommon.h>
 #include <Core/Utils/Geometry.h>
-
-#include "DX11SamplerState.h"
 
 namespace crystal
 {

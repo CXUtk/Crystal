@@ -233,7 +233,7 @@ namespace crystal
 		m_textureRefSet.clear();
 	}
 
-	void SpriteBatch::Impl::Draw(std::shared_ptr<Texture2D> texture, const Bound2f& destRect,
+	void SpriteBatch::Impl::Draw(std::shared_ptr<ITexture2D> texture, const Bound2f& destRect,
 					const Bound2i* srcRect, const Color4f& color, const Vector2f& origin, float rotation,
 					SpriteEffect effect, float depth)
 	{

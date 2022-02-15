@@ -1,19 +1,29 @@
 ﻿#include "DX11PipelineStateObject.h"
 #include "DX11GraphicsDevice.h"
-#include "DX11VertexBuffer.h"
-#include "DX11IndexBuffer.h"
-#include "DX11VertexShader.h"
-#include "DX11FragmentShader.h"
-#include "DX11ShaderProgram.h"
-#include "DX11Texture2D.h"
-#include "DX11SamplerState.h"
+
 #include "PipelineStates/DX11BlendState.h"
+
+#include "PipelineResources/DX11VertexBuffer.h"
+#include "PipelineResources/DX11IndexBuffer.h"
+#include "PipelineResources/DX11VertexShader.h"
+#include "PipelineResources/DX11FragmentShader.h"
+#include "PipelineResources/DX11ShaderProgram.h"
+#include "PipelineResources/DX11Texture2D.h"
+#include "PipelineResources/DX11SamplerState.h"
+
 #include "d3dUtils.h"
 #include "dxTrace.h"
 #include <Core/Utils/Misc.h>
 
+
+
 namespace crystal
 {
+	DX11PipelineStateObject::DX11PipelineStateObject(DX11GraphicsDevice* graphicsDevice,
+		DX11GraphicsContext* graphicsContext)
+		: m_pGraphicsDevice(graphicsDevice), m_pGraphicsContext(graphicsContext)
+	{}
+
 	DX11PipelineStateObject::DX11PipelineStateObject(DX11GraphicsDevice* graphicsDevice)
 		: m_pGraphicsDevice(graphicsDevice)
 	{
@@ -59,7 +69,15 @@ namespace crystal
 			m_currentDepthStencilState.ReleaseAndGetAddressOf());
 	}
 
+
+
 	DX11PipelineStateObject::~DX11PipelineStateObject()
+	{}
+
+	void DX11PipelineStateObject::Load()
+	{}
+
+	void DX11PipelineStateObject::Unload()
 	{}
 
 	void DX11PipelineStateObject::BindVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
@@ -251,13 +269,4 @@ namespace crystal
 		m_pGraphicsDevice->GetD3DDeviceContext()->OMSetDepthStencilState(m_currentDepthStencilState.Get(), 0);
 	}
 
-	bool DX11PipelineStateObject::m_checkRasterizerState(DX11PipelineStateObject* other)
-	{
-		return memcmp(&m_rasterStateDesc, &other->m_rasterStateDesc, sizeof(D3D11_RASTERIZER_DESC)) != 0 
-			|| m_scissorRect != other->m_scissorRect;
-	}
-	bool DX11PipelineStateObject::m_checkDepthStencilState(DX11PipelineStateObject* other)
-	{
-		return memcmp(&m_depthStencilStateDesc, &other->m_depthStencilStateDesc, sizeof(D3D11_DEPTH_STENCIL_DESC)) != 0;
-	}
 }

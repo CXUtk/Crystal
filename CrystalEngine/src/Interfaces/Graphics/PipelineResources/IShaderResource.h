@@ -1,3 +1,4 @@
+#pragma once
 #include "../GraphicsCommon.h"
 namespace crystal
 {
@@ -5,6 +6,6 @@ namespace crystal
 	{
 	public:
 		virtual ~IShaderResource() = 0 {};
-		virtual void GetShaderResourceHandle(void** pHandle) = 0;
+		virtual void GetShaderResourceHandle(void** pHandle) const = 0;
 	};
 }

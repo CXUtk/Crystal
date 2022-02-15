@@ -1,18 +1,12 @@
 ﻿#include "DX11RenderTarget2D.h"
-#include "DX11GraphicsDevice.h"
-#include "DX11VertexBuffer.h"
-#include "DX11IndexBuffer.h"
-#include "DX11VertexShader.h"
-#include "DX11FragmentShader.h"
-#include "DX11ShaderProgram.h"
-#include "DX11PipelineStateObject.h"
 #include "DX11Texture2D.h"
-#include "dxTrace.h"
+#include "../DX11GraphicsDevice.h"
+#include "../dxTrace.h"
 
 namespace crystal
 {
-	DX11RenderTarget2D::DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice, 
-		const RenderTarget2DDescription& desc) 
+	DX11RenderTarget2D::DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice,
+		const RenderTarget2DDescription& desc)
 		: m_pGraphicsDevice(graphicsDevice)
 	{
 		auto device = m_pGraphicsDevice->GetD3DDevice();
@@ -38,7 +32,7 @@ namespace crystal
 			textureDesc.Format = DX11Common::RenderFormatConvert(desc.TargetFormat, true);
 			textureDesc.Usage = D3D11_USAGE_DEFAULT;
 			textureDesc.MiscFlags = 0;
-			textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_RENDER_TARGET 
+			textureDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_RENDER_TARGET
 				| D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
 			textureDesc.CPUAccessFlags = 0;
 			textureDesc.SampleDesc.Count = 1;
@@ -61,7 +55,7 @@ namespace crystal
 			srvDesc.Texture2D.MostDetailedMip = 0;
 			HR(device->CreateShaderResourceView(renderTargetTexture.Get(), &srvDesc, m_pShaderResourceView.GetAddressOf()));
 		}
-		
+
 		if (depthStencil)
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
@@ -91,18 +85,48 @@ namespace crystal
 		}
 	}
 
+	DX11RenderTarget2D::DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11RenderTargetView> renderTargetView,
+		ComPtr<ID3D11ShaderResourceView> shaderResourceView, ComPtr<ID3D11DepthStencilView> depthStencilView, const D3D11_VIEWPORT& viewPort)
+		: m_pGraphicsDevice(graphicsDevice), m_pRenderTargetView(renderTargetView),
+		m_pShaderResourceView(shaderResourceView), m_pDepthStencilView(depthStencilView),
+		m_viewport(viewPort)
+	{}
+
+
 	DX11RenderTarget2D::~DX11RenderTarget2D()
 	{}
 
-	void DX11RenderTarget2D::GetShaderResourceHandle(void** pHandle)
+	void DX11RenderTarget2D::GetShaderResourceHandle(void** pHandle) const
 	{
 		*pHandle = m_pShaderResourceView.Get();
 	}
 
-	void DX11RenderTarget2D::m_setToCurrentContext()
+	void DX11RenderTarget2D::SetToCurrentContext(ID3D11DeviceContext* context)
 	{
-		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
 		context->RSSetViewports(1, &m_viewport);
 		context->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
+	}
+
+	void DX11RenderTarget2D::ClearContent(ID3D11DeviceContext* context, ClearOptions options, const Color4f& color, float depth, int stencil)
+	{
+		if (options & ClearOptions::CRYSTAL_CLEAR_TARGET)
+		{
+			context->ClearRenderTargetView(m_pRenderTargetView.Get(),
+				crystal_value_ptr(color));
+		}
+		int clearDepthStencilFlags = 0;
+		if (options & ClearOptions::CRYSTAL_CLEAR_DEPTH)
+		{
+			clearDepthStencilFlags |= D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH;
+		}
+		if (options & ClearOptions::CRYSTAL_CLEAR_STENCIL)
+		{
+			clearDepthStencilFlags |= D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL;
+		}
+		if (clearDepthStencilFlags)
+		{
+			context->ClearDepthStencilView(m_pDepthStencilView.Get(),
+				clearDepthStencilFlags, depth, stencil);
+		}
 	}
 }

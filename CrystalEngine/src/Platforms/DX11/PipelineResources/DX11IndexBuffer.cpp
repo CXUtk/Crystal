@@ -1,7 +1,7 @@
 ﻿#include "DX11IndexBuffer.h"
-#include "DX11GraphicsDevice.h"
-#include "d3dUtils.h"
-#include "dxTrace.h"
+#include "../DX11GraphicsDevice.h"
+#include "../d3dUtils.h"
+#include "../dxTrace.h"
 #include <Core/Utils/Misc.h>
 
 
@@ -17,9 +17,8 @@ namespace crystal
 	DX11IndexBuffer::~DX11IndexBuffer()
 	{}
 
-	void DX11IndexBuffer::m_BindToPipeline(size_t offset)
+	void DX11IndexBuffer::SetToCurrentContext(ID3D11DeviceContext * context, size_t offset)
 	{
-		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
-		deviceContext->IASetIndexBuffer(m_pBuffer.Get(), m_indexFormat, offset);
+		context->IASetIndexBuffer(m_pBuffer.Get(), m_indexFormat, offset);
 	}
 }

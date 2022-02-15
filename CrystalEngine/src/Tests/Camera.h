@@ -1,7 +1,6 @@
 #pragma once
 #include <Crystal.h>
-#include <Core/Utils/Math.h>
-#include <Core/Platform/Graphics/GraphicsCommon.h>
+#include <Interfaces/Interfaces.h>
 
 using namespace crystal;
 

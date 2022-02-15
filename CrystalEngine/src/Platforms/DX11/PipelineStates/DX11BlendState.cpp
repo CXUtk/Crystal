@@ -12,9 +12,8 @@ namespace crystal
 	DX11BlendState::~DX11BlendState()
 	{}
 
-	void DX11BlendState::Apply()
+	void DX11BlendState::SetToCurrentContext(ID3D11DeviceContext * context)
 	{
-		auto context = m_pGraphicsDevice->GetD3DDeviceContext();
 		float blendFactors[4] = { 0.f, 0.f, 0.f, 0.f };
 		context->OMSetBlendState(m_blendState.Get(), blendFactors, -1);
 	}

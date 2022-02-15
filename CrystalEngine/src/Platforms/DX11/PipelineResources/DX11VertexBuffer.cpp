@@ -1,9 +1,9 @@
 ﻿#include "DX11VertexBuffer.h"
-#include "DX11GraphicsDevice.h"
-#include "d3dUtils.h"
-#include "dxTrace.h"
 #include <Core/Utils/Misc.h>
-
+#include "../DX11GraphicsDevice.h"
+#include "../DX11GraphicsContext.h"
+#include "../d3dUtils.h"
+#include "../dxTrace.h"
 
 namespace crystal
 {
@@ -69,12 +69,12 @@ return vout;\
 		HR(d3dUtils::CreateShaderFromMemory(dummyShader.c_str(), dummyShader.size(), "dummyVS", "VS", 
 			DX11Common::ShaderModelConvert(ShaderType::VERTEX_SHADER), pBlob.GetAddressOf()));
 		HR(device->CreateInputLayout(d3dInputElements.get(), layout.Elements.size(),
-			pBlob->GetBufferPointer(), pBlob->GetBufferSize(), m_pInputLayout.GetAddressOf()));
+			pBlob->GetBufferPointer(), pBlob->GetBufferSize(), m_pInputLayout.ReleaseAndGetAddressOf()));
 	}
 
 	void DX11VertexBuffer::ChangeBufferContent(const void* src, size_t size, size_t offset)
 	{
-		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
+		auto deviceContext = std::dynamic_pointer_cast<DX11GraphicsContext>(m_pGraphicsDevice->GetContext())->GetD3DDevice();
 		D3D11_MAPPED_SUBRESOURCE mapRes;
 		deviceContext->Map(m_pBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes);
 		size_t destSize = mapRes.RowPitch - offset;
@@ -83,11 +83,10 @@ return vout;\
 		deviceContext->Unmap(m_pBuffer.Get(), 0);
 	}
 
-	void DX11VertexBuffer::m_BindToPipeline(size_t offset)
+	void DX11VertexBuffer::SetToCurrentContext(ID3D11DeviceContext* context, size_t offset)
 	{
-		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
 		UINT offsetU = offset;
-		deviceContext->IASetVertexBuffers(0, 1, m_pBuffer.GetAddressOf(), &m_strides, &offsetU);
-		deviceContext->IASetInputLayout(m_pInputLayout.Get());
+		context->IASetVertexBuffers(0, 1, m_pBuffer.GetAddressOf(), &m_strides, &offsetU);
+		context->IASetInputLayout(m_pInputLayout.Get());
 	}
 }
