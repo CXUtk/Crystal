@@ -34,16 +34,16 @@ namespace crystal
 	class SpriteBatch
 	{
 	public:
-		SpriteBatch(GraphicsDevice* graphicsDevice);
+		SpriteBatch(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext);
 		~SpriteBatch();
 
 		void Begin();
 		void Begin(const Matrix4f& transform);
 		void End();
 
-		void Draw(std::shared_ptr<Texture2D> texture, const Vector2f& center, const Color4f& color);
-		void Draw(std::shared_ptr<Texture2D> texture, const Bound2i& drawRect, const Color4f& color);
-		void Draw(std::shared_ptr<Texture2D> texture, const Vector2f& pos, const Color4f& color,
+		void Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& center, const Color4f& color);
+		void Draw(std::shared_ptr<ITexture2D> texture, const Bound2i& drawRect, const Color4f& color);
+		void Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& pos, const Color4f& color,
 			float rotation, const Vector2f& origin, float scale, SpriteEffect effect);
 	private:
 		class Impl;

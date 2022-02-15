@@ -1,13 +1,7 @@
-#define NOMINMAX
-#define NODRAWTEXT
-#define NOGDI
-#define NOBITMAP
-#define NOMCX
-#define NOSERVICE
-#define NOHELP
-
 #include <Core/Render/SpriteBatch.h>
-#include <Platforms/CurrentGraphics.h>
+#include <Interfaces/Graphics/GraphicsInterfaces.h>
+#include <stdexcept>
+
 
 namespace crystal
 {
@@ -23,44 +17,56 @@ namespace crystal
 
 	struct SpriteInfo
 	{
-		Bound2f			TexCoords;
-		Bound2f			DestRect;
-		Color4f			Color;
-		Vector2f		Origin;
-		float			Depth;
-		float			Rotation;
-		Texture2D*		Texture;
-		SpriteEffect	SpriteEffect;
+		Bound2f							TexCoords;
+		Bound2f							DestRect;
+		Color4f							Color;
+		Vector2f						Origin;
+		float							Depth;
+		float							Rotation;
+		std::shared_ptr<ITexture2D>		Texture;
+		SpriteEffect					SpriteEffect;
 	};
 
 	struct RenderState
 	{
-		SpriteSortMode							m_spriteSortMode = SpriteSortMode::Deferred;
-		Matrix4f								m_renderMatrix{};
-		std::shared_ptr<PipelineStateObject>	m_pPipelineStateObject = nullptr;
-		std::shared_ptr<ShaderProgram>			m_pShaderProgram = nullptr;
+		SpriteSortMode								m_spriteSortMode = SpriteSortMode::Deferred;
+		Matrix4f									m_renderMatrix{};
+		std::shared_ptr<IShaderProgram>				m_pShaderProgram = nullptr;
+		std::shared_ptr<IRasterState>				m_pRasterState = nullptr;
+		std::shared_ptr<IBlendState>				m_pBlendState = nullptr;
+		std::shared_ptr<IDepthStencilState>			m_pDepthStencilState = nullptr;
+		std::shared_ptr<ISamplerState>				m_pSamplerState = nullptr;
 	};
 
 	class SpriteBatch::Impl
 	{
 	public:
-		explicit Impl(GraphicsDevice* graphicsDevice);
+		explicit Impl(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext);
 		~Impl();
 		 
 
-		void Begin(SpriteSortMode spriteSortMode, const Matrix4f* transform,
-			std::shared_ptr<PipelineStateObject> pso, std::shared_ptr<ShaderProgram> shader);
+		void Begin(SpriteSortMode spriteSortMode,
+			const Matrix4f* transform,
+			std::shared_ptr<IBlendState> blendState,
+			std::shared_ptr<ISamplerState> samplerState,
+			std::shared_ptr<IShaderProgram> shader,
+			std::shared_ptr<IRasterState> rasterState,
+			std::shared_ptr<IDepthStencilState> depthStencilState);
 		void End();
 
-		void Draw(std::shared_ptr<Texture2D> texture, const Bound2f& destRect,
+		void Draw(std::shared_ptr<ITexture2D> texture, const Bound2f& destRect,
 					const Bound2i* srcRect, const Color4f& color, const Vector2f& origin, float rotation,
 					SpriteEffect effect, float depth);
 	private:
-		std::shared_ptr<VertexBuffer>		m_pDefaultVertexBuffer = nullptr;
-		GraphicsDevice*						m_pGraphicsDevice = nullptr;
-
 		static constexpr int MAX_QUADS_PER_BATCH = 1 << 12;
 		static constexpr int MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH << 2;
+
+		IGraphicsDevice*					m_pGraphicsDevice = nullptr;
+		IGraphicsContext*					m_pGraphicsContext = nullptr;
+
+		std::shared_ptr<IPipelineStateObject>		m_pDefaultPSO = nullptr;
+		std::shared_ptr<IPipelineResourceObject>	m_pDefaultPRO = nullptr;
+		std::shared_ptr<IVertexBuffer>				m_pDefaultVertexBuffer = nullptr;
 
 		RenderState						m_defaultRenderState{};
 		RenderState						m_currentRenderState{};
@@ -68,11 +74,11 @@ namespace crystal
 		std::vector<SpriteInfo>			m_spriteQueue{};
 		bool							m_isBatchingBegin = false;
 
-		std::set<std::shared_ptr<Texture2D>>	m_textureRefSet;
+		std::set<std::shared_ptr<ITexture2D>>	m_textureRefSet;
 		static BatchVertex2D					m_defaultVertices[4];
 
 		void m_FlushThisBatch();
-		void m_RenderBatch(Texture2D* texture, const SpriteInfo* src, size_t count);
+		void m_RenderBatch(std::shared_ptr<ITexture2D> texture, const SpriteInfo* src, size_t count);
 		void m_PushOneQuad(const SpriteInfo& sprite);
 	};
 
@@ -84,9 +90,9 @@ namespace crystal
 		{ Vector3f(-0.5f, 0.5f, 0.f), Vector2f(0.0f, 1.0f), Vector4f(1.0f) },
 	};
 
-	SpriteBatch::SpriteBatch(GraphicsDevice* graphicsDevice)
+	SpriteBatch::SpriteBatch(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext)
 	{
-		m_pImpl = std::make_unique<Impl>(graphicsDevice);
+		m_pImpl = std::make_unique<Impl>(graphicsDevice, graphicsContext);
 	}
 
 	SpriteBatch::~SpriteBatch()
@@ -95,15 +101,16 @@ namespace crystal
 	void SpriteBatch::Begin()
 	{
 		m_pImpl->Begin(SpriteSortMode::Deferred,
-			nullptr, nullptr, nullptr);
+			nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 	}
 
 	void SpriteBatch::Begin(const Matrix4f& transform)
 	{
-		m_pImpl->Begin(SpriteSortMode::Deferred, &transform, nullptr, nullptr);
+		m_pImpl->Begin(SpriteSortMode::Deferred, &transform, nullptr, nullptr, nullptr, 
+			nullptr, nullptr);
 	}
 
-	void SpriteBatch::Draw(std::shared_ptr<Texture2D> texture, const Vector2f& center, const Color4f& color)
+	void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& center, const Color4f& color)
 	{
 		auto halfSize = Vector2f(texture->GetSize()) * 0.5f;
 		auto minPos = center - halfSize;
@@ -112,7 +119,7 @@ namespace crystal
 			0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
 	}
 
-	void SpriteBatch::Draw(std::shared_ptr<Texture2D> texture, const Bound2i& drawRect, const Color4f& color)
+	void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Bound2i& drawRect, const Color4f& color)
 	{
 		Bound2f rect(drawRect.GetMinPos(), drawRect.GetMaxPos());
 		m_pImpl->Draw(texture, rect, nullptr, color, Vector2f(0.f), 
@@ -124,7 +131,7 @@ namespace crystal
 		m_pImpl->End();
 	}
 
-	void SpriteBatch::Draw(std::shared_ptr<Texture2D> texture, const Vector2f& pos,
+	void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& pos,
 		const Color4f& color, float rotation, const Vector2f& origin, float scale, SpriteEffect effect)
 	{
 		auto texScale = texture->GetSize();
@@ -135,16 +142,12 @@ namespace crystal
 	}
 
 
-	SpriteBatch::Impl::Impl(GraphicsDevice* graphicsDevice)
-		: m_pGraphicsDevice(graphicsDevice)
+	SpriteBatch::Impl::Impl(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext)
+		: m_pGraphicsDevice(graphicsDevice), m_pGraphicsContext(graphicsContext)
 	{
 		static_assert(MAX_VERTICES_PER_BATCH < (1 << 16));
 
-		auto defaultPSO = m_pGraphicsDevice->CreatePipelineStateObject();
-		defaultPSO->SetDepthTestState(true);
-		defaultPSO->SetCullMode(CullingMode::None);
-		defaultPSO->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
-		auto p = defaultPSO->GetCullMode();
+		m_pDefaultPRO = graphicsDevice->CreatePipelineResourceObject();
 
 		// Initialize index buffers (static)
 		IndexBufferDescription indexBufferDesc;
@@ -168,7 +171,7 @@ namespace crystal
 		}
 		auto pIndexBuffer = m_pGraphicsDevice->CreateIndexBuffer(indexBufferDesc, &indices[0],
 			sizeof(uint16_t) * MAX_QUADS_PER_BATCH * INDICIES_PER_QUAD);
-		defaultPSO->BindIndexBuffer(pIndexBuffer);
+		m_pDefaultPRO->SetIndexBuffer(pIndexBuffer);
 
 
 		// Initialize vertex buffer (dynamic)
@@ -184,22 +187,41 @@ namespace crystal
 		};
 		VertexLayout vLayout(elements, sizeof(BatchVertex2D));
 		m_pDefaultVertexBuffer->BindVertexLayout(vLayout);
-		defaultPSO->BindVertexBuffer(m_pDefaultVertexBuffer);
+		m_pDefaultPRO->SetVertexBuffer(m_pDefaultVertexBuffer);
 
+		// Initialize pipeline states
+		RasterStateDescription rasterDesc = {};
+		rasterDesc.CullMode = CullingMode::None;
+		rasterDesc.FillMode = FillMode::SOLID;
+		rasterDesc.Viewport = nullptr;
+		m_defaultRenderState.m_pRasterState = graphicsDevice->CreateRasterState(rasterDesc);
+		m_defaultRenderState.m_pBlendState = graphicsDevice->GetCommonBlendState(BlendStates::Opaque);
+		m_defaultRenderState.m_pSamplerState = graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp);
 
-		m_defaultRenderState.m_pPipelineStateObject = defaultPSO;
+		DepthStencilStateDescription DSDesc = {};
+		DSDesc.EnableDepthTest = false;
+		DSDesc.EnableStencilTest = false;
+		m_defaultRenderState.m_pDepthStencilState = graphicsDevice->CreateDepthStencilState(DSDesc);
 		m_defaultRenderState.m_pShaderProgram = m_pGraphicsDevice->CreateShaderProgramFromFile("resources/sprite.json");
-		auto viewPortSize = m_pGraphicsDevice->GetBackBufferSize();
+		
+		auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();
 		m_defaultRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,
 			(float)viewPortSize.y, -1.f, 1.f);
 		m_defaultRenderState.m_spriteSortMode = SpriteSortMode::Deferred;
+
+		m_pDefaultPSO = m_pGraphicsDevice->CreatePipelineStateObject();
 	}
 
 	SpriteBatch::Impl::~Impl()
 	{}
 
-	void SpriteBatch::Impl::Begin(SpriteSortMode spriteSortMode, const Matrix4f* transform,
-			std::shared_ptr<PipelineStateObject> pso, std::shared_ptr<ShaderProgram> shader)
+	void SpriteBatch::Impl::Begin(SpriteSortMode spriteSortMode, 
+		const Matrix4f* transform, 
+		std::shared_ptr<IBlendState> blendState, 
+		std::shared_ptr<ISamplerState> samplerState,
+		std::shared_ptr<IShaderProgram> shader,
+		std::shared_ptr<IRasterState> rasterState,
+		std::shared_ptr<IDepthStencilState> depthStencilState)
 	{
 		if (m_isBatchingBegin)
 		{
@@ -209,7 +231,7 @@ namespace crystal
 
 		if (!transform)
 		{
-			auto viewPortSize = m_pGraphicsDevice->GetBackBufferSize();
+			auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();
 			m_currentRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,
 				(float)viewPortSize.y, -1.f, 1.f);
 		}
@@ -217,9 +239,19 @@ namespace crystal
 		{
 			m_currentRenderState.m_renderMatrix = *transform;
 		}
-		m_currentRenderState.m_pPipelineStateObject =  pso ? pso : m_defaultRenderState.m_pPipelineStateObject;
+		m_currentRenderState.m_pRasterState =rasterState ? rasterState : m_defaultRenderState.m_pRasterState;
+		m_currentRenderState.m_pBlendState =  blendState ? blendState : m_defaultRenderState.m_pBlendState;
+		m_currentRenderState.m_pDepthStencilState = depthStencilState ? depthStencilState : m_currentRenderState.m_pDepthStencilState;
 		m_currentRenderState.m_pShaderProgram = shader ? shader : m_defaultRenderState.m_pShaderProgram;
+		m_currentRenderState.m_pSamplerState = samplerState ? samplerState : m_defaultRenderState.m_pSamplerState;
 		m_currentRenderState.m_spriteSortMode = spriteSortMode;
+
+		m_pDefaultPSO->SetBlendState(m_currentRenderState.m_pBlendState);
+		m_pDefaultPSO->SetRasterState(m_currentRenderState.m_pRasterState);
+		m_pDefaultPSO->SetDepthStencilState(m_currentRenderState.m_pDepthStencilState);
+
+		m_pDefaultPRO->SetShaderProgram(m_currentRenderState.m_pShaderProgram);
+		m_pDefaultPRO->SetSamplerState(m_currentRenderState.m_pSamplerState, 0);
 	}
 
 	void SpriteBatch::Impl::End()
@@ -263,7 +295,7 @@ namespace crystal
 			spriteInfo.TexCoords = Bound2f(Vector2f(0.f), Vector2f(1.f));
 		}
 
-		spriteInfo.Texture = texture.get();
+		spriteInfo.Texture = texture;
 		spriteInfo.DestRect = destRect;
 		spriteInfo.Origin = origin;
 		spriteInfo.Color = color;
@@ -299,43 +331,37 @@ namespace crystal
 		m_spriteQueue.clear();
 	}
 
-	void SpriteBatch::Impl::m_RenderBatch(Texture2D* texture, const SpriteInfo* src, size_t count)
+	void SpriteBatch::Impl::m_RenderBatch(std::shared_ptr<ITexture2D> texture, const SpriteInfo* src, size_t count)
 	{
-		auto deviceContext = m_pGraphicsDevice->GetD3DDeviceContext();
-		auto shaderResource = texture->GetShaderResourceView();
-		deviceContext->VSSetShaderResources(0, 1, &shaderResource);
-		deviceContext->PSSetShaderResources(0, 1, &shaderResource);
+		m_pDefaultPRO->SetShaderResource(texture, 0);
 
+		m_pGraphicsContext->BeginPipeline(m_pDefaultPSO);
 		{
-			m_pGraphicsDevice->PushPipelineStateObject(m_currentRenderState.m_pPipelineStateObject);
-
 			m_currentRenderState.m_pShaderProgram->SetUniformMat4f("MVP", m_currentRenderState.m_renderMatrix);
-			m_currentRenderState.m_pShaderProgram->Apply();
 
-			for (size_t i = 0; i < count;)
+			m_pGraphicsContext->LoadPipelineResources(m_pDefaultPRO);
 			{
-				size_t quadCountThisRound = std::min(count - i, static_cast<size_t>(MAX_QUADS_PER_BATCH));
-				for (int j = 0; j < quadCountThisRound; j++)
+				for (size_t i = 0; i < count;)
 				{
-					m_PushOneQuad(src[i + j]);
+					size_t quadCountThisRound = std::min(count - i, static_cast<size_t>(MAX_QUADS_PER_BATCH));
+					for (int j = 0; j < quadCountThisRound; j++)
+					{
+						m_PushOneQuad(src[i + j]);
+					}
+					assert(m_vertices.size() % 4 == 0);
+					size_t verticesThisRound = quadCountThisRound * VERTICES_PER_QUAD;
+					m_pDefaultVertexBuffer->ChangeBufferContent(m_vertices.data(),
+						verticesThisRound * sizeof(BatchVertex2D), 0);
+
+					m_pGraphicsContext->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST,
+							quadCountThisRound * INDICIES_PER_QUAD, 0, 0);
+					m_vertices.clear();
+					i += quadCountThisRound;
 				}
-				assert(m_vertices.size() % 4 == 0);
-				size_t verticesThisRound = quadCountThisRound * VERTICES_PER_QUAD;
-				m_pDefaultVertexBuffer->ChangeBufferContent(m_vertices.data(),
-					verticesThisRound * sizeof(BatchVertex2D), 0);
-					
-				m_pGraphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST,
-						quadCountThisRound * INDICIES_PER_QUAD, 0, 0);
-				m_vertices.clear();
-				i += quadCountThisRound;
 			}
-
-			m_pGraphicsDevice->PopPipelineStateObject();
+			m_pGraphicsContext->UnloadPipelineResources();
 		}
-
-		ID3D11ShaderResourceView* nullview = nullptr;
-		deviceContext->VSSetShaderResources(0, 1, &nullview);
-		deviceContext->PSSetShaderResources(0, 1, &nullview);
+		m_pGraphicsContext->EndPipeline();
 	}
 
 	void SpriteBatch::Impl::m_PushOneQuad(const SpriteInfo& sprite)

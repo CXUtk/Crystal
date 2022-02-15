@@ -24,9 +24,9 @@ namespace crystal
 
 	private:
 		bool m_renderPause = false;
-		std::shared_ptr<ShaderProgram> m_pShader = nullptr;
-		std::shared_ptr<PipelineStateObject> m_PSO = nullptr;
-		std::shared_ptr<crystal::Texture2D> m_texture2D = nullptr;
-		std::shared_ptr<crystal::Texture2D> m_texture2D1 = nullptr;
+		std::shared_ptr<IShaderProgram> m_pShader = nullptr;
+		std::shared_ptr<IPipelineStateObject> m_PSO = nullptr;
+		std::shared_ptr<ITexture2D> m_texture2D = nullptr;
+		std::shared_ptr<ITexture2D> m_texture2D1 = nullptr;
 	};
 }

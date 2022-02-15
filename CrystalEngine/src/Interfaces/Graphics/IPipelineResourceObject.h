@@ -13,6 +13,6 @@ namespace crystal
 		virtual void SetShaderProgram(std::shared_ptr<IShaderProgram> shaderProgram) = 0;
 
 		virtual void SetVertexBuffer(std::shared_ptr<IVertexBuffer> vertexBuffer) = 0;
-		virtual void SetIndexBuffer(std::shared_ptr<IIndexBuffer> vertexBuffer) = 0;
+		virtual void SetIndexBuffer(std::shared_ptr<IIndexBuffer> indexBuffer) = 0;
 	};
 }

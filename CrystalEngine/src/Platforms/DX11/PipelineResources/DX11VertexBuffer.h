@@ -12,7 +12,7 @@ namespace crystal
 		virtual void BindVertexLayout(const VertexLayout& layout) override;
 		virtual void ChangeBufferContent(const void* src, size_t size, size_t offset) override;
 
-		void SetToCurrentContext(ID3D11DeviceContext* context, size_t offset);
+		void SetToCurrentContext(ID3D11DeviceContext* context, size_t offset = 0);
 	private:
 		DX11GraphicsDevice*			m_pGraphicsDevice{};
 		ComPtr<ID3D11Buffer>		m_pBuffer{};

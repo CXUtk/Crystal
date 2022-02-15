@@ -1,5 +1,8 @@
 #include "DX11GraphicsContext.h"
 #include "DX11GraphicsDevice.h"
+#include "DX11PipelineResourceObject.h"
+#include "DX11PipelineStateObject.h"
+
 #include "PipelineResources/DX11RenderTarget2D.h"
 
 #include <Platforms/DX11/dxTrace.h>
@@ -15,15 +18,20 @@ namespace crystal
 	{
 		m_renderTargets.push_back(nullptr);
 		m_CreateSwapChainAndLink(args);
-		m_resizeBuffer();
+		m_ResizeBuffer();
 		m_pWindow->AppendOnResizeEvent([this](Vector2i size) {
-			m_resizeBuffer();
+			m_ResizeBuffer();
 		});
 
 	}
 
 	DX11GraphicsContext::~DX11GraphicsContext()
 	{}
+
+	void DX11GraphicsContext::ReturnLastViewports()
+	{
+		m_renderTargets.back()->SetViewportToCurrentContext(this);
+	}
 
 	void DX11GraphicsContext::Present()
 	{
@@ -32,17 +40,25 @@ namespace crystal
 
 	void DX11GraphicsContext::DrawPrimitives(PrimitiveType primitiveType, size_t offset, size_t numVertices)
 	{
+		if (!m_pCurrentPipelineResource || !m_pCurrentPipelineState)
+		{
+			throw std::logic_error("Cannot start a draw when PipelineResource or PipelineState are not active");
+		}
 		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
 		m_pd3dImmediateContext->Draw(numVertices, offset);
 	}
 
 	void DX11GraphicsContext::DrawIndexedPrimitives(PrimitiveType primitiveType, size_t numIndices, size_t indexOffset, size_t vertexOffset)
 	{
+		if (!m_pCurrentPipelineResource || !m_pCurrentPipelineState)
+		{
+			throw std::logic_error("Cannot start a draw when PipelineResource or PipelineState are not active");
+		}
 		m_pd3dImmediateContext->IASetPrimitiveTopology(DX11Common::PrimitiveTypeToTopologyConvert(primitiveType));
 		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
 	}
 
-	void DX11GraphicsContext::m_resizeBuffer()
+	void DX11GraphicsContext::m_ResizeBuffer()
 	{
 		auto dx11GraphicsDevice = m_pGraphicsDevice->GetD3DDevice();
 		assert(m_pd3dImmediateContext);
@@ -102,15 +118,16 @@ namespace crystal
 		// Combine render targets and the depth stencil buffer to the pipeline
 		m_pd3dImmediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
+		D3D11_VIEWPORT screenViewport{};
 		// Initialize viewport
-		m_ScreenViewport.TopLeftX = 0;
-		m_ScreenViewport.TopLeftY = 0;
-		m_ScreenViewport.Width = static_cast<float>(newWindowSize.x);
-		m_ScreenViewport.Height = static_cast<float>(newWindowSize.y);
-		m_ScreenViewport.MinDepth = 0.0f;
-		m_ScreenViewport.MaxDepth = 1.0f;
+		screenViewport.TopLeftX = 0;
+		screenViewport.TopLeftY = 0;
+		screenViewport.Width = static_cast<float>(newWindowSize.x);
+		screenViewport.Height = static_cast<float>(newWindowSize.y);
+		screenViewport.MinDepth = 0.0f;
+		screenViewport.MaxDepth = 1.0f;
 
-		m_pd3dImmediateContext->RSSetViewports(1, &m_ScreenViewport);
+		m_pd3dImmediateContext->RSSetViewports(1, &screenViewport);
 
 		// Set DEBUG name
 		d3dUtils::D3D11SetDebugObjectName(depthStencilBuffer.Get(), "DepthStencilBuffer");
@@ -119,7 +136,7 @@ namespace crystal
 
 		m_renderTargets[0].reset();
 		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(dx11GraphicsDevice, renderTargetView,
-			nullptr, depthStencilView, m_ScreenViewport);
+			nullptr, depthStencilView, screenViewport);
 	}
 
 	void DX11GraphicsContext::m_CreateSwapChainAndLink(const InitArgs& args)
@@ -186,11 +203,45 @@ namespace crystal
 			options, color, depth, stencil);
 	}
 
-	void DX11GraphicsContext::PushPipeline(std::shared_ptr<IPipelineResourceObject> pipelineResource, std::shared_ptr<IPipelineStateObject> pipelineState)
-	{}
+	void DX11GraphicsContext::BeginPipeline(std::shared_ptr<IPipelineStateObject> pipelineState)
+	{
+		if (m_pCurrentPipelineState)
+		{
+			throw std::logic_error("Cannot begin a pipeline when a pipeline already started");
+		}
+		m_pCurrentPipelineState = std::dynamic_pointer_cast<DX11PipelineStateObject>(pipelineState);
+		m_pCurrentPipelineState->Load();
+	}
 
-	void DX11GraphicsContext::PopPipeline()
-	{}
+	void DX11GraphicsContext::EndPipeline()
+	{
+		if (!m_pCurrentPipelineState)
+		{
+			throw std::logic_error("Cannot end a pipeline when there is no pipeline process");
+		}
+		m_pCurrentPipelineState->Unload();
+		m_pCurrentPipelineState.reset();
+	}
+
+	void DX11GraphicsContext::LoadPipelineResources(std::shared_ptr<IPipelineResourceObject> pipelineResource)
+	{
+		if (m_pCurrentPipelineResource)
+		{
+			throw std::logic_error("Cannot load pipeline resource when there is a resource in active");
+		}
+		m_pCurrentPipelineResource = std::dynamic_pointer_cast<DX11PipelineResourceObject>(pipelineResource);
+		m_pCurrentPipelineResource->Load();
+	}
+
+	void DX11GraphicsContext::UnloadPipelineResources()
+	{
+		if (!m_pCurrentPipelineResource)
+		{
+			throw std::logic_error("Cannot unload resource when there is no resource loaded");
+		}
+		m_pCurrentPipelineResource->Unload();
+		m_pCurrentPipelineResource.reset();
+	}
 
 
 	void DX11GraphicsContext::PushRenderTarget2D(std::shared_ptr<IRenderTarget2D> renderTarget2D)
@@ -198,13 +249,20 @@ namespace crystal
 		assert(m_renderTargets.size() > 0);
 		auto dx11RenderTarget = std::dynamic_pointer_cast<DX11RenderTarget2D>(renderTarget2D);
 		m_renderTargets.push_back(dx11RenderTarget);
-		m_renderTargets.back()->SetToCurrentContext(m_pd3dImmediateContext.Get());
+
+		m_renderTargets.back()->SetViewportToCurrentContext(this);
+		m_renderTargets.back()->SetToCurrentContext(this);
 	}
 
 	void DX11GraphicsContext::PopRenderTarget2D()
 	{
 		assert(m_renderTargets.size() > 1);
 		m_renderTargets.pop_back();
-		m_renderTargets.back()->SetToCurrentContext(m_pd3dImmediateContext.Get());
+		m_renderTargets.back()->SetViewportToCurrentContext(this);
+		m_renderTargets.back()->SetToCurrentContext(this);
+	}
+	Vector2i DX11GraphicsContext::GetCurrentFrameBufferSize() const
+	{
+		return m_renderTargets.back()->GetSize();
 	}
 }

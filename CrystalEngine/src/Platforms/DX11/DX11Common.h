@@ -10,15 +10,20 @@ namespace crystal
 
 	class DX11GraphicsDevice;
 	class DX11GraphicsContext;
+	class DX11PipelineStateObject;
+	class DX11PipelineResourceObject;
 
-	class IDX11ShaderResource;
 	class DX11RenderTarget2D;
 	class DX11VertexShader;
 	class DX11FragmentShader;
 	class DX11VertexBuffer;
 	class DX11IndexBuffer;
 	class DX11ShaderProgram;
-	class IDX11SamplerState;
+	class DX11SamplerState;
+
+	class DX11RasterState;
+	class DX11DepthStencilState;
+	class DX11BlendState;
 
 	class DX11Common{
 	public:
@@ -35,6 +40,9 @@ namespace crystal
 
 		static D3D11_CULL_MODE CullModeConvert(CullingMode mode);
 		static D3D11_FILL_MODE FillModeConvert(FillMode mode);
+
+		static D3D11_BLEND BlendFactorConvert(BlendFactors blendFactor);
+		static D3D11_BLEND_OP BlendOpConvert(BlendOperations blendOp);
 
 		static std::string ConvertFromUtf16ToUtf8(const std::wstring& wstr)
 		{

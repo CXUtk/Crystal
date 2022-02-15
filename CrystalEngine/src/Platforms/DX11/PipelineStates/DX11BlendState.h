@@ -7,12 +7,13 @@ namespace crystal
 	{
 	public:
 		DX11BlendState(DX11GraphicsDevice* graphicsDevice, 
-			ComPtr<ID3D11BlendState> blendState);
+			const BlendStateDescription& blendStateDesc);
 		~DX11BlendState();
 
-		void SetToCurrentContext(ID3D11DeviceContext* context);
+		void Load(DX11GraphicsContext* context);
+		void Unload(DX11GraphicsContext* context);
 	private:
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
-		ComPtr<ID3D11BlendState>		m_blendState = nullptr;
+		ComPtr<ID3D11BlendState>		m_pBlendState = nullptr;
 	};
 }

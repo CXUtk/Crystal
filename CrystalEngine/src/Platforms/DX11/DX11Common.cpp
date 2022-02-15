@@ -179,6 +179,37 @@ namespace crystal
 	}
 	constexpr auto FillModeMapping = GenerateFillModeMapping<(size_t)FillMode::__COUNT>();
 
+	template<size_t N>
+	constexpr std::array<D3D11_BLEND, N> GenerateBlendFactorMapping()
+	{
+		std::array<D3D11_BLEND, N> M{};
+		M[(int)BlendFactors::Zero] = D3D11_BLEND::D3D11_BLEND_ZERO;
+		M[(int)BlendFactors::One] = D3D11_BLEND::D3D11_BLEND_ONE;
+		M[(int)BlendFactors::SrcColor] = D3D11_BLEND::D3D11_BLEND_SRC_COLOR;		
+		M[(int)BlendFactors::InvSrcColor] = D3D11_BLEND::D3D11_BLEND_INV_SRC_COLOR;
+		M[(int)BlendFactors::SrcAlpha] = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+		M[(int)BlendFactors::InvSrcAlpha] = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+		M[(int)BlendFactors::DestColor] = D3D11_BLEND::D3D11_BLEND_DEST_COLOR;
+		M[(int)BlendFactors::InvDestColor] = D3D11_BLEND::D3D11_BLEND_INV_DEST_COLOR;
+		M[(int)BlendFactors::DestAlpha] = D3D11_BLEND::D3D11_BLEND_DEST_ALPHA;
+		M[(int)BlendFactors::InvDestAlpha] = D3D11_BLEND::D3D11_BLEND_INV_DEST_ALPHA;
+		return M;
+	}
+	constexpr auto BlendFactorMapping = GenerateBlendFactorMapping<(size_t)BlendFactors::__COUNT>();
+
+	template<size_t N>
+	constexpr std::array<D3D11_BLEND_OP, N> GenerateBlendOpMapping()
+	{
+		std::array<D3D11_BLEND_OP, N> M{};
+		M[(int)BlendOperations::Add] = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+		M[(int)BlendOperations::Subtract] = D3D11_BLEND_OP::D3D11_BLEND_OP_SUBTRACT;
+		M[(int)BlendOperations::RevSubtract] = D3D11_BLEND_OP::D3D11_BLEND_OP_REV_SUBTRACT;
+		M[(int)BlendOperations::Min] = D3D11_BLEND_OP::D3D11_BLEND_OP_MIN;
+		M[(int)BlendOperations::Max] = D3D11_BLEND_OP::D3D11_BLEND_OP_MAX;
+		return M;
+	}
+	constexpr auto BlendOpMapping = GenerateBlendOpMapping<(size_t)BlendOperations::__COUNT>();
+
 	void DX11Common::InitDX11Commons(DX11GraphicsDevice* graphicsDevice)
 	{
 		static bool initialized = false;
@@ -236,5 +267,13 @@ namespace crystal
 	D3D11_FILL_MODE DX11Common::FillModeConvert(FillMode mode)
 	{
 		return FillModeMapping[(int)mode];
+	}
+	D3D11_BLEND DX11Common::BlendFactorConvert(BlendFactors blendFactor)
+	{
+		return BlendFactorMapping[(int)blendFactor];
+	}
+	D3D11_BLEND_OP DX11Common::BlendOpConvert(BlendOperations blendOp)
+	{
+		return BlendOpMapping[(int)blendOp];
 	}
 }

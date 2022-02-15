@@ -11,6 +11,5 @@ namespace crystal
 		virtual void SetRasterState(std::shared_ptr<IRasterState> rasterState) = 0;
 		virtual void SetDepthStencilState(std::shared_ptr<IDepthStencilState> rasterState) = 0;
 		virtual void SetBlendState(std::shared_ptr<IBlendState> rasterState) = 0;
-		virtual void SetViewPort(const Bound3f* viewPortBound) = 0;
 	};
 }

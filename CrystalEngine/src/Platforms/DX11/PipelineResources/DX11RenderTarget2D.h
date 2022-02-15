@@ -13,8 +13,11 @@ namespace crystal
 		~DX11RenderTarget2D() override;
 
 		virtual void GetShaderResourceHandle(void** pHandle) const override;
+		virtual Vector2i GetSize() const override;
 
-		void SetToCurrentContext(ID3D11DeviceContext* context);
+		void SetToCurrentContext(DX11GraphicsContext* context);
+		void SetViewportToCurrentContext(DX11GraphicsContext* context);
+
 		void ClearContent(ID3D11DeviceContext* context, ClearOptions options, 
 			const Color4f& color, float depth, int stencil);
 	private:

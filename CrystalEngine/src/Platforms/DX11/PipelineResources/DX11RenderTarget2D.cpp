@@ -1,5 +1,7 @@
 ﻿#include "DX11RenderTarget2D.h"
 #include "DX11Texture2D.h"
+
+#include "../DX11GraphicsContext.h"
 #include "../DX11GraphicsDevice.h"
 #include "../dxTrace.h"
 
@@ -83,6 +85,7 @@ namespace crystal
 
 			HR(device->CreateDepthStencilView(depthStencilTexture.Get(), &dsvDesc, m_pDepthStencilView.GetAddressOf()));
 		}
+		m_size = desc.Size;
 	}
 
 	DX11RenderTarget2D::DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11RenderTargetView> renderTargetView,
@@ -90,7 +93,9 @@ namespace crystal
 		: m_pGraphicsDevice(graphicsDevice), m_pRenderTargetView(renderTargetView),
 		m_pShaderResourceView(shaderResourceView), m_pDepthStencilView(depthStencilView),
 		m_viewport(viewPort)
-	{}
+	{
+		m_pRenderTargetView->
+	}
 
 
 	DX11RenderTarget2D::~DX11RenderTarget2D()
@@ -101,10 +106,19 @@ namespace crystal
 		*pHandle = m_pShaderResourceView.Get();
 	}
 
-	void DX11RenderTarget2D::SetToCurrentContext(ID3D11DeviceContext* context)
+	Vector2i DX11RenderTarget2D::GetSize() const
 	{
-		context->RSSetViewports(1, &m_viewport);
-		context->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
+		return Vector2i(m_viewport.Width, m_viewport.Height);
+	}
+
+	void DX11RenderTarget2D::SetToCurrentContext(DX11GraphicsContext* context)
+	{
+		context->GetD3DContext()->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
+	}
+
+	void DX11RenderTarget2D::SetViewportToCurrentContext(DX11GraphicsContext* context)
+	{
+		context->GetD3DContext()->RSSetViewports(1, &m_viewport);
 	}
 
 	void DX11RenderTarget2D::ClearContent(ID3D11DeviceContext* context, ClearOptions options, const Color4f& color, float depth, int stencil)

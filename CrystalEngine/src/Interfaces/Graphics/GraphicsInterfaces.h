@@ -14,7 +14,10 @@
 #include "PipelineResources/IVertexBuffer.h"
 #include "PipelineResources/IIndexBuffer.h"
 #include "PipelineResources/ISamplerState.h"
+
 #include "PipelineStates/IBlendState.h"
+#include "PipelineStates/IRasterState.h"
+#include "PipelineStates/IDepthStencilState.h"
 
 namespace crystal
 {

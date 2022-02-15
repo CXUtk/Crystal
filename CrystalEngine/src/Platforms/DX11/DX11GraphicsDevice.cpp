@@ -2,16 +2,20 @@
 #include "d3dUtils.h"
 #include "dxTrace.h"
 
+#include "DX11PipelineStateObject.h"
+#include "DX11PipelineResourceObject.h"
+
 #include "PipelineResources/DX11VertexBuffer.h"
 #include "PipelineResources/DX11IndexBuffer.h"
 #include "PipelineResources/DX11VertexShader.h"
 #include "PipelineResources/DX11FragmentShader.h"
 #include "PipelineResources/DX11ShaderProgram.h"
-#include "DX11PipelineStateObject.h"
 #include "PipelineResources/DX11Texture2D.h"
 #include "PipelineResources/DX11RenderTarget2D.h"
 #include "PipelineResources/DX11SamplerState.h"
 #include "PipelineStates/DX11BlendState.h"
+#include "PipelineStates/DX11RasterState.h"
+#include "PipelineStates/DX11DepthStencilState.h"
 #include "DX11GraphicsContext.h"
 
 #include <Core/InitArgs.h>
@@ -62,7 +66,12 @@ namespace crystal
 
 	std::shared_ptr<IPipelineStateObject> DX11GraphicsDevice::CreatePipelineStateObject()
 	{
-		return std::make_shared<DX11PipelineStateObject>(this);
+		return std::make_shared<DX11PipelineStateObject>(this, m_pGraphicsContext);
+	}
+
+	std::shared_ptr<IPipelineResourceObject> DX11GraphicsDevice::CreatePipelineResourceObject()
+	{
+		return std::make_shared<DX11PipelineResourceObject>(this, m_pGraphicsContext);
 	}
 
 	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
@@ -144,6 +153,21 @@ namespace crystal
 	std::shared_ptr<IRenderTarget2D> DX11GraphicsDevice::CreateRenderTarget2D(const RenderTarget2DDescription& desc)
 	{
 		return std::make_shared<DX11RenderTarget2D>(this, desc);	
+	}
+
+	std::shared_ptr<IRasterState> DX11GraphicsDevice::CreateRasterState(const RasterStateDescription& rasterDesc)
+	{
+		return std::make_shared<DX11RasterState>(this, rasterDesc);
+	}
+
+	std::shared_ptr<IBlendState> DX11GraphicsDevice::CreateBlendState(const BlendStateDescription& blendDesc)
+	{
+		return std::make_shared<DX11BlendState>(this, blendDesc);
+	}
+
+	std::shared_ptr<IDepthStencilState> DX11GraphicsDevice::CreateDepthStencilState(const DepthStencilStateDescription& DSSDesc)
+	{
+		return std::make_shared<DX11DepthStencilState>(this, DSSDesc);
 	}
 
 	bool DX11GraphicsDevice::m_InitD3DX11(const InitArgs& args)
@@ -263,7 +287,7 @@ namespace crystal
 		throw std::exception("Unknown Sampler State");
 	}
 
-	std::shared_ptr<IBlendState> DX11GraphicsDevice::GetCommonBlengState(BlendStates state)
+	std::shared_ptr<IBlendState> DX11GraphicsDevice::GetCommonBlendState(BlendStates state)
 	{
 		switch (state)
 		{

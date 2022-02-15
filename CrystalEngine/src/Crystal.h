@@ -2,6 +2,7 @@
 #include <memory>
 #include <set>
 #include <map>
+#include <exception>
 #include <glm/glm.hpp>
 
 namespace crystal

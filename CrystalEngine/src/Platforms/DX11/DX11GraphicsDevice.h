@@ -28,9 +28,14 @@ namespace crystal
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
+		virtual std::shared_ptr<IRasterState> CreateRasterState(const RasterStateDescription& rasterDesc) override;
+		virtual std::shared_ptr<IBlendState> CreateBlendState(const BlendStateDescription& blendDesc) override;
+		virtual std::shared_ptr<IDepthStencilState> CreateDepthStencilState(const DepthStencilStateDescription& DSSDesc) override;
+
 		virtual std::shared_ptr<IPipelineStateObject> CreatePipelineStateObject() override;
+		virtual std::shared_ptr<IPipelineResourceObject> CreatePipelineResourceObject() override;
 		virtual std::shared_ptr<ISamplerState> GetCommonSamplerState(SamplerStates state) override;
-		virtual std::shared_ptr<IBlendState> GetCommonBlengState(BlendStates state) override;
+		virtual std::shared_ptr<IBlendState> GetCommonBlendState(BlendStates state) override;
 	private:
 		std::shared_ptr<DX11GraphicsContext>	m_pGraphicsContext = nullptr;
 

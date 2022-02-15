@@ -38,6 +38,7 @@ namespace crystal
 	using Matrix2f = glm::mat2;
 	using Matrix3f = glm::mat3;
 	using Matrix4f = glm::mat4;
+	using Viewport = Bound3f;
 
 	template<typename T>
 	inline float* crystal_value_ptr(T x) { return glm::value_ptr(x); }
@@ -250,6 +251,33 @@ namespace crystal
 		__COUNT
 	};
 
+	enum class BlendFactors
+	{
+		Zero,
+		One,
+		SrcColor,
+		InvSrcColor,
+		SrcAlpha,
+		InvSrcAlpha,
+		DestColor,
+		InvDestColor,
+		DestAlpha,
+		InvDestAlpha,
+
+		__COUNT
+	};
+
+	enum class BlendOperations
+	{
+		Add,
+		Subtract,
+		RevSubtract,
+		Min,
+		Max,
+
+		__COUNT
+	};
+
 	enum ClearOptions : int
 	{
 		CRYSTAL_CLEAR_TARGET = 1 << 0,
@@ -350,6 +378,34 @@ namespace crystal
 		int					MipmapLevels;
 		RenderFormat		TargetFormat;
 		RenderTargetFlags	RTFlags;
+	};
+
+	struct RasterStateDescription
+	{
+		bool				EnableScissorTest;
+		bool				EnableAntialiasedLine;
+		CullingMode			CullMode;
+		FillMode			FillMode;
+		Bound2i				ScissorBound;
+		const Viewport*		Viewport;
+	};
+
+	struct DepthStencilStateDescription
+	{
+		bool		EnableDepthTest;
+		bool		EnableStencilTest;
+	};
+
+	struct BlendStateDescription
+	{
+		bool			EnableBlending;
+		BlendFactors	SrcBlend;
+		BlendFactors	DestBlend;
+		BlendOperations	BlendOp;
+		BlendFactors	SrcBlendAlpha;
+		BlendFactors	DestBlendAlpha;
+		BlendOperations BlendOpAlpha;
+		uint32_t		RenderTargetWriteMask;
 	};
 
 	struct VertexLayout

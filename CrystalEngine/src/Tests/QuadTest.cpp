@@ -8,12 +8,6 @@
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
 
-#ifdef CRYSTAL_USE_OPENGL
-#include <Platforms/OpenGL/OpenGLPlatform.h>
-#elif defined(CRYSTAL_USE_DX11)
-#include <Platforms/DX11/DX11Platform.h>
-#endif
-
 namespace crystal
 {
 	QuadTest::QuadTest()
@@ -43,7 +37,7 @@ namespace crystal
 		1, 2, 3
 	};
 
-	static std::shared_ptr<VertexBuffer> vertexBuffer;
+	static std::shared_ptr<IVertexBuffer> vertexBuffer;
 
 	void QuadTest::Initialize()
 	{

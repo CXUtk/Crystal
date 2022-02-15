@@ -8,5 +8,6 @@ namespace crystal
 	{
 	public:
 		virtual ~IRenderTarget2D() = 0 {};
+		virtual Vector2i GetSize() const = 0;
 	};
 }

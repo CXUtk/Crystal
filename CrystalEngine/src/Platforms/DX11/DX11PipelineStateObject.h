@@ -10,9 +10,8 @@ namespace crystal
 		~DX11PipelineStateObject() override;
 
 		virtual void SetRasterState(std::shared_ptr<IRasterState> rasterState) override;
-		virtual void SetDepthStencilState(std::shared_ptr<IDepthStencilState> rasterState) override;
-		virtual void SetBlendState(std::shared_ptr<IBlendState> rasterState) override;
-		virtual void SetViewPort(const Bound3f* viewPortBound) override;
+		virtual void SetDepthStencilState(std::shared_ptr<IDepthStencilState> depthStencilState) override;
+		virtual void SetBlendState(std::shared_ptr<IBlendState> blendState) override;
 
 		void Load();
 		void Unload();
@@ -21,8 +20,8 @@ namespace crystal
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
 		DX11GraphicsContext*			m_pGraphicsContext = nullptr;
 
-		std::shared_ptr<IRasterState>		m_currentRasterizerState = nullptr;
-		std::shared_ptr<IBlendState>		m_currentBlendState = nullptr;
-		std::shared_ptr<IDepthStencilState>	m_currentDepthStencilState = nullptr;
+		std::shared_ptr<DX11RasterState>		m_pRasterizerState = nullptr;
+		std::shared_ptr<DX11BlendState>			m_pBlendState = nullptr;
+		std::shared_ptr<DX11DepthStencilState>	m_pDepthStencilState = nullptr;
 	};
 }
