@@ -29,13 +29,13 @@ namespace crystal
 
 	struct RenderState
 	{
-		SpriteSortMode								m_spriteSortMode = SpriteSortMode::Deferred;
-		Matrix4f									m_renderMatrix{};
-		std::shared_ptr<IShaderProgram>				m_pShaderProgram = nullptr;
-		std::shared_ptr<IRasterState>				m_pRasterState = nullptr;
-		std::shared_ptr<IBlendState>				m_pBlendState = nullptr;
-		std::shared_ptr<IDepthStencilState>			m_pDepthStencilState = nullptr;
-		std::shared_ptr<ISamplerState>				m_pSamplerState = nullptr;
+		SpriteSortMode							m_spriteSortMode = SpriteSortMode::Deferred;
+		Matrix4f								m_renderMatrix{};
+		std::shared_ptr<IShaderProgram>			m_pShaderProgram = nullptr;
+		std::shared_ptr<IRasterState>			m_pRasterState = nullptr;
+		std::shared_ptr<IBlendState>			m_pBlendState = nullptr;
+		std::shared_ptr<IDepthStencilState>		m_pDepthStencilState = nullptr;
+		std::shared_ptr<ISamplerState>			m_pSamplerState = nullptr;
 	};
 
 	class SpriteBatch::Impl
@@ -241,7 +241,7 @@ namespace crystal
 		}
 		m_currentRenderState.m_pRasterState =rasterState ? rasterState : m_defaultRenderState.m_pRasterState;
 		m_currentRenderState.m_pBlendState =  blendState ? blendState : m_defaultRenderState.m_pBlendState;
-		m_currentRenderState.m_pDepthStencilState = depthStencilState ? depthStencilState : m_currentRenderState.m_pDepthStencilState;
+		m_currentRenderState.m_pDepthStencilState = depthStencilState ? depthStencilState : m_defaultRenderState.m_pDepthStencilState;
 		m_currentRenderState.m_pShaderProgram = shader ? shader : m_defaultRenderState.m_pShaderProgram;
 		m_currentRenderState.m_pSamplerState = samplerState ? samplerState : m_defaultRenderState.m_pSamplerState;
 		m_currentRenderState.m_spriteSortMode = spriteSortMode;
