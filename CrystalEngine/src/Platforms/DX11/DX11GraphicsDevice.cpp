@@ -32,15 +32,15 @@ namespace crystal
 	public:
 		CommonStates(DX11GraphicsDevice* graphicsDevice);
 
-		std::shared_ptr<DX11SamplerState> PointClamp = nullptr;
-		std::shared_ptr<DX11SamplerState> PointWarp = nullptr;
-		std::shared_ptr<DX11SamplerState> LinearClamp = nullptr;
-		std::shared_ptr<DX11SamplerState> LinearWarp = nullptr;
+		std::shared_ptr<ISamplerState> PointClamp = nullptr;
+		std::shared_ptr<ISamplerState> PointWarp = nullptr;
+		std::shared_ptr<ISamplerState> LinearClamp = nullptr;
+		std::shared_ptr<ISamplerState> LinearWarp = nullptr;
 
 
-		std::shared_ptr<DX11BlendState>		Blend_Opaque = nullptr;
-		std::shared_ptr<DX11BlendState>		Blend_Alpha = nullptr;
-		std::shared_ptr<DX11BlendState>		Blend_Additive = nullptr;
+		std::shared_ptr<IBlendState>		Blend_Opaque = nullptr;
+		std::shared_ptr<IBlendState>		Blend_Alpha = nullptr;
+		std::shared_ptr<IBlendState>		Blend_Additive = nullptr;
 
 	private:
 		DX11GraphicsDevice*		m_pGraphicsDevice;
@@ -66,12 +66,12 @@ namespace crystal
 
 	std::shared_ptr<IPipelineStateObject> DX11GraphicsDevice::CreatePipelineStateObject()
 	{
-		return std::make_shared<DX11PipelineStateObject>(this, m_pGraphicsContext);
+		return std::make_shared<DX11PipelineStateObject>(this, ptr(m_pGraphicsContext));
 	}
 
 	std::shared_ptr<IPipelineResourceObject> DX11GraphicsDevice::CreatePipelineResourceObject()
 	{
-		return std::make_shared<DX11PipelineResourceObject>(this, m_pGraphicsContext);
+		return std::make_shared<DX11PipelineResourceObject>(this, ptr(m_pGraphicsContext));
 	}
 
 	std::shared_ptr<IVertexBuffer> DX11GraphicsDevice:: CreateVertexBuffer(const VertexBufferDescription& desc, void* src, size_t size)
@@ -355,36 +355,25 @@ namespace crystal
 		LinearClamp = std::make_shared<DX11SamplerState>(graphicsDevice, linearClamp);
 
 
-		ComPtr<ID3D11BlendState> blendOpaque;
-		ComPtr<ID3D11BlendState> blendAlpha;
-		ComPtr<ID3D11BlendState> blendAdditive;
-
 		// Opaque, no blending
-		D3D11_BLEND_DESC blendDesc = {};
-		blendDesc.AlphaToCoverageEnable = false;
-		blendDesc.IndependentBlendEnable = false;
-		blendDesc.RenderTarget[0].BlendEnable = false;
-		HR(device->CreateBlendState(&blendDesc, blendOpaque.GetAddressOf()));
-		d3dUtils::D3D11SetDebugObjectName(blendOpaque.Get(), "Blend Opaque");
-		Blend_Opaque = std::make_shared<DX11BlendState>(this, blendOpaque);
+		BlendStateDescription blendDesc = {};
+		blendDesc.EnableBlending = true;
+		blendDesc.SrcBlend = BlendFactors::One;
+		blendDesc.DestBlend = BlendFactors::Zero;
+		blendDesc.BlendOp = BlendOperations::Add;
+		blendDesc.SrcBlendAlpha = BlendFactors::One;
+		blendDesc.DestBlendAlpha = BlendFactors::Zero;
+		blendDesc.RenderTargetWriteMask = 0xF;
+		Blend_Opaque = m_pGraphicsDevice->CreateBlendState(blendDesc);
 
 		// Alpha Blending	src * alpha_s + dest * (1 - alpha_s)
-		blendDesc.RenderTarget[0].BlendEnable = true;
-		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		HR(device->CreateBlendState(&blendDesc, blendAlpha.GetAddressOf()));
-		d3dUtils::D3D11SetDebugObjectName(blendAlpha.Get(), "Blend Alpha");
-		Blend_Alpha = std::make_shared<DX11BlendState>(this, blendAlpha);
+		blendDesc.SrcBlend = BlendFactors::SrcAlpha;
+		blendDesc.DestBlend = BlendFactors::InvSrcAlpha;
+		Blend_Alpha = m_pGraphicsDevice->CreateBlendState(blendDesc);
 
 		// Additive Blending  src + dest
-		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-		HR(device->CreateBlendState(&blendDesc, blendAdditive.GetAddressOf()));
-		d3dUtils::D3D11SetDebugObjectName(blendAdditive.Get(), "Blend Additive");
-		Blend_Additive = std::make_shared<DX11BlendState>(this, blendAdditive);
+		blendDesc.SrcBlend = BlendFactors::One;
+		blendDesc.DestBlend = BlendFactors::One;
+		Blend_Additive = m_pGraphicsDevice->CreateBlendState(blendDesc);
 	}
 }

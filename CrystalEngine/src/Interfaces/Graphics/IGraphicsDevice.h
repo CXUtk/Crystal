@@ -25,8 +25,8 @@ namespace crystal
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;
 		virtual std::shared_ptr<IRasterState> CreateRasterState(const RasterStateDescription& rasterDesc) = 0;
-		virtual std::shared_ptr<IBlendState> CreateBlendState(const BlendStateDescription& rasterDesc) = 0;
-		virtual std::shared_ptr<IDepthStencilState> CreateDepthStencilState(const DepthStencilStateDescription& rasterDesc) = 0;
+		virtual std::shared_ptr<IBlendState> CreateBlendState(const BlendStateDescription& blendDesc) = 0;
+		virtual std::shared_ptr<IDepthStencilState> CreateDepthStencilState(const DepthStencilStateDescription& DSSDesc) = 0;
 
 		virtual std::shared_ptr<IPipelineStateObject> CreatePipelineStateObject() = 0;
 		virtual std::shared_ptr<IPipelineResourceObject> CreatePipelineResourceObject() = 0;

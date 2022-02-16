@@ -28,7 +28,7 @@ namespace crystal
 		std::shared_ptr<DX11IndexBuffer>		m_pIndexBuffer = nullptr;
 		std::shared_ptr<DX11ShaderProgram>		m_pShaderProgram = nullptr;
 
-		std::shared_ptr<IShaderResource>		m_SRVSlots[MAX_SHADER_RESOURCES_SLOTS];
-		std::shared_ptr<DX11SamplerState>		m_SamplerSlots[MAX_SHADER_RESOURCES_SLOTS];
+		std::shared_ptr<IShaderResource>		m_SRVSlots[MAX_SHADER_RESOURCES_SLOTS]{};
+		std::shared_ptr<DX11SamplerState>		m_SamplerSlots[MAX_SHADER_RESOURCES_SLOTS]{};
 	};
 }

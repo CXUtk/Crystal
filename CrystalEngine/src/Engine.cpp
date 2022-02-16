@@ -24,7 +24,7 @@ namespace crystal
         GraphicsCommons::InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(args);
 
-        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice());
+        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice(), GetGraphicsContext());
     }
     
     Engine::~Engine()
@@ -48,6 +48,11 @@ namespace crystal
     IGraphicsDevice* Engine::GetGraphicsDevice() const
     {
         return m_platformProvider->GetGraphicsDevice();
+    }
+
+    IGraphicsContext* Engine::GetGraphicsContext() const
+    {
+        return GetGraphicsDevice()->GetContext().get();
     }
 
     SpriteBatch* Engine::GetSpriteBatch() const

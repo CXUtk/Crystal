@@ -84,17 +84,21 @@ namespace crystal
 
 	void DX11PipelineStateObject::SetDepthStencilState(std::shared_ptr<IDepthStencilState> depthStencilState)
 	{
-		m_pRasterizerState = std::dynamic_pointer_cast<DX11DepthStencilState>(depthStencilState);
+		m_pDepthStencilState = std::dynamic_pointer_cast<DX11DepthStencilState>(depthStencilState);
 	}
 
 	void DX11PipelineStateObject::SetBlendState(std::shared_ptr<IBlendState> blendState)
 	{
-		m_pRasterizerState = std::dynamic_pointer_cast<DX11BlendState>(blendState);
+		m_pBlendState = std::dynamic_pointer_cast<DX11BlendState>(blendState);
 	}
 
 	void DX11PipelineStateObject::Load()
 	{
 		auto context = m_pGraphicsContext->GetD3DContext();
+		if (!m_pRasterizerState || !m_pDepthStencilState || !m_pBlendState)
+		{
+			throw std::logic_error("Pipeline states are not specified");
+		}
 		m_pRasterizerState->Load(m_pGraphicsContext);
 		m_pDepthStencilState->Load(m_pGraphicsContext);
 		m_pBlendState->Load(m_pGraphicsContext);

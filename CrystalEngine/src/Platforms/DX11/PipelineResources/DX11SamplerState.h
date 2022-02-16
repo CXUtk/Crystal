@@ -9,9 +9,9 @@ namespace crystal
 		DX11SamplerState(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11SamplerState> samplerState);
 		~DX11SamplerState();
 
-		ComPtr<ID3D11SamplerState> GetDX11SamplerState() const { return m_samplerState.Get(); }
+		ID3D11SamplerState* GetDX11SamplerState() const { return m_pSamplerState.Get(); }
 	private:
 		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
-		ComPtr<ID3D11SamplerState>		m_samplerState = nullptr;
+		ComPtr<ID3D11SamplerState>		m_pSamplerState = nullptr;
 	};
 }

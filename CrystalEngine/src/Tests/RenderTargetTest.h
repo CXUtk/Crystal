@@ -23,12 +23,14 @@ namespace crystal
 
 	private:
 		bool m_renderPause = false;
-		std::shared_ptr<crystal::ShaderProgram> m_pShader = nullptr;
-		std::shared_ptr<crystal::ShaderProgram> m_pScreenShader = nullptr;
+		std::shared_ptr<IShaderProgram> m_pShader = nullptr;
+		std::shared_ptr<IShaderProgram> m_pScreenShader = nullptr;
 		std::shared_ptr<Camera> m_pCamera = nullptr;
-		std::shared_ptr<crystal::PipelineStateObject> m_PSO = nullptr;
-		std::shared_ptr<crystal::PipelineStateObject> m_PSOScreen = nullptr;
-		std::shared_ptr<crystal::Texture2D> m_texture2D = nullptr;
-		std::shared_ptr<crystal::RenderTarget2D> m_renderTarget2D = nullptr;
+		std::shared_ptr<IPipelineStateObject> m_PSO = nullptr;
+		std::shared_ptr<IPipelineStateObject> m_PSOScreen = nullptr;
+		std::shared_ptr<IPipelineResourceObject> m_PRO = nullptr;
+		std::shared_ptr<IPipelineResourceObject> m_PROScreen = nullptr;
+		std::shared_ptr<ITexture2D> m_texture2D = nullptr;
+		std::shared_ptr<IRenderTarget2D> m_renderTarget2D = nullptr;
 	};
 }

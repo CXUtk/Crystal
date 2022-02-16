@@ -39,6 +39,8 @@ namespace crystal
 
 		IGraphicsDevice* GetGraphicsDevice() const;
 
+		IGraphicsContext* GetGraphicsContext() const;
+
 		SpriteBatch* GetSpriteBatch() const;
 
 		/**

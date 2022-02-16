@@ -65,11 +65,17 @@ namespace crystal
 		ID3D11SamplerState* samplers[MAX_SHADER_RESOURCES_SLOTS] = {};
 		for (int i = 0; i < MAX_SHADER_RESOURCES_SLOTS; i++)
 		{
-			m_SRVSlots[i]->GetShaderResourceHandle((void**)&SRVs[i]);
+			if (m_SRVSlots[i])
+			{
+				m_SRVSlots[i]->GetShaderResourceHandle((void**)&SRVs[i]);
+			}
 		}
 		for (int i = 0; i < MAX_SHADER_RESOURCES_SLOTS; i++)
 		{
-			samplers[i] = m_SamplerSlots[i]->GetDX11SamplerState().Get();
+			if (m_SamplerSlots[i])
+			{
+				samplers[i] = m_SamplerSlots[i]->GetDX11SamplerState();
+			}
 		}
 
 		if (shaderMask & ShaderMask::CRYSTAL_SHADERMASK_VERTEX_SHADER)
@@ -85,5 +91,21 @@ namespace crystal
 	}
 
 	void DX11PipelineResourceObject::Unload()
-	{}
+	{
+		auto context = m_pGraphicsContext->GetD3DContext();
+		auto shaderMask = m_pShaderProgram->GetShaderMask();
+
+		ID3D11ShaderResourceView* nullView = nullptr;
+		ID3D11SamplerState* nullSampler = nullptr;
+		if (shaderMask & ShaderMask::CRYSTAL_SHADERMASK_VERTEX_SHADER)
+		{
+			context->VSSetShaderResources(0, 1, &nullView);
+			context->VSSetSamplers(0, 1, &nullSampler);
+		}
+		if (shaderMask & ShaderMask::CRYSTAL_SHADERMASK_FRAGMENT_SHADER)
+		{
+			context->PSSetShaderResources(0, 1, &nullView);
+			context->PSSetSamplers(0, 1, &nullSampler);
+		}
+	}
 }

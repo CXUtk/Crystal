@@ -1,6 +1,6 @@
 #include "OrbitControllerTest.h"
 #include <Engine.h>
-#include <Core/Platform/Platforms.h>
+#include <Interfaces/Interfaces.h>
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
@@ -8,12 +8,6 @@
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
-
-#ifdef CRYSTAL_USE_OPENGL
-#include <Platforms/OpenGL/OpenGLPlatform.h>
-#elif defined(CRYSTAL_USE_DX11)
-#include <Platforms/DX11/DX11Platform.h>
-#endif
 
 namespace crystal
 {
@@ -63,6 +57,7 @@ namespace crystal
 		ibufferDesc.Format = DataFormat::UInt32;
 
 		m_PSO = graphicsDevice->CreatePipelineStateObject();
+		m_PRO = graphicsDevice->CreatePipelineResourceObject();
 		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, 
 			loader.Vertices.data(), sizeof(objloader::VertexData) * loader.Vertices.size());
 		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
@@ -79,12 +74,23 @@ namespace crystal
 		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
 
 		vertexBuffer->BindVertexLayout(vLayout);
-		m_PSO->BindVertexBuffer(vertexBuffer);
-		m_PSO->SetCullMode(CullingMode::CullCCW);
-		m_PSO->SetFillMode(FillMode::SOLID);
-		m_PSO->SetDepthTestState(true);
-		m_PSO->BindShaderResource(m_texture2D, 0);
-		m_PSO->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
+		m_PRO->SetVertexBuffer(vertexBuffer);
+		m_PRO->SetShaderProgram(m_pShader);
+		m_PRO->SetShaderResource(m_texture2D, 0);
+		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
+		//indexBuffer->Bind(0);
+
+		m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
+		DepthStencilStateDescription DSSDesc = {};
+		DSSDesc.EnableDepthTest = true;
+		DSSDesc.EnableStencilTest = false;
+		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilState(DSSDesc));
+
+		RasterStateDescription RSDesc = {};
+		RSDesc.CullMode = CullingMode::None;
+		RSDesc.FillMode = FillMode::SOLID;
+		RSDesc.Viewport = nullptr;
+		m_PSO->SetRasterState(graphicsDevice->CreateRasterState(RSDesc));
 		//indexBuffer->Bind(0);
 	}
 
@@ -145,8 +151,8 @@ namespace crystal
 	void OrbitControllerTest::Draw(const crystal::GameTimer& gameTimer)
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
-		auto graphicsDevice = m_engine->GetGraphicsDevice();
-		graphicsDevice->Clear(
+		auto graphicsContext = m_engine->GetGraphicsContext();
+		graphicsContext->Clear(
 			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET 
 			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
@@ -158,13 +164,16 @@ namespace crystal
 		auto P = m_pCamera->GetProjectionMatrix();
 		auto V = m_pCamera->GetViewMatrix();
 		m_pShader->SetUniformMat4f("VP", P * V);
-		m_pShader->Apply();
 		
-		graphicsDevice->PushPipelineStateObject(m_PSO);
+		graphicsContext->BeginPipeline(m_PSO);
 		{
-			graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+			graphicsContext->LoadPipelineResources(m_PRO);
+			{
+				graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+			}
+			graphicsContext->UnloadPipelineResources();
 		}
-		graphicsDevice->PopPipelineStateObject();
+		graphicsContext->EndPipeline();
 	}
 
 	void OrbitControllerTest::Exit()

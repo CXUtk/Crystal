@@ -1,6 +1,6 @@
 #include "RenderTargetTest.h"
 #include <Engine.h>
-#include <Core/Platform/Platforms.h>
+#include <Interfaces/Interfaces.h>
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
@@ -8,12 +8,6 @@
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
-
-#ifdef CRYSTAL_USE_OPENGL
-#include <Platforms/OpenGL/OpenGLPlatform.h>
-#elif defined(CRYSTAL_USE_DX11)
-#include <Platforms/DX11/DX11Platform.h>
-#endif
 
 namespace crystal
 {
@@ -72,6 +66,8 @@ namespace crystal
 
 		m_PSO = graphicsDevice->CreatePipelineStateObject();
 		m_PSOScreen = graphicsDevice->CreatePipelineStateObject();
+		m_PRO = graphicsDevice->CreatePipelineResourceObject();
+		m_PROScreen = graphicsDevice->CreatePipelineResourceObject();
 		auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc,
 			loader.Vertices.data(), sizeof(objloader::VertexData) * loader.Vertices.size());
 		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
@@ -114,33 +110,54 @@ namespace crystal
 		IndexBufferDescription indexDesc1;
 		indexDesc1.Format = DataFormat::UInt32;
 		indexDesc1.Usage = BufferUsage::Immutable;
-		auto indexBuffer1 = graphicsDevice->CreateIndexBuffer(indexDesc1, indices, sizeof(indices));
-		auto vertexBuffer1 = graphicsDevice->CreateVertexBuffer(bufferDesc1, vertices, sizeof(vertices));
-		vertexBuffer1->BindVertexLayout(vLayout1);
+		auto indexBufferScreen = graphicsDevice->CreateIndexBuffer(indexDesc1, indices, sizeof(indices));
+		auto vertexBufferScreen = graphicsDevice->CreateVertexBuffer(bufferDesc1, vertices, sizeof(vertices));
+		vertexBufferScreen->BindVertexLayout(vLayout1);
 
 
 		RenderTarget2DDescription renderTargetDesc;
 		renderTargetDesc.TargetFormat = RenderFormat::RGBA8ub;
-		renderTargetDesc.RTFlags = RenderTargetFlags::CRYSTAL_TEXTURE_TARGET;
+		renderTargetDesc.RTFlags = RenderTargetFlags::CRYSTAL_TEXTURE_TARGET | RenderTargetFlags::CRYSTAL_DEPTH_TARGET;
 		renderTargetDesc.Size = windowSize;
 		renderTargetDesc.MipmapLevels = 1;
 
 		m_renderTarget2D = graphicsDevice->CreateRenderTarget2D(renderTargetDesc);
 
 
-		m_PSO->BindVertexBuffer(vertexBuffer);
-		m_PSO->SetCullMode(CullingMode::CullCCW);
-		m_PSO->SetFillMode(FillMode::SOLID);
-		m_PSO->SetDepthTestState(true);
-		m_PSO->BindShaderResource(m_texture2D, 0);
-		m_PSO->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
+		m_PRO->SetVertexBuffer(vertexBuffer);
+		m_PRO->SetShaderProgram(m_pShader);
+		m_PRO->SetShaderResource(m_texture2D, 0);
+		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
+
+
+		m_PROScreen->SetVertexBuffer(vertexBufferScreen);
+		m_PROScreen->SetIndexBuffer(indexBufferScreen);
+		m_PROScreen->SetShaderProgram(m_pScreenShader);
+		m_PROScreen->SetShaderResource(m_renderTarget2D, 0);
+		m_PROScreen->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
 		//indexBuffer->Bind(0);
 
 
-		m_PSOScreen->BindVertexBuffer(vertexBuffer1);
-		m_PSOScreen->BindIndexBuffer(indexBuffer1);
-		m_PSOScreen->BindShaderResource(m_renderTarget2D, 0);
-		m_PSOScreen->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
+		DepthStencilStateDescription DSSDesc = {};
+		DSSDesc.EnableDepthTest = true;
+		DSSDesc.EnableStencilTest = false;
+		auto defaultDepth = graphicsDevice->CreateDepthStencilState(DSSDesc);
+		DSSDesc.EnableDepthTest = false;
+		auto noDepth = graphicsDevice->CreateDepthStencilState(DSSDesc);
+
+
+		RasterStateDescription RSDesc = {};
+		RSDesc.CullMode = CullingMode::None;
+		RSDesc.FillMode = FillMode::SOLID;
+		RSDesc.Viewport = nullptr;
+		auto defaultRaster = graphicsDevice->CreateRasterState(RSDesc);
+		m_PSO->SetRasterState(defaultRaster);
+		m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
+		m_PSO->SetDepthStencilState(defaultDepth);
+
+		m_PSOScreen->SetRasterState(defaultRaster);
+		m_PSOScreen->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
+		m_PSOScreen->SetDepthStencilState(noDepth);
 	}
 
 
@@ -188,11 +205,11 @@ namespace crystal
 	void RenderTargetTest::Draw(const crystal::GameTimer& gameTimer)
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
-		auto graphicsDevice = m_engine->GetGraphicsDevice();
+		auto graphicsContext = m_engine->GetGraphicsContext();
 
-		graphicsDevice->PushRenderTarget2D(m_renderTarget2D);
+		graphicsContext->PushRenderTarget2D(m_renderTarget2D);
 		{
-			graphicsDevice->Clear(
+			graphicsContext->Clear(
 				crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
 				| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
 				| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
@@ -204,29 +221,35 @@ namespace crystal
 			auto P = m_pCamera->GetProjectionMatrix();
 			auto V = m_pCamera->GetViewMatrix();
 			m_pShader->SetUniformMat4f("VP", P * V);
-			m_pShader->Apply();
 
 			//graphicsDevice->SetPipelineStateObject(m_PSO);
-			graphicsDevice->PushPipelineStateObject(m_PSO);
+			graphicsContext->BeginPipeline(m_PSO);
 			{
-				graphicsDevice->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+				graphicsContext->LoadPipelineResources(m_PRO);
+				{
+					graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+				}
+				graphicsContext->UnloadPipelineResources();
 			}
-			graphicsDevice->PopPipelineStateObject();
+			graphicsContext->EndPipeline();
 		}
-		graphicsDevice->PopRenderTarget2D();
+		graphicsContext->PopRenderTarget2D();
 
-		graphicsDevice->Clear(
+		graphicsContext->Clear(
 			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
 			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 		//graphicsDevice->SetPipelineStateObject(m_PSOScreen);
-		graphicsDevice->PushPipelineStateObject(m_PSOScreen);
+		graphicsContext->BeginPipeline(m_PSOScreen);
 		{
-			m_pScreenShader->Apply();
-			graphicsDevice->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+			graphicsContext->LoadPipelineResources(m_PROScreen);
+			{
+				graphicsContext->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+			}
+			graphicsContext->UnloadPipelineResources();
 		}
-		graphicsDevice->PopPipelineStateObject();
+		graphicsContext->EndPipeline();
 	}
 
 	void RenderTargetTest::Exit()

@@ -74,7 +74,8 @@ return vout;\
 
 	void DX11VertexBuffer::ChangeBufferContent(const void* src, size_t size, size_t offset)
 	{
-		auto deviceContext = std::dynamic_pointer_cast<DX11GraphicsContext>(m_pGraphicsDevice->GetContext())->GetD3DDevice();
+		// TODO: change it to member?
+		auto deviceContext = std::dynamic_pointer_cast<DX11GraphicsContext>(m_pGraphicsDevice->GetContext())->GetD3DContext();
 		D3D11_MAPPED_SUBRESOURCE mapRes;
 		deviceContext->Map(m_pBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapRes);
 		size_t destSize = mapRes.RowPitch - offset;

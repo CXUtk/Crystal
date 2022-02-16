@@ -3,7 +3,7 @@
 
 namespace crystal
 {
-	class DX11RenderTarget2D : public IRenderTarget2D, public IShaderResource
+	class DX11RenderTarget2D : public IRenderTarget2D
 	{
 	public:
 		DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice, const RenderTarget2DDescription& desc);

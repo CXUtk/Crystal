@@ -135,7 +135,7 @@ namespace crystal
 		d3dUtils::D3D11SetDebugObjectName(renderTargetView.Get(), "BackBufferRTV[0]");
 
 		m_renderTargets[0].reset();
-		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(dx11GraphicsDevice, renderTargetView,
+		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(m_pGraphicsDevice, renderTargetView,
 			nullptr, depthStencilView, screenViewport);
 	}
 

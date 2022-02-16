@@ -85,7 +85,6 @@ namespace crystal
 
 			HR(device->CreateDepthStencilView(depthStencilTexture.Get(), &dsvDesc, m_pDepthStencilView.GetAddressOf()));
 		}
-		m_size = desc.Size;
 	}
 
 	DX11RenderTarget2D::DX11RenderTarget2D(DX11GraphicsDevice* graphicsDevice, ComPtr<ID3D11RenderTargetView> renderTargetView,
@@ -94,7 +93,6 @@ namespace crystal
 		m_pShaderResourceView(shaderResourceView), m_pDepthStencilView(depthStencilView),
 		m_viewport(viewPort)
 	{
-		m_pRenderTargetView->
 	}
 
 
@@ -137,7 +135,7 @@ namespace crystal
 		{
 			clearDepthStencilFlags |= D3D11_CLEAR_FLAG::D3D11_CLEAR_STENCIL;
 		}
-		if (clearDepthStencilFlags)
+		if (clearDepthStencilFlags && m_pDepthStencilView != nullptr)
 		{
 			context->ClearDepthStencilView(m_pDepthStencilView.Get(),
 				clearDepthStencilFlags, depth, stencil);

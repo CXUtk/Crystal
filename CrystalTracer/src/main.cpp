@@ -11,7 +11,7 @@ int main()
 	Engine* engine = Engine::GetInstance();
 	try
 	{
-		engine->Start(std::make_unique<QuadTest>());
+		engine->Start(std::make_unique<RenderTargetTest>());
 	}
 	catch (std::exception ex)
 	{

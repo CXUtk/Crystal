@@ -6,7 +6,7 @@ cmake_minimum_required (VERSION 3.8)
 file(GLOB CrystalEngineSources_Extra "src/*.cpp")
 set(CrystalEngineSources_PlatformFactory "src/Platforms/PlatformFactory.cpp" "src/Platforms/PlatformFactory.h")
 file(GLOB_RECURSE CrystalEngineSources_Core "src/Core/*.cpp")
-file(GLOB_RECURSE CrystalEngineHeaders_Core "src/Core/*.h")
+file(GLOB_RECURSE CrystalEngineInterfaces_Core "src/Interfaces/*.cpp")
 file(GLOB_RECURSE CrystalEngineTests "src/Tests/*.cpp")
 
 if (CRYSTAL_USE_OPENGL MATCHES ON AND CRYSTAL_USE_DX11 MATCHES ON)
@@ -29,7 +29,7 @@ endif()
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
 ${CrystalEngineSources_Core}
-${CrystalEngineHeaders_Core}
+${CrystalEngineInterfaces_Core}
 ${CrystalEngineSources_Platform}
 ${CrystalEngineSources_PlatformFactory}
 ${CrystalEngineTests})
