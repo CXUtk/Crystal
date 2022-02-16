@@ -42,6 +42,11 @@ namespace crystal
 		std::shared_ptr<IBlendState>		Blend_Alpha = nullptr;
 		std::shared_ptr<IBlendState>		Blend_Additive = nullptr;
 
+		std::shared_ptr<IDepthStencilState>	NoDepthTest = nullptr;
+		std::shared_ptr<IDepthStencilState>	DefaultDepthTest = nullptr;
+		
+		std::shared_ptr<IRasterState>		Raster_CullNone = nullptr;
+
 	private:
 		DX11GraphicsDevice*		m_pGraphicsDevice;
 	};
@@ -265,22 +270,18 @@ namespace crystal
 		{
 			return m_commonStates->PointClamp;
 		}
-		break;
 		case crystal::SamplerStates::PointWarp:
 		{
 			return m_commonStates->PointWarp;
 		}
-		break;
 		case crystal::SamplerStates::LinearClamp:
 		{
 			return m_commonStates->LinearClamp;
 		}
-		break;
 		case crystal::SamplerStates::LinearWarp:
 		{
 			return m_commonStates->LinearWarp;
 		}
-		break;
 		default:
 			break;
 		}
@@ -295,21 +296,50 @@ namespace crystal
 		{
 			return m_commonStates->Blend_Opaque;
 		}
-		break;
 		case crystal::BlendStates::AlphaBlend:
 		{
 			return m_commonStates->Blend_Alpha;
 		}
-		break;
 		case crystal::BlendStates::Additive:
 		{
 			return m_commonStates->Blend_Additive;
 		}
-		break;
 		default:
 			break;
 		}
 		throw std::exception("Unknown Blend State");
+	}
+
+	std::shared_ptr<IDepthStencilState> DX11GraphicsDevice::GetCommonDepthStencilState(DepthStencilStates state)
+	{
+		switch (state)
+		{
+		case crystal::DepthStencilStates::NoDepthTest:
+		{
+			return m_commonStates->NoDepthTest;
+		}
+		case crystal::DepthStencilStates::DefaultDepthTest:
+		{
+			return m_commonStates->DefaultDepthTest;
+		}
+		default:
+			break;
+		}
+		throw std::exception("Unknown Depth Stencil State");
+	}
+
+	std::shared_ptr<IRasterState> DX11GraphicsDevice::GetCommonRasterState(RasterStates state)
+	{
+		switch (state)
+		{
+		case crystal::RasterStates::CullNone:
+		{
+			return m_commonStates->Raster_CullNone;
+		}
+		default:
+			break;
+		}
+		throw std::exception("Unknown Raster State");
 	}
 
 
@@ -375,5 +405,27 @@ namespace crystal
 		blendDesc.SrcBlend = BlendFactors::One;
 		blendDesc.DestBlend = BlendFactors::One;
 		Blend_Additive = m_pGraphicsDevice->CreateBlendState(blendDesc);
+
+
+		DepthStencilStateDescription DSDesc = {};
+		DSDesc.EnableDepthTest = false;
+		DSDesc.EnableStencilTest = false;
+		NoDepthTest = m_pGraphicsDevice->CreateDepthStencilState(DSDesc);
+
+		DSDesc.EnableDepthTest = true;
+		DSDesc.EnableDepthWrite = true;
+		DSDesc.DepthFunction = ComparisonFunction::Less;
+		DSDesc.StencilReadMask = 0xFF;
+		DSDesc.StencilWriteMask = 0xFF;
+		DefaultDepthTest = m_pGraphicsDevice->CreateDepthStencilState(DSDesc);
+
+
+		RasterStateDescription rasterDesc = {};
+		rasterDesc.CullMode = CullingMode::None;
+		rasterDesc.FillMode = FillMode::SOLID;
+		rasterDesc.EnableScissorTest = false;
+		rasterDesc.EnableAntialiasedLine = false;
+		rasterDesc.Viewport = nullptr;
+		Raster_CullNone = m_pGraphicsDevice->CreateRasterState(rasterDesc);
 	}
 }

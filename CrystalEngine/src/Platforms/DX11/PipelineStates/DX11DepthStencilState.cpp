@@ -11,24 +11,24 @@ namespace crystal
 	{
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 		depthStencilDesc.DepthEnable = DSDesc.EnableDepthTest;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = DX11Common::ComparisonFunctionConvert(DSDesc.DepthFunction);
+		depthStencilDesc.DepthWriteMask = DSDesc.EnableDepthWrite ? D3D11_DEPTH_WRITE_MASK_ALL: D3D11_DEPTH_WRITE_MASK_ZERO;
 
 		depthStencilDesc.StencilEnable = DSDesc.EnableStencilTest;
-		depthStencilDesc.StencilReadMask = 0xFF;
-		depthStencilDesc.StencilWriteMask = 0xFF;
+		depthStencilDesc.StencilReadMask = DSDesc.StencilReadMask;
+		depthStencilDesc.StencilWriteMask = DSDesc.StencilWriteMask;
 
 		// Stencil operations if pixel is front-facing
-		depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-		depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		depthStencilDesc.FrontFace.StencilFailOp = DX11Common::StencilOperationConvert(DSDesc.StencilFailedOp);
+		depthStencilDesc.FrontFace.StencilDepthFailOp = DX11Common::StencilOperationConvert(DSDesc.DepthFailedOp);
+		depthStencilDesc.FrontFace.StencilPassOp = DX11Common::StencilOperationConvert(DSDesc.StencilPassedOp);
+		depthStencilDesc.FrontFace.StencilFunc = DX11Common::ComparisonFunctionConvert(DSDesc.StencilFunction);
 
 		// Stencil operations if pixel is back-facing
-		depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-		depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		depthStencilDesc.BackFace.StencilFailOp = DX11Common::StencilOperationConvert(DSDesc.StencilFailedOp);
+		depthStencilDesc.BackFace.StencilDepthFailOp = DX11Common::StencilOperationConvert(DSDesc.DepthFailedOp);
+		depthStencilDesc.BackFace.StencilPassOp = DX11Common::StencilOperationConvert(DSDesc.StencilPassedOp);
+		depthStencilDesc.BackFace.StencilFunc = DX11Common::ComparisonFunctionConvert(DSDesc.StencilFunction);
 
 
 		HR(m_pGraphicsDevice->GetD3DDevice()->CreateDepthStencilState(&depthStencilDesc,

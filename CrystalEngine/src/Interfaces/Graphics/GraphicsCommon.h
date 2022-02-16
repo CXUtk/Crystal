@@ -251,6 +251,21 @@ namespace crystal
 		__COUNT
 	};
 
+	enum class RasterStates
+	{
+		CullNone,
+
+		__COUNT
+	};
+
+	enum class DepthStencilStates
+	{
+		NoDepthTest,
+		DefaultDepthTest,
+
+		__COUNT
+	};
+
 	enum class BlendFactors
 	{
 		Zero,
@@ -274,6 +289,34 @@ namespace crystal
 		RevSubtract,
 		Min,
 		Max,
+
+		__COUNT
+	};
+
+	enum class ComparisonFunction
+	{
+		Never,
+		Always,
+		Equal,
+		NotEqual,
+		Less,
+		LessEqual,
+		Greater,
+		GreaterEqual,
+
+		__COUNT
+	};
+
+	enum class StencilOperation
+	{
+		Zero,
+		Keep,
+		Replace,
+		IncreaseClamp,
+		DecreaseClamp,
+		IncreaseWarp,
+		DecreaseWarp,
+		Invert,
 
 		__COUNT
 	};
@@ -392,8 +435,17 @@ namespace crystal
 
 	struct DepthStencilStateDescription
 	{
-		bool		EnableDepthTest;
-		bool		EnableStencilTest;
+		bool				EnableDepthTest;
+		bool				EnableStencilTest;
+		bool				EnableDepthWrite;
+		uint8_t				StencilReadMask;
+		uint8_t				StencilWriteMask;
+
+		ComparisonFunction	DepthFunction;
+		ComparisonFunction	StencilFunction;
+		StencilOperation	StencilFailedOp;
+		StencilOperation	DepthFailedOp;
+		StencilOperation	StencilPassedOp;
 	};
 
 	struct BlendStateDescription

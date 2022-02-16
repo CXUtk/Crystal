@@ -276,4 +276,54 @@ namespace crystal
 	{
 		return BlendOpMapping[(int)blendOp];
 	}
+	D3D11_COMPARISON_FUNC DX11Common::ComparisonFunctionConvert(ComparisonFunction cmp)
+	{
+		switch (cmp)
+		{
+		case crystal::ComparisonFunction::Never:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+		case crystal::ComparisonFunction::Always:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
+		case crystal::ComparisonFunction::Equal:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_EQUAL;
+		case crystal::ComparisonFunction::NotEqual:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NOT_EQUAL;
+		case crystal::ComparisonFunction::Less:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+		case crystal::ComparisonFunction::LessEqual:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		case crystal::ComparisonFunction::Greater:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER;
+		case crystal::ComparisonFunction::GreaterEqual:
+			return D3D11_COMPARISON_FUNC::D3D11_COMPARISON_GREATER_EQUAL;
+		default:
+			break;
+		}
+		throw std::logic_error("Invalid Comparison Function type");
+	}
+	D3D11_STENCIL_OP DX11Common::StencilOperationConvert(StencilOperation op)
+	{
+		switch (op)
+		{
+		case crystal::StencilOperation::Zero:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_ZERO;
+		case crystal::StencilOperation::Keep:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+		case crystal::StencilOperation::Replace:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+		case crystal::StencilOperation::IncreaseClamp:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
+		case crystal::StencilOperation::DecreaseClamp:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_DECR_SAT;
+		case crystal::StencilOperation::IncreaseWarp:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR;
+		case crystal::StencilOperation::DecreaseWarp:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_DECR;
+		case crystal::StencilOperation::Invert:
+			return D3D11_STENCIL_OP::D3D11_STENCIL_OP_INVERT;
+		default:
+			break;
+		}
+		throw std::logic_error("Invalid Stencil Operation type");
+	}
 }

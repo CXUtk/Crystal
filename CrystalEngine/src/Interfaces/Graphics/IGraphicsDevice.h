@@ -30,7 +30,10 @@ namespace crystal
 
 		virtual std::shared_ptr<IPipelineStateObject> CreatePipelineStateObject() = 0;
 		virtual std::shared_ptr<IPipelineResourceObject> CreatePipelineResourceObject() = 0;
+
 		virtual std::shared_ptr<ISamplerState> GetCommonSamplerState(SamplerStates state) = 0;
 		virtual std::shared_ptr<IBlendState> GetCommonBlendState(BlendStates state) = 0;
+		virtual std::shared_ptr<IDepthStencilState> GetCommonDepthStencilState(DepthStencilStates state) = 0;
+		virtual std::shared_ptr<IRasterState> GetCommonRasterState(RasterStates state) = 0;
 	};
 }

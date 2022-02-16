@@ -221,18 +221,11 @@ namespace crystal
 		m_pDefaultPRO->SetVertexBuffer(m_pDefaultVertexBuffer);
 
 		// Initialize pipeline states
-		RasterStateDescription rasterDesc = {};
-		rasterDesc.CullMode = CullingMode::None;
-		rasterDesc.FillMode = FillMode::SOLID;
-		rasterDesc.Viewport = nullptr;
-		m_defaultRenderState.m_pRasterState = graphicsDevice->CreateRasterState(rasterDesc);
+		m_defaultRenderState.m_pRasterState = graphicsDevice->GetCommonRasterState(RasterStates::CullNone);
 		m_defaultRenderState.m_pBlendState = graphicsDevice->GetCommonBlendState(BlendStates::Opaque);
 		m_defaultRenderState.m_pSamplerState = graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp);
 
-		DepthStencilStateDescription DSDesc = {};
-		DSDesc.EnableDepthTest = false;
-		DSDesc.EnableStencilTest = false;
-		m_defaultRenderState.m_pDepthStencilState = graphicsDevice->CreateDepthStencilState(DSDesc);
+		m_defaultRenderState.m_pDepthStencilState = graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::NoDepthTest);
 		m_defaultRenderState.m_pShaderProgram = m_pGraphicsDevice->CreateShaderProgramFromFile("resources/sprite.json");
 		
 		auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();

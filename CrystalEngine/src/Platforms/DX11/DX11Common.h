@@ -43,6 +43,9 @@ namespace crystal
 
 		static D3D11_BLEND BlendFactorConvert(BlendFactors blendFactor);
 		static D3D11_BLEND_OP BlendOpConvert(BlendOperations blendOp);
+		
+		static D3D11_COMPARISON_FUNC ComparisonFunctionConvert(ComparisonFunction cmp);
+		static D3D11_STENCIL_OP StencilOperationConvert(StencilOperation op);
 
 		static std::string ConvertFromUtf16ToUtf8(const std::wstring& wstr)
 		{
