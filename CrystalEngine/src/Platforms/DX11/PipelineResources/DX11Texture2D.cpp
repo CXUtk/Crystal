@@ -79,8 +79,9 @@ namespace crystal
 	DX11Texture2D::~DX11Texture2D()
 	{}
 
-	void DX11Texture2D::GetShaderResourceHandle(void** pHandle) const
+	void DX11Texture2D::GetShaderResourceHandle(void* pHandle) const
 	{
-		*pHandle = m_pSRV.Get();
+		ID3D11ShaderResourceView** ptr = (ID3D11ShaderResourceView**)pHandle;
+		*ptr = m_pSRV.Get();
 	}
 }

@@ -99,9 +99,10 @@ namespace crystal
 	DX11RenderTarget2D::~DX11RenderTarget2D()
 	{}
 
-	void DX11RenderTarget2D::GetShaderResourceHandle(void** pHandle) const
+	void DX11RenderTarget2D::GetShaderResourceHandle(void* pHandle) const
 	{
-		*pHandle = m_pShaderResourceView.Get();
+		ID3D11ShaderResourceView** ptr = (ID3D11ShaderResourceView**)pHandle;
+		*ptr = m_pShaderResourceView.Get();
 	}
 
 	Vector2i DX11RenderTarget2D::GetSize() const

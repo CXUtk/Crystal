@@ -1,4 +1,4 @@
-#include <Core/Render/SpriteBatch.h>
+#include "SpriteBatch.h"
 #include <Interfaces/Graphics/GraphicsInterfaces.h>
 #include <stdexcept>
 
@@ -104,10 +104,41 @@ namespace crystal
 			nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 	}
 
-	void SpriteBatch::Begin(const Matrix4f& transform)
+	void SpriteBatch::Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState)
 	{
-		m_pImpl->Begin(SpriteSortMode::Deferred, &transform, nullptr, nullptr, nullptr, 
+		m_pImpl->Begin(spriteSortMode, nullptr, nullptr, samplerState, nullptr,
+				nullptr, nullptr);
+	}
+
+	void SpriteBatch::Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState, 
+		std::shared_ptr<IBlendState> blendState)
+	{
+		m_pImpl->Begin(spriteSortMode, nullptr, blendState, samplerState, nullptr,
+					nullptr, nullptr);
+	}
+
+	void SpriteBatch::Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState, 
+		std::shared_ptr<IBlendState> blendState, std::shared_ptr<IShaderProgram> shader)
+	{
+		m_pImpl->Begin(spriteSortMode, nullptr, blendState, samplerState, shader,
 			nullptr, nullptr);
+	}
+
+	void SpriteBatch::Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState, 
+		std::shared_ptr<IBlendState> blendState, std::shared_ptr<IShaderProgram> shader, 
+		Matrix4f& transform)
+	{
+		m_pImpl->Begin(spriteSortMode, &transform, blendState, samplerState, shader,
+			nullptr, nullptr);
+	}
+
+	void SpriteBatch::Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState, 
+		std::shared_ptr<IBlendState> blendState, std::shared_ptr<IShaderProgram> shader, 
+		Matrix4f & transform, std::shared_ptr<IRasterState> rasterState, 
+		std::shared_ptr<IDepthStencilState> depthStencilState)
+	{
+		m_pImpl->Begin(spriteSortMode, &transform, blendState, samplerState, shader,
+			rasterState, depthStencilState);
 	}
 
 	void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& center, const Color4f& color)

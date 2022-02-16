@@ -6,6 +6,6 @@ namespace crystal
 	{
 	public:
 		virtual ~IShaderResource() = 0 {};
-		virtual void GetShaderResourceHandle(void** pHandle) const = 0;
+		virtual void GetShaderResourceHandle(void* pHandle) const = 0;
 	};
 }

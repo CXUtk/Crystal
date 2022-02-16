@@ -98,6 +98,7 @@ namespace crystal
 	{
 		auto windowSize = m_engine->GetWindow()->GetWindowSize();
 		auto graphicsContext = m_engine->GetGraphicsContext();
+		auto graphicsDevice = m_engine->GetGraphicsDevice();
 		auto spriteBatch = m_engine->GetSpriteBatch();
 		graphicsContext->Clear(
 			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
@@ -105,27 +106,26 @@ namespace crystal
 			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
 			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
 
-		spriteBatch->Begin();
-		auto size = m_texture2D->GetSize();
 		R += 0.01;
-		for (int i = 0; i < 10; i++)
-		{
-			for (int j = 0; j < 10; j++)
-			{
-				if ((i + j) % 2 == 0)
-				{
-					spriteBatch->Draw(m_texture2D, Vector2f(i * 80, j * 60), Color4f(1.f),
-						R, Vector2f(0.f), 1.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
-						| SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL);
-				}
-				else
-				{
-					spriteBatch->Draw(m_texture2D, Vector2f(i * 80, j * 60), Color4f(1.f, 0.f, 0.f, 1.f),
-						R, Vector2f(0.f), 1.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL
-						| SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL);
-				}
-			}
-		}
+		auto size = m_texture2D->GetSize();
+		//spriteBatch->Begin();
+		//spriteBatch->Draw(m_texture2D, Vector2f(200.f, 300.f), Color4f(1.f),
+		//			R, Vector2f(size) * 0.5f, 4.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+		//spriteBatch->End();
+
+		//spriteBatch->Begin(SpriteSortMode::Deferred, 
+		//	graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp));
+		//spriteBatch->Draw(m_texture2D, Vector2f(600.f, 300.f), Color4f(1.f),
+		//	R, Vector2f(size) * 0.5f, 4.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+		//spriteBatch->End();
+
+		spriteBatch->Begin(SpriteSortMode::Deferred,
+			graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 
+			graphicsDevice->GetCommonBlendState(BlendStates::AlphaBlend));
+		spriteBatch->Draw(m_texture2D, Vector2f(300.f, 300.f), Color4f(1.f, 1.f, 1.f, 0.5f),
+			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+		spriteBatch->Draw(m_texture2D, Vector2f(400.f, 350.f), Color4f(1.f, 1.f, 1.f, 0.5f),
+			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
 		spriteBatch->End();
 	}
 

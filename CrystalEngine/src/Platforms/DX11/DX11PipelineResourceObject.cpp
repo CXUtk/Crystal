@@ -67,7 +67,7 @@ namespace crystal
 		{
 			if (m_SRVSlots[i])
 			{
-				m_SRVSlots[i]->GetShaderResourceHandle((void**)&SRVs[i]);
+				m_SRVSlots[i]->GetShaderResourceHandle((void*)&SRVs[i]);
 			}
 		}
 		for (int i = 0; i < MAX_SHADER_RESOURCES_SLOTS; i++)

@@ -12,7 +12,7 @@ namespace crystal
 			const D3D11_VIEWPORT& viewPort);
 		~DX11RenderTarget2D() override;
 
-		virtual void GetShaderResourceHandle(void** pHandle) const override;
+		virtual void GetShaderResourceHandle(void* pHandle) const override;
 		virtual Vector2i GetSize() const override;
 
 		void SetToCurrentContext(DX11GraphicsContext* context);

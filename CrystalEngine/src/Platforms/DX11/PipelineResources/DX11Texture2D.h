@@ -11,7 +11,7 @@ namespace crystal
 		~DX11Texture2D() override;
 
 		virtual Vector2i GetSize() const override { return m_size; }
-		virtual void GetShaderResourceHandle(void** pHandle) const override;
+		virtual void GetShaderResourceHandle(void* pHandle) const override;
 	private:
 		DX11GraphicsDevice*					m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11Texture2D>				m_texture2D = nullptr;
