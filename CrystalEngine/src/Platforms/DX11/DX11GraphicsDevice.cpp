@@ -21,7 +21,7 @@
 #include <Core/InitArgs.h>
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/IO.h>
-#include <SJson/SJson.h>
+#include <SJson/SJson.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 namespace crystal
@@ -122,25 +122,25 @@ namespace crystal
 	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
 	{
 		auto source = ReadAllStringFromFile(path);
-		auto root = SJson::SJsonParse(source);
-		auto dx11Src = root->GetMember("dx11Src");
+		auto root = SJson::JsonConvert::Parse(source);
+		auto& dx11Src = root["dx11Src"];
 		auto directory = GetDirectoryPath(path);
 
-		auto filePath = directory + "/" + dx11Src->GetString();
+		auto filePath = directory + "/" + dx11Src.Get<std::string>();
 		auto shaderSrc = ReadAllStringFromFile(filePath);
 
 		UniformVariableCollection variables;
-		auto uniforms = root->GetMember("uniforms");
-		uniforms->ForEachElements([&variables](const SJson::SJsonNode* node)
+		auto& uniforms = root["uniforms"];
+		uniforms.foreach([&variables](const SJson::JsonNode& node)
 		{
-			UniformVariable variable = ParseUniformVariable(node->GetMember("name")->GetString(),
-				node->GetMember("type")->GetString());
+			UniformVariable variable = ParseUniformVariable(node["name"].Get<std::string>(),
+				node["type"].Get<std::string>());
 			variables.Add(variable);
 		});
 		auto vs = this->CreateVertexShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(), 
-			dx11Src->GetString(), root->GetMember("vsEntry")->GetString());
+			dx11Src.Get<std::string>(), root["vsEntry"].Get<std::string>());
 		auto fs = this->CreateFragmentShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(),
-			dx11Src->GetString(), root->GetMember("fsEntry")->GetString());
+			dx11Src.Get<std::string>(), root["fsEntry"].Get<std::string>());
 
 		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
 	}

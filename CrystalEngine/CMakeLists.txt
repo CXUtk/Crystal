@@ -46,8 +46,6 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 
 # 操作系统和图形接口判定
-add_subdirectory("external/SJson")
-target_link_libraries(CrystalEngine PRIVATE SJson)
 
 if (CRYSTAL_USE_OPENGL)
     if (UNIX)
