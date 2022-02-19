@@ -176,11 +176,11 @@ namespace SJson
 	};
 
 
-	JsonNode::~JsonNode()
+	inline JsonNode::~JsonNode()
 	{
 	}
 
-	JsonNode::JsonNode()
+	inline JsonNode::JsonNode()
 		: m_type(ValueType::Null), m_value(std::monostate())
 	{
 	}
@@ -210,7 +210,7 @@ namespace SJson
 	{
 	}
 
-	JsonNode::JsonNode(const std::string& value)
+	inline JsonNode::JsonNode(const std::string& value)
 		: m_type(ValueType::String), m_value(value)
 	{
 	}
@@ -273,13 +273,14 @@ namespace SJson
 		return std::get<std::string>(m_value);
 	}
 
-	std::string JsonNode::ToString(const JsonFormatOption& format) const
+	inline std::string JsonNode::ToString(const JsonFormatOption& format) const
 	{
 		return internal_tostring(format, 0);
 	}
 
 	inline void JsonNode::foreach(std::function<void(const JsonNode&)> action) const
 	{
+		assert(m_type == ValueType::Array);
 		for (auto& element : std::get<array_type>(m_value))
 		{
 			action(element);
@@ -288,11 +289,13 @@ namespace SJson
 
 	inline void JsonNode::push_back(JsonNode&& node)
 	{
+		assert(m_type == ValueType::Array);
 		std::get<array_type>(m_value).push_back(std::move(node));
 	}
 
 	inline void JsonNode::push_back(const JsonNode& node)
 	{
+		assert(m_type == ValueType::Array);
 		std::get<array_type>(m_value).push_back(node);
 	}
 
@@ -303,11 +306,13 @@ namespace SJson
 			m_type = ValueType::Object;
 			m_value = object_type();
 		}
+		assert(m_type == ValueType::Object);
 		return std::get<object_type>(m_value)[name];
 	}
 
 	inline const JsonNode& JsonNode::operator[](const std::string& name) const
 	{
+		assert(m_type == ValueType::Object);
 		auto& map = std::get<object_type>(m_value);
 		auto it = map.find(name);
 		if (it == map.end())
@@ -319,11 +324,13 @@ namespace SJson
 
 	inline JsonNode& JsonNode::operator[](size_t index)
 	{
+		assert(m_type == ValueType::Array);
 		return std::get<array_type>(m_value)[index];
 	}
 
 	inline const JsonNode& JsonNode::operator[](size_t index) const
 	{
+		assert(m_type == ValueType::Array);
 		return std::get<array_type>(m_value)[index];
 	}
 
@@ -835,7 +842,7 @@ namespace SJson
 		return tokenList;
 	}
 
-	int expect(const JsonToken& token, TokenType type, int index)
+	inline int expect(const JsonToken& token, TokenType type, int index)
 	{
 		if (token.Token != type)
 		{
@@ -848,7 +855,7 @@ namespace SJson
 	using m_pair = std::pair<const std::string, JsonNode>;
 	using arrlist = std::vector<JsonNode>;
 
-	maplist parse_object(const std::vector<JsonToken>& tokens,
+	inline maplist parse_object(const std::vector<JsonToken>& tokens,
 		int index, int& newIndex)
 	{
 
@@ -891,7 +898,7 @@ namespace SJson
 		}
 	}
 
-	arrlist parse_array(const std::vector<JsonToken>& tokens,
+	inline arrlist parse_array(const std::vector<JsonToken>& tokens,
 		int index, int& newIndex)
 	{
 		arrlist list;
@@ -966,7 +973,7 @@ namespace SJson
 		return result;
 	}
 
-	JsonNode parse(const std::vector<JsonToken>& tokens, int index, int& newIndex)
+	inline JsonNode parse(const std::vector<JsonToken>& tokens, int index, int& newIndex)
 	{
 		auto& token = tokens[index];
 		switch (token.Token)
@@ -1031,7 +1038,7 @@ namespace SJson
 		throw parse_error("Failed to parse", token);
 	}
 
-	JsonNode JsonConvert::Parse(const std::string& text)
+	inline JsonNode JsonConvert::Parse(const std::string& text)
 	{
 		auto tokens = lex(text);
 		int index = 0;
@@ -1041,11 +1048,6 @@ namespace SJson
 			throw parse_error("Root not singluar", tokens[index]);
 		}
 		return node;
-	}
-
-	std::string JsonConvert::Serialize(const JsonNode& node)
-	{
-		return std::string();
 	}
 
 	inline std::string GetValueTypeName(ValueType type)

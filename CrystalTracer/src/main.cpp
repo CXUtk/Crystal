@@ -6,41 +6,10 @@
 #include <CrystalEngine/src/Core/Utils/Logger.h>
 #include <SJson/SJson.hpp>
 using namespace crystal;
+#include "test.h"
+#include "testobj.h"
 
 
-
-#define PROPERTY(type, member) property(&type::member, #member)
-
-template<typename Class, typename T>
-struct PropertyImpl
-{
-	constexpr PropertyImpl(T Class::* aMember, const char* aName) : member{ aMember }, name{ aName } {}
-
-	using Type = T;
-
-	T Class::* member;
-	const char* name;
-};
-
-template<typename Class, typename T>
-constexpr auto property(T Class::* member, const char* name)
-{
-	return PropertyImpl<Class, T>{member, name};
-}
-
-
-struct TestObject
-{
-	int			Age;
-	float		Weight;
-	std::string	Name;
-	bool		IsMale;
-
-	//constexpr static auto properties = std::make_tuple(
-	//	property(&TestObject::Weight, "Weight"),
-	//	property(&Age, "Age")
-	//);
-};
 
 //template<typename T>
 //constexpr SJson::JsonNode toJson_s(T& v)
