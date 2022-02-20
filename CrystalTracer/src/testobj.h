@@ -1,5 +1,18 @@
-
-class TestObject;
+#pragma once
+#include "test.h"
+class Internal
+{
+public:
+	int A;
+	float B;
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			PROPERTY(Internal, A),
+			PROPERTY(Internal, B)
+		);
+	}
+};
 
 class TestObject
 {
@@ -8,9 +21,18 @@ public:
 	float		Weight;
 	std::string	Name;
 	bool		IsMale;
+	Internal	Inter;
+	int* s;
 
-	constexpr static auto properties = std::make_tuple(
-		property(&TestObject::Weight, "Weight"),
-		property(&TestObject::Age, "Age")
-	);
+	constexpr static auto properties()
+	{
+		return std::make_tuple(
+			PROPERTY(TestObject, Age),
+			PROPERTY(TestObject, Weight),
+			PROPERTY(TestObject, Name),
+			PROPERTY(TestObject, IsMale),
+			PROPERTY(TestObject, Inter),
+			PROPERTY(TestObject, s)
+		);
+	}
 };
