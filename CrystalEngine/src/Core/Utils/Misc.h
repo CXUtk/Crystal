@@ -82,7 +82,7 @@ inline std::string Trim(const std::string& str)
     }
     while (r >= l && str[r] == ' ')
     {
-        r++;
+        r--;
     }
     if (r - l + 1 == 0) return "";
     return str.substr(l, r - l + 1);

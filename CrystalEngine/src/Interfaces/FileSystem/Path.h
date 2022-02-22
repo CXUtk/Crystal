@@ -13,7 +13,8 @@ namespace crystal
 		static path_type Combine(const path_type& path1, const path_type& path2);
 
 		static path_type Normalize(const path_type& path);
-		
+
+		static void CheckInvalidPathChars(const path_type& path);
 
 		static constexpr char DirectorySeparatorChar = '/';
 		static constexpr const char* const DirectorySeparatorCharAsString = "/";

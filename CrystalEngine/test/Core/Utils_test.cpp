@@ -2,8 +2,11 @@
 
 #include "../test.h"
 
-int main()
+TEST(Test_Utils_Misc, String_Trim)
 {
-	printf("Test started!\n");
-	return 0;
+	EXPECT_EQ(Trim("abcd"), "abcd");
+	EXPECT_EQ(Trim("a  "), "a");
+	EXPECT_EQ(Trim("  a  "), "a");
+	EXPECT_EQ(Trim("  ab cd  "), "ab cd");
+	EXPECT_EQ(Trim("    "), "");
 }

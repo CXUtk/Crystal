@@ -9,8 +9,6 @@ namespace crystal
 {
 	class IFileStream;
 
-
-
 	inline FileAccess operator|(FileAccess a, FileAccess b)
 	{
 		return static_cast<FileAccess>(static_cast<int>(a) | static_cast<int>(b));
