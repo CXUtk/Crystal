@@ -1,8 +1,8 @@
 #include <CrystalEngine/src/Engine.h>
-#include <CrystalEngine/src/Tests/OrbitControllerTest.h>
-#include <CrystalEngine/src/Tests/TriangleTest.h>
-#include <CrystalEngine/src/Tests/QuadTest.h>
-#include <CrystalEngine/src/Tests/RenderTargetTest.h>
+#include <CrystalEngine/src/Tests/Integrated/OrbitControllerTest.h>
+#include <CrystalEngine/src/Tests/Integrated/TriangleTest.h>
+#include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
+#include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>
 #include <SJson/SJson.hpp>
 using namespace crystal;

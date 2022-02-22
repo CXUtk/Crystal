@@ -123,10 +123,10 @@ namespace crystal
 	{
 		auto source = ReadAllStringFromFile(path);
 		auto root = SJson::JsonConvert::Parse(source);
-		auto& dx11Src = root["dx11Src"];
+		auto dx11Src = root["dx11Src"].Get<std::string>();
 		auto directory = GetDirectoryPath(path);
 
-		auto filePath = directory + "/" + dx11Src.Get<std::string>();
+		auto filePath = directory + "/" + dx11Src;
 		auto shaderSrc = ReadAllStringFromFile(filePath);
 
 		UniformVariableCollection variables;
@@ -138,9 +138,9 @@ namespace crystal
 			variables.Add(variable);
 		});
 		auto vs = this->CreateVertexShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(), 
-			dx11Src.Get<std::string>(), root["vsEntry"].Get<std::string>());
+			dx11Src, root["vsEntry"].Get<std::string>());
 		auto fs = this->CreateFragmentShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(),
-			dx11Src.Get<std::string>(), root["fsEntry"].Get<std::string>());
+			dx11Src, root["fsEntry"].Get<std::string>());
 
 		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
 	}

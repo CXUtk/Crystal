@@ -72,3 +72,18 @@ inline std::string GetDirectoryPath(const std::string& path)
     }
     throw std::exception("Invalid file path");
 }
+
+inline std::string Trim(const std::string& str)
+{
+    int l = 0, r = str.size() - 1;
+    while (l <= r && str[l] == ' ')
+    {
+        l++;
+    }
+    while (r >= l && str[r] == ' ')
+    {
+        r++;
+    }
+    if (r - l + 1 == 0) return "";
+    return str.substr(l, r - l + 1);
+}
