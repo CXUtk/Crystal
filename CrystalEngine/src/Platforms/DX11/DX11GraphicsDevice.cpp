@@ -1,4 +1,4 @@
-﻿#include "DX11GraphicsDevice.h"
+#include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 
@@ -110,39 +110,11 @@ namespace crystal
 		return std::make_shared<DX11FragmentShader>(this, pPixelShader);
 	}
 
-
-	UniformVariable ParseUniformVariable(const std::string& name, const std::string& type)
+	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader,
+			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& variables)
 	{
-		UniformVariable varb;
-		varb.Name = name;
-		varb.Format = GraphicsCommons::StringToComponentFormatConvert(type);
-		return varb;
-	}
-
-	std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgramFromFile(const std::string& path)
-	{
-		auto source = ReadAllStringFromFile(path);
-		auto root = SJson::JsonConvert::Parse(source);
-		auto dx11Src = root["dx11Src"].Get<std::string>();
-		auto directory = GetDirectoryPath(path);
-
-		auto filePath = directory + "/" + dx11Src;
-		auto shaderSrc = ReadAllStringFromFile(filePath);
-
-		UniformVariableCollection variables;
-		auto& uniforms = root["uniforms"];
-		uniforms.foreach([&variables](const SJson::JsonNode& node)
-		{
-			UniformVariable variable = ParseUniformVariable(node["name"].Get<std::string>(),
-				node["type"].Get<std::string>());
-			variables.Add(variable);
-		});
-		auto vs = this->CreateVertexShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(), 
-			dx11Src, root["vsEntry"].Get<std::string>());
-		auto fs = this->CreateFragmentShaderFromMemory(shaderSrc.c_str(), shaderSrc.size(),
-			dx11Src, root["fsEntry"].Get<std::string>());
-
-		return std::make_shared<DX11ShaderProgram>(this, vs, fs, variables);
+		return std::make_shared<DX11ShaderProgram>(this, std::dynamic_pointer_cast<DX11VertexShader>(vertexShader), 
+			std::dynamic_pointer_cast<DX11FragmentShader>(fragmentShader), variables);
 	}
 
 	std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc)

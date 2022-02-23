@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "DX11Common.h"
 
 namespace crystal
@@ -23,7 +23,8 @@ namespace crystal
 			const std::string& name, const std::string& entryPoint) override;
 		virtual std::shared_ptr<IFragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) override;
-		virtual std::shared_ptr<IShaderProgram> CreateShaderProgramFromFile(const std::string& path) override;
+		virtual std::shared_ptr<IShaderProgram> CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader,
+			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& variables) override;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;

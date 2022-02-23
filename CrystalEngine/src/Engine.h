@@ -43,6 +43,8 @@ namespace crystal
 
 		SpriteBatch* GetSpriteBatch() const;
 
+		GraphicsAPIType	GetGraphicsAPIType() const;
+
 		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 

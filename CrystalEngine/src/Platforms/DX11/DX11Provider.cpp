@@ -1,4 +1,4 @@
-﻿#include "DX11Provider.h"
+#include "DX11Provider.h"
 #include <Platforms/Windows32/Win32GameWindow.h>
 #include <Platforms/DX11/DX11GraphicsDevice.h>
 #include <Platforms/DX11/DX11GraphicsContext.h>
@@ -41,6 +41,11 @@ namespace crystal
 	IGraphicsContext* DX11Provider::GetGraphicsContext() const
 	{
 		return m_pDX11GraphicsContext;
+	}
+
+	GraphicsAPIType DX11Provider::GetGraphicsAPIType() const
+	{
+		return GraphicsAPIType::DirectX11;
 	}
 
 	void DX11Provider::Present()

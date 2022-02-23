@@ -20,7 +20,8 @@ namespace crystal
 			const std::string& name, const std::string& entryPoint) = 0;
 		virtual std::shared_ptr<IFragmentShader> CreateFragmentShaderFromMemory(const char* src, size_t size,
 			const std::string& name, const std::string& entryPoint) = 0;
-		virtual std::shared_ptr<IShaderProgram> CreateShaderProgramFromFile(const std::string& path) = 0;
+		virtual std::shared_ptr<IShaderProgram> CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader,
+			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& variables) = 0;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;

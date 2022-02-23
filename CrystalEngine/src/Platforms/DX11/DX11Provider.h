@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <Interfaces/Interfaces.h>
 #include <Crystal.h>
 
@@ -18,6 +18,7 @@ namespace crystal
 		virtual IFileSystem* GetFileSystem() const override;
 		virtual IGraphicsDevice* GetGraphicsDevice() const override;
 		virtual IGraphicsContext* GetGraphicsContext() const override;
+		virtual GraphicsAPIType GetGraphicsAPIType() const override;
 		virtual void Present() override;
 
 	private:

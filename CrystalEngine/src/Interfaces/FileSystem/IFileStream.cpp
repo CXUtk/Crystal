@@ -11,7 +11,7 @@ namespace crystal
 	{
 		std::ios_base::openmode mode = 0;
 
-		m_filePath = Path::Normalize(path);
+		m_filePath = path.lexically_normal();
 
 		if (fileMode == FileMode::Open)
 		{

@@ -109,4 +109,9 @@ namespace crystal
 
         m_application->Exit();
     }
+
+    GraphicsAPIType crystal::Engine::GetGraphicsAPIType() const
+    {
+        return m_platformProvider->GetGraphicsAPIType();
+    }
 }

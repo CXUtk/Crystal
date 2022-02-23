@@ -21,6 +21,14 @@
 
 namespace crystal
 {
+	enum class GraphicsAPIType
+	{
+		OpenGL,
+		DirectX11,
+		DirectX12,
+		Vulkan
+	};
+
 	class IPlatformProvider
 	{
 	public:
@@ -30,6 +38,7 @@ namespace crystal
 		virtual IFileSystem* GetFileSystem() const = 0;
 		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
 		virtual IGraphicsContext* GetGraphicsContext() const = 0;
+		virtual GraphicsAPIType GetGraphicsAPIType() const = 0;
 		virtual void Present() = 0;
 	};
 }
