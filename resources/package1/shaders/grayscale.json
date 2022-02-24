@@ -1,4 +1,5 @@
 {
+  "name": "GrayScale",
   "dx11Src": "grayscale.hlsl",
   "openGLVSSrc": "grayscale.vert",
   "openGLFSSrc": "grayscale.frag",

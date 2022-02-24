@@ -67,7 +67,7 @@ namespace crystal
 		auto indexBuffer = graphicsDevice->CreateIndexBuffer(ibufferDesc, 
 			indices, sizeof(indices));
 
-		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/triangle.json");
+		//m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/triangle.json");
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PRO->SetIndexBuffer(indexBuffer);

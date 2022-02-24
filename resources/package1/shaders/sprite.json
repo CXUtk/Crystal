@@ -1,4 +1,5 @@
 {
+  "name": "Sprite",
   "dx11Src": "sprite.hlsl",
   "openGLVSSrc": "sprite.vert",
   "openGLFSSrc": "sprite.frag",

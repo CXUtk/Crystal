@@ -1,30 +1,27 @@
 #include "Engine.h"
 #include "Core/Application.h"
-#include "Core/InitArgs.h"
+
 #include "Core/Utils/GameTimer.h"
 #include "Core/Input/InputController.h"
 #include "Core/Utils/Logger.h"
 #include "Core/Render/SpriteBatch.h"
+#include "Core/Asset/AssetManager.h"
 #include "Platforms/PlatformFactory.h"
 
 namespace crystal
 {
     Engine::Engine()
     {
-        InitArgs args{};
-        args.WindowWidth = 800;
-        args.WindowHeight = 600;
-        args.WindowResizable = false;
-        args.FPSLimit = 60;
-        strcpy(args.WindowTitle, "Test");
+        m_initArgs = {};
+        m_initArgs.WindowWidth = 800;
+        m_initArgs.WindowHeight = 600;
+        m_initArgs.WindowResizable = false;
+        m_initArgs.FPSLimit = 60;
+        strcpy(m_initArgs.WindowTitle, "Test");
 
-        m_fpsCap = 1.0 / args.FPSLimit;
+        m_fpsCap = 1.0 / m_initArgs.FPSLimit;
 
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
-        GraphicsCommons::InitGraphicsCommons();
-        m_platformProvider = PlatformFactory::GetPlatformProvider(args);
-
-        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice(), GetGraphicsContext());
     }
     
     Engine::~Engine()
@@ -33,6 +30,11 @@ namespace crystal
         m_inputController.reset();
         m_platformProvider.reset();
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Destruct");
+    }
+
+    AssetManager* Engine::GetAssetManager() const
+    {
+        return ptr(m_pAssetManager);
     }
 
     IGameWindow* Engine::GetWindow() const
@@ -52,7 +54,7 @@ namespace crystal
 
     IGraphicsContext* Engine::GetGraphicsContext() const
     {
-        return GetGraphicsDevice()->GetContext().get();
+        return m_platformProvider->GetGraphicsDevice()->GetContext().get();
     }
 
     SpriteBatch* Engine::GetSpriteBatch() const
@@ -65,8 +67,19 @@ namespace crystal
     //    return m_platformProvider->GetGraphicsDevice();
     //}
 
+    void Engine::m_Initialize()
+    {
+        GraphicsCommons::InitGraphicsCommons();
+        m_platformProvider = PlatformFactory::GetPlatformProvider(m_initArgs);
+
+        m_pAssetManager = AssetManager::LoadAssetPackage("resources/package1/contents.json");
+        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice(), GetGraphicsContext());
+    }
+
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
+        m_Initialize();
+
         m_application = std::move(application);
         m_application->SetEngine(this);
 

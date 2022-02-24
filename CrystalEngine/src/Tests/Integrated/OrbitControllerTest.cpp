@@ -64,7 +64,7 @@ namespace crystal
 		//	loader.Triangles.data(), sizeof(float) * 3 * loader.Triangles.size());
 		indices = loader.Triangles.size() * 3;
 
-		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
+		//m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;

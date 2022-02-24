@@ -2,6 +2,7 @@
 #include "Crystal.h"
 #include "Core/Utils/GameTimer.h"
 #include "Interfaces/Interfaces.h"
+#include "Core/InitArgs.h"
 #include <functional>
 
 namespace crystal
@@ -37,13 +38,32 @@ namespace crystal
 		*/
 		InputController* GetInputController() const;
 
+		/**
+		 * @brief 
+		 * @return 
+		*/
 		IGraphicsDevice* GetGraphicsDevice() const;
 
+		/**
+		 * @brief 
+		 * @return 
+		*/
 		IGraphicsContext* GetGraphicsContext() const;
 
+		/**
+		 * @brief 
+		 * @return 
+		*/
 		SpriteBatch* GetSpriteBatch() const;
 
+		/**
+		 * @brief 
+		 * @return 
+		*/
 		GraphicsAPIType	GetGraphicsAPIType() const;
+
+
+		AssetManager* GetAssetManager() const;
 
 		/**
 		 * @brief Take control on the application and start the main game loop
@@ -57,9 +77,15 @@ namespace crystal
 		std::unique_ptr<InputController>		m_inputController;
 		std::unique_ptr<SpriteBatch>			m_spriteBatch;
 
+		std::shared_ptr<AssetManager>			m_pAssetManager;
+
 		double		m_fpsCap;			// Maximum FPS
 		GameTimer	m_gameTimer;		// Game timer
+
+		InitArgs	m_initArgs;
 	
 		Engine();
+
+		void m_Initialize();
 	};
 }

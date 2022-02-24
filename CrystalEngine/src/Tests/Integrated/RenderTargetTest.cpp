@@ -75,8 +75,8 @@ namespace crystal
 		indices = loader.Triangles.size() * 3;
 		vertexBuffer->BindVertexLayout(vLayout);
 
-		m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
-		m_pScreenShader = graphicsDevice->CreateShaderProgramFromFile("resources/grayscale.json");
+		//m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
+		//m_pScreenShader = graphicsDevice->CreateShaderProgramFromFile("resources/grayscale.json");
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;

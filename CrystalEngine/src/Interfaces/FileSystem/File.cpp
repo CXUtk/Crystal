@@ -21,10 +21,15 @@ namespace crystal
                 str = strStream.str();
                 iStream.close();
             }
+            else
+            {
+                throw std::exception("Cannot open file");
+            }
         }
         catch (std::exception& e)
         {
-            throw std::exception(string_format("Failed to read file %s: %s", path.c_str(), e.what()).c_str());
+            throw std::exception(string_format("Failed to read file %s: %s", path.string().c_str(),
+                e.what()).c_str());
         }
         return str;
 	}
@@ -40,10 +45,14 @@ namespace crystal
                 oStream << text;
                 oStream.close();
             }
+            else
+            {
+                throw std::exception("Cannot open file");
+            }
         }
         catch (std::exception& e)
         {
-            throw std::exception(string_format("Failed to write to file %s: %s", path.c_str(), e.what()).c_str());
+            throw std::exception(string_format("Failed to write to file %s: %s", path.string().c_str(), e.what()).c_str());
         }
     }
 
@@ -64,10 +73,14 @@ namespace crystal
                 }
                 iStream.close();
             }
+            else
+            {
+                throw std::exception("Cannot open file");
+            }
         }
         catch (std::exception& e)
         {
-            throw std::exception(string_format("Failed to read file %s: %s", path.c_str(), e.what()).c_str());
+            throw std::exception(string_format("Failed to read file %s: %s", path.string().c_str(), e.what()).c_str());
         }
         return lines;
     }
@@ -86,10 +99,14 @@ namespace crystal
                 }
                 oStream.close();
             }
+            else
+            {
+                throw std::exception("Cannot open file");
+            }
         }
         catch (std::exception& e)
         {
-            throw std::exception(string_format("Failed to write to file %s: %s", path.c_str(), e.what()).c_str());
+            throw std::exception(string_format("Failed to write to file %s: %s", path.string().c_str(), e.what()).c_str());
         }
     }
 
@@ -114,10 +131,14 @@ namespace crystal
                            std::back_inserter(buffer));
                 iStream.close();
             }
+            else
+            {
+                throw std::exception("Cannot open file");
+            }
         }
         catch (std::exception& e)
         {
-            throw std::exception(string_format("Failed to read file %s: %s", path.c_str(), e.what()).c_str());
+            throw std::exception(string_format("Failed to read file %s: %s", path.string().c_str(), e.what()).c_str());
         }
         return buffer;
     }
@@ -133,10 +154,14 @@ namespace crystal
                 oStream.write((const char*)src, size);
                 oStream.close();
             }
+            else
+            {
+                throw std::exception("Cannot open file");
+            }
         }
         catch (std::exception& e)
         {
-            throw std::exception(string_format("Failed to write to file %s: %s", path.c_str(), e.what()).c_str());
+            throw std::exception(string_format("Failed to write to file %s: %s", path.string().c_str(), e.what()).c_str());
         }
     }
 

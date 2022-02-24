@@ -1,6 +1,8 @@
 #include "SpriteBatch.h"
 #include <Interfaces/Graphics/GraphicsInterfaces.h>
 #include <stdexcept>
+#include <Engine.h>
+#include <Core/Asset/AssetManager.h>
 
 
 namespace crystal
@@ -178,6 +180,8 @@ namespace crystal
 	{
 		static_assert(MAX_VERTICES_PER_BATCH < (1 << 16));
 
+		auto assetManager = Engine::GetInstance()->GetAssetManager();
+
 		m_pDefaultPRO = graphicsDevice->CreatePipelineResourceObject();
 
 		// Initialize index buffers (static)
@@ -226,7 +230,7 @@ namespace crystal
 		m_defaultRenderState.m_pSamplerState = graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp);
 
 		m_defaultRenderState.m_pDepthStencilState = graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::NoDepthTest);
-		m_defaultRenderState.m_pShaderProgram = m_pGraphicsDevice->CreateShaderProgramFromFile("resources/sprite.json");
+		m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("Sprite");
 		
 		auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();
 		m_defaultRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,
