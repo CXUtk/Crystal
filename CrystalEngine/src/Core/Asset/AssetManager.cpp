@@ -22,7 +22,8 @@ namespace crystal
         texDesc.MipmapLevels = 1;
         texDesc.Usage = BufferUsage::Immutable;
         uint32_t pureWhite = 0xffffffff;
-        assetPackage->LoadOneTexture2D("white", graphicsDevice->CreateTexture2DFromMemory((uint8_t*)&pureWhite, sizeof(pureWhite), texDesc));
+        assetPackage->LoadOneTexture2D("white",
+            graphicsDevice->CreateTexture2DFromFile("resources/White.png", texDesc));
 
         m_packagesMap["Crystal"] = assetPackage;
     }

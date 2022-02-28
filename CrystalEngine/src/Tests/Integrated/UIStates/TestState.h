@@ -1,5 +1,6 @@
 #pragma once
-#include <Core/UI/UIState.h>
+#include <Core/UI/UIExports.h>
+
 namespace crystal
 {
     class TestState : public UIState
@@ -7,9 +8,6 @@ namespace crystal
     public:
         TestState();
         virtual ~TestState() override;
-
-        virtual void Update(const GameTimer& gameTimer) override;
-        virtual void Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer) override;
 
     private:
         std::shared_ptr<UIElement> m_uiElement;

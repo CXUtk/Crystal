@@ -23,9 +23,22 @@ namespace crystal
         DrawChildren(spriteBatch, gameTimer);
     }
 
-    void UIElement::ReCalculate()
+    void UIElement::Recalculate()
     {
-        CalculateBounds();
+        RecalculateSelf();
+        RecalculateChildren();
+
+        m_calculatedOuterBound = m_calculatedInnerBound;
+
+        // If the child is overflow, we will combine its outer bound as ours outer bound
+        // Becuase the overflowed child also respond to event
+        for (auto& child : m_pChildren)
+        {
+            if (child->IsActive() && child->GetOverflowStyle() == OverflowStyle::Overflow)
+            {
+                m_calculatedOuterBound = m_calculatedOuterBound.Union(child->m_calculatedOuterBound);
+            }
+        }
     }
 
     void UIElement::AppendChild(std::shared_ptr<UIElement> element)
@@ -47,6 +60,44 @@ namespace crystal
         }
         m_pChildren.erase(p);
         element->m_pParent = nullptr;
+    }
+
+    std::shared_ptr<UIElement> UIElement::GetResponseElement(const Vector2f& screenPos)
+    {
+        for (auto& child : m_pChildren)
+        {
+            if (child->CanResponseEvent() && child->GetEventBound().Contains(screenPos))
+            {
+                return child->GetResponseElement(screenPos);
+            }
+        }
+        return shared_from_this();
+    }
+
+    void UIElement::MouseJustPressed(UIMouseButtonEventArgs args)
+    {
+        if (args.ButtonFlags != MouseButtonFlags::None)
+        {
+            m_eventOnMouseJustPress.Invoke(args);
+        }
+    }
+
+    void UIElement::MouseJustReleased(UIMouseButtonEventArgs args)
+    {
+        if (args.ButtonFlags != MouseButtonFlags::None)
+        {
+            m_eventOnMouseJustRelease.Invoke(args);
+        }
+    }
+
+    void UIElement::MouseEnter(UIMouseEventArgs args)
+    {
+        m_eventOnMouseEnter.Invoke(args);
+    }
+
+    void UIElement::MouseLeave(UIMouseEventArgs args)
+    {
+        m_eventOnMouseLeave.Invoke(args);
     }
 
     std::shared_ptr<UIElement> UIElement::GetChildByName(const std::string& name)
@@ -92,10 +143,24 @@ namespace crystal
 
     void UIElement::DrawChildren(SpriteBatch* spriteBatch, const GameTimer& gameTimer)
     {
+        for (auto it = m_pChildren.rbegin(); it != m_pChildren.rend(); ++it)
+        {
+            auto& child = (*it);
+            if (!child->m_isActive || !child->m_isVisible) continue;
+            (*it)->Draw(spriteBatch, gameTimer);
+        }
+    }
+
+    void UIElement::RecalculateSelf()
+    {
+        CalculateBounds();
+    }
+
+    void UIElement::RecalculateChildren()
+    {
         for (auto& child : m_pChildren)
         {
-            if (!child->m_isActive || !child->m_isVisible) continue;
-            child->Draw(spriteBatch, gameTimer);
+            child->Recalculate();
         }
     }
 

@@ -7,19 +7,20 @@ namespace crystal
     {
         m_uiElement = std::make_shared<UIElement>();
         m_uiElement->SetSize(SizeLayout{ {100, 0}, {100, 0} });
-        m_uiElement->AddEventListener<UIEventType::OnMouseClicked>([](UIMouseEventArgs args) {
+        m_uiElement->AddEventListener<UIEventType::OnMouseJustPressed>([](UIMouseEventArgs args) {
             printf("Clicked\n");
         });
-        m_uiElement->ReCalculate();
+        m_uiElement->AddEventListener<UIEventType::OnMouseEnter>([](UIMouseEventArgs args) {
+            printf("Enter\n");
+        });
+        m_uiElement->AddEventListener<UIEventType::OnMouseLeave>([](UIMouseEventArgs args) {
+            printf("Leave\n");
+        });
+        m_uiElement->Recalculate();
+
+        AppendElement(m_uiElement);
     }
+
     TestState::~TestState()
     {}
-    void TestState::Update(const GameTimer& gameTimer)
-    {
-        m_uiElement->Update(gameTimer);
-    }
-    void TestState::Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer)
-    {
-        m_uiElement->Draw(spriteBatch, gameTimer);
-    }
 }

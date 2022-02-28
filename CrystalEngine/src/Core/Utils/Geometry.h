@@ -137,6 +137,15 @@ namespace crystal
             return area;
         }
 
+        bool Contains(const Vec& point) const
+        {
+            for (int i = 0; i < L; i++)
+            {
+                if (point[i] < _minPos[i] || point[i] > _maxPos[i]) return false;
+            }
+            return true;
+        }
+
     private:
         Vec _minPos, _maxPos;
     };

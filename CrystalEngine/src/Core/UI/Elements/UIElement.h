@@ -1,6 +1,6 @@
 #pragma once
-#include "../UICommon.h"
-#include "../UIEventArgs.h"
+#include "../Common/UICommon.h"
+#include "../Common/UIEventArgs.h"
 
 namespace crystal
 {
@@ -12,7 +12,7 @@ namespace crystal
 
         virtual void Update(const GameTimer& gameTimer);
         virtual void Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
-        virtual void ReCalculate();
+        virtual void Recalculate();
 
         // Add Listeners
         template<UIEventType E>
@@ -21,8 +21,42 @@ namespace crystal
         void AppendChild(std::shared_ptr<UIElement> element);
         void RemoveChild(std::shared_ptr<UIElement> element);
         std::shared_ptr<UIElement> GetChildByName(const std::string& name);
+        /**
+         * @brief Get the element that supposed to respond to the event at given position,
+         * if no such element exist, then [this] becomes that element
+         * @param screenPos: Given position
+         * @return 
+        */
+        std::shared_ptr<UIElement> GetResponseElement(const Vector2f& screenPos);
+
+
+        // Events Handler
+        void MouseJustPressed(UIMouseButtonEventArgs args);
+        void MouseJustReleased(UIMouseButtonEventArgs args);
+        void MouseEnter(UIMouseEventArgs args);
+        void MouseLeave(UIMouseEventArgs args);
+
+
+        bool IsActive() const { return m_isActive; }
+        void SetActive(bool value) { m_isActive = value; }
+
+        bool IsVisible() const { return m_isVisible; }
+        void SetVisible(bool value) { m_isVisible = value; }
+
+        bool NoEvents() const { return m_noEvents; }
+        void SetNoEvents(bool value) { m_noEvents = value; }
+
+        bool CanResponseEvent() const { return m_isActive && !m_noEvents; }
 
         std::string GetName() const { return m_name; }
+
+        std::string GetTooltip() const { return m_tooltip; }
+        void GetTooltip(const std::string& tooltip) { m_tooltip = tooltip; }
+
+        OverflowStyle GetOverflowStyle() const { return m_overflowStyle; }
+
+        PropagationFlags GetPropagationFlags() const { return m_propagationFlags; }
+        void SetPropagationFlags(PropagationFlags flags) { m_propagationFlags = flags; }
 
         Vector2f GetPivot() const { return m_pivot; }
         void SetPivot(Vector2f pivot) { m_pivot = pivot; }
@@ -35,6 +69,9 @@ namespace crystal
 
         SizeLayout GetSize() const { return m_size; }
         void SetSize(SizeLayout size) { m_size = size; }
+
+        Bound2f GetEventBound() const { return m_calculatedOuterBound; }
+        Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
     protected:
         // Virtual
         virtual void UpdateSelf(const GameTimer& gameTimer);
@@ -42,12 +79,16 @@ namespace crystal
         virtual void DrawSelf(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
         virtual void DrawChildren(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
 
+        virtual void RecalculateSelf();
+        virtual void RecalculateChildren();
+
         /// Data
 
         // Events
-        UIEvent<UIEventType::OnMouseClicked>    m_eventOnMouseClick{};
-        UIEvent<UIEventType::OnMouseDown>       m_eventOnMouseDown{};
-        UIEvent<UIEventType::OnMouseUp>         m_eventOnMouseUp{};
+        UIEvent<UIEventType::OnMouseJustPressed>    m_eventOnMouseJustPress{};
+        UIEvent<UIEventType::OnMouseJustReleased>   m_eventOnMouseJustRelease{};
+        UIEvent<UIEventType::OnMouseEnter>          m_eventOnMouseEnter{};
+        UIEvent<UIEventType::OnMouseLeave>          m_eventOnMouseLeave{};
 
         // Relationship
         std::vector<std::shared_ptr<UIElement>>     m_pChildren{};
@@ -56,7 +97,7 @@ namespace crystal
         // Properties
         bool        m_isActive = true;
         bool        m_isVisible = true;
-        bool        m_noEvent = false;
+        bool        m_noEvents = false;
         bool        m_isFocused = false;
 
         std::string     m_name{};
@@ -105,26 +146,34 @@ namespace crystal
     }
 
     template<>
-    inline void UIElement::AddEventListener<UIEventType::OnMouseClicked>(
-        UIEventListener<UIEventType::OnMouseClicked> listener
+    inline void UIElement::AddEventListener<UIEventType::OnMouseJustPressed>(
+        UIEventListener<UIEventType::OnMouseJustPressed> listener
         )
     {
-        m_eventOnMouseClick += listener;
+        m_eventOnMouseJustPress += listener;
     }
 
     template<>
-    inline void UIElement::AddEventListener<UIEventType::OnMouseDown>(
-        UIEventListener<UIEventType::OnMouseDown> listener
+    inline void UIElement::AddEventListener<UIEventType::OnMouseJustReleased>(
+        UIEventListener<UIEventType::OnMouseJustReleased> listener
         )
     {
-        m_eventOnMouseDown += listener;
+        m_eventOnMouseJustRelease += listener;
     }
 
     template<>
-    inline void UIElement::AddEventListener<UIEventType::OnMouseUp>(
-        UIEventListener<UIEventType::OnMouseUp> listener
+    inline void UIElement::AddEventListener<UIEventType::OnMouseEnter>(
+        UIEventListener<UIEventType::OnMouseEnter> listener
         )
     {
-        m_eventOnMouseUp += listener;
+        m_eventOnMouseEnter += listener;
+    }
+
+    template<>
+    inline void UIElement::AddEventListener<UIEventType::OnMouseLeave>(
+        UIEventListener<UIEventType::OnMouseLeave> listener
+        )
+    {
+        m_eventOnMouseLeave += listener;
     }
 }

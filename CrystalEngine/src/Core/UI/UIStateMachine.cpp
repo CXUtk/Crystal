@@ -39,5 +39,10 @@ namespace crystal
     void UIStateMachine::SetInitState(const std::string & name)
     {
         m_pCurrentUIState = m_UIStates[name];
+
+        for (auto& pair : m_UIStates)
+        {
+            pair.second->Preprocess();
+        }
     }
 }

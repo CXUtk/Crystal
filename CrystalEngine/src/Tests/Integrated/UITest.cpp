@@ -31,6 +31,12 @@ namespace crystal
 
     void UITest::Draw(const crystal::GameTimer& gameTimer)
     {
+        auto graphicsContext = m_engine->GetGraphicsContext();
+        graphicsContext->Clear(
+            crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+            | crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+            | crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
+            crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
         m_pUIStateMachine->Draw(gameTimer);
     }
 
