@@ -2,13 +2,14 @@
 #include <CrystalEngine/src/Tests/Integrated/OrbitControllerTest.h>
 #include <CrystalEngine/src/Tests/Integrated/TriangleTest.h>
 #include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
+#include <CrystalEngine/src/Tests/Integrated/UITest.h>
 #include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>
 #include <SJson/SJson.hpp>
 using namespace crystal;
-
-#include <Interfaces/FileSystem/File.h>
-#include <type_traits>
+//
+//#include <Interfaces/FileSystem/File.h>
+//#include <type_traits>
 
 int main()
 {
@@ -39,14 +40,14 @@ int main()
 	//auto str = File::ReadAllText("test.txt");
 
 	//std::cout << str << std::endl;
-	//Engine* engine = Engine::GetInstance();
-	//try
-	//{
-	//	engine->Start(std::make_unique<QuadTest>());
-	//}
-	//catch (std::exception ex)
-	//{
-	//	crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
-	//}
+	Engine* engine = Engine::GetInstance();
+	try
+	{
+		engine->Start(std::make_unique<UITest>());
+	}
+	catch (std::exception ex)
+	{
+		crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
+	}
 	return 0;
 }

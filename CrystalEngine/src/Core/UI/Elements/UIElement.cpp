@@ -1,5 +1,7 @@
 #include "UIElement.h"
 #include <Engine.h>
+
+#include <Core/Asset/AssetManager.h>
 #include <Core/Render/SpriteBatch.h>
 
 namespace crystal
@@ -77,10 +79,13 @@ namespace crystal
         if constexpr (EnableDebugDraw)
         {
             auto graphicsDevice = Engine::GetInstance()->GetGraphicsDevice();
+            auto assetsManager = Engine::GetInstance()->GetAssetManager();
+            auto whiteTexture = assetsManager->LoadAsset<ITexture2D>("Crystal:white");
             spriteBatch->Begin(SpriteSortMode::Deferred,
                 graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp),
                 graphicsDevice->GetCommonBlendState(BlendStates::AlphaBlend));
-            spriteBatch->Draw()
+            Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+            spriteBatch->Draw(whiteTexture, bound, Color4f(1.f, 1.f, 1.f, 0.33f));
             spriteBatch->End();
         }
     }

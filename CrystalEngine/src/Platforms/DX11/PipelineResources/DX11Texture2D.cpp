@@ -1,4 +1,4 @@
-﻿#include "DX11Texture2D.h"
+#include "DX11Texture2D.h"
 #include "DX11ShaderProgram.h"
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
@@ -72,8 +72,13 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
+        ComPtr<ID3D11Texture2D> pTexture2D = nullptr;
 		DirectX::CreateWICTextureFromMemoryEx(graphicsDevice->GetD3DDevice(), src, size, 0, textureDesc.Usage, textureDesc.BindFlags,
-			textureDesc.CPUAccessFlags, textureDesc.MiscFlags, 0, nullptr, m_pSRV.GetAddressOf());
+			textureDesc.CPUAccessFlags, textureDesc.MiscFlags, 0, reinterpret_cast<ID3D11Resource**>(pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
+        pTexture2D->GetDesc(&textureDesc);
+
+        m_size.x = textureDesc.Width;
+        m_size.y = textureDesc.Height;
 	}
 
 	DX11Texture2D::~DX11Texture2D()

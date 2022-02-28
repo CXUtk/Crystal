@@ -72,7 +72,8 @@ namespace crystal
         GraphicsCommons::InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(m_initArgs);
 
-        m_pAssetManager = AssetManager::LoadAssetPackage("resources/package1/contents.json");
+        m_pAssetManager = std::make_shared<AssetManager>();
+        m_pAssetManager->LoadAssetPackage("resources/package1/contents.json");
         m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice(), GetGraphicsContext());
     }
 

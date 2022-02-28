@@ -230,7 +230,7 @@ namespace crystal
 		m_defaultRenderState.m_pSamplerState = graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp);
 
 		m_defaultRenderState.m_pDepthStencilState = graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::NoDepthTest);
-		m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("Sprite");
+		m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("package1:Sprite");
 		
 		auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();
 		m_defaultRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,

@@ -10,5 +10,8 @@ namespace crystal
 
         virtual void Update(const GameTimer& gameTimer) override;
         virtual void Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer) override;
+
+    private:
+        std::shared_ptr<UIElement> m_uiElement;
     };
 }

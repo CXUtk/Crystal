@@ -24,6 +24,17 @@ namespace crystal
 
         std::string GetName() const { return m_name; }
 
+        Vector2f GetPivot() const { return m_pivot; }
+        void SetPivot(Vector2f pivot) { m_pivot = pivot; }
+
+        Vector2f GetPosition() const { return m_position; }
+        void SetPosition(Vector2f pos) { m_position = pos; }
+
+        Vector2f GetAnchorPoint() const { return m_anchorPoint; }
+        void SetAnchorPoint(Vector2f anchorPoint) { m_anchorPoint = anchorPoint; }
+
+        SizeLayout GetSize() const { return m_size; }
+        void SetSize(SizeLayout size) { m_size = size; }
     protected:
         // Virtual
         virtual void UpdateSelf(const GameTimer& gameTimer);
@@ -76,12 +87,12 @@ namespace crystal
         SizeLayout      m_size{};
 
         // Not recommended
-        Vector2f        m_scale;
-        Float           m_rotation;
+        Vector2f        m_scale{};
+        Float           m_rotation{};
 
         // Auxiliary data
-        Bound2f         m_calculatedInnerBound;
-        Bound2f         m_calculatedOuterBound;
+        Bound2f         m_calculatedInnerBound{};
+        Bound2f         m_calculatedOuterBound{};
 
 
         void CalculateBounds();

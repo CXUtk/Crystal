@@ -50,8 +50,8 @@ namespace crystal
     };
 
     template<UIEventType E>
-    using UIEvent = UIEventDelegate<E>::Event_Type;
+    using UIEvent = typename UIEventDelegate<E>::Event_Type;
 
     template<UIEventType E>
-    using UIEventListener = UIEventDelegate<E>::Func_Type;
+    using UIEventListener = typename UIEventDelegate<E>::Func_Type;
 }

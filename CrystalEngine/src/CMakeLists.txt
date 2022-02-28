@@ -24,7 +24,7 @@ if (CRYSTAL_USE_DX11)
 endif()
 
 
-# 将源代码添加到此项目的可执行文件。
+# 陆芦脭麓麓煤脗毛脤铆录脫碌陆麓脣脧卯脛驴碌脛驴脡脰麓脨脨脦脛录镁隆拢
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
 ${CrystalEngineSources_Core}
@@ -38,13 +38,13 @@ set_target_properties(CrystalEngine PROPERTIES
             CXX_EXTENSIONS OFF)
 
 
-# 调整GLFW的Flags，关掉无用的编译组件
+# 碌梅脮没GLFW碌脛Flags拢卢鹿脴碌么脦脼脫脙碌脛卤脿脪毛脳茅录镁
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 
-# 操作系统和图形接口判定
+# 虏脵脳梅脧碌脥鲁潞脥脥录脨脦陆脫驴脷脜脨露篓
 
 if (CRYSTAL_USE_OPENGL)
     if (UNIX)

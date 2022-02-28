@@ -6,6 +6,7 @@
 #include <Core/Render/SpriteBatch.h>
 
 #include <Core/UI/UIStateMachine.h>
+#include "UIStates/TestState.h"
 
 namespace crystal
 {
@@ -19,7 +20,8 @@ namespace crystal
     {
         m_pUIStateMachine = std::make_unique<UIStateMachine>();
 
-        m_pUIStateMachine->AddState()
+        m_pUIStateMachine->AddState("test", std::make_shared<TestState>());
+        m_pUIStateMachine->SetInitState("test");
     }
 
     void UITest::Update(const crystal::GameTimer& gameTimer)

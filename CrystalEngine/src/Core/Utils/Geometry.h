@@ -146,4 +146,10 @@ namespace crystal
     {
         return BoundingBox<L, T, Q>(botLeft, botLeft + size);
     }
+
+    template<typename T1, typename T2, glm::length_t L, glm::qualifier Q>
+    inline BoundingBox<L, T1, Q> BoundingBoxConvert(const BoundingBox<L, T2, Q>& bbox)
+    {
+        return BoundingBox<L, T1, Q>(BoundingBox<L, T1, Q>::Vec(bbox.GetMinPos()), BoundingBox<L, T1, Q>::Vec(bbox.GetMaxPos()));
+    }
 }
