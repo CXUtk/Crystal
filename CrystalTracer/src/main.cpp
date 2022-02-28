@@ -8,6 +8,8 @@
 using namespace crystal;
 
 #include <Interfaces/FileSystem/File.h>
+#include <type_traits>
+
 int main()
 {
 	//fs::path path("C:\\Windows\\System32\\啊啊啊.txt");
@@ -37,14 +39,14 @@ int main()
 	//auto str = File::ReadAllText("test.txt");
 
 	//std::cout << str << std::endl;
-	Engine* engine = Engine::GetInstance();
-	try
-	{
-		engine->Start(std::make_unique<QuadTest>());
-	}
-	catch (std::exception ex)
-	{
-		crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
-	}
+	//Engine* engine = Engine::GetInstance();
+	//try
+	//{
+	//	engine->Start(std::make_unique<QuadTest>());
+	//}
+	//catch (std::exception ex)
+	//{
+	//	crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
+	//}
 	return 0;
 }

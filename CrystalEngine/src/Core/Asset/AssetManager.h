@@ -20,8 +20,10 @@ namespace crystal
 		std::shared_ptr<T> LoadAsset(const URI& uri);
 	private:
 		std::map<std::string, std::shared_ptr<IShaderProgram>> m_shadersMap;
+        std::map<std::string, std::shared_ptr<ITexture2D>> m_texture2DMap;
 
 		void m_LoadShaders(const std::vector<path_type>& paths);
+        void m_LoadTextures(const std::vector<path_type>& paths);
 	};
 
 	template<typename T>
@@ -36,6 +38,15 @@ namespace crystal
 			}
 			return p->second;
 		}
+        else if constexpr (std::is_same<T, ITexture2D>::value)
+        {
+            auto p = m_texture2DMap.find(uri);
+            if (p == m_texture2DMap.end())
+            {
+                throw std::invalid_argument(string_format("Cannot find given texture2D asset: %s", uri.c_str()));
+            }
+            return p->second;
+        }
 		else
 		{
 			static_assert(false, "AssetManager does not support this asset type");

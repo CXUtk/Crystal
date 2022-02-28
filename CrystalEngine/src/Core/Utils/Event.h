@@ -35,6 +35,6 @@ namespace crystal
 		}
 
 	private:
-		std::vector<Func> _eventHandlers;
+        std::vector<Func> _eventHandlers{};
 	};
 }
