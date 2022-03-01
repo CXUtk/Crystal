@@ -119,14 +119,14 @@ namespace crystal
 		//	R, Vector2f(size) * 0.5f, 4.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
 		//spriteBatch->End();
 
-		spriteBatch->Begin(SpriteSortMode::Deferred,
-			graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 
-			graphicsDevice->GetCommonBlendState(BlendStates::AlphaBlend));
-		spriteBatch->Draw(m_texture2D, Vector2f(300.f, 300.f), Color4f(1.f, 1.f, 1.f, 0.5f),
-			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
-		spriteBatch->Draw(m_texture2D, Vector2f(400.f, 350.f), Color4f(1.f, 1.f, 1.f, 0.5f),
-			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
-		spriteBatch->End();
+		//spriteBatch->Begin(SpriteSortMode::Deferred,
+		//	graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 
+		//	graphicsDevice->GetCommonBlendState(BlendStates::AlphaBlend));
+		//spriteBatch->Draw(m_texture2D, Vector2f(300.f, 300.f), Color4f(1.f, 1.f, 1.f, 0.5f),
+		//	0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+		//spriteBatch->Draw(m_texture2D, Vector2f(400.f, 350.f), Color4f(1.f, 1.f, 1.f, 0.5f),
+		//	0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+		//spriteBatch->End();
 	}
 
 	void QuadTest::Exit()

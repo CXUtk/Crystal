@@ -4,8 +4,9 @@
 #include "Core/Utils/GameTimer.h"
 #include "Core/Input/InputController.h"
 #include "Core/Utils/Logger.h"
-#include "Core/Render/SpriteBatch.h"
+#include "Core/Render/RenderExports.h"
 #include "Core/Asset/AssetManager.h"
+
 #include "Platforms/PlatformFactory.h"
 
 namespace crystal
@@ -26,6 +27,9 @@ namespace crystal
     
     Engine::~Engine()
     {
+        m_pGeometryRenderer.reset();
+        m_spriteBatch.reset();
+        m_pAssetManager.reset();
         m_application.reset();
         m_inputController.reset();
         m_platformProvider.reset();
@@ -61,6 +65,11 @@ namespace crystal
     {
         return ptr(m_spriteBatch);
     }
+
+    GeometryRenderer* Engine::GetGeometryRenderer() const
+    {
+        return ptr(m_pGeometryRenderer);
+    }
     
     //IGraphicsDevice* Engine::GetGraphicsDevice() const
     //{
@@ -74,7 +83,12 @@ namespace crystal
 
         m_pAssetManager = std::make_shared<AssetManager>();
         m_pAssetManager->LoadAssetPackage("resources/package1/contents.json");
-        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice(), GetGraphicsContext());
+
+        auto graphicsDevice = GetGraphicsDevice();
+        auto graphicsContext = GetGraphicsContext();
+
+        m_spriteBatch = std::make_unique<SpriteBatch>(graphicsDevice, graphicsContext);
+        m_pGeometryRenderer = std::make_unique<GeometryRenderer>(graphicsDevice, graphicsContext);
     }
 
     void Engine::Start(std::unique_ptr<Application>&& application)

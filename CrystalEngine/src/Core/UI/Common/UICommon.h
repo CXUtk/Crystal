@@ -1,5 +1,6 @@
 #pragma once
 #include <Interfaces/Graphics/GraphicsCommon.h>
+#include <Core/Render/RenderCommon.h>
 #include <string>
 #include <chrono>
 #include <memory>

@@ -43,7 +43,7 @@ int main()
 	Engine* engine = Engine::GetInstance();
 	try
 	{
-		engine->Start(std::make_unique<UITest>());
+		engine->Start(std::make_unique<QuadTest>());
 	}
 	catch (std::exception ex)
 	{

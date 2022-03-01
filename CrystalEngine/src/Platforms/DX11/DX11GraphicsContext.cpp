@@ -65,10 +65,13 @@ namespace crystal
 		assert(dx11GraphicsDevice);
 		assert(m_pSwapChain);
 
+        m_renderTargets[0].reset();
+
 		// Resize the buffer if window size was changed
 		auto newWindowSize = m_pWindow->GetWindowSize();
 		if (m_backBufferSize != newWindowSize)
 		{
+
 			HR(m_pSwapChain->ResizeBuffers(1, newWindowSize.x, newWindowSize.y, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 			m_backBufferSize = newWindowSize;
 		}
@@ -134,7 +137,7 @@ namespace crystal
 		d3dUtils::D3D11SetDebugObjectName(depthStencilView.Get(), "DepthStencilView");
 		d3dUtils::D3D11SetDebugObjectName(renderTargetView.Get(), "BackBufferRTV[0]");
 
-		m_renderTargets[0].reset();
+        m_renderTargets[0].reset();
 		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(m_pGraphicsDevice, renderTargetView,
 			nullptr, depthStencilView, screenViewport);
 	}
@@ -143,7 +146,7 @@ namespace crystal
 	{
 		auto dx11GraphicsDevice = m_pGraphicsDevice->GetD3DDevice();
 
-		// ¼ì²â MSAAÖ§³ÖµÄÖÊÁ¿µÈ¼¶
+		// æ£€æµ‹ MSAAæ”¯æŒçš„è´¨é‡ç­‰çº§
 		dx11GraphicsDevice->CheckMultisampleQualityLevels(
 			DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_MSAAQuality);
 		assert(m_MSAAQuality > 0);
@@ -169,7 +172,7 @@ namespace crystal
 		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-		// ÊÇ·ñ¿ªÆô4±¶¶àÖØ²ÉÑù£¿
+		// æ˜¯å¦å¼€å¯4å€å¤šé‡é‡‡æ ·ï¼Ÿ
 		if (args.Enable4xMSAA)
 		{
 			sd.SampleDesc.Count = 4;
@@ -192,7 +195,7 @@ namespace crystal
 
 		dxgiFactory->MakeWindowAssociation(m_pWindow->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
-		// ÉèÖÃµ÷ÊÔ¶ÔÏóÃû
+		// è®¾ç½®è°ƒè¯•å¯¹è±¡å
 		d3dUtils::D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
 		d3dUtils::DXGISetDebugObjectName(m_pSwapChain.Get(), "SwapChain");
 	}

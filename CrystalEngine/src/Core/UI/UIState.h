@@ -2,6 +2,7 @@
 #include "Common/UICommon.h"
 #include <Interfaces/Interfaces.h>
 
+
 namespace crystal
 {
 	class UIState
@@ -11,7 +12,7 @@ namespace crystal
 
         virtual void Preprocess();
         virtual void Update(const GameTimer& gameTimer);
-        virtual void Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
+        virtual void Draw(const RenderPayload& payload, const GameTimer& gameTimer);
 
     protected:
         std::vector<std::shared_ptr<UIElement>> m_pUIElements{};

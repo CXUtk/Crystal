@@ -29,13 +29,13 @@ namespace crystal
         RecalculateAll();
     }
 
-    void UIState::Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer)
+    void UIState::Draw(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         for (auto it = m_pUIElements.rbegin(); it != m_pUIElements.rend(); ++it)
         {
             auto& child = (*it);
             if (!child->IsActive() || !child->IsVisible()) continue;
-            (*it)->Draw(spriteBatch, gameTimer);
+            (*it)->Draw(payload, gameTimer);
         }
 
         DrawTooltip();
@@ -63,6 +63,7 @@ namespace crystal
     {
         m_pHoverElement = nullptr;
         auto mousePos = m_pGameWindow->GetMousePos();
+
         for (auto& element : m_pUIElements)
         {
             if (element->CanResponseEvent()
@@ -83,7 +84,6 @@ namespace crystal
             mouseButtonArgs.TimeStamp = gameTimer.GetPhysicalTime();
 
             UIMouseEventArgs mouseArgs = {};
-            mouseArgs.Element = mouseButtonArgs.Element;
             mouseArgs.MousePosScreen = mousePos;
             mouseArgs.TimeStamp = gameTimer.GetPhysicalTime();
 
@@ -125,9 +125,26 @@ namespace crystal
             {
                 if (m_pPrevHoverElement)
                 {
+                    mouseArgs.Element = m_pPrevHoverElement.get();
                     m_pPrevHoverElement->MouseLeave(mouseArgs);
                 }
+                mouseArgs.Element = m_pHoverElement.get();
                 m_pHoverElement->MouseEnter(mouseArgs);
+            }
+        }
+        else
+        {
+            if (m_pPrevHoverElement != m_pHoverElement)
+            {
+                UIMouseEventArgs mouseArgs = {};
+                mouseArgs.Element = m_pPrevHoverElement.get();
+                mouseArgs.MousePosScreen = mousePos;
+                mouseArgs.TimeStamp = gameTimer.GetPhysicalTime();
+
+                if (m_pPrevHoverElement)
+                {
+                    m_pPrevHoverElement->MouseLeave(mouseArgs);
+                }
             }
         }
         m_pPrevHoverElement = m_pHoverElement;

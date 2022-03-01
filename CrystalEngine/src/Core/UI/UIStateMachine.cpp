@@ -2,6 +2,8 @@
 #include "UIState.h"
 #include <Engine.h>
 
+#include <Core/Render/RenderExports.h>
+
 namespace crystal
 {
 	UIStateMachine::UIStateMachine()
@@ -21,8 +23,15 @@ namespace crystal
     void UIStateMachine::Draw(const GameTimer & gameTimer)
     {
         if (!m_pCurrentUIState) return;
-        auto spriteBatch = Engine::GetInstance()->GetSpriteBatch();
-        m_pCurrentUIState->Draw(spriteBatch, gameTimer);
+        auto engine = Engine::GetInstance();
+        auto spriteBatch = engine->GetSpriteBatch();
+        auto geometryRenderer = engine->GetGeometryRenderer();
+
+        RenderPayload payload = {};
+        payload.SpriteBatch = spriteBatch;
+        payload.GeometryRenderer = geometryRenderer;
+
+        m_pCurrentUIState->Draw(payload, gameTimer);
     }
     void UIStateMachine::AddState(const std::string& name, std::shared_ptr<UIState> state)
     {

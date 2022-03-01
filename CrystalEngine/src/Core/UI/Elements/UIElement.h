@@ -11,7 +11,7 @@ namespace crystal
         virtual ~UIElement();
 
         virtual void Update(const GameTimer& gameTimer);
-        virtual void Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
+        virtual void Draw(const RenderPayload& payload, const GameTimer& gameTimer);
         virtual void Recalculate();
 
         // Add Listeners
@@ -76,8 +76,8 @@ namespace crystal
         // Virtual
         virtual void UpdateSelf(const GameTimer& gameTimer);
         virtual void UpdateChildren(const GameTimer& gameTimer);
-        virtual void DrawSelf(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
-        virtual void DrawChildren(SpriteBatch* spriteBatch, const GameTimer& gameTimer);
+        virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer);
+        virtual void DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer);
 
         virtual void RecalculateSelf();
         virtual void RecalculateChildren();

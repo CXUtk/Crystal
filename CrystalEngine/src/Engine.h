@@ -56,6 +56,12 @@ namespace crystal
 		*/
 		SpriteBatch* GetSpriteBatch() const;
 
+        /**
+         * @brief 
+         * @return 
+        */
+        GeometryRenderer* GetGeometryRenderer() const;
+
 		/**
 		 * @brief 
 		 * @return 
@@ -72,17 +78,19 @@ namespace crystal
 		void Start(std::unique_ptr<Application>&& application);
 
 	private:
-		std::unique_ptr<Application>			m_application;
-		std::unique_ptr<IPlatformProvider>		m_platformProvider;
-		std::unique_ptr<InputController>		m_inputController;
-		std::unique_ptr<SpriteBatch>			m_spriteBatch;
+		std::unique_ptr<Application>			m_application = nullptr;
+		std::unique_ptr<IPlatformProvider>		m_platformProvider = nullptr;
+		std::unique_ptr<InputController>		m_inputController = nullptr;
 
-		std::shared_ptr<AssetManager>			m_pAssetManager;
+		std::unique_ptr<SpriteBatch>			m_spriteBatch = nullptr;
+        std::unique_ptr<GeometryRenderer>	    m_pGeometryRenderer = nullptr;
 
-		double		m_fpsCap;			// Maximum FPS
-		GameTimer	m_gameTimer;		// Game timer
+		std::shared_ptr<AssetManager>			m_pAssetManager = nullptr;
 
-		InitArgs	m_initArgs;
+		double		m_fpsCap = 0.0;			// Maximum FPS
+        GameTimer	m_gameTimer{};		// Game timer
+
+        InitArgs	m_initArgs{};
 	
 		Engine();
 

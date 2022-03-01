@@ -1,6 +1,7 @@
 {
   "shaders": [
     "shaders/sprite.json",
+    "shaders/geometry.json",
     "shaders/grayscale.json"
   ]
 }

@@ -107,5 +107,9 @@ namespace crystal
 			context->PSSetShaderResources(0, 1, &nullView);
 			context->PSSetSamplers(0, 1, &nullSampler);
 		}
+        //UINT zero = 0;
+        //ID3D11Buffer* nullBuffer = nullptr;
+        //context->IASetVertexBuffers(0, 1, &nullBuffer, &zero, &zero);
+        //context->IASetInputLayout(nullptr);
 	}
 }

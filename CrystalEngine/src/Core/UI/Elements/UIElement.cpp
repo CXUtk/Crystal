@@ -2,7 +2,7 @@
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
-#include <Core/Render/SpriteBatch.h>
+#include <Core/Render/RenderExports.h>
 
 namespace crystal
 {
@@ -17,10 +17,10 @@ namespace crystal
         UpdateChildren(gameTimer);
     }
 
-    void UIElement::Draw(SpriteBatch* spriteBatch, const GameTimer& gameTimer)
+    void UIElement::Draw(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        DrawSelf(spriteBatch, gameTimer);
-        DrawChildren(spriteBatch, gameTimer);
+        DrawSelf(payload, gameTimer);
+        DrawChildren(payload, gameTimer);
     }
 
     void UIElement::Recalculate()
@@ -125,29 +125,26 @@ namespace crystal
         }
     }
 
-    void UIElement::DrawSelf(SpriteBatch* spriteBatch, const GameTimer& gameTimer)
+    void UIElement::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         if constexpr (EnableDebugDraw)
         {
             auto graphicsDevice = Engine::GetInstance()->GetGraphicsDevice();
-            auto assetsManager = Engine::GetInstance()->GetAssetManager();
-            auto whiteTexture = assetsManager->LoadAsset<ITexture2D>("Crystal:white");
-            spriteBatch->Begin(SpriteSortMode::Deferred,
-                graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp),
-                graphicsDevice->GetCommonBlendState(BlendStates::AlphaBlend));
+
+            payload.GeometryRenderer->Begin();
             Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
-            spriteBatch->Draw(whiteTexture, bound, Color4f(1.f, 1.f, 1.f, 0.33f));
-            spriteBatch->End();
+            payload.GeometryRenderer->DrawBound2D(bound, Color4f(1.f, 1.f, 0.f, 1.f));
+            payload.GeometryRenderer->End();
         }
     }
 
-    void UIElement::DrawChildren(SpriteBatch* spriteBatch, const GameTimer& gameTimer)
+    void UIElement::DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         for (auto it = m_pChildren.rbegin(); it != m_pChildren.rend(); ++it)
         {
             auto& child = (*it);
             if (!child->m_isActive || !child->m_isVisible) continue;
-            (*it)->Draw(spriteBatch, gameTimer);
+            (*it)->Draw(payload, gameTimer);
         }
     }
 

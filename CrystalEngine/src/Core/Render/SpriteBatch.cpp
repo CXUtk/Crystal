@@ -76,7 +76,6 @@ namespace crystal
 		std::vector<SpriteInfo>			m_spriteQueue{};
 		bool							m_isBatchingBegin = false;
 
-		std::set<std::shared_ptr<ITexture2D>>	m_textureRefSet;
 		static BatchVertex2D					m_defaultVertices[4];
 
 		void m_FlushThisBatch();
@@ -94,7 +93,7 @@ namespace crystal
 
 	SpriteBatch::SpriteBatch(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext)
 	{
-		m_pImpl = std::make_unique<Impl>(graphicsDevice, graphicsContext);
+		m_pImpl = std::make_unique<SpriteBatch::Impl>(graphicsDevice, graphicsContext);
 	}
 
 	SpriteBatch::~SpriteBatch()
@@ -183,6 +182,7 @@ namespace crystal
 		auto assetManager = Engine::GetInstance()->GetAssetManager();
 
 		m_pDefaultPRO = graphicsDevice->CreatePipelineResourceObject();
+        m_pDefaultPSO = m_pGraphicsDevice->CreatePipelineStateObject();
 
 		// Initialize index buffers (static)
 		IndexBufferDescription indexBufferDesc;
@@ -236,8 +236,6 @@ namespace crystal
 		m_defaultRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,
 			(float)viewPortSize.y, -1.f, 1.f);
 		m_defaultRenderState.m_spriteSortMode = SpriteSortMode::Deferred;
-
-		m_pDefaultPSO = m_pGraphicsDevice->CreatePipelineStateObject();
 	}
 
 	SpriteBatch::Impl::~Impl()
@@ -282,7 +280,7 @@ namespace crystal
 		m_pDefaultPRO->SetSamplerState(m_currentRenderState.m_pSamplerState, 0);
 	}
 
-	void SpriteBatch::Impl::End()
+    void SpriteBatch::Impl::End()
 	{
 		if (!m_isBatchingBegin)
 		{
@@ -290,7 +288,6 @@ namespace crystal
 		}
 		m_FlushThisBatch();
 		m_isBatchingBegin = false;
-		m_textureRefSet.clear();
 	}
 
 	void SpriteBatch::Impl::Draw(std::shared_ptr<ITexture2D> texture, const Bound2f& destRect,

@@ -22,7 +22,10 @@ namespace crystal
 	class Application;
 	class GameTimer;
 	class InputController;
-	class SpriteBatch;
+
+    class SpriteBatch;
+    class GeometryRenderer;
+
 	class AssetManager;
 
 	// Data
