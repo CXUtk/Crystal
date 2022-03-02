@@ -17,19 +17,19 @@ namespace crystal
 		Color4f		Color;
 	};
 
-	struct SpriteInfo
-	{
-		Bound2f							TexCoords;
-		Bound2f							DestRect;
-		Color4f							Color;
-		Vector2f						Origin;
-		float							Depth;
-		float							Rotation;
-		std::shared_ptr<ITexture2D>		Texture;
-		SpriteEffect					SpriteEffect;
-	};
+    struct SpriteInfo
+    {
+        Bound2f							TexCoords{};
+        Bound2f							DestRect{};
+        Color4f							Color{};
+        Vector2f						Origin{};
+        float							Depth = 0.f;
+        float							Rotation = 0.f;
+        std::shared_ptr<ITexture2D>		Texture = nullptr;
+        SpriteEffect					SpriteEffect = SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE;
+    };
 
-	struct RenderState
+	struct RenderStateSB
 	{
 		SpriteSortMode							m_spriteSortMode = SpriteSortMode::Deferred;
 		Matrix4f								m_renderMatrix{};
@@ -39,6 +39,11 @@ namespace crystal
 		std::shared_ptr<IDepthStencilState>		m_pDepthStencilState = nullptr;
 		std::shared_ptr<ISamplerState>			m_pSamplerState = nullptr;
 	};
+
+    //inline RenderState::~RenderState()
+    //{
+    //    printf("23333\n");
+    //}
 
 	class SpriteBatch::Impl
 	{
@@ -70,8 +75,8 @@ namespace crystal
 		std::shared_ptr<IPipelineResourceObject>	m_pDefaultPRO = nullptr;
 		std::shared_ptr<IVertexBuffer>				m_pDefaultVertexBuffer = nullptr;
 
-		RenderState						m_defaultRenderState{};
-		RenderState						m_currentRenderState{};
+        RenderStateSB					m_defaultRenderState{};
+        RenderStateSB					m_currentRenderState{};
 		std::vector<BatchVertex2D>		m_vertices{};
 		std::vector<SpriteInfo>			m_spriteQueue{};
 		bool							m_isBatchingBegin = false;
@@ -181,7 +186,7 @@ namespace crystal
 
 		auto assetManager = Engine::GetInstance()->GetAssetManager();
 
-		m_pDefaultPRO = graphicsDevice->CreatePipelineResourceObject();
+		m_pDefaultPRO = m_pGraphicsDevice->CreatePipelineResourceObject();
         m_pDefaultPSO = m_pGraphicsDevice->CreatePipelineStateObject();
 
 		// Initialize index buffers (static)
@@ -230,7 +235,7 @@ namespace crystal
 		m_defaultRenderState.m_pSamplerState = graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp);
 
 		m_defaultRenderState.m_pDepthStencilState = graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::NoDepthTest);
-		m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("package1:Sprite");
+        m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("package1:Sprite");
 		
 		auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();
 		m_defaultRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,
@@ -239,7 +244,8 @@ namespace crystal
 	}
 
 	SpriteBatch::Impl::~Impl()
-	{}
+	{
+    }
 
 	void SpriteBatch::Impl::Begin(SpriteSortMode spriteSortMode, 
 		const Matrix4f* transform, 
@@ -265,7 +271,7 @@ namespace crystal
 		{
 			m_currentRenderState.m_renderMatrix = *transform;
 		}
-		m_currentRenderState.m_pRasterState =rasterState ? rasterState : m_defaultRenderState.m_pRasterState;
+		m_currentRenderState.m_pRasterState = rasterState ? rasterState : m_defaultRenderState.m_pRasterState;
 		m_currentRenderState.m_pBlendState =  blendState ? blendState : m_defaultRenderState.m_pBlendState;
 		m_currentRenderState.m_pDepthStencilState = depthStencilState ? depthStencilState : m_defaultRenderState.m_pDepthStencilState;
 		m_currentRenderState.m_pShaderProgram = shader ? shader : m_defaultRenderState.m_pShaderProgram;
@@ -454,4 +460,5 @@ namespace crystal
 			m_vertices.push_back(vertices[i]);
 		}
 	}
+
 }

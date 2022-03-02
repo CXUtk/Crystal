@@ -34,7 +34,7 @@ namespace crystal
 		virtual Vector2i GetCurrentFrameBufferSize() const override;
 	private:
 
-		DX11GraphicsDevice*				m_pGraphicsDevice = nullptr;
+        ComPtr<ID3D11Device>		    m_pd3dGraphicsDevice = nullptr;
 		ComPtr<ID3D11DeviceContext>		m_pd3dImmediateContext = nullptr;
 		ComPtr<IDXGISwapChain>			m_pSwapChain = nullptr;
 
@@ -51,7 +51,7 @@ namespace crystal
 		std::shared_ptr<DX11PipelineResourceObject>			m_pCurrentPipelineResource;
 		std::shared_ptr<DX11PipelineStateObject>			m_pCurrentPipelineState;
 
-		void m_ResizeBuffer();
+		void m_ResizeBuffer(DX11GraphicsDevice* graphicsDevice);
 		void m_CreateSwapChainAndLink(const InitArgs& args);
 	};
 }

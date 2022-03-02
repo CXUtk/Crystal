@@ -14,13 +14,13 @@ namespace crystal
 {
 	DX11GraphicsContext::DX11GraphicsContext(DX11GraphicsDevice* graphicsDevice, Win32GameWindow* window,
 		ComPtr<ID3D11DeviceContext> context, const InitArgs& args)
-		: m_pGraphicsDevice(graphicsDevice), m_pWindow(window), m_pd3dImmediateContext(context)
+		: m_pd3dGraphicsDevice(graphicsDevice->GetD3DDevice()), m_pWindow(window), m_pd3dImmediateContext(context)
 	{
 		m_renderTargets.push_back(nullptr);
 		m_CreateSwapChainAndLink(args);
-		m_ResizeBuffer();
-		m_pWindow->AppendOnResizeEvent([this](Vector2i size) {
-			m_ResizeBuffer();
+		m_ResizeBuffer(graphicsDevice);
+		m_pWindow->AppendOnResizeEvent([this, graphicsDevice](Vector2i size) {
+			m_ResizeBuffer(graphicsDevice);
 		});
 
 	}
@@ -58,11 +58,10 @@ namespace crystal
 		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
 	}
 
-	void DX11GraphicsContext::m_ResizeBuffer()
+	void DX11GraphicsContext::m_ResizeBuffer(DX11GraphicsDevice* graphicsDevice)
 	{
-		auto dx11GraphicsDevice = m_pGraphicsDevice->GetD3DDevice();
 		assert(m_pd3dImmediateContext);
-		assert(dx11GraphicsDevice);
+		assert(m_pd3dGraphicsDevice);
 		assert(m_pSwapChain);
 
         m_renderTargets[0].reset();
@@ -71,7 +70,6 @@ namespace crystal
 		auto newWindowSize = m_pWindow->GetWindowSize();
 		if (m_backBufferSize != newWindowSize)
 		{
-
 			HR(m_pSwapChain->ResizeBuffers(1, newWindowSize.x, newWindowSize.y, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 			m_backBufferSize = newWindowSize;
 		}
@@ -82,7 +80,7 @@ namespace crystal
 			ComPtr<ID3D11Texture2D> backBuffer;
 
 			m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
-			dx11GraphicsDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
+            m_pd3dGraphicsDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
 
 			// Set DEBUG name
 			d3dUtils::D3D11SetDebugObjectName(backBuffer.Get(), "BackBuffer[0]");
@@ -115,8 +113,8 @@ namespace crystal
 		// Create DepthStencil buffer and view
 		ComPtr<ID3D11Texture2D>	depthStencilBuffer;
 		ComPtr<ID3D11DepthStencilView> depthStencilView;
-		HR(dx11GraphicsDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencilBuffer.GetAddressOf()));
-		HR(dx11GraphicsDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.ReleaseAndGetAddressOf()));
+		HR(m_pd3dGraphicsDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencilBuffer.GetAddressOf()));
+		HR(m_pd3dGraphicsDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.ReleaseAndGetAddressOf()));
 
 		// Combine render targets and the depth stencil buffer to the pipeline
 		m_pd3dImmediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
@@ -137,14 +135,13 @@ namespace crystal
 		d3dUtils::D3D11SetDebugObjectName(depthStencilView.Get(), "DepthStencilView");
 		d3dUtils::D3D11SetDebugObjectName(renderTargetView.Get(), "BackBufferRTV[0]");
 
-        m_renderTargets[0].reset();
-		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(m_pGraphicsDevice, renderTargetView,
+		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(graphicsDevice, renderTargetView,
 			nullptr, depthStencilView, screenViewport);
 	}
 
 	void DX11GraphicsContext::m_CreateSwapChainAndLink(const InitArgs& args)
 	{
-		auto dx11GraphicsDevice = m_pGraphicsDevice->GetD3DDevice();
+        auto dx11GraphicsDevice = m_pd3dGraphicsDevice.Get();
 
 		// 检测 MSAA支持的质量等级
 		dx11GraphicsDevice->CheckMultisampleQualityLevels(

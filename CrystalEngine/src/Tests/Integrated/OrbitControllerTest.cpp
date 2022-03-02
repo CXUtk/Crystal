@@ -5,6 +5,7 @@
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
 #include <Core/Utils/GameTimer.h>
+#include <Core/Asset/AssetManager.h>
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
@@ -29,6 +30,7 @@ namespace crystal
 
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
+        auto assetManager = m_engine->GetAssetManager();
 		m_pCamera = std::make_shared<Camera>(1.0f, windowSize.x / windowSize.y, 0.5f, 100.f);
 		//Vertex vertices[] =
 		//{
@@ -64,7 +66,7 @@ namespace crystal
 		//	loader.Triangles.data(), sizeof(float) * 3 * loader.Triangles.size());
 		indices = loader.Triangles.size() * 3;
 
-		//m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
+        m_pShader = assetManager->LoadAsset<IShaderProgram>("package1:Model");
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;

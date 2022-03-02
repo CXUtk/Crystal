@@ -21,7 +21,7 @@ namespace crystal
         PrimitiveType   PrimitiveType;
     };
 
-    struct RenderState
+    struct RenderStateG
     {
         Matrix4f								m_renderMatrix{};
         std::shared_ptr<IShaderProgram>			m_pShaderProgram = nullptr;
@@ -50,8 +50,8 @@ namespace crystal
         IGraphicsDevice*    m_pGraphicsDevice = nullptr;
         IGraphicsContext*   m_pGraphicsContext = nullptr;
 
-        RenderState			m_defaultRenderState{};
-        RenderState			m_currentRenderState{};
+        RenderStateG		m_defaultRenderState{};
+        RenderStateG		m_currentRenderState{};
 
         std::shared_ptr<IPipelineStateObject>		m_pDefaultPSO = nullptr;
         std::shared_ptr<IPipelineResourceObject>	m_pDefaultPRO = nullptr;

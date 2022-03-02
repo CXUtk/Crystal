@@ -113,8 +113,8 @@ namespace crystal
     std::shared_ptr<IShaderProgram> DX11GraphicsDevice::CreateShaderProgram(std::shared_ptr<IVertexShader> vertexShader,
             std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& variables)
     {
-        return std::make_shared<DX11ShaderProgram>(this, std::dynamic_pointer_cast<DX11VertexShader>(vertexShader), 
-            std::dynamic_pointer_cast<DX11FragmentShader>(fragmentShader), variables);
+        return std::make_shared<DX11ShaderProgram>(this, vertexShader, 
+            fragmentShader, variables);
     }
 
     std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc)

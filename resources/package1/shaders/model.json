@@ -1,21 +1,22 @@
 {
-  "dx11Src": "model.hlsl",
-  "openGLVSSrc": "model.vert",
-  "openGLFSSrc": "model.frag",
-  "vsEntry": "VS",
-  "fsEntry": "PS",
-  "uniforms": [
-    {
-      "name": "M",
-      "type": "mat4"
-    },
-    {
-      "name": "MN",
-      "type": "mat4"
-    },
-    {
-      "name": "VP",
-      "type": "mat4"
-    }
-  ]
+    "name": "Model",
+    "dx11Src": "model.hlsl",
+    "openGLVSSrc": "model.vert",
+    "openGLFSSrc": "model.frag",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "M",
+            "type": "mat4"
+        },
+        {
+            "name": "MN",
+            "type": "mat4"
+        },
+        {
+            "name": "VP",
+            "type": "mat4"
+        }
+    ]
 }

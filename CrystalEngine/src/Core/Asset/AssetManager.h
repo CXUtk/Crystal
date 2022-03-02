@@ -24,6 +24,10 @@ namespace crystal
     inline std::string GetPackageName(const URI& uri)
     {
         auto p = std::find(uri.begin(), uri.end(), ':');
+        if (p == uri.end())
+        {
+            throw std::invalid_argument(string_format("Package name invalid"));
+        }
         return uri.substr(0, p - uri.begin());
     }
 
