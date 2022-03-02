@@ -8,6 +8,7 @@
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
+#include <Core/Asset/AssetManager.h>
 
 namespace crystal
 {
@@ -36,6 +37,7 @@ namespace crystal
 
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
+        auto assetManager = m_engine->GetAssetManager();
 		m_pCamera = std::make_shared<Camera>(1.0f, windowSize.x / windowSize.y, 0.5f, 100.f);
 		//Vertex vertices[] =
 		//{
@@ -75,8 +77,8 @@ namespace crystal
 		indices = loader.Triangles.size() * 3;
 		vertexBuffer->BindVertexLayout(vLayout);
 
-		//m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
-		//m_pScreenShader = graphicsDevice->CreateShaderProgramFromFile("resources/grayscale.json");
+        m_pShader = assetManager->LoadAsset<IShaderProgram>("package1:Model");
+		m_pScreenShader = assetManager->LoadAsset<IShaderProgram>("package1:GrayScale");
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;
@@ -135,29 +137,15 @@ namespace crystal
 		m_PROScreen->SetShaderProgram(m_pScreenShader);
 		m_PROScreen->SetShaderResource(m_renderTarget2D, 0);
 		m_PROScreen->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
-		//indexBuffer->Bind(0);
+        m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
 
+        m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
+        m_PSO->SetDepthStencilState(graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::DefaultDepthTest));
+        m_PSO->SetRasterState(graphicsDevice->GetCommonRasterState(RasterStates::CullNone));
 
-		DepthStencilStateDescription DSSDesc = {};
-		DSSDesc.EnableDepthTest = true;
-		DSSDesc.EnableStencilTest = false;
-		auto defaultDepth = graphicsDevice->CreateDepthStencilState(DSSDesc);
-		DSSDesc.EnableDepthTest = false;
-		auto noDepth = graphicsDevice->CreateDepthStencilState(DSSDesc);
-
-
-		RasterStateDescription RSDesc = {};
-		RSDesc.CullMode = CullingMode::None;
-		RSDesc.FillMode = FillMode::SOLID;
-		RSDesc.Viewport = nullptr;
-		auto defaultRaster = graphicsDevice->CreateRasterState(RSDesc);
-		m_PSO->SetRasterState(defaultRaster);
-		m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
-		m_PSO->SetDepthStencilState(defaultDepth);
-
-		m_PSOScreen->SetRasterState(defaultRaster);
+		m_PSOScreen->SetRasterState(graphicsDevice->GetCommonRasterState(RasterStates::CullNone));
 		m_PSOScreen->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
-		m_PSOScreen->SetDepthStencilState(noDepth);
+		m_PSOScreen->SetDepthStencilState(graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::NoDepthTest));
 	}
 
 

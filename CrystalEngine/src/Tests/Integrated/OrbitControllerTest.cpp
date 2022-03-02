@@ -80,19 +80,9 @@ namespace crystal
 		m_PRO->SetShaderProgram(m_pShader);
 		m_PRO->SetShaderResource(m_texture2D, 0);
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
-		//indexBuffer->Bind(0);
-
 		m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
-		DepthStencilStateDescription DSSDesc = {};
-		DSSDesc.EnableDepthTest = true;
-		DSSDesc.EnableStencilTest = false;
-		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilState(DSSDesc));
-
-		RasterStateDescription RSDesc = {};
-		RSDesc.CullMode = CullingMode::None;
-		RSDesc.FillMode = FillMode::SOLID;
-		RSDesc.Viewport = nullptr;
-		m_PSO->SetRasterState(graphicsDevice->CreateRasterState(RSDesc));
+		m_PSO->SetDepthStencilState(graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::DefaultDepthTest));
+		m_PSO->SetRasterState(graphicsDevice->GetCommonRasterState(RasterStates::CullNone));
 		//indexBuffer->Bind(0);
 	}
 
@@ -125,18 +115,18 @@ namespace crystal
 		{
 			orbitControl.y = glm::pi<float>() - 0.01f;
 		}
-		//if (inputController->IsKeyDowned(crystal::KeyCode::CRYSTAL_A_KEY))
-		//{
-		//	orbitControl.x += 0.01f;
-		//	//m_renderPause = !m_renderPause;
-		//	//printf("%s\n", m_renderPause ? "Paused" : "Resumed");
-		//}
-		//if (inputController->IsKeyDowned(crystal::KeyCode::CRYSTAL_D_KEY))
-		//{
-		//	orbitControl.x -= 0.01f;
-		//	//printf("Time: %lf\n", gameTimer.GetLogicTime());
-		//	//printf("Time: %lf\n", gameTimer.GetLogicalDeltaTime());
-		//}
+		if (inputController->IsKeyDowned(crystal::KeyCode::CRYSTAL_A_KEY))
+		{
+			orbitControl.x += 0.01f;
+			//m_renderPause = !m_renderPause;
+			//printf("%s\n", m_renderPause ? "Paused" : "Resumed");
+		}
+		if (inputController->IsKeyDowned(crystal::KeyCode::CRYSTAL_D_KEY))
+		{
+			orbitControl.x -= 0.01f;
+			//printf("Time: %lf\n", gameTimer.GetLogicTime());
+			//printf("Time: %lf\n", gameTimer.GetLogicalDeltaTime());
+		}
 
 		auto sinTheta = std::sin(orbitControl.y);
 		auto cosTheta = std::sqrt(1.f - sinTheta * sinTheta);
