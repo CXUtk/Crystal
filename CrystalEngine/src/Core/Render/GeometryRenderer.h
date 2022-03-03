@@ -27,6 +27,9 @@ namespace crystal
 
         void DrawBound2D(const Bound2i& bound,
             const Color4f& color);
+        void DrawBound2DFill(const Bound2i& bound,
+            const Color4f& fillColor, const Color4f& borderColor);
+
     private:
         class Impl;
         std::unique_ptr<Impl> m_pImpl;

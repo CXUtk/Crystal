@@ -22,6 +22,8 @@ namespace crystal
 
         std::shared_ptr<UIElement>  m_pHoverElement = nullptr;
         std::shared_ptr<UIElement>  m_pPrevHoverElement = nullptr;
+        std::shared_ptr<UIElement>  m_pLastLeftMouseDownElement = nullptr;
+        double                      m_lastLeftMouseClickTime = 0.0;
         std::string                 m_toolTip{};
 
         void AppendElement(std::shared_ptr<UIElement> element);

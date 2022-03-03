@@ -298,7 +298,47 @@ namespace crystal
         vertex.Position = Vector3f(maxPos.x, maxPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
 
+        vertex.Position = Vector3f(minPos.x - 1, maxPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+    }
+
+    void GeometryRenderer::DrawBound2DFill(const Bound2i& bound, const Color4f& fillColor, const Color4f& borderColor)
+    {
+        auto minPos = bound.GetMinPos();
+        auto maxPos = bound.GetMaxPos();
+
+        BatchGVertex2D vertex = {};
+
+        m_pImpl->BeginNewPrimitive(PrimitiveType::TRIANGLE_STRIP);
+        vertex.Color = fillColor;
+        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(maxPos.x, minPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
         vertex.Position = Vector3f(minPos.x, maxPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(maxPos.x, maxPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+
+        m_pImpl->BeginNewPrimitive(PrimitiveType::LINE_STRIP);
+        vertex.Color = borderColor;
+        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(maxPos.x, minPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(maxPos.x, maxPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(minPos.x - 1, maxPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
 
         vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);

@@ -1,6 +1,7 @@
 #pragma once
 #include "../Common/UICommon.h"
 #include "../Common/UIEventArgs.h"
+#include "../Common/UIStyle.h"
 
 namespace crystal
 {
@@ -31,11 +32,13 @@ namespace crystal
 
 
         // Events Handler
-        void MouseJustPressed(UIMouseButtonEventArgs args);
-        void MouseJustReleased(UIMouseButtonEventArgs args);
-        void MouseEnter(UIMouseEventArgs args);
-        void MouseLeave(UIMouseEventArgs args);
-        void MouseScroll(UIMouseScrollEventArgs args);
+        virtual void MouseJustPressed(UIMouseButtonEventArgs args);
+        virtual void MouseJustReleased(UIMouseButtonEventArgs args);
+        virtual void MouseClicked(UIMouseButtonEventArgs args);
+        virtual void MouseDoubleClicked(UIMouseButtonEventArgs args);
+        virtual void MouseEnter(UIMouseEventArgs args);
+        virtual void MouseLeave(UIMouseEventArgs args);
+        virtual void MouseScroll(UIMouseScrollEventArgs args);
 
 
         bool IsActive() const { return m_isActive; }
@@ -76,21 +79,16 @@ namespace crystal
 
         Bound2f GetEventBound() const { return m_calculatedOuterBound; }
         Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
+
+        void SetStyle(std::shared_ptr<UIStyle> style) { m_pStyle = style; }
     protected:
-        // Virtual
-        virtual void UpdateSelf(const GameTimer& gameTimer);
-        virtual void UpdateChildren(const GameTimer& gameTimer);
-        virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer);
-        virtual void DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer);
-
-        virtual void RecalculateSelf();
-        virtual void RecalculateChildren();
-
         /// Data
 
         // Events
         UIEvent<UIEventType::OnMouseJustPressed>    m_eventOnMouseJustPress{};
         UIEvent<UIEventType::OnMouseJustReleased>   m_eventOnMouseJustRelease{};
+        UIEvent<UIEventType::OnMouseClicked>        m_eventOnMouseClicked{};
+        UIEvent<UIEventType::OnMouseDoubleClicked>  m_eventOnMouseDoubleClicked{};
         UIEvent<UIEventType::OnMouseEnter>          m_eventOnMouseEnter{};
         UIEvent<UIEventType::OnMouseLeave>          m_eventOnMouseLeave{};
         UIEvent<UIEventType::OnMouseScroll>         m_eventOnMouseScroll{};
@@ -98,6 +96,8 @@ namespace crystal
         // Relationship
         std::vector<std::shared_ptr<UIElement>>     m_pChildren{};
         UIElement*                                  m_pParent = nullptr;
+        std::shared_ptr<UIStyle>                    m_pStyle = nullptr;
+        
 
         // Properties
         bool        m_isActive = true;
@@ -108,7 +108,7 @@ namespace crystal
         std::string     m_name{};
         std::string     m_tooltip{};
 
-        OverflowStyle       m_overflowStyle = OverflowStyle::Overflow;
+        OverflowStyle       m_overflowStyle = OverflowStyle::Hidden;
         PropagationFlags    m_propagationFlags = PropagationFlags::None;
 
         /**
@@ -141,7 +141,20 @@ namespace crystal
         Bound2f         m_calculatedOuterBound{};
 
 
+        // Virtual
+        virtual void UpdateSelf(const GameTimer& gameTimer);
+        virtual void UpdateChildren(const GameTimer& gameTimer);
+        virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer);
+        virtual void DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer);
+
+        virtual void RecalculateSelf();
+        virtual void RecalculateChildren();
+
         void CalculateBounds();
+        Vector2f GetPivotScreenPos() const;
+        Bound2f GetParentBound() const;
+        Vector2f GetLocalPositionToScreenPos(const Vector2f& localPos) const;
+        Vector2f GetScreenPositionToLocalPos(const Vector2f& screenPos) const;
     };
 
     template<UIEventType E>
@@ -188,5 +201,21 @@ namespace crystal
         )
     {
         m_eventOnMouseScroll += listener;
+    }
+    
+    template<>
+    inline void UIElement::AddEventListener<UIEventType::OnMouseClicked>(
+        UIEventListener<UIEventType::OnMouseClicked> listener
+        )
+    {
+        m_eventOnMouseClicked += listener;
+    }
+
+    template<>
+    inline void UIElement::AddEventListener<UIEventType::OnMouseDoubleClicked>(
+        UIEventListener<UIEventType::OnMouseDoubleClicked> listener
+        )
+    {
+        m_eventOnMouseDoubleClicked += listener;
     }
 }

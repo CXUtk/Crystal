@@ -7,6 +7,7 @@
     ],
     "textures": [
         "textures/box.json",
-        "textures/boxBlack.json"
+        "textures/boxBlack.json",
+        "textures/Cross.json"
     ]
 }

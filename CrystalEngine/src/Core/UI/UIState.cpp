@@ -92,6 +92,7 @@ namespace crystal
             if (m_pInputController->IsMouseJustPressed(MouseButtonCode::LEFT_BUTTON))
             {
                 mouseButtonsFlags = mouseButtonsFlags | MouseButtonFlags::LeftButton;
+                m_pLastLeftMouseDownElement = m_pHoverElement;
             }
             if (m_pInputController->IsMouseJustPressed(MouseButtonCode::RIGHT_BUTTON))
             {
@@ -102,7 +103,10 @@ namespace crystal
                 mouseButtonsFlags = mouseButtonsFlags | MouseButtonFlags::MiddleButton;
             }
             mouseButtonArgs.ButtonFlags = mouseButtonsFlags;
-            m_pHoverElement->MouseJustPressed(mouseButtonArgs);
+            if (mouseButtonsFlags != MouseButtonFlags::None)
+            {
+                m_pHoverElement->MouseJustPressed(mouseButtonArgs);
+            }
 
             // Mouse Just Release Events
             mouseButtonsFlags = MouseButtonFlags::None;
@@ -119,7 +123,24 @@ namespace crystal
                 mouseButtonsFlags = mouseButtonsFlags | MouseButtonFlags::MiddleButton;
             }
             mouseButtonArgs.ButtonFlags = mouseButtonsFlags;
-            m_pHoverElement->MouseJustReleased(mouseButtonArgs);
+            if (mouseButtonsFlags != MouseButtonFlags::None)
+            {
+                m_pHoverElement->MouseJustReleased(mouseButtonArgs);
+
+                if (m_pLastLeftMouseDownElement != nullptr && m_pLastLeftMouseDownElement == m_pHoverElement)
+                {
+                    if (mouseArgs.TimeStamp - m_lastLeftMouseClickTime > 0.25)
+                    {
+                        m_pHoverElement->MouseClicked(mouseButtonArgs);
+                    }
+                    else
+                    {
+                        m_pHoverElement->MouseDoubleClicked(mouseButtonArgs);
+                    }
+                    m_lastLeftMouseClickTime = mouseArgs.TimeStamp;
+                }
+                m_pLastLeftMouseDownElement = nullptr;
+            }
 
             if (m_pPrevHoverElement != m_pHoverElement)
             {
@@ -130,6 +151,17 @@ namespace crystal
                 }
                 mouseArgs.Element = m_pHoverElement.get();
                 m_pHoverElement->MouseEnter(mouseArgs);
+            }
+
+            auto scrollValue = m_pInputController->GetScrollValue();
+            if (scrollValue != Vector2f(0.f))
+            {
+                UIMouseScrollEventArgs mouseScrollArgs = {};
+                mouseScrollArgs.Element = m_pHoverElement.get();
+                mouseScrollArgs.TimeStamp = mouseArgs.TimeStamp;
+                mouseScrollArgs.Value = scrollValue;
+
+                m_pHoverElement->MouseScroll(mouseScrollArgs);
             }
         }
         else

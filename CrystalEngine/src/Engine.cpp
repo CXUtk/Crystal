@@ -89,19 +89,19 @@ namespace crystal
 
         m_spriteBatch = std::make_unique<SpriteBatch>(graphicsDevice, graphicsContext);
         m_pGeometryRenderer = std::make_unique<GeometryRenderer>(graphicsDevice, graphicsContext);
+
+        m_inputController = std::make_unique<InputController>(m_platformProvider->GetGameWindow());
     }
 
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
         m_Initialize();
 
+        auto window = m_platformProvider->GetGameWindow();
         m_application = std::move(application);
         m_application->SetEngine(this);
 
         m_application->Initialize();
-
-        auto window = this->GetWindow();
-        m_inputController = std::make_unique<InputController>(window);
 
         m_gameTimer.Start();
         double frameBeginTime = 0.0;

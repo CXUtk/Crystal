@@ -10,6 +10,7 @@ namespace crystal
         virtual ~TestState() override;
 
     private:
-        std::shared_ptr<UIElement> m_uiElement;
+        std::shared_ptr<UIElement>  m_uiElement = nullptr;
+        std::shared_ptr<UIStyle>    m_pUIStyle = nullptr;
     };
 }

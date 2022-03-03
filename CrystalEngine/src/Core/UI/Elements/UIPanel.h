@@ -12,21 +12,15 @@ namespace crystal
         UIPanel();
         ~UIPanel() override;
 
-        Color4f GetDrawColor() const { return m_drawColor; }
-        void SetDrawColor(const Color4f& color) { m_drawColor = color; }
+        Color4f GetFillColor() const { return m_drawColor; }
+        void SetFillColor(const Color4f& color) { m_drawColor = color; }
 
-        Vector2i GetCornerSize() const { return m_cornerSize; }
-        void SetDrawColor(const Vector2i& size) { m_cornerSize = size; }
-
-        std::shared_ptr<ITexture2D> GetPanelTexture() const { return m_panelTexture; }
-        void SetDrawColor(std::shared_ptr<ITexture2D> texture) { m_panelTexture = texture; }
+        Color4f GetBorderColor() const { return m_drawColor; }
+        void SetBorderColor(const Color4f& color) { m_drawColor = color; }
 
     protected:
         Color4f     m_drawColor{};
-        Vector2i    m_cornerSize{};
-
-        std::shared_ptr<ITexture2D>     m_panelTexture = nullptr;
-
+        Color4f     m_borderColor{};
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
     };

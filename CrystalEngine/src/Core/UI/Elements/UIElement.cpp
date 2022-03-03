@@ -44,7 +44,7 @@ namespace crystal
         // Becuase the overflowed child also respond to event
         for (auto& child : m_pChildren)
         {
-            if (child->IsActive() && child->GetOverflowStyle() == OverflowStyle::Overflow)
+            if (child->CanResponseEvent() && child->GetOverflowStyle() == OverflowStyle::Overflow)
             {
                 m_calculatedOuterBound = m_calculatedOuterBound.Union(child->m_calculatedOuterBound);
             }
@@ -86,28 +86,65 @@ namespace crystal
 
     void UIElement::MouseJustPressed(UIMouseButtonEventArgs args)
     {
-        if (args.ButtonFlags != MouseButtonFlags::None)
+        m_eventOnMouseJustPress.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseJustDown))
         {
-            m_eventOnMouseJustPress.Invoke(args);
+            m_pParent->MouseJustPressed(args);
         }
     }
 
     void UIElement::MouseJustReleased(UIMouseButtonEventArgs args)
     {
-        if (args.ButtonFlags != MouseButtonFlags::None)
+        m_eventOnMouseJustRelease.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseJustUp))
         {
-            m_eventOnMouseJustRelease.Invoke(args);
+            m_pParent->MouseJustReleased(args);
+        }
+    }
+
+    void UIElement::MouseClicked(UIMouseButtonEventArgs args)
+    {
+        m_eventOnMouseClicked.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseClicked))
+        {
+            m_pParent->MouseClicked(args);
+        }
+    }
+
+    void UIElement::MouseDoubleClicked(UIMouseButtonEventArgs args)
+    {
+        m_eventOnMouseDoubleClicked.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseDoubleClicked))
+        {
+            m_pParent->MouseDoubleClicked(args);
         }
     }
 
     void UIElement::MouseEnter(UIMouseEventArgs args)
     {
         m_eventOnMouseEnter.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseEnter))
+        {
+            m_pParent->MouseEnter(args);
+        }
     }
 
     void UIElement::MouseLeave(UIMouseEventArgs args)
     {
         m_eventOnMouseLeave.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseLeave))
+        {
+            m_pParent->MouseLeave(args);
+        }
+    }
+
+    void UIElement::MouseScroll(UIMouseScrollEventArgs args)
+    {
+        m_eventOnMouseScroll.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::MouseScroll))
+        {
+            m_pParent->MouseScroll(args);
+        }
     }
 
     std::shared_ptr<UIElement> UIElement::GetChildByName(const std::string& name)
@@ -174,23 +211,47 @@ namespace crystal
 
     void UIElement::CalculateBounds()
     {
-        Bound2f parentBound = {};
+        Bound2f parentBound = GetParentBound();
+        auto pivotScreenPos = GetPivotScreenPos();
+
+        auto parentSize = parentBound.GetMaxPos() - parentBound.GetMinPos();
+        auto selfSize = Vector2f(m_size.Width.Relative * parentSize.x + m_size.Width.Absolute,
+            m_size.Height.Relative * parentSize.y + m_size.Height.Absolute);
+
+        m_calculatedInnerBound = Bound2f(pivotScreenPos - selfSize * m_pivot,
+            pivotScreenPos + selfSize * (Vector2f(1.f) - m_pivot));
+    }
+
+    Vector2f UIElement::GetPivotScreenPos() const
+    {
+        Bound2f parentBound = GetParentBound();
+        auto parentSize = parentBound.GetMaxPos() - parentBound.GetMinPos();
+        return parentBound.GetMinPos() + parentSize * m_anchorPoint + m_position;
+    }
+
+    Bound2f UIElement::GetParentBound() const
+    {
         if (m_pParent)
         {
-            parentBound = m_pParent->m_calculatedInnerBound;
+            return m_pParent->m_calculatedInnerBound;
         }
         else
         {
             auto size = Engine::GetInstance()->GetWindow()->GetWindowSize();
-            parentBound = Bound2f(Vector2f(0.f), Vector2f(size));
+            return Bound2f(Vector2f(0.f), Vector2f(size));
         }
+    }
+    Vector2f UIElement::GetLocalPositionToScreenPos(const Vector2f& localPos) const
+    {
+        Bound2f parentBound = GetParentBound();
         auto parentSize = parentBound.GetMaxPos() - parentBound.GetMinPos();
-        auto pivotPosWorld = parentBound.GetMinPos() + parentSize * m_anchorPoint + m_position;
-
-        auto selfSize = Vector2f(m_size.Width.Relative * parentSize.x + m_size.Width.Absolute,
-            m_size.Height.Relative * parentSize.y + m_size.Height.Absolute);
-
-        m_calculatedInnerBound = Bound2f(pivotPosWorld - selfSize * m_pivot,
-            pivotPosWorld + selfSize * (Vector2f(1.f) - m_pivot));
+        return parentBound.GetMinPos() + parentSize * m_anchorPoint + localPos;
+    }
+    Vector2f UIElement::GetScreenPositionToLocalPos(const Vector2f& screenPos) const
+    {
+        Bound2f parentBound = GetParentBound();
+        auto parentSize = parentBound.GetMaxPos() - parentBound.GetMinPos();
+        auto pivotScreenPos = parentBound.GetMinPos() + parentSize * m_anchorPoint;
+        return screenPos - pivotScreenPos;
     }
 }

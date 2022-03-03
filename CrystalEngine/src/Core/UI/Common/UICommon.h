@@ -15,6 +15,9 @@ namespace crystal
     class UIStateMachine;
 
     class UIElement;
+    class UIIconButton;
+    class UIPanel;
+    class UIWidget;
 
     struct Layout1D
     {
@@ -26,23 +29,44 @@ namespace crystal
     {
         Layout1D Width;
         Layout1D Height;
+
+        SizeLayout() = default;
+        SizeLayout(int width, int height)
+        {
+            Width.Absolute = width;
+            Width.Relative = 0;
+
+            Height.Absolute = height;
+            Height.Relative = 0;
+        }
+
+        SizeLayout(int width, float widthRel, int height, float heightRel)
+        {
+            Width.Absolute = width;
+            Width.Relative = widthRel;
+
+            Height.Absolute = height;
+            Height.Relative = heightRel;
+        }
     };
 
     enum class OverflowStyle
     {
-        Overflow,
         Hidden,
+        Overflow,
     };
 
     BIT_FLAGS_BEGIN(PropagationFlags, uint32_t)
     {
         None = 0,
-        MouseClick = 1 << 0,
-        MouseUp = 1 << 1,
-        MouseDown = 1 << 2,
-
+        MouseJustDown = 1 << 0,
+        MouseJustUp = 1 << 1,
+        MouseClicked = 1 << 2,
+        MouseDoubleClicked = 1 << 3,
+        MouseEnter = 1 << 4,
+        MouseLeave = 1 << 5,
+        MouseScroll = 1 << 6,
         All = -1
     };
     BIT_FLAGS_END(PropagationFlags);
-
 }

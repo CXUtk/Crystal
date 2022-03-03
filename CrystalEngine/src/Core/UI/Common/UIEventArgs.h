@@ -32,7 +32,7 @@ namespace crystal
 
     struct UIMouseScrollEventArgs : public UIEventArgs
     {
-        Vector2i            MousePosScreen;
+        Vector2f            Value;
     };
 
     using UIMouseButtonEvent = Event<UIMouseButtonEventArgs>;
@@ -43,6 +43,8 @@ namespace crystal
     {
         OnMouseJustPressed,
         OnMouseJustReleased,
+        OnMouseClicked,
+        OnMouseDoubleClicked,
         OnMouseEnter,
         OnMouseLeave,
         OnMouseHover,
@@ -61,6 +63,20 @@ namespace crystal
 
     template<>
     struct UIEventDelegate<UIEventType::OnMouseJustReleased>
+    {
+        using Func_Type = typename UIMouseButtonEvent::Func;
+        using Event_Type = UIMouseButtonEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::OnMouseClicked>
+    {
+        using Func_Type = typename UIMouseButtonEvent::Func;
+        using Event_Type = UIMouseButtonEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::OnMouseDoubleClicked>
     {
         using Func_Type = typename UIMouseButtonEvent::Func;
         using Event_Type = UIMouseButtonEvent;
