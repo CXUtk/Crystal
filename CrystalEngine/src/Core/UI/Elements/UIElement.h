@@ -35,6 +35,7 @@ namespace crystal
         void MouseJustReleased(UIMouseButtonEventArgs args);
         void MouseEnter(UIMouseEventArgs args);
         void MouseLeave(UIMouseEventArgs args);
+        void MouseScroll(UIMouseScrollEventArgs args);
 
 
         bool IsActive() const { return m_isActive; }
@@ -70,6 +71,9 @@ namespace crystal
         SizeLayout GetSize() const { return m_size; }
         void SetSize(SizeLayout size) { m_size = size; }
 
+        int GetWidth() const;
+        int GetHeight() const;
+
         Bound2f GetEventBound() const { return m_calculatedOuterBound; }
         Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
     protected:
@@ -89,6 +93,7 @@ namespace crystal
         UIEvent<UIEventType::OnMouseJustReleased>   m_eventOnMouseJustRelease{};
         UIEvent<UIEventType::OnMouseEnter>          m_eventOnMouseEnter{};
         UIEvent<UIEventType::OnMouseLeave>          m_eventOnMouseLeave{};
+        UIEvent<UIEventType::OnMouseScroll>         m_eventOnMouseScroll{};
 
         // Relationship
         std::vector<std::shared_ptr<UIElement>>     m_pChildren{};
@@ -175,5 +180,13 @@ namespace crystal
         )
     {
         m_eventOnMouseLeave += listener;
+    }
+
+    template<>
+    inline void UIElement::AddEventListener<UIEventType::OnMouseScroll>(
+        UIEventListener<UIEventType::OnMouseScroll> listener
+        )
+    {
+        m_eventOnMouseScroll += listener;
     }
 }

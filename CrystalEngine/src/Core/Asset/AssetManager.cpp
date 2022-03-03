@@ -46,14 +46,14 @@ namespace crystal
             assetPackage->LoadShaders(shaderPaths);
         }
 
-        //{
-        //    // Load textures
-        //    std::vector<path_type> texturePaths;
-        //    contents["texture2ds"].foreach([&](const SJson::JsonNode& node) {
-        //        texturePaths.push_back(parentPath / node.Get<std::string>());
-        //    });
-        //    assetPackage->LoadTextures(texturePaths);
-        //}
+        {
+            // Load textures
+            std::vector<path_type> texturePaths;
+            contents["textures"].foreach([&](const SJson::JsonNode& node) {
+                texturePaths.push_back(parentPath / node.Get<std::string>());
+            });
+            assetPackage->LoadTextures(texturePaths);
+        }
 
         auto s = path.parent_path().stem().string();
         m_packagesMap[s] = assetPackage;

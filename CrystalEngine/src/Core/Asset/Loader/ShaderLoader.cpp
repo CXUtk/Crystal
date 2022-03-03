@@ -76,7 +76,7 @@ namespace crystal
 		auto graphicsDevice = engine->GetGraphicsDevice();
 		auto graphicsAPI = engine->GetGraphicsAPIType();
 
-		path_type pathToVertexShader = curPath;
+		path_type pathToFragmentShader = curPath;
 		std::string fileName;
 
 		if (graphicsAPI == GraphicsAPIType::DirectX11 || graphicsAPI == GraphicsAPIType::DirectX12)
@@ -88,9 +88,9 @@ namespace crystal
 			fileName = metaData["openGLVSSrc"].Get<std::string>();
 		}
 
-		pathToVertexShader /= fileName;
+        pathToFragmentShader /= fileName;
 
-		auto source = File::ReadAllText(pathToVertexShader);
+		auto source = File::ReadAllText(pathToFragmentShader);
 
 		if (graphicsAPI == GraphicsAPIType::DirectX11 || graphicsAPI == GraphicsAPIType::DirectX12)
 		{

@@ -30,8 +30,14 @@ namespace crystal
         MouseButtonFlags    ButtonFlags;
     };
 
+    struct UIMouseScrollEventArgs : public UIEventArgs
+    {
+        Vector2i            MousePosScreen;
+    };
+
     using UIMouseButtonEvent = Event<UIMouseButtonEventArgs>;
     using UIMouseEvent = Event<UIMouseEventArgs>;
+    using UIMouseScrollEvent = Event<UIMouseScrollEventArgs>;
 
     enum class UIEventType
     {
@@ -39,7 +45,8 @@ namespace crystal
         OnMouseJustReleased,
         OnMouseEnter,
         OnMouseLeave,
-        OnMouseHover
+        OnMouseHover,
+        OnMouseScroll
     };
 
     template<UIEventType E>
@@ -48,29 +55,36 @@ namespace crystal
     template<>
     struct UIEventDelegate<UIEventType::OnMouseJustPressed>
     {
-        using Func_Type = typename Event<UIMouseButtonEventArgs>::Func;
+        using Func_Type = typename UIMouseButtonEvent::Func;
         using Event_Type = UIMouseButtonEvent;
     };
 
     template<>
     struct UIEventDelegate<UIEventType::OnMouseJustReleased>
     {
-        using Func_Type = typename Event<UIMouseButtonEventArgs>::Func;
+        using Func_Type = typename UIMouseButtonEvent::Func;
         using Event_Type = UIMouseButtonEvent;
     };
 
     template<>
     struct UIEventDelegate<UIEventType::OnMouseEnter>
     {
-        using Func_Type = typename Event<UIMouseEventArgs>::Func;
+        using Func_Type = typename UIMouseEvent::Func;
         using Event_Type = UIMouseEvent;
     };
 
     template<>
     struct UIEventDelegate<UIEventType::OnMouseLeave>
     {
-        using Func_Type = typename Event<UIMouseEventArgs>::Func;
+        using Func_Type = typename UIMouseEvent::Func;
         using Event_Type = UIMouseEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::OnMouseScroll>
+    {
+        using Func_Type = typename UIMouseScrollEvent::Func;
+        using Event_Type = UIMouseScrollEvent;
     };
 
     template<UIEventType E>

@@ -4,5 +4,9 @@
         "shaders/geometry.json",
         "shaders/model.json",
         "shaders/grayscale.json"
+    ],
+    "textures": [
+        "textures/box.json",
+        "textures/boxBlack.json"
     ]
 }

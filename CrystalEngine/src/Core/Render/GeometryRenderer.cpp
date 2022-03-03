@@ -300,5 +300,8 @@ namespace crystal
 
         vertex.Position = Vector3f(minPos.x, maxPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
+
+        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
+        m_pImpl->AppendGVertex(vertex);
     }
 }

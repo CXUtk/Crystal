@@ -8,6 +8,7 @@ namespace crystal
 {
     UIElement::UIElement()
     {}
+
     UIElement::~UIElement()
     {}
 
@@ -20,6 +21,15 @@ namespace crystal
     void UIElement::Draw(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         DrawSelf(payload, gameTimer);
+        if constexpr (EnableDebugDraw)
+        {
+            auto graphicsDevice = Engine::GetInstance()->GetGraphicsDevice();
+
+            payload.GeometryRenderer->Begin();
+            Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+            payload.GeometryRenderer->DrawBound2D(bound, Color4f(1.f, 1.f, 0.f, 1.f));
+            payload.GeometryRenderer->End();
+        }
         DrawChildren(payload, gameTimer);
     }
 
@@ -113,6 +123,16 @@ namespace crystal
         return *p;
     }
 
+    int UIElement::GetWidth() const
+    {
+        return m_calculatedInnerBound.GetMaxPos().x - m_calculatedInnerBound.GetMinPos().x;
+    }
+
+    int UIElement::GetHeight() const
+    {
+        return m_calculatedInnerBound.GetMaxPos().y - m_calculatedInnerBound.GetMinPos().y;
+    }
+
     void UIElement::UpdateSelf(const GameTimer& gameTimer)
     {}
 
@@ -127,15 +147,6 @@ namespace crystal
 
     void UIElement::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        if constexpr (EnableDebugDraw)
-        {
-            auto graphicsDevice = Engine::GetInstance()->GetGraphicsDevice();
-
-            payload.GeometryRenderer->Begin();
-            Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
-            payload.GeometryRenderer->DrawBound2D(bound, Color4f(1.f, 1.f, 0.f, 1.f));
-            payload.GeometryRenderer->End();
-        }
     }
 
     void UIElement::DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer)
@@ -174,7 +185,7 @@ namespace crystal
             parentBound = Bound2f(Vector2f(0.f), Vector2f(size));
         }
         auto parentSize = parentBound.GetMaxPos() - parentBound.GetMinPos();
-        auto pivotPosWorld = parentBound.GetMinPos() + parentSize * m_anchorPoint;
+        auto pivotPosWorld = parentBound.GetMinPos() + parentSize * m_anchorPoint + m_position;
 
         auto selfSize = Vector2f(m_size.Width.Relative * parentSize.x + m_size.Width.Absolute,
             m_size.Height.Relative * parentSize.y + m_size.Height.Absolute);

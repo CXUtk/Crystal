@@ -64,6 +64,7 @@ namespace crystal
 		void Draw(std::shared_ptr<ITexture2D> texture, const Bound2f& destRect,
 					const Bound2i* srcRect, const Color4f& color, const Vector2f& origin, float rotation,
 					SpriteEffect effect, float depth);
+
 	private:
 		static constexpr int MAX_QUADS_PER_BATCH = 1 << 12;
 		static constexpr int MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH << 2;
@@ -162,6 +163,13 @@ namespace crystal
 		m_pImpl->Draw(texture, rect, nullptr, color, Vector2f(0.f), 
 			0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
 	}
+
+    void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Bound2i& drawRect, const Bound2i* srcRect, const Color4f& color)
+    {
+        Bound2f rect(drawRect.GetMinPos(), drawRect.GetMaxPos());
+        m_pImpl->Draw(texture, rect, srcRect, color, Vector2f(0.f),
+            0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
+    }
 
 	void SpriteBatch::End()
 	{
@@ -460,5 +468,79 @@ namespace crystal
 			m_vertices.push_back(vertices[i]);
 		}
 	}
+
+    void SpriteBatchUtils::DrawNineSquareTexture(SpriteBatch* spriteBatch,
+        std::shared_ptr<ITexture2D> texture,
+        const Vector2i& cornerSize,
+        const Bound2i& bound,
+        const Color4f& color)
+    {
+        auto texSize = texture->GetSize();
+        auto minPos = bound.GetMinPos();
+        auto maxPos = bound.GetMaxPos();
+        auto boundSize = bound.GetSize();
+        {
+            auto botLeft = Bound2i(Vector2i(0), cornerSize);
+            auto texBotLeft = Bound2i(Vector2i(0), cornerSize);
+            spriteBatch->Draw(texture, Bound2i(minPos + botLeft.GetMinPos(),
+                minPos + botLeft.GetMaxPos()), &texBotLeft, color);
+
+            auto botMid = Bound2i(Vector2i(cornerSize.x, 0),
+                Vector2i(boundSize.x - cornerSize.x, cornerSize.y));
+            auto texBotMid = Bound2i(Vector2i(cornerSize.x, 0),
+                Vector2i(texSize.x - cornerSize.x, cornerSize.y));
+            spriteBatch->Draw(texture, Bound2i(minPos + botMid.GetMinPos(),
+                minPos + botMid.GetMaxPos()), &texBotMid, color);
+
+            auto botRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, 0),
+                Vector2i(boundSize.x, cornerSize.y));
+            auto texBotRight = Bound2i(Vector2i(texSize.x - cornerSize.x, 0),
+                Vector2i(texSize.x, cornerSize.y));
+            spriteBatch->Draw(texture, Bound2i(minPos + botRight.GetMinPos(),
+                minPos + botRight.GetMaxPos()), &texBotRight, color);
+        }
+
+        {
+            auto midLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, boundSize.y - cornerSize.y));
+            auto texMidLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, texSize.y - cornerSize.y));
+            spriteBatch->Draw(texture, Bound2i(minPos + midLeft.GetMinPos(),
+                minPos + midLeft.GetMaxPos()), &texMidLeft, color);
+
+            auto midMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
+                Vector2i(boundSize - cornerSize));
+            auto texMidMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
+                Vector2i(texSize - cornerSize));
+            spriteBatch->Draw(texture, Bound2i(minPos + midMid.GetMinPos(),
+                minPos + midMid.GetMaxPos()), &texMidMid, color);
+
+            auto midRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, cornerSize.y),
+                Vector2i(boundSize.x, boundSize.y - cornerSize.y));
+            auto texMidRight = Bound2i(Vector2i(texSize.x - cornerSize.x, cornerSize.y),
+                Vector2i(texSize.x, texSize.y - cornerSize.y));
+            spriteBatch->Draw(texture, Bound2i(minPos + midRight.GetMinPos(),
+                minPos + midRight.GetMaxPos()), &texMidRight, color);
+        }
+
+        {
+            auto topLeft = Bound2i(Vector2i(0, boundSize.y - cornerSize.y), Vector2i(cornerSize.x, boundSize.y));
+            auto texTopLeft = Bound2i(Vector2i(0, texSize.y - cornerSize.y), Vector2i(cornerSize.x, texSize.y));
+            spriteBatch->Draw(texture, Bound2i(minPos + topLeft.GetMinPos(),
+                minPos + topLeft.GetMaxPos()), &texTopLeft, color);
+
+            auto topMid = Bound2i(Vector2i(cornerSize.x, boundSize.y - cornerSize.y),
+                Vector2i(boundSize.x - cornerSize.x, boundSize.y));
+            auto texTopMid = Bound2i(Vector2i(cornerSize.x, texSize.y - cornerSize.y),
+                Vector2i(texSize.x - cornerSize.x, texSize.y));
+            spriteBatch->Draw(texture, Bound2i(minPos + topMid.GetMinPos(),
+                minPos + topMid.GetMaxPos()), &texTopMid, color);
+
+            auto topRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, boundSize.y - cornerSize.y),
+                Vector2i(boundSize));
+            auto texTopRight = Bound2i(Vector2i(texSize.x - cornerSize.x, texSize.y - cornerSize.y),
+                Vector2i(texSize));
+            spriteBatch->Draw(texture, Bound2i(minPos + topRight.GetMinPos(),
+                minPos + topRight.GetMaxPos()), &texTopRight, color);
+        }
+    }
 
 }

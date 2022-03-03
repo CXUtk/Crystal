@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Loader/ShaderLoader.h"
+#include "Loader/TextureLoader.h"
 
 namespace crystal
 {
@@ -24,12 +25,12 @@ namespace crystal
 
     void AssetPackage::LoadTextures(const std::vector<path_type>& paths)
     {
-        //for (auto& path : paths)
-        //{
-        //    auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
-        //    auto name = textureMetaInfo["name"].Get<std::string>();
-        //    m_texture2DMap[name] = Texture2DLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
-        //}
+        for (auto& path : paths)
+        {
+            auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
+            auto name = textureMetaInfo["name"].Get<std::string>();
+            m_texture2DMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
+        }
     }
 
     void AssetPackage::LoadOneTexture2D(std::string name, std::shared_ptr<ITexture2D> texture)
