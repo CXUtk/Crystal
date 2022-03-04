@@ -16,6 +16,8 @@ namespace crystal
 
 		virtual IGameWindow* GetGameWindow() const override;
 		virtual IFileSystem* GetFileSystem() const override;
+        virtual void LoadSharedLibrary(const std::string& name, void* handle) override;
+        virtual bool ReleaseSharedLibrary(void* handle) override;
 		virtual IGraphicsDevice* GetGraphicsDevice() const override;
 		virtual IGraphicsContext* GetGraphicsContext() const override;
 		virtual GraphicsAPIType GetGraphicsAPIType() const override;

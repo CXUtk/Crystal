@@ -8,6 +8,7 @@
 
 #include "AssetPackage.h"
 
+
 namespace crystal
 {
     AssetManager::AssetManager()
@@ -26,6 +27,23 @@ namespace crystal
             graphicsDevice->CreateTexture2DFromFile("resources/White.png", texDesc));
 
         m_packagesMap["Crystal"] = assetPackage;
+
+
+        FT_Library ft;
+        if (FT_Init_FreeType(&ft))
+        {
+            printf("ERROR::FREETYPE: Could not init FreeType Library\n");
+        }
+F        FT_Error_String
+
+        FT_Face face;
+        if (FT_New_Face(ft, "resources/fonts/consola.ttf", 0, &face))
+        {
+            printf("ERROR::FREETYPE: Failed to load font\n");
+        }
+        FT_Done_Face(face);
+        FT_Done_FreeType(ft);
+
     }
 
     AssetManager::~AssetManager()

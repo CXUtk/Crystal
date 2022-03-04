@@ -3,6 +3,9 @@
 #include <Platforms/DX11/DX11GraphicsDevice.h>
 #include <Platforms/DX11/DX11GraphicsContext.h>
 
+#include <Core/Utils/Logger.h>
+#include <Core/Utils/Misc.h>
+
 namespace crystal
 {
 	DX11Provider::DX11Provider(const InitArgs& args)
@@ -32,6 +35,22 @@ namespace crystal
 	{
 		return nullptr;
 	}
+
+	void DX11Provider::LoadSharedLibrary(const std::string& name, void* handle)
+	{
+        HMODULE hDll = LoadLibraryW(DX11Common::ConvertFromUtf8ToUtf16(name).c_str());
+        if (!hDll || hDll == INVALID_HANDLE_VALUE)
+        {
+            throw std::logic_error(string_format("Unable to load library %s", name.c_str()));
+        }
+        *((HMODULE*)handle) = hDll;
+	}
+
+    bool DX11Provider::ReleaseSharedLibrary(void* handle)
+    {
+        HMODULE hDll = *((HMODULE*)handle);
+        return FreeLibrary(hDll);
+    }
 
 	IGraphicsDevice* DX11Provider::GetGraphicsDevice() const
 	{

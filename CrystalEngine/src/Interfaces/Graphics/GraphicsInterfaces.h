@@ -36,6 +36,8 @@ namespace crystal
 
 		virtual IGameWindow* GetGameWindow() const = 0;
 		virtual IFileSystem* GetFileSystem() const = 0;
+        virtual void LoadSharedLibrary(const std::string& name, void* handle) = 0;
+        virtual bool ReleaseSharedLibrary(void* handle) = 0;
 		virtual IGraphicsDevice* GetGraphicsDevice() const = 0;
 		virtual IGraphicsContext* GetGraphicsContext() const = 0;
 		virtual GraphicsAPIType GetGraphicsAPIType() const = 0;

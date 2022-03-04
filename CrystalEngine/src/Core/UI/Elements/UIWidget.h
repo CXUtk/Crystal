@@ -28,8 +28,7 @@ namespace crystal
         Vector2i                        m_cornerSize{};
         std::shared_ptr<ITexture2D>     m_panelTexture = nullptr;
         bool                            m_isDragging = false;
-        Vector2i                        m_dragStartMousePos{};
-        Vector2f                        m_dragStartPos{};
+        Vector2i                        m_lastMousePos{};
         UIWidgetCloseEvent              m_eventOnClose{};
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
