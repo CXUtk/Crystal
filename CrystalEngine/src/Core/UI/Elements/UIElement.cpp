@@ -20,7 +20,10 @@ namespace crystal
 
     void UIElement::Draw(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        DrawSelf(payload, gameTimer);
+        if (m_isVisible)
+        {
+            DrawSelf(payload, gameTimer);
+        }
         if constexpr (EnableDebugDraw)
         {
             auto graphicsDevice = Engine::GetInstance()->GetGraphicsDevice();
@@ -30,6 +33,7 @@ namespace crystal
             payload.GeometryRenderer->DrawBound2D(bound, Color4f(1.f, 1.f, 0.f, 1.f));
             payload.GeometryRenderer->End();
         }
+
         DrawChildren(payload, gameTimer);
     }
 

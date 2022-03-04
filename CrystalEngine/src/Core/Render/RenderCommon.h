@@ -11,5 +11,6 @@ namespace crystal
     {
         SpriteBatch*        SpriteBatch = nullptr;
         GeometryRenderer*   GeometryRenderer = nullptr;
+        Bound2i*            ScissorBound = nullptr;
     };
 }

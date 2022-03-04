@@ -27,7 +27,7 @@ namespace crystal
     {
         auto device = Engine::GetInstance()->GetGraphicsDevice();
 
-        payload.SpriteBatch->Begin(SpriteSortMode::Deferred, device->GetCommonSamplerState(SamplerStates::PointClamp),
+        payload.SpriteBatch->Begin(SpriteSortMode::Deferred, nullptr,
             device->GetCommonBlendState(BlendStates::AlphaBlend));
         Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
         payload.SpriteBatch->Draw(m_pIconTexture, m_calculatedInnerBound.GetCenter(), m_mouseHover ? m_hoverColor : m_unhoverColor);

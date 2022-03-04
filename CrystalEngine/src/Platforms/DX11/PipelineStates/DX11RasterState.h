@@ -7,7 +7,12 @@ namespace crystal
 	{
 	public:
 		DX11RasterState(DX11GraphicsDevice* graphicsDevice, const RasterStateDescription& rasterDesc);
+        DX11RasterState(const DX11RasterState& state);
 		~DX11RasterState();
+
+        virtual void SetScissorState(bool enable) override;
+        virtual void SetScissorBound(const Bound2i& scissorBound) override;
+        virtual std::shared_ptr<IRasterState> Clone() const override;
 
 		void Load(DX11GraphicsContext* context);
 		void Unload(DX11GraphicsContext* context);

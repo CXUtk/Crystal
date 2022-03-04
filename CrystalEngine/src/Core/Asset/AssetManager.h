@@ -4,6 +4,7 @@
 #include <Core/Utils/Misc.h>
 
 #include "AssetPackage.h"
+#include "Loader/FontLoader.h"
 
 namespace crystal
 {
@@ -18,7 +19,9 @@ namespace crystal
         template<typename T>
         std::shared_ptr<T> LoadAsset(const URI& uri);
     private:
-        std::map<std::string, std::shared_ptr<AssetPackage>>    m_packagesMap;
+        std::map<std::string, std::shared_ptr<AssetPackage>>    m_packagesMap{};
+
+        std::unique_ptr<FontLoader>     m_pFontLoader = nullptr;
     };
 
     inline std::string GetPackageName(const URI& uri)
@@ -57,6 +60,10 @@ namespace crystal
         else if constexpr (std::is_same<T, ITexture2D>::value)
         {
             return p->second->GetTexture2D(resPath);
+        }
+        else if constexpr (std::is_same<T, Font>::value)
+        {
+            return p->second->GetFont(resPath);
         }
         else
         {

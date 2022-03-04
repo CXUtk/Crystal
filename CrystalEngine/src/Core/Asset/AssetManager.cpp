@@ -16,6 +16,8 @@ namespace crystal
         auto engine = Engine::GetInstance();
         auto graphicsDevice = engine->GetGraphicsDevice();
 
+        m_pFontLoader = std::make_unique<FontLoader>();
+
         std::shared_ptr<AssetPackage> assetPackage = std::make_shared<AssetPackage>();
 
         Texture2DDescription texDesc = {};
@@ -26,28 +28,17 @@ namespace crystal
         assetPackage->LoadOneTexture2D("white",
             graphicsDevice->CreateTexture2DFromFile("resources/White.png", texDesc));
 
+        assetPackage->LoadOneFont("Consolas", m_pFontLoader->LoadFont("resources/fonts/consola.ttf"));
+
         m_packagesMap["Crystal"] = assetPackage;
-
-
-        FT_Library ft;
-        if (FT_Init_FreeType(&ft))
-        {
-            printf("ERROR::FREETYPE: Could not init FreeType Library\n");
-        }
-F        FT_Error_String
-
-        FT_Face face;
-        if (FT_New_Face(ft, "resources/fonts/consola.ttf", 0, &face))
-        {
-            printf("ERROR::FREETYPE: Failed to load font\n");
-        }
-        FT_Done_Face(face);
-        FT_Done_FreeType(ft);
 
     }
 
     AssetManager::~AssetManager()
-    {}
+    {
+        m_packagesMap.clear();
+        m_pFontLoader.reset();
+    }
 
     void AssetManager::LoadAssetPackage(const path_type& path)
     {

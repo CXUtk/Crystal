@@ -63,12 +63,19 @@ namespace crystal
     void UIWidget::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         auto device = Engine::GetInstance()->GetGraphicsDevice();
+        auto assetManager = Engine::GetInstance()->GetAssetManager();
         auto geometryRenderer = payload.GeometryRenderer;
         auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Begin(SpriteSortMode::Deferred, device->GetCommonSamplerState(SamplerStates::PointClamp),
+        spriteBatch->Begin(SpriteSortMode::Deferred, nullptr,
             device->GetCommonBlendState(BlendStates::AlphaBlend));
+
+
         SpriteBatchUtils::DrawNineSquareTexture(payload.SpriteBatch, m_panelTexture,
             m_cornerSize, BoundingBoxConvert<int>(m_calculatedInnerBound), Color4f(1.f));
+
+        auto font = assetManager->LoadAsset<Font>("Crystal:Consolas");
+        spriteBatch->DrawString(font, "jgpq", m_calculatedInnerBound.GetMinPos() + Vector2f(0, 10),
+            Color4f(1.f));
         spriteBatch->End();
     }
 

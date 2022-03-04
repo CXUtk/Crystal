@@ -52,8 +52,8 @@ namespace crystal
 
     enum class OverflowStyle
     {
-        Hidden,
         Overflow,
+        Hidden,
     };
 
     BIT_FLAGS_BEGIN(PropagationFlags, uint32_t)

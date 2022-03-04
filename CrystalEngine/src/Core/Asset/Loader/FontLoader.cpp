@@ -27,6 +27,6 @@ namespace crystal
         {
             throw std::runtime_error(string_format("FontLoader::LoadFont(): Failed to load font: %s\n", pathStr.c_str()));
         }
-        return std::make_shared<Font>(face);
+        return std::make_shared<Font>(face, 18);
     }
 }

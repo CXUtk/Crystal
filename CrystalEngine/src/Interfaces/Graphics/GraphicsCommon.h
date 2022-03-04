@@ -410,6 +410,7 @@ namespace crystal
 
 	struct Texture2DDescription
 	{
+        Vector2i	    Size;
 		int				MipmapLevels;
 		RenderFormat	Format;
 		BufferUsage		Usage;

@@ -8,5 +8,7 @@ namespace crystal
     class AssetPackage;
     class AssetManager;
 
+    class FontLoader;
+
     using URI = std::string;
 }

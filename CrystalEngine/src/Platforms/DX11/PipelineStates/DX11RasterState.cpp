@@ -44,8 +44,49 @@ namespace crystal
 		}
 	}
 
+    DX11RasterState::DX11RasterState(const DX11RasterState& state)
+    {
+        if (&state == this) return;
+        m_pGraphicsDevice = state.m_pGraphicsDevice;
+
+        D3D11_RASTERIZER_DESC desc;
+        state.m_pRasterState->GetDesc(&desc);
+
+        HR(m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&desc,
+            m_pRasterState.GetAddressOf()));
+
+        m_pViewport = std::make_unique<D3D11_VIEWPORT>(*state.m_pViewport.get());
+        m_enableScissor = state.m_enableScissor;
+        m_scissorBound = state.m_scissorBound;
+    }
+
 	DX11RasterState::~DX11RasterState()
 	{}
+
+    void DX11RasterState::SetScissorState(bool enable)
+    {
+        if (enable != m_enableScissor)
+        {
+            D3D11_RASTERIZER_DESC desc;
+            m_pRasterState->GetDesc(&desc);
+
+            desc.ScissorEnable = enable;
+
+            HR(m_pGraphicsDevice->GetD3DDevice()->CreateRasterizerState(&desc,
+                m_pRasterState.GetAddressOf()));
+        }
+        m_enableScissor = enable;
+    }
+
+    void DX11RasterState::SetScissorBound(const Bound2i& scissorBound)
+    {
+        m_scissorBound = scissorBound;
+    }
+
+    std::shared_ptr<IRasterState> DX11RasterState::Clone() const
+    {
+        return std::make_shared<DX11RasterState>(*this);
+    }
 
 	void DX11RasterState::Load(DX11GraphicsContext* context)
 	{
@@ -60,7 +101,7 @@ namespace crystal
 			auto maxpos = m_scissorBound.GetMaxPos();
 			auto bufferSize = context->GetBackBufferSize();
 
-			RECT scissorRect;
+            RECT scissorRect = {};
 			scissorRect.left = minpos.x;
 			scissorRect.top = bufferSize.y - maxpos.y - 1;
 			scissorRect.right = maxpos.x;

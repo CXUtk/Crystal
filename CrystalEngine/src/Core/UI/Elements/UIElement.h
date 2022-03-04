@@ -108,7 +108,7 @@ namespace crystal
         std::string     m_name{};
         std::string     m_tooltip{};
 
-        OverflowStyle       m_overflowStyle = OverflowStyle::Hidden;
+        OverflowStyle       m_overflowStyle = OverflowStyle::Overflow;
         PropagationFlags    m_propagationFlags = PropagationFlags::None;
 
         /**
