@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <memory>
 #include <Interfaces/Interfaces.h>
 #include <SJson/SJson.hpp>
@@ -17,13 +17,21 @@ namespace crystal
         uint32_t                        Advance;        // Offset to advance to next glyph
     };
 
+    struct StringMetric
+    {
+        int Width = 0;
+        int yMin = std::numeric_limits<int>::max(), yMax = std::numeric_limits<int>::min();
+    };
+
     class Font
     {
     public:
         Font(FT_Face face, size_t fontSize);
         ~Font();
 
-        const Character& GetCharacter(uint32_t code) const;
+        Character& GetCharacter(uint32_t code);
+        StringMetric MeasureString(const std::string& str);
+        std::vector<uint32_t> GetCodesFromString(const std::string& str);
     private:
         FT_Face     m_fontFace = nullptr;
         size_t      m_fontSize = 0;
@@ -31,5 +39,6 @@ namespace crystal
         std::map<uint32_t, Character>   m_charMap;
 
         void GenerateCharMap();
+        void LoadChar(uint32_t code);
     };
 }

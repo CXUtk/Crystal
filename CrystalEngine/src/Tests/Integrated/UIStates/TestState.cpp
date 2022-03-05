@@ -1,4 +1,4 @@
-#include "TestState.h"
+﻿#include "TestState.h"
 
 #include <Engine.h>
 #include <Core/Asset/AssetManager.h>
@@ -66,13 +66,14 @@ namespace crystal
         widget->SetSize(SizeLayout(200, 200));
         widget->SetPosition(Vector2f(0, 0));
         widget->Recalculate();
-        widget->AddOnCloseEventListener([widget](UIEventArgs args) {
-            widget->SetActive(false);
+        widget->AddOnCloseEventListener([](UIEventArgs args) {
+            args.Element->SetActive(false);
         });
 
         AppendElement(widget);
     }
 
     TestState::~TestState()
-    {}
+    {
+    }
 }

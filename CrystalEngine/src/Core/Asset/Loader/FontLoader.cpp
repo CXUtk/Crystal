@@ -1,4 +1,4 @@
-#include "FontLoader.h"
+﻿#include "FontLoader.h"
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Misc.h>
 
@@ -23,6 +23,7 @@ namespace crystal
         FT_Face face;
 
         std::string pathStr = path.string();
+
         if (FT_New_Face(m_fontLibrary, pathStr.c_str(), 0, &face))
         {
             throw std::runtime_error(string_format("FontLoader::LoadFont(): Failed to load font: %s\n", pathStr.c_str()));

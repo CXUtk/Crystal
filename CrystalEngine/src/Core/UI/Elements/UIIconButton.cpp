@@ -1,4 +1,4 @@
-#include "UIIconButton.h"
+﻿#include "UIIconButton.h"
 
 #include <Engine.h>
 #include <Core/Asset/AssetManager.h>
@@ -12,7 +12,8 @@ namespace crystal
         m_unhoverColor = Color4f(0.75f);
     }
     UIIconButton::~UIIconButton()
-    {}
+    {
+    }
     void UIIconButton::MouseEnter(UIMouseEventArgs args)
     {
         m_mouseHover = true;

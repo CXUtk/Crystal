@@ -1,4 +1,4 @@
-#include "UIWidget.h"
+﻿#include "UIWidget.h"
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
@@ -27,13 +27,22 @@ namespace crystal
             closeArg.TimeStamp = args.TimeStamp;
             m_eventOnClose.Invoke(closeArg);
         });
+
+        m_windowTitle = std::make_shared<UILabel>();
+        m_windowTitle->SetText("Title");
+        m_windowTitle->SetAnchorPoint(Vector2f(0.f, 1.f));
+        m_windowTitle->SetPivot(Vector2f(0.f, 1.f));
+        m_windowTitle->SetPosition(Vector2f(10, -10));
+
         AppendChild(m_closeButton);
+        AppendChild(m_windowTitle);
 
         m_gameWindow = Engine::GetInstance()->GetWindow();
     }
 
     UIWidget::~UIWidget()
-    {}
+    {
+    }
 
     void UIWidget::UpdateSelf(const GameTimer& gameTimer)
     {
@@ -68,14 +77,9 @@ namespace crystal
         auto spriteBatch = payload.SpriteBatch;
         spriteBatch->Begin(SpriteSortMode::Deferred, nullptr,
             device->GetCommonBlendState(BlendStates::AlphaBlend));
-
-
         SpriteBatchUtils::DrawNineSquareTexture(payload.SpriteBatch, m_panelTexture,
             m_cornerSize, BoundingBoxConvert<int>(m_calculatedInnerBound), Color4f(1.f));
 
-        auto font = assetManager->LoadAsset<Font>("Crystal:Consolas");
-        spriteBatch->DrawString(font, "jgpq", m_calculatedInnerBound.GetMinPos() + Vector2f(0, 10),
-            Color4f(1.f));
         spriteBatch->End();
     }
 

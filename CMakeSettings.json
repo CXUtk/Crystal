@@ -20,6 +20,11 @@
           "name": "CRYSTAL_USE_OPENGL",
           "value": "False",
           "type": "BOOL"
+        },
+        {
+          "name": "CMAKE_CXX_FLAGS",
+          "value": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /utf-8",
+          "type": "STRING"
         }
       ]
     },

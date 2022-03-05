@@ -3,6 +3,7 @@
 #include "../Common/UIEventArgs.h"
 
 #include "UIElement.h"
+#include "UILabel.h"
 
 namespace crystal
 {
@@ -14,16 +15,17 @@ namespace crystal
         UIWidget();
         ~UIWidget() override;
 
-        virtual void UpdateSelf(const GameTimer& gameTimer);
+        virtual void UpdateSelf(const GameTimer& gameTimer) override;
 
-        virtual void MouseJustPressed(UIMouseButtonEventArgs args);
-        virtual void MouseJustReleased(UIMouseButtonEventArgs args);
+        virtual void MouseJustPressed(UIMouseButtonEventArgs args) override;
+        virtual void MouseJustReleased(UIMouseButtonEventArgs args) override;
 
         void AddOnCloseEventListener(UIWidgetCloseEvent::Func listener);
 
     protected:
         IGameWindow*                    m_gameWindow = nullptr;
         std::shared_ptr<UIIconButton>   m_closeButton = nullptr;
+        std::shared_ptr<UILabel>        m_windowTitle = nullptr;
 
         Vector2i                        m_cornerSize{};
         std::shared_ptr<ITexture2D>     m_panelTexture = nullptr;

@@ -1,4 +1,4 @@
-#include "SpriteBatch.h"
+﻿#include "SpriteBatch.h"
 #include <Interfaces/Graphics/GraphicsInterfaces.h>
 #include <stdexcept>
 #include <Engine.h>
@@ -189,7 +189,8 @@ namespace crystal
     void SpriteBatch::DrawString(std::shared_ptr<Font> font, const std::string& text, const Vector2f& pos, const Color4f& color)
     {
         Vector2f origin = pos;
-        for (auto c : text)
+        auto codes = font->GetCodesFromString(text);
+        for (auto c : codes)
         {
             auto& character = font->GetCharacter(c);
             if (!character.Texture2D) continue;
@@ -200,7 +201,7 @@ namespace crystal
 
             m_pImpl->Draw(character.Texture2D, Bound2f(minPos, maxPos), nullptr, color,
                 Vector2f(0.f), 0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
-            origin.x += character.Advance >> 6;
+            origin.x += character.Advance;
         }
     }
 

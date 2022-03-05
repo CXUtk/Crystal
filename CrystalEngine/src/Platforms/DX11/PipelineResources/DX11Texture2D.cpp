@@ -1,4 +1,4 @@
-#include "DX11Texture2D.h"
+﻿#include "DX11Texture2D.h"
 #include "DX11ShaderProgram.h"
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
@@ -45,6 +45,7 @@ namespace crystal
 
 		m_size.x = textureDesc.Width;
 		m_size.y = textureDesc.Height;
+        printf("texture con\n");
 	}
 
 	DX11Texture2D::DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
@@ -88,10 +89,13 @@ namespace crystal
 
         m_size.x = textureDesc.Width;
         m_size.y = textureDesc.Height;
+        printf("texture con\n");
 	}
 
 	DX11Texture2D::~DX11Texture2D()
-	{}
+	{
+        printf("texture rel\n");
+    }
 
 	void DX11Texture2D::GetShaderResourceHandle(void* pHandle) const
 	{
