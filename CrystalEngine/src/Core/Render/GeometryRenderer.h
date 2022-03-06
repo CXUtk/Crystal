@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "RenderCommon.h"
 
 namespace crystal
@@ -33,9 +33,11 @@ namespace crystal
             const Color4f& color);
         void DrawBound2DFill(const Bound2i& bound,
             const Color4f& fillColor, const Color4f& borderColor);
+        void DrawBound2DFill(const Bound2i& bound, const Color4f& fillColor);
 
     private:
         class Impl;
-        std::unique_ptr<Impl> m_pImpl;
+        std::unique_ptr<Impl>   m_pImpl;
+        GraphicsAPIType         m_apiType;
     };
 }

@@ -1,5 +1,5 @@
-﻿#pragma once
-#include <Interfaces/Graphics/GraphicsCommon.h>
+#pragma once
+#include <Interfaces/Interfaces.h>
 #include <Core/Utils/Geometry.h>
 
 namespace crystal

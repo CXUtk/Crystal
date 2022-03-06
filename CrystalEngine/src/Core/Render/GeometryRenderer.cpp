@@ -1,4 +1,4 @@
-﻿#include "GeometryRenderer.h"
+#include "GeometryRenderer.h"
 
 #include <stdexcept>
 
@@ -190,6 +190,7 @@ namespace crystal
     GeometryRenderer::GeometryRenderer(IGraphicsDevice* graphicsDevice, IGraphicsContext* context)
     {
         m_pImpl = std::make_unique<GeometryRenderer::Impl>(graphicsDevice, context);
+        m_apiType = Engine::GetInstance()->GetGraphicsAPIType();
     }
 
     GeometryRenderer::~GeometryRenderer()
@@ -297,14 +298,28 @@ namespace crystal
         vertex.Position = Vector3f(maxPos.x, maxPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
 
-        vertex.Position = Vector3f(minPos.x - 1, maxPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
+        if (m_apiType == GraphicsAPIType::DirectX11)
+        {
+            vertex.Position = Vector3f(minPos.x - 1, maxPos.y, 0.f);
+            m_pImpl->AppendGVertex(vertex);
+        }
+        else
+        {
+            vertex.Position = Vector3f(minPos.x, maxPos.y, 0.f);
+            m_pImpl->AppendGVertex(vertex);
+        }
 
         vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
     }
 
     void GeometryRenderer::DrawBound2DFill(const Bound2i& bound, const Color4f& fillColor, const Color4f& borderColor)
+    {
+        DrawBound2DFill(bound, fillColor);
+        DrawBound2D(bound, borderColor);
+    }
+
+    void GeometryRenderer::DrawBound2DFill(const Bound2i& bound, const Color4f& fillColor)
     {
         auto minPos = bound.GetMinPos();
         auto maxPos = bound.GetMaxPos();
@@ -313,34 +328,28 @@ namespace crystal
 
         m_pImpl->BeginNewPrimitive(PrimitiveType::TRIANGLE_STRIP);
         vertex.Color = fillColor;
-        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
 
-        vertex.Position = Vector3f(maxPos.x, minPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
+        if (m_apiType == GraphicsAPIType::DirectX11)
+        {
+            vertex.Position = Vector3f(minPos.x, minPos.y + 1, 0.f);
+            m_pImpl->AppendGVertex(vertex);
+
+            vertex.Position = Vector3f(maxPos.x, minPos.y + 1, 0.f);
+            m_pImpl->AppendGVertex(vertex);
+        }
+        else
+        {
+            vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
+            m_pImpl->AppendGVertex(vertex);
+
+            vertex.Position = Vector3f(maxPos.x, minPos.y, 0.f);
+            m_pImpl->AppendGVertex(vertex);
+        }
 
         vertex.Position = Vector3f(minPos.x, maxPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
 
         vertex.Position = Vector3f(maxPos.x, maxPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
-
-
-        m_pImpl->BeginNewPrimitive(PrimitiveType::LINE_STRIP);
-        vertex.Color = borderColor;
-        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
-
-        vertex.Position = Vector3f(maxPos.x, minPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
-
-        vertex.Position = Vector3f(maxPos.x, maxPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
-
-        vertex.Position = Vector3f(minPos.x - 1, maxPos.y, 0.f);
-        m_pImpl->AppendGVertex(vertex);
-
-        vertex.Position = Vector3f(minPos.x, minPos.y, 0.f);
         m_pImpl->AppendGVertex(vertex);
     }
 }

@@ -77,7 +77,16 @@ namespace crystal
         button->SetAnchorPoint(Vector2f(0.5f, 0.5f));
         button->SetSize(SizeLayout(100, 50));
 
+        auto progressBar = std::make_shared<UIProgressBar>();
+        progressBar->SetName("Button");
+        progressBar->SetPivot(Vector2f(0.5f, 0.5f));
+        progressBar->SetAnchorPoint(Vector2f(0.5f, 0.5f));
+        progressBar->SetSize(SizeLayout(100, 16));
+        progressBar->SetValue(0.5f);
+        progressBar->SetPosition(Vector2f(0.f, -80.f));
+
         widget->AppendChild(button);
+        widget->AppendChild(progressBar);
 
         AppendElement(widget);
     }

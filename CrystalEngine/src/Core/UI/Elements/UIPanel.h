@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "../Common/UICommon.h"
 #include "../Common/UIEventArgs.h"
 
@@ -15,8 +15,8 @@ namespace crystal
         Color4f GetFillColor() const { return m_drawColor; }
         void SetFillColor(const Color4f& color) { m_drawColor = color; }
 
-        Color4f GetBorderColor() const { return m_drawColor; }
-        void SetBorderColor(const Color4f& color) { m_drawColor = color; }
+        Color4f GetBorderColor() const { return m_borderColor; }
+        void SetBorderColor(const Color4f& color) { m_borderColor = color; }
 
     protected:
         Color4f     m_drawColor{};

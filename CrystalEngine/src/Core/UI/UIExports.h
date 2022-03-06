@@ -10,4 +10,5 @@
 #include "Elements/UIPanel.h"
 #include "Elements/UIIconButton.h"
 #include "Elements/UITextButton.h"
+#include "Elements/UIProgressBar.h"
 #include "Elements/Compound/UIWidget.h"

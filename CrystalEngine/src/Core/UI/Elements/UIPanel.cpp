@@ -20,7 +20,7 @@ namespace crystal
     {
         auto device = Engine::GetInstance()->GetGraphicsDevice();
         auto geometryRenderer = payload.GeometryRenderer;
-        geometryRenderer->Begin();
+        geometryRenderer->Begin(payload.PSO);
         geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(m_calculatedInnerBound),
             m_drawColor, m_borderColor);
         geometryRenderer->End();
