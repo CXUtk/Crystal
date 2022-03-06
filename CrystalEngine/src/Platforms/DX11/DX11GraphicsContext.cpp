@@ -1,4 +1,4 @@
-#include "DX11GraphicsContext.h"
+﻿#include "DX11GraphicsContext.h"
 #include "DX11GraphicsDevice.h"
 #include "DX11PipelineResourceObject.h"
 #include "DX11PipelineStateObject.h"
@@ -203,24 +203,10 @@ namespace crystal
 			options, color, depth, stencil);
 	}
 
-	void DX11GraphicsContext::BeginPipeline(std::shared_ptr<IPipelineStateObject> pipelineState)
+	void DX11GraphicsContext::LoadPipelineState(std::shared_ptr<IPipelineStateObject> pipelineState)
 	{
-		if (m_pCurrentPipelineState)
-		{
-			throw std::logic_error("Cannot begin a pipeline when a pipeline already started");
-		}
 		m_pCurrentPipelineState = std::dynamic_pointer_cast<DX11PipelineStateObject>(pipelineState);
 		m_pCurrentPipelineState->Load();
-	}
-
-	void DX11GraphicsContext::EndPipeline()
-	{
-		if (!m_pCurrentPipelineState)
-		{
-			throw std::logic_error("Cannot end a pipeline when there is no pipeline process");
-		}
-		m_pCurrentPipelineState->Unload();
-		m_pCurrentPipelineState.reset();
 	}
 
 	void DX11GraphicsContext::LoadPipelineResources(std::shared_ptr<IPipelineResourceObject> pipelineResource)
@@ -261,6 +247,23 @@ namespace crystal
 		m_renderTargets.back()->SetViewportToCurrentContext(this);
 		m_renderTargets.back()->SetToCurrentContext(this);
 	}
+
+    void DX11GraphicsContext::SetViewPort(const Viewport& viewport)
+    {
+        D3D11_VIEWPORT rsViewPort = {};
+
+        auto minPos = viewport.GetMinPos();
+        auto maxPos = viewport.GetMaxPos();
+        rsViewPort.TopLeftX = minPos.x;
+        rsViewPort.TopLeftY = minPos.y;
+        rsViewPort.Width = maxPos.x;
+        rsViewPort.TopLeftY = maxPos.y;
+        rsViewPort.MinDepth = minPos.z;
+        rsViewPort.MaxDepth = maxPos.z;
+
+        m_pd3dImmediateContext->RSSetViewports(1, &rsViewPort);
+    }
+
 	Vector2i DX11GraphicsContext::GetCurrentFrameBufferSize() const
 	{
 		return m_renderTargets.back()->GetSize();

@@ -1,4 +1,4 @@
-#include "UIStateMachine.h"
+﻿#include "UIStateMachine.h"
 #include "UIState.h"
 #include <Engine.h>
 
@@ -7,7 +7,16 @@
 namespace crystal
 {
 	UIStateMachine::UIStateMachine()
-	{}
+	{
+        auto engine = Engine::GetInstance();
+        auto graphicsDevice = engine->GetGraphicsDevice();
+
+        m_PSO = graphicsDevice->CreatePipelineStateObject();
+
+        m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::AlphaBlend));
+        m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest));
+        m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
+    }
 	UIStateMachine::~UIStateMachine()
 	{}
     void UIStateMachine::Update(const GameTimer& gameTimer)
@@ -30,6 +39,7 @@ namespace crystal
         RenderPayload payload = {};
         payload.SpriteBatch = spriteBatch;
         payload.GeometryRenderer = geometryRenderer;
+        payload.PSO = m_PSO;
 
         m_pCurrentUIState->Draw(payload, gameTimer);
     }

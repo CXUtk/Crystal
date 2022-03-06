@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "RenderCommon.h"
 
 namespace crystal
@@ -10,6 +10,10 @@ namespace crystal
         ~GeometryRenderer();
 
         void Begin();
+        void Begin(std::shared_ptr<IPipelineStateObject> PSO);
+        void Begin(std::shared_ptr<IPipelineStateObject> PSO, const Matrix4f* transform);
+        void Begin(std::shared_ptr<IPipelineStateObject> PSO, const Matrix4f* transform, std::shared_ptr<IShaderProgram> shader);
+       
         void End();
 
         void DrawLineStrip(const std::vector<Vector2f>& points,

@@ -80,9 +80,9 @@ namespace crystal
 		m_PRO->SetShaderProgram(m_pShader);
 		m_PRO->SetShaderResource(m_texture2D, 0);
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
-		m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
-		m_PSO->SetDepthStencilState(graphicsDevice->GetCommonDepthStencilState(DepthStencilStates::DefaultDepthTest));
-		m_PSO->SetRasterState(graphicsDevice->GetCommonRasterState(RasterStates::CullNone));
+		m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
+		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
+		m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
 		//indexBuffer->Bind(0);
 	}
 
@@ -140,33 +140,31 @@ namespace crystal
 		m_pCamera->SetAspectRatio(static_cast<crystal::Float>(windowSize.x) / windowSize.y);
 	}
 
-	void OrbitControllerTest::Draw(const crystal::GameTimer& gameTimer)
-	{
-		auto windowSize = m_engine->GetWindow()->GetWindowSize();
-		auto graphicsContext = m_engine->GetGraphicsContext();
-		graphicsContext->Clear(
-			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET 
-			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
-			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
-			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-		//m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
-		//m_pShader->SetUniform1f("uBase", 1.0f);
-		m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
-		m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
-		auto P = m_pCamera->GetProjectionMatrix();
-		auto V = m_pCamera->GetViewMatrix();
-		m_pShader->SetUniformMat4f("VP", P * V);
-		
-		graphicsContext->BeginPipeline(m_PSO);
-		{
-			graphicsContext->LoadPipelineResources(m_PRO);
-			{
-				graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
-			}
-			graphicsContext->UnloadPipelineResources();
-		}
-		graphicsContext->EndPipeline();
-	}
+    void OrbitControllerTest::Draw(const crystal::GameTimer& gameTimer)
+    {
+        auto windowSize = m_engine->GetWindow()->GetWindowSize();
+        auto graphicsContext = m_engine->GetGraphicsContext();
+        graphicsContext->Clear(
+            crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+            | crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+            | crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
+            crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
+        //m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
+        //m_pShader->SetUniform1f("uBase", 1.0f);
+        m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
+        m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
+        auto P = m_pCamera->GetProjectionMatrix();
+        auto V = m_pCamera->GetViewMatrix();
+        m_pShader->SetUniformMat4f("VP", P * V);
+
+        graphicsContext->LoadPipelineState(m_PSO);
+        graphicsContext->LoadPipelineResources(m_PRO);
+        {
+            graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+        }
+        graphicsContext->UnloadPipelineResources();
+
+    }
 
 	void OrbitControllerTest::Exit()
 	{

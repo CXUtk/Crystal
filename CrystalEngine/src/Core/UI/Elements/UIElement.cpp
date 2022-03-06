@@ -1,4 +1,4 @@
-#include "UIElement.h"
+﻿#include "UIElement.h"
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
@@ -33,8 +33,26 @@ namespace crystal
             payload.GeometryRenderer->DrawBound2D(bound, Color4f(1.f, 1.f, 0.f, 1.f));
             payload.GeometryRenderer->End();
         }
+        if (m_overflowStyle == OverflowStyle::Hidden)
+        {
+            auto RSState = payload.PSO->GetRasterState();
+            auto oldScissorState = RSState->GetScissorState();
+            auto oldScissorBound = RSState->GetScissorBound();
 
-        DrawChildren(payload, gameTimer);
+            RSState->SetScissorState(true);
+            auto scissorBound = BoundingBoxConvert<int>(m_calculatedInnerBound)
+                .IntersectWith(oldScissorBound);
+            RSState->SetScissorBound(scissorBound);
+
+            DrawChildren(payload, gameTimer);
+
+            RSState->SetScissorState(oldScissorState);
+            RSState->SetScissorBound(oldScissorBound);
+        }
+        else
+        {
+            DrawChildren(payload, gameTimer);
+        }
     }
 
     void UIElement::Recalculate()

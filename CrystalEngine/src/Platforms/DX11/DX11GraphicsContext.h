@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DX11Common.h"
 
 namespace crystal
@@ -22,14 +22,15 @@ namespace crystal
 			size_t indexOffset, size_t vertexOffset) override;
 		virtual void Clear(ClearOptions options, const Color4f& color, float depth, int stencil) override;
 
-		virtual void BeginPipeline(std::shared_ptr<IPipelineStateObject> pipelineState) override;
-		virtual void EndPipeline() override;
+		virtual void LoadPipelineState(std::shared_ptr<IPipelineStateObject> pipelineState) override;
 		
 		virtual void LoadPipelineResources(std::shared_ptr<IPipelineResourceObject> pipelineResource) override;
 		virtual void UnloadPipelineResources() override;
 
 		virtual void PushRenderTarget2D(std::shared_ptr<IRenderTarget2D> renderTarget2D) override;
 		virtual void PopRenderTarget2D() override;
+
+        virtual void SetViewPort(const Viewport& viewport) override;
 
 		virtual Vector2i GetCurrentFrameBufferSize() const override;
 	private:

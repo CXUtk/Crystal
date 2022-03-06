@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "RenderCommon.h"
 #include <Core/Asset/Content/Font.h>
 
@@ -37,18 +37,20 @@ namespace crystal
 		~SpriteBatch();
 
 		void Begin();
-		void Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState);
-		void Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState,
-			std::shared_ptr<IBlendState> blendState);
-		void Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState,
-			std::shared_ptr<IBlendState> blendState, std::shared_ptr<IShaderProgram> shader);
-		void Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState,
-			std::shared_ptr<IBlendState> blendState, std::shared_ptr<IShaderProgram> shader, 
-			Matrix4f& transform);
-		void Begin(SpriteSortMode spriteSortMode, std::shared_ptr<ISamplerState> samplerState,
-			std::shared_ptr<IBlendState> blendState, std::shared_ptr<IShaderProgram> shader,
-			Matrix4f& transform, std::shared_ptr<IRasterState> rasterState,
-			std::shared_ptr<IDepthStencilState> depthStencilState);
+		void Begin(SpriteSortMode spriteSortMode,
+            std::shared_ptr<IPipelineStateObject> PSO);
+        void Begin(SpriteSortMode spriteSortMode,
+            std::shared_ptr<IPipelineStateObject> PSO,
+            std::shared_ptr<ISamplerState> samplerState);
+        void Begin(SpriteSortMode spriteSortMode,
+            std::shared_ptr<IPipelineStateObject> PSO,
+            std::shared_ptr<ISamplerState> samplerState,
+            std::shared_ptr<IShaderProgram> shader);
+        void Begin(SpriteSortMode spriteSortMode,
+            std::shared_ptr<IPipelineStateObject> PSO,
+            std::shared_ptr<ISamplerState> samplerState,
+            std::shared_ptr<IShaderProgram> shader,
+            const Matrix4f& transform);
 		void End();
 
 		void Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& center, const Color4f& color);

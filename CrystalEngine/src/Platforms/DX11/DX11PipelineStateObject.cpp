@@ -45,6 +45,21 @@ namespace crystal
 		m_pBlendState = std::dynamic_pointer_cast<DX11BlendState>(blendState);
 	}
 
+    std::shared_ptr<IRasterState> DX11PipelineStateObject::GetRasterState()
+    {
+        return m_pRasterizerState;
+    }
+
+    std::shared_ptr<IDepthStencilState> DX11PipelineStateObject::GetDepthStencilState()
+    {
+        return m_pDepthStencilState;
+    }
+
+    std::shared_ptr<IBlendState> DX11PipelineStateObject::GetBlendState()
+    {
+        return m_pBlendState;
+    }
+
 	void DX11PipelineStateObject::Load()
 	{
 		auto context = m_pGraphicsContext->GetD3DContext();

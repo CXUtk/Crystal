@@ -1,4 +1,4 @@
-#include "TriangleTest.h"
+﻿#include "TriangleTest.h"
 #include <Engine.h>
 #include <Interfaces/Interfaces.h>
 #include <Core/Utils/Logger.h>
@@ -75,7 +75,7 @@ namespace crystal
         m_PRO->SetShaderProgram(m_pShader);
         //indexBuffer->Bind(0);
 
-        m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
+        m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
         DepthStencilStateDescription DSSDesc = {};
         DSSDesc.EnableDepthTest = false;
         DSSDesc.EnableStencilTest = false;
@@ -84,7 +84,6 @@ namespace crystal
         RasterStateDescription RSDesc = {};
         RSDesc.CullMode = CullingMode::None;
         RSDesc.FillMode = FillMode::SOLID;
-        RSDesc.Viewport = nullptr;
         m_PSO->SetRasterState(graphicsDevice->CreateRasterState(RSDesc));
     }
 
@@ -103,16 +102,14 @@ namespace crystal
             crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
         m_pShader->SetUniform1f("uLuminance", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
         m_pShader->SetUniform1f("uBase", 0.0f);
-        
-        graphicsContext->BeginPipeline(m_PSO);
+
+        graphicsContext->LoadPipelineState(m_PSO);
+
+        graphicsContext->LoadPipelineResources(m_PRO);
         {
-            graphicsContext->LoadPipelineResources(m_PRO);
-            {
-                graphicsContext->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
-            }
-            graphicsContext->UnloadPipelineResources();
+            graphicsContext->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 3, 0, 0);
         }
-        graphicsContext->EndPipeline();
+        graphicsContext->UnloadPipelineResources();
     }
 
     void TriangleTest::Exit()

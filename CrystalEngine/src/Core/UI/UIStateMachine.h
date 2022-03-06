@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/UICommon.h"
 namespace crystal
 {
@@ -18,5 +18,6 @@ namespace crystal
         std::map<std::string, std::shared_ptr<UIState>>	m_UIStates{};
         std::shared_ptr<UIState>                        m_pCurrentUIState = nullptr;
         std::shared_ptr<UIState>                        m_pNextUIState = nullptr;
+        std::shared_ptr<IPipelineStateObject>           m_PSO = nullptr;
 	};
 }

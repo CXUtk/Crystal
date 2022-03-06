@@ -14,6 +14,7 @@ namespace crystal
         auto assetManager = Engine::GetInstance()->GetAssetManager();
         m_panelTexture = assetManager->LoadAsset<ITexture2D>("package1:BoxBlack");
         m_cornerSize = Vector2i(10);
+        m_overflowStyle = OverflowStyle::Hidden;
 
         m_closeButton = std::make_shared<UIIconButton>();
         m_closeButton->SetIconTexture(assetManager->LoadAsset<ITexture2D>("package1:Cross"));
@@ -29,7 +30,7 @@ namespace crystal
         });
 
         m_windowTitle = std::make_shared<UILabel>();
-        m_windowTitle->SetText("Title");
+        m_windowTitle->SetText("Title32154365465746588768969589");
         m_windowTitle->SetAnchorPoint(Vector2f(0.f, 1.f));
         m_windowTitle->SetPivot(Vector2f(0.f, 1.f));
         m_windowTitle->SetPosition(Vector2f(10, -10));
@@ -75,11 +76,9 @@ namespace crystal
         auto assetManager = Engine::GetInstance()->GetAssetManager();
         auto geometryRenderer = payload.GeometryRenderer;
         auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Begin(SpriteSortMode::Deferred, nullptr,
-            device->GetCommonBlendState(BlendStates::AlphaBlend));
+        spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
         SpriteBatchUtils::DrawNineSquareTexture(payload.SpriteBatch, m_panelTexture,
             m_cornerSize, BoundingBoxConvert<int>(m_calculatedInnerBound), Color4f(1.f));
-
         spriteBatch->End();
     }
 

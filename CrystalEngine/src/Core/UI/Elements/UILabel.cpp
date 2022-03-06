@@ -1,4 +1,4 @@
-#include "UILabel.h"
+﻿#include "UILabel.h"
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
@@ -43,8 +43,7 @@ namespace crystal
     {
         auto device = Engine::GetInstance()->GetGraphicsDevice();
         auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Begin(SpriteSortMode::Deferred, nullptr,
-            device->GetCommonBlendState(BlendStates::AlphaBlend));
+        spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
         spriteBatch->DrawString(m_pFont, m_text, m_calculatedInnerBound.GetMinPos() + m_originOffset,
             Color4f(1.f));
         spriteBatch->End();

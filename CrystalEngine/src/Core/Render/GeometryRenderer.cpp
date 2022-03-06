@@ -1,4 +1,4 @@
-#include "GeometryRenderer.h"
+﻿#include "GeometryRenderer.h"
 
 #include <stdexcept>
 
@@ -24,10 +24,8 @@ namespace crystal
     struct RenderStateG
     {
         Matrix4f								m_renderMatrix{};
+        std::shared_ptr<IPipelineStateObject>   m_PSO = nullptr;
         std::shared_ptr<IShaderProgram>			m_pShaderProgram = nullptr;
-        std::shared_ptr<IRasterState>			m_pRasterState = nullptr;
-        std::shared_ptr<IBlendState>			m_pBlendState = nullptr;
-        std::shared_ptr<IDepthStencilState>		m_pDepthStencilState = nullptr;
     };
 
     class GeometryRenderer::Impl
@@ -37,10 +35,8 @@ namespace crystal
         ~Impl();
 
         void Begin(const Matrix4f* transform,
-            std::shared_ptr<IBlendState> blendState,
-            std::shared_ptr<IShaderProgram> shader,
-            std::shared_ptr<IRasterState> rasterState,
-            std::shared_ptr<IDepthStencilState> depthStencilState);
+            std::shared_ptr<IPipelineStateObject> pso,
+            std::shared_ptr<IShaderProgram> shader);
         void End();
 
         void BeginNewPrimitive(PrimitiveType type);
@@ -53,7 +49,6 @@ namespace crystal
         RenderStateG		m_defaultRenderState{};
         RenderStateG		m_currentRenderState{};
 
-        std::shared_ptr<IPipelineStateObject>		m_pDefaultPSO = nullptr;
         std::shared_ptr<IPipelineResourceObject>	m_pDefaultPRO = nullptr;
         std::shared_ptr<IVertexBuffer>				m_pDefaultVertexBuffer = nullptr;
 
@@ -70,7 +65,7 @@ namespace crystal
         auto assetManager = Engine::GetInstance()->GetAssetManager();
 
         m_pDefaultPRO = m_pGraphicsDevice->CreatePipelineResourceObject();
-        m_pDefaultPSO = m_pGraphicsDevice->CreatePipelineStateObject();
+        m_defaultRenderState.m_PSO = m_pGraphicsDevice->CreatePipelineStateObject();
 
         // Initialize vertex buffer (dynamic)
         VertexBufferDescription vertexBufferDesc;
@@ -87,9 +82,10 @@ namespace crystal
         m_pDefaultPRO->SetVertexBuffer(m_pDefaultVertexBuffer);
 
         // Initialize pipeline states
-        m_defaultRenderState.m_pRasterState = m_pGraphicsDevice->GetCommonRasterState(RasterStates::CullNone);
-        m_defaultRenderState.m_pBlendState = m_pGraphicsDevice->GetCommonBlendState(BlendStates::Opaque);
-        m_defaultRenderState.m_pDepthStencilState = m_pGraphicsDevice->GetCommonDepthStencilState(DepthStencilStates::NoDepthTest);
+        auto& defPSO = m_defaultRenderState.m_PSO;
+        defPSO->SetRasterState(m_pGraphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
+        defPSO->SetBlendState(m_pGraphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
+        defPSO->SetDepthStencilState(m_pGraphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest));
         m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("package1:Geometry");
     }
 
@@ -99,10 +95,8 @@ namespace crystal
     }
 
     void GeometryRenderer::Impl::Begin(const Matrix4f* transform,
-         std::shared_ptr<IBlendState> blendState,
-         std::shared_ptr<IShaderProgram> shader,
-         std::shared_ptr<IRasterState> rasterState,
-         std::shared_ptr<IDepthStencilState> depthStencilState)
+            std::shared_ptr<IPipelineStateObject> pso,
+            std::shared_ptr<IShaderProgram> shader)
     {
         if (m_isBatchingBegin)
         {
@@ -121,14 +115,8 @@ namespace crystal
         {
             m_currentRenderState.m_renderMatrix = *transform;
         }
-        m_currentRenderState.m_pRasterState = rasterState ? rasterState : m_defaultRenderState.m_pRasterState;
-        m_currentRenderState.m_pBlendState = blendState ? blendState : m_defaultRenderState.m_pBlendState;
-        m_currentRenderState.m_pDepthStencilState = depthStencilState ? depthStencilState : m_defaultRenderState.m_pDepthStencilState;
+        m_currentRenderState.m_PSO = pso ? pso : m_defaultRenderState.m_PSO;
         m_currentRenderState.m_pShaderProgram = shader ? shader : m_defaultRenderState.m_pShaderProgram;
-
-        m_pDefaultPSO->SetBlendState(m_currentRenderState.m_pBlendState);
-        m_pDefaultPSO->SetRasterState(m_currentRenderState.m_pRasterState);
-        m_pDefaultPSO->SetDepthStencilState(m_currentRenderState.m_pDepthStencilState);
 
         m_pDefaultPRO->SetShaderProgram(m_currentRenderState.m_pShaderProgram);
 
@@ -172,32 +160,28 @@ namespace crystal
 
     void GeometryRenderer::Impl::FlushThisBatch()
     {
-        m_pGraphicsContext->BeginPipeline(m_pDefaultPSO);
+        m_pGraphicsContext->LoadPipelineState(m_currentRenderState.m_PSO);
+        m_pGraphicsContext->LoadPipelineResources(m_pDefaultPRO);
         {
-            m_pGraphicsContext->LoadPipelineResources(m_pDefaultPRO);
+            for (size_t i = 0; i < m_vertices.size(); i += MAX_VERTICES)
             {
-                for (size_t i = 0; i < m_vertices.size(); i += MAX_VERTICES)
+                size_t verticesThisRound = std::min(MAX_VERTICES, m_vertices.size() - i);
+                m_pDefaultVertexBuffer->ChangeBufferContent(m_vertices.data(),
+                    verticesThisRound * sizeof(BatchGVertex2D), 0);
+
+                size_t offset = 0;
+                for (auto& command : m_commandList)
                 {
-                    size_t verticesThisRound = std::min(MAX_VERTICES, m_vertices.size() - i);
-                    m_pDefaultVertexBuffer->ChangeBufferContent(m_vertices.data(),
-                        verticesThisRound * sizeof(BatchGVertex2D), 0);
-
-                    size_t offset = 0;
-                    for (auto& command : m_commandList)
-                    {
-                        m_pGraphicsContext->DrawPrimitives(
-                            command.PrimitiveType,
-                            offset,
-                            command.NumVertices
-                        );
-                        offset += command.NumVertices;
-                    }
+                    m_pGraphicsContext->DrawPrimitives(
+                        command.PrimitiveType,
+                        offset,
+                        command.NumVertices
+                    );
+                    offset += command.NumVertices;
                 }
-
             }
-            m_pGraphicsContext->UnloadPipelineResources();
         }
-        m_pGraphicsContext->EndPipeline();
+        m_pGraphicsContext->UnloadPipelineResources();
 
         m_vertices.clear();
         m_commandList.clear();
@@ -213,7 +197,22 @@ namespace crystal
 
     void GeometryRenderer::Begin()
     {
-        m_pImpl->Begin(nullptr, nullptr, nullptr, nullptr, nullptr);
+        m_pImpl->Begin(nullptr, nullptr, nullptr);
+    }
+
+    void GeometryRenderer::Begin(std::shared_ptr<IPipelineStateObject> PSO)
+    {
+        m_pImpl->Begin(nullptr, PSO, nullptr);
+    }
+
+    void GeometryRenderer::Begin(std::shared_ptr<IPipelineStateObject> PSO, const Matrix4f* transform)
+    {
+        m_pImpl->Begin(transform, PSO, nullptr);
+    }
+
+    void GeometryRenderer::Begin(std::shared_ptr<IPipelineStateObject> PSO, const Matrix4f * transform, std::shared_ptr<IShaderProgram> shader)
+    {
+        m_pImpl->Begin(transform, PSO, shader);
     }
 
     void GeometryRenderer::End()

@@ -1,4 +1,4 @@
-#include "DX11GraphicsDevice.h"
+﻿#include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 
@@ -38,14 +38,14 @@ namespace crystal
         std::shared_ptr<ISamplerState> LinearWarp = nullptr;
 
 
-        std::shared_ptr<IBlendState>		Blend_Opaque = nullptr;
-        std::shared_ptr<IBlendState>		Blend_Alpha = nullptr;
-        std::shared_ptr<IBlendState>		Blend_Additive = nullptr;
+        BlendStateDescription		        Blend_Opaque{};
+        BlendStateDescription		        Blend_Alpha{};
+        BlendStateDescription		        Blend_Additive{};
 
-        std::shared_ptr<IDepthStencilState>	NoDepthTest = nullptr;
-        std::shared_ptr<IDepthStencilState>	DefaultDepthTest = nullptr;
+        DepthStencilStateDescription	    NoDepthTest{};
+        DepthStencilStateDescription	    DefaultDepthTest{};
         
-        std::shared_ptr<IRasterState>		Raster_CullNone = nullptr;
+        RasterStateDescription		        Raster_CullNone{};
 
     private:
         DX11GraphicsDevice*		m_pGraphicsDevice;
@@ -259,61 +259,59 @@ namespace crystal
         throw std::exception("Unknown Sampler State");
     }
 
-    std::shared_ptr<IBlendState> DX11GraphicsDevice::GetCommonBlendState(BlendStates state)
+    std::shared_ptr<IBlendState> DX11GraphicsDevice::CreateBlendStateFromTemplate(BlendStates state)
     {
         switch (state)
         {
         case crystal::BlendStates::Opaque:
         {
-            return m_commonStates->Blend_Opaque;
+            return CreateBlendState(m_commonStates->Blend_Opaque);
         }
         case crystal::BlendStates::AlphaBlend:
         {
-            return m_commonStates->Blend_Alpha;
+            return CreateBlendState(m_commonStates->Blend_Alpha);
         }
         case crystal::BlendStates::Additive:
         {
-            return m_commonStates->Blend_Additive;
+            return CreateBlendState(m_commonStates->Blend_Additive);
         }
         default:
             break;
         }
-        throw std::exception("Unknown Blend State");
+        throw std::exception("DX11GraphicsDevice: Unknown Blend State");
     }
 
-    std::shared_ptr<IDepthStencilState> DX11GraphicsDevice::GetCommonDepthStencilState(DepthStencilStates state)
+    std::shared_ptr<IDepthStencilState> DX11GraphicsDevice::CreateDepthStencilStateFromTemplate(DepthStencilStates state)
     {
         switch (state)
         {
         case crystal::DepthStencilStates::NoDepthTest:
         {
-            return m_commonStates->NoDepthTest;
+            return CreateDepthStencilState(m_commonStates->NoDepthTest);
         }
         case crystal::DepthStencilStates::DefaultDepthTest:
         {
-            return m_commonStates->DefaultDepthTest;
+            return CreateDepthStencilState(m_commonStates->DefaultDepthTest);
         }
         default:
             break;
         }
-        throw std::exception("Unknown Depth Stencil State");
+        throw std::exception("DX11GraphicsDevice: Unknown Depth Stencil State");
     }
 
-    std::shared_ptr<IRasterState> DX11GraphicsDevice::GetCommonRasterState(RasterStates state)
+    std::shared_ptr<IRasterState> DX11GraphicsDevice::CreateRasterStateFromTemplate(RasterStates state)
     {
         switch (state)
         {
         case crystal::RasterStates::CullNone:
         {
-            return m_commonStates->Raster_CullNone;
+            return CreateRasterState(m_commonStates->Raster_CullNone);
         }
         default:
             break;
         }
         throw std::exception("Unknown Raster State");
     }
-
-
 
     DX11GraphicsDevice::CommonStates::CommonStates(DX11GraphicsDevice* graphicsDevice)
         : m_pGraphicsDevice(graphicsDevice)
@@ -365,30 +363,30 @@ namespace crystal
         blendDesc.SrcBlendAlpha = BlendFactors::One;
         blendDesc.DestBlendAlpha = BlendFactors::Zero;
         blendDesc.RenderTargetWriteMask = 0xF;
-        Blend_Opaque = m_pGraphicsDevice->CreateBlendState(blendDesc);
+        Blend_Opaque = blendDesc;
 
         // Alpha Blending	src * alpha_s + dest * (1 - alpha_s)
         blendDesc.SrcBlend = BlendFactors::SrcAlpha;
         blendDesc.DestBlend = BlendFactors::InvSrcAlpha;
-        Blend_Alpha = m_pGraphicsDevice->CreateBlendState(blendDesc);
+        Blend_Alpha = blendDesc;
 
         // Additive Blending  src + dest
         blendDesc.SrcBlend = BlendFactors::One;
         blendDesc.DestBlend = BlendFactors::One;
-        Blend_Additive = m_pGraphicsDevice->CreateBlendState(blendDesc);
+        Blend_Additive = blendDesc;
 
 
         DepthStencilStateDescription DSDesc = {};
         DSDesc.EnableDepthTest = false;
         DSDesc.EnableStencilTest = false;
-        NoDepthTest = m_pGraphicsDevice->CreateDepthStencilState(DSDesc);
+        NoDepthTest = DSDesc;
 
         DSDesc.EnableDepthTest = true;
         DSDesc.EnableDepthWrite = true;
         DSDesc.DepthFunction = ComparisonFunction::Less;
         DSDesc.StencilReadMask = 0xFF;
         DSDesc.StencilWriteMask = 0xFF;
-        DefaultDepthTest = m_pGraphicsDevice->CreateDepthStencilState(DSDesc);
+        DefaultDepthTest = DSDesc;
 
 
         RasterStateDescription rasterDesc = {};
@@ -396,7 +394,6 @@ namespace crystal
         rasterDesc.FillMode = FillMode::SOLID;
         rasterDesc.EnableScissorTest = false;
         rasterDesc.EnableAntialiasedLine = false;
-        rasterDesc.Viewport = nullptr;
-        Raster_CullNone = m_pGraphicsDevice->CreateRasterState(rasterDesc);
+        Raster_CullNone = rasterDesc;
     }
 }

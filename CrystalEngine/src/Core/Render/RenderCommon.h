@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Interfaces/Graphics/GraphicsCommon.h>
 #include <Core/Utils/Geometry.h>
 
@@ -9,8 +9,8 @@ namespace crystal
 
     struct RenderPayload
     {
-        SpriteBatch*        SpriteBatch = nullptr;
-        GeometryRenderer*   GeometryRenderer = nullptr;
-        Bound2i*            ScissorBound = nullptr;
+        SpriteBatch*                            SpriteBatch = nullptr;
+        GeometryRenderer*                       GeometryRenderer = nullptr;
+        std::shared_ptr<IPipelineStateObject>   PSO = nullptr;
     };
 }

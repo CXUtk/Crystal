@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "GraphicsCommon.h"
 
 namespace crystal
@@ -33,8 +33,8 @@ namespace crystal
 		virtual std::shared_ptr<IPipelineResourceObject> CreatePipelineResourceObject() = 0;
 
 		virtual std::shared_ptr<ISamplerState> GetCommonSamplerState(SamplerStates state) = 0;
-		virtual std::shared_ptr<IBlendState> GetCommonBlendState(BlendStates state) = 0;
-		virtual std::shared_ptr<IDepthStencilState> GetCommonDepthStencilState(DepthStencilStates state) = 0;
-		virtual std::shared_ptr<IRasterState> GetCommonRasterState(RasterStates state) = 0;
+		virtual std::shared_ptr<IBlendState> CreateBlendStateFromTemplate(BlendStates state) = 0;
+		virtual std::shared_ptr<IDepthStencilState> CreateDepthStencilStateFromTemplate(DepthStencilStates state) = 0;
+		virtual std::shared_ptr<IRasterState> CreateRasterStateFromTemplate(RasterStates state) = 0;
 	};
 }

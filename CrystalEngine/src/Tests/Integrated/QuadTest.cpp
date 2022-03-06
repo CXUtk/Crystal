@@ -1,4 +1,4 @@
-#include "QuadTest.h"
+﻿#include "QuadTest.h"
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
@@ -63,10 +63,6 @@ namespace crystal
 		//auto indexBuffer = graphicsDevice->CreateIndexBuffer(indexDesc, indices, sizeof(indices));
 		//vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc, nullptr, sizeof(vertices));
 		//vertexBuffer->BindVertexLayout(vLayout);
-
-
-
-		//m_PSO = graphicsDevice->CreatePipelineStateObject();
 		//m_PSO->BindVertexBuffer(vertexBuffer);
 		//m_PSO->BindIndexBuffer(indexBuffer);
 
@@ -84,10 +80,12 @@ namespace crystal
 		m_texture2D = graphicsDevice->CreateTexture2DFromFile("resources/test.jpg", texturedesc);
 		m_texture2D1 = graphicsDevice->CreateTexture2DFromFile("resources/dots.png", texturedesc);
 
+        m_PSO = graphicsDevice->CreatePipelineStateObject();
+        m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
+        m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::AlphaBlend));
+        m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest));
 		//m_PSO->BindShaderResource(m_texture2D, 0);
 		//m_PSO->BindSamplerState(graphicsDevice->GetSamplerState(SamplerStates::PointClamp), 0);
-
-
 	}
 
 	void QuadTest::Update(const crystal::GameTimer& gameTimer)
@@ -119,9 +117,8 @@ namespace crystal
 		//	R, Vector2f(size) * 0.5f, 4.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
 		//spriteBatch->End();
 
-		spriteBatch->Begin(SpriteSortMode::Deferred,
-			graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 
-			graphicsDevice->GetCommonBlendState(BlendStates::AlphaBlend));
+		spriteBatch->Begin(SpriteSortMode::Deferred, m_PSO,
+			graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp));
 		spriteBatch->Draw(m_texture2D, Vector2f(300.f, 300.f), Color4f(1.f, 1.f, 1.f, 0.5f),
 			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
 		spriteBatch->Draw(m_texture2D, Vector2f(400.f, 350.f), Color4f(1.f, 1.f, 1.f, 0.5f),

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "DX11Common.h"
 
 namespace crystal
@@ -36,10 +36,10 @@ namespace crystal
 		virtual std::shared_ptr<IPipelineStateObject> CreatePipelineStateObject() override;
 		virtual std::shared_ptr<IPipelineResourceObject> CreatePipelineResourceObject() override;
 
-		virtual std::shared_ptr<ISamplerState> GetCommonSamplerState(SamplerStates state) override;
-		virtual std::shared_ptr<IBlendState> GetCommonBlendState(BlendStates state) override;
-		virtual std::shared_ptr<IDepthStencilState> GetCommonDepthStencilState(DepthStencilStates state) override;
-		virtual std::shared_ptr<IRasterState> GetCommonRasterState(RasterStates state) override;
+        virtual std::shared_ptr<ISamplerState> GetCommonSamplerState(SamplerStates state) override;
+        virtual std::shared_ptr<IBlendState> CreateBlendStateFromTemplate(BlendStates state) override;
+        virtual std::shared_ptr<IDepthStencilState> CreateDepthStencilStateFromTemplate(DepthStencilStates state) override;
+        virtual std::shared_ptr<IRasterState> CreateRasterStateFromTemplate(RasterStates state) override;
 	private:
 		std::shared_ptr<DX11GraphicsContext>	m_pGraphicsContext = nullptr;
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Crystal.h>
 #include <vector>
 #include <string>
@@ -431,7 +431,6 @@ namespace crystal
 		CullingMode			CullMode;
 		FillMode			FillMode;
 		Bound2i				ScissorBound;
-		const Viewport*		Viewport;
 	};
 
 	struct DepthStencilStateDescription
