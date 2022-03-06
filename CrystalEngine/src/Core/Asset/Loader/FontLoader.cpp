@@ -1,4 +1,4 @@
-﻿#include "FontLoader.h"
+#include "FontLoader.h"
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Misc.h>
 

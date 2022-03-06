@@ -9,7 +9,7 @@
 
 namespace crystal
 {
-    constexpr bool EnableDebugDraw = false;
+    constexpr bool EnableDebugDraw = true;
 
     class UIState;
     class UIStateMachine;
@@ -85,4 +85,7 @@ namespace crystal
         All = -1
     };
     BIT_FLAGS_END(PropagationFlags);
+
+    constexpr PropagationFlags MouseClickEvents = PropagationFlags::MouseJustDown | PropagationFlags::MouseJustUp
+        | PropagationFlags::MouseClicked | PropagationFlags::MouseDoubleClicked;
 }

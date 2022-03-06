@@ -101,13 +101,17 @@ namespace crystal
     {\
         enum Flags : type\
 
-#define BIT_FLAGS_END(name) inline Flags operator|(Flags a, Flags b)\
+#define BIT_FLAGS_END(name) inline constexpr Flags operator|(Flags a, Flags b)\
     {\
         return static_cast<Flags>(static_cast<int>(a) | static_cast<int>(b));\
     }\
-    inline Flags operator&(Flags a, Flags b)\
+    inline constexpr Flags operator&(Flags a, Flags b)\
     {\
         return static_cast<Flags>(static_cast<int>(a) & static_cast<int>(b));\
+    }\
+    inline constexpr Flags operator^(Flags a, Flags b)\
+    {\
+        return static_cast<Flags>(static_cast<int>(a) ^ static_cast<int>(b));\
     }\
 };\
     using name = Crystal_##name::Flags

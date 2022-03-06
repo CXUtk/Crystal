@@ -64,7 +64,7 @@ namespace crystal
         widget->SetName("Window");
         widget->SetPivot(Vector2f(0.5f, 0.5f));
         widget->SetAnchorPoint(Vector2f(0.5f, 0.5f));
-        widget->SetSize(SizeLayout(200, 200));
+        widget->SetSize(SizeLayout(400, 400));
         widget->SetPosition(Vector2f(0, 0));
         widget->AddOnCloseEventListener([](UIEventArgs args) {
             args.Element->SetActive(false);
@@ -77,21 +77,48 @@ namespace crystal
         button->SetAnchorPoint(Vector2f(0.5f, 0.5f));
         button->SetSize(SizeLayout(100, 50));
 
-        auto progressBar = std::make_shared<UIProgressBar>();
-        progressBar->SetName("Button");
-        progressBar->SetPivot(Vector2f(0.5f, 0.5f));
-        progressBar->SetAnchorPoint(Vector2f(0.5f, 0.5f));
-        progressBar->SetSize(SizeLayout(100, 16));
-        progressBar->SetValue(0.5f);
-        progressBar->SetPosition(Vector2f(0.f, -80.f));
+        m_slider = std::make_shared<UIValueSlider>();
+        m_slider->SetName("Slider");
+        m_slider->SetPivot(Vector2f(0.5f, 0.5f));
+        m_slider->SetAnchorPoint(Vector2f(0.5f, 0.5f));
+        m_slider->SetSize(SizeLayout(200, 20));
+        m_slider->SetValue(0.f);
+        m_slider->SetPosition(Vector2f(0.f, -80.f));
+
+        auto uiValueLabel = std::make_shared<UILabel>();
+        uiValueLabel->SetName("Slider Label");
+        uiValueLabel->SetPivot(Vector2f(0, 0.5f));
+        uiValueLabel->SetAnchorPoint(Vector2f(0.5f));
+        uiValueLabel->SetPosition(Vector2f(100.f, -80.f));
+        uiValueLabel->SetText("0");
+
+        auto ptrLabel = ptr(uiValueLabel);
+        m_slider->AddOnValueChangedEventListener([ptrLabel](UIValueChangeEventArgs<double> args) {
+            ptrLabel->SetText(string_format("%.2lf", args.Value));
+        });
+
+        auto scrollBar = std::make_shared<UIScrollBarV>();
+        scrollBar->SetName("Scroll Bar V");
+        scrollBar->SetPivot(Vector2f(0, 0.5f));
+        scrollBar->SetAnchorPoint(Vector2f(0.5f));
+        scrollBar->SetPosition(Vector2f(100.f, -120.f));
+        scrollBar->SetSize(SizeLayout(16, 140));
+        scrollBar->SetViewRange(0.1f);
 
         widget->AppendChild(button);
-        widget->AppendChild(progressBar);
+        widget->AppendChild(m_slider);
+        widget->AppendChild(uiValueLabel);
+        widget->AppendChild(scrollBar);
 
         AppendElement(widget);
     }
 
     TestState::~TestState()
     {
+    }
+    void TestState::Update(const GameTimer& gameTimer)
+    {
+        //m_slider->SetValue(std::sin(gameTimer.GetCurrentTime()) * 0.5 + 0.5);
+        UIState::Update(gameTimer);
     }
 }

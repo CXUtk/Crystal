@@ -50,6 +50,7 @@ namespace crystal
         bool NoEvents() const { return m_noEvents; }
         void SetNoEvents(bool value) { m_noEvents = value; }
 
+
         bool CanResponseEvent() const { return m_isActive && !m_noEvents; }
 
         std::string GetName() const { return m_name; }
@@ -80,6 +81,11 @@ namespace crystal
 
         Bound2f GetEventBound() const { return m_calculatedOuterBound; }
         Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
+
+        Vector2f GetPivotScreenPos() const;
+        Bound2f GetParentBound() const;
+        Vector2f GetLocalPositionToScreenPos(const Vector2f& localPos) const;
+        Vector2f GetScreenPositionToLocalPos(const Vector2f& screenPos) const;
 
     protected:
         /// Data
@@ -112,7 +118,7 @@ namespace crystal
         std::string     m_tooltip{};
 
         OverflowStyle       m_overflowStyle = OverflowStyle::Overflow;
-        PropagationFlags    m_propagationFlags = PropagationFlags::None;
+        PropagationFlags    m_propagationFlags = PropagationFlags::All;
 
         /**
          * @brief Position is the displacement of pivot towards anchor point.
@@ -154,10 +160,6 @@ namespace crystal
         virtual void RecalculateChildren();
 
         void CalculateBounds();
-        Vector2f GetPivotScreenPos() const;
-        Bound2f GetParentBound() const;
-        Vector2f GetLocalPositionToScreenPos(const Vector2f& localPos) const;
-        Vector2f GetScreenPositionToLocalPos(const Vector2f& screenPos) const;
     };
 
     template<UIEventType E>

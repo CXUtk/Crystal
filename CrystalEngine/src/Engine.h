@@ -71,6 +71,8 @@ namespace crystal
 
 		AssetManager* GetAssetManager() const;
 
+        double GetCurrentTime() const;
+
 		/**
 		 * @brief Take control on the application and start the main game loop
 		 * @param application 

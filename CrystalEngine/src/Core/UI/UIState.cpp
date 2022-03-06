@@ -1,4 +1,4 @@
-﻿#include "UIState.h"
+#include "UIState.h"
 #include "Elements/UIElement.h"
 
 #include <Engine.h>
@@ -60,25 +60,33 @@ namespace crystal
     }
     void UIState::MouseEvent(const GameTimer& gameTimer)
     {
-        m_pHoverElement = nullptr;
-        auto mousePos = m_pGameWindow->GetMousePos();
+        std::shared_ptr<UIElement> eventElement = nullptr;
 
-        for (auto it = m_pUIElements.rbegin(); it != m_pUIElements.rend(); ++it)
+        auto mousePos = m_pGameWindow->GetMousePos();
+        if (m_pFocusedElement)
         {
-            auto& child = (*it);
-            if (child->CanResponseEvent() && child->GetEventBound().Contains(mousePos))
+            // If focused on an element then respond directly to that element
+            eventElement = m_pFocusedElement->GetResponseElement(mousePos);
+        }
+        else
+        {
+            for (auto it = m_pUIElements.rbegin(); it != m_pUIElements.rend(); ++it)
             {
-                m_pHoverElement = child->GetResponseElement(mousePos);
-                break;
+                auto& child = (*it);
+                if (child->CanResponseEvent() && child->GetEventBound().Contains(mousePos))
+                {
+                    eventElement = child->GetResponseElement(mousePos);
+                    break;
+                }
             }
         }
 
-        if (m_pHoverElement)
+        if (eventElement)
         {
-            m_toolTip = m_pHoverElement->GetTooltip();
+            m_toolTip = eventElement->GetTooltip();
 
             UIMouseButtonEventArgs mouseButtonArgs = {};
-            mouseButtonArgs.Element = ptr(m_pHoverElement);
+            mouseButtonArgs.Element = ptr(eventElement);
             mouseButtonArgs.MousePosScreen = mousePos;
             mouseButtonArgs.TimeStamp = gameTimer.GetPhysicalTime();
 
@@ -91,7 +99,8 @@ namespace crystal
             if (m_pInputController->IsMouseJustPressed(MouseButtonCode::LEFT_BUTTON))
             {
                 mouseButtonsFlags = mouseButtonsFlags | MouseButtonFlags::LeftButton;
-                m_pLastLeftMouseDownElement = m_pHoverElement;
+                m_pLastLeftMouseDownElement = eventElement;
+                m_pFocusedElement = eventElement;
             }
             if (m_pInputController->IsMouseJustPressed(MouseButtonCode::RIGHT_BUTTON))
             {
@@ -104,7 +113,7 @@ namespace crystal
             mouseButtonArgs.ButtonFlags = mouseButtonsFlags;
             if (mouseButtonsFlags != MouseButtonFlags::None)
             {
-                m_pHoverElement->MouseJustPressed(mouseButtonArgs);
+                eventElement->MouseJustPressed(mouseButtonArgs);
             }
 
             // Mouse Just Release Events
@@ -124,48 +133,54 @@ namespace crystal
             mouseButtonArgs.ButtonFlags = mouseButtonsFlags;
             if (mouseButtonsFlags != MouseButtonFlags::None)
             {
-                m_pHoverElement->MouseJustReleased(mouseButtonArgs);
+                eventElement->MouseJustReleased(mouseButtonArgs);
+                if ((mouseButtonsFlags & MouseButtonFlags::LeftButton) && m_pFocusedElement)
+                {
+                    m_pFocusedElement = nullptr;
+                }
 
-                if (m_pLastLeftMouseDownElement != nullptr && m_pLastLeftMouseDownElement == m_pHoverElement)
+                // If up position is in the event bound, then it is a click event
+                if (m_pLastLeftMouseDownElement != nullptr && m_pLastLeftMouseDownElement == eventElement
+                    && eventElement->GetEventBound().Contains(mousePos))
                 {
                     if (mouseArgs.TimeStamp - m_lastLeftMouseClickTime > 0.25)
                     {
-                        m_pHoverElement->MouseClicked(mouseButtonArgs);
+                        eventElement->MouseClicked(mouseButtonArgs);
                     }
                     else
                     {
-                        m_pHoverElement->MouseDoubleClicked(mouseButtonArgs);
+                        eventElement->MouseDoubleClicked(mouseButtonArgs);
                     }
                     m_lastLeftMouseClickTime = mouseArgs.TimeStamp;
                 }
                 m_pLastLeftMouseDownElement = nullptr;
             }
 
-            if (m_pPrevHoverElement != m_pHoverElement)
+            if (m_pPrevHoverElement != eventElement)
             {
                 if (m_pPrevHoverElement)
                 {
                     mouseArgs.Element = m_pPrevHoverElement.get();
                     m_pPrevHoverElement->MouseLeave(mouseArgs);
                 }
-                mouseArgs.Element = m_pHoverElement.get();
-                m_pHoverElement->MouseEnter(mouseArgs);
+                mouseArgs.Element = ptr(eventElement);
+                eventElement->MouseEnter(mouseArgs);
             }
 
             auto scrollValue = m_pInputController->GetScrollValue();
             if (scrollValue != Vector2f(0.f))
             {
                 UIMouseScrollEventArgs mouseScrollArgs = {};
-                mouseScrollArgs.Element = m_pHoverElement.get();
+                mouseScrollArgs.Element = ptr(eventElement);
                 mouseScrollArgs.TimeStamp = mouseArgs.TimeStamp;
                 mouseScrollArgs.Value = scrollValue;
 
-                m_pHoverElement->MouseScroll(mouseScrollArgs);
+                eventElement->MouseScroll(mouseScrollArgs);
             }
         }
         else
         {
-            if (m_pPrevHoverElement != m_pHoverElement)
+            if (m_pPrevHoverElement != eventElement)
             {
                 UIMouseEventArgs mouseArgs = {};
                 mouseArgs.Element = m_pPrevHoverElement.get();
@@ -178,7 +193,7 @@ namespace crystal
                 }
             }
         }
-        m_pPrevHoverElement = m_pHoverElement;
+        m_pPrevHoverElement = eventElement;
     }
     void UIState::DrawTooltip()
     {}

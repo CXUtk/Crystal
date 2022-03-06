@@ -35,9 +35,19 @@ namespace crystal
         Vector2f            Value;
     };
 
+    template<typename T>
+    struct UIValueChangeEventArgs
+    {
+        UIElement*  Element;
+        double      TimeStamp;
+        T           Value;
+    };
+
     using UIMouseButtonEvent = Event<UIMouseButtonEventArgs>;
     using UIMouseEvent = Event<UIMouseEventArgs>;
     using UIMouseScrollEvent = Event<UIMouseScrollEventArgs>;
+    template<typename T>
+    using UIValueChangeEvent = Event<UIValueChangeEventArgs<T>>;
 
     enum class UIEventType
     {

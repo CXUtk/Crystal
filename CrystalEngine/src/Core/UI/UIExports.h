@@ -11,4 +11,6 @@
 #include "Elements/UIIconButton.h"
 #include "Elements/UITextButton.h"
 #include "Elements/UIProgressBar.h"
+#include "Elements/UIValueSlider.h"
+#include "Elements/UIScrollBar.h"
 #include "Elements/Compound/UIWidget.h"

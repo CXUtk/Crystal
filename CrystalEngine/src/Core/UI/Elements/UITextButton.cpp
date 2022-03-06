@@ -27,6 +27,8 @@ namespace crystal
 
         AppendChild(m_penel);
         AppendChild(m_buttonText);
+
+        m_propagationFlags = PropagationFlags::MouseScroll;
     }
 
     UITextButton::~UITextButton()

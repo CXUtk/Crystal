@@ -58,6 +58,8 @@ namespace crystal
     void UIElement::Recalculate()
     {
         RecalculateSelf();
+        CalculateBounds();
+
         RecalculateChildren();
 
         m_calculatedOuterBound = m_calculatedInnerBound;
@@ -220,7 +222,6 @@ namespace crystal
 
     void UIElement::RecalculateSelf()
     {
-        CalculateBounds();
     }
 
     void UIElement::RecalculateChildren()

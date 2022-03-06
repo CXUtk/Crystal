@@ -138,6 +138,11 @@ namespace crystal
         m_application->Exit();
     }
 
+    double Engine::GetCurrentTime() const
+    {
+        return m_gameTimer.GetCurrentTime();
+    }
+
     GraphicsAPIType crystal::Engine::GetGraphicsAPIType() const
     {
         return m_platformProvider->GetGraphicsAPIType();

@@ -10,7 +10,6 @@ namespace crystal
     UIImage::UIImage()
     {
         m_imageDesc.DrawColor = Color4f(1.f);
-        m_propagationFlags = PropagationFlags::All;
     }
 
     UIImage::~UIImage()

@@ -13,7 +13,6 @@ namespace crystal
         m_pFont = assetManager->LoadAsset<Font>("Crystal:Consolas");
 
         m_textColor = Color4f(1.f);
-        m_propagationFlags = PropagationFlags::All;
     }
 
     UILabel::~UILabel()

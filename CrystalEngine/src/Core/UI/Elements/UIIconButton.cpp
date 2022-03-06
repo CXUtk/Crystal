@@ -10,6 +10,8 @@ namespace crystal
     {
         m_hoverColor = Color4f(1.f);
         m_unhoverColor = Color4f(0.75f);
+
+        m_propagationFlags = PropagationFlags::MouseScroll;
     }
     UIIconButton::~UIIconButton()
     {
