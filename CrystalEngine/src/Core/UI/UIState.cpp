@@ -1,4 +1,4 @@
-#include "UIState.h"
+﻿#include "UIState.h"
 #include "Elements/UIElement.h"
 
 #include <Engine.h>
@@ -31,11 +31,10 @@ namespace crystal
 
     void UIState::Draw(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        for (auto it = m_pUIElements.rbegin(); it != m_pUIElements.rend(); ++it)
+        for (auto& child : m_pUIElements)
         {
-            auto& child = (*it);
             if (!child->IsActive() || !child->IsVisible()) continue;
-            (*it)->Draw(payload, gameTimer);
+            child->Draw(payload, gameTimer);
         }
 
         DrawTooltip();
@@ -64,12 +63,12 @@ namespace crystal
         m_pHoverElement = nullptr;
         auto mousePos = m_pGameWindow->GetMousePos();
 
-        for (auto& element : m_pUIElements)
+        for (auto it = m_pUIElements.rbegin(); it != m_pUIElements.rend(); ++it)
         {
-            if (element->CanResponseEvent()
-                && element->GetEventBound().Contains(mousePos))
+            auto& child = (*it);
+            if (child->CanResponseEvent() && child->GetEventBound().Contains(mousePos))
             {
-                m_pHoverElement = element->GetResponseElement(mousePos);
+                m_pHoverElement = child->GetResponseElement(mousePos);
                 break;
             }
         }

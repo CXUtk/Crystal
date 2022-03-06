@@ -9,4 +9,5 @@
 #include "Elements/UIElement.h"
 #include "Elements/UIPanel.h"
 #include "Elements/UIIconButton.h"
-#include "Elements/UIWidget.h"
+#include "Elements/UITextButton.h"
+#include "Elements/Compound/UIWidget.h"

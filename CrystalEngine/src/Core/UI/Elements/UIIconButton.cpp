@@ -1,4 +1,4 @@
-﻿#include "UIIconButton.h"
+#include "UIIconButton.h"
 
 #include <Engine.h>
 #include <Core/Asset/AssetManager.h>

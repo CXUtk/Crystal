@@ -8,11 +8,10 @@ namespace crystal
     class UIStyle
     {
     public:
-        UIStyle();
-        ~UIStyle();
 
-        Color4f GetPanelBorderColor() const;
-        Color4f GetPanelInnerColor() const;
-        std::shared_ptr<ITexture2D> GetPanelTexture() const;
+        static Color4f GetPanelBorderColor() { return Color4f(0.55f, 0.55f, 0.55f, 1.f); }
+        static Color4f GetPanelInnerColor() { return Color4f(0.17f, 0.17f, 0.17f, 1.f); }
+        static Color4f GetButtonColor() { return Color4f(0.17f, 0.3f, 0.5f, 1.f); }
+        static Color4f GetButtonHoverColor() { return Color4f(0.2f, 0.41f, 0.67f, 1.f); }
     };
 }

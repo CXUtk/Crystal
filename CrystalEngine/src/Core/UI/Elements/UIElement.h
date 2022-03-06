@@ -26,7 +26,7 @@ namespace crystal
          * @brief Get the element that supposed to respond to the event at given position,
          * if no such element exist, then [this] becomes that element
          * @param screenPos: Given position
-         * @return 
+         * @return
         */
         std::shared_ptr<UIElement> GetResponseElement(const Vector2f& screenPos);
 
@@ -53,9 +53,10 @@ namespace crystal
         bool CanResponseEvent() const { return m_isActive && !m_noEvents; }
 
         std::string GetName() const { return m_name; }
+        void SetName(const std::string& name) { m_name = name; }
 
         std::string GetTooltip() const { return m_tooltip; }
-        void GetTooltip(const std::string& tooltip) { m_tooltip = tooltip; }
+        void SetTooltip(const std::string& tooltip) { m_tooltip = tooltip; }
 
         OverflowStyle GetOverflowStyle() const { return m_overflowStyle; }
 
@@ -80,7 +81,6 @@ namespace crystal
         Bound2f GetEventBound() const { return m_calculatedOuterBound; }
         Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
 
-        void SetStyle(std::shared_ptr<UIStyle> style) { m_pStyle = style; }
     protected:
         /// Data
 
@@ -94,10 +94,13 @@ namespace crystal
         UIEvent<UIEventType::OnMouseScroll>         m_eventOnMouseScroll{};
 
         // Relationship
+
+        /**
+         * @brief Children are drawn from front to back, that means the first element will be at the bottom
+        */
         std::vector<std::shared_ptr<UIElement>>     m_pChildren{};
         UIElement*                                  m_pParent = nullptr;
-        std::shared_ptr<UIStyle>                    m_pStyle = nullptr;
-        
+
 
         // Properties
         bool        m_isActive = true;
@@ -202,7 +205,7 @@ namespace crystal
     {
         m_eventOnMouseScroll += listener;
     }
-    
+
     template<>
     inline void UIElement::AddEventListener<UIEventType::OnMouseClicked>(
         UIEventListener<UIEventType::OnMouseClicked> listener

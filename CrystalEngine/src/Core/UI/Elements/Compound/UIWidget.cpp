@@ -1,20 +1,38 @@
-﻿#include "UIWidget.h"
+#include "UIWidget.h"
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
 #include <Core/Render/RenderExports.h>
 #include <Core/Input/InputController.h>
 
-#include "UIIconButton.h"
+
 
 namespace crystal
 {
-    UIWidget::UIWidget() : UIElement()
+    UIWidget::UIWidget(const std::string& title) : UIElement()
     {
         auto assetManager = Engine::GetInstance()->GetAssetManager();
-        m_panelTexture = assetManager->LoadAsset<ITexture2D>("package1:BoxBlack");
-        m_cornerSize = Vector2i(10);
         m_overflowStyle = OverflowStyle::Hidden;
+
+        std::shared_ptr<UIImage> panel = std::make_shared<UIImage>();
+        panel->SetInline(false);
+        panel->SetImageType(ImageType::Sliced9);
+        panel->SetPivot(Vector2f(0.f));
+        panel->SetAnchorPoint(Vector2f(0.f));
+        panel->SetSize(SizeLayout(0, 1.f, 0, 1.f));
+        panel->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxBlack"));
+        panel->SetCornerSize(Vector2i(10));
+
+        std::shared_ptr<UIImage> panelBar = std::make_shared<UIImage>();
+        panelBar->SetInline(false);
+        panelBar->SetImageType(ImageType::Sliced6);
+        panelBar->SetPivot(Vector2f(0.f, 1.f));
+        panelBar->SetAnchorPoint(Vector2f(0.f, 1.f));
+        panelBar->SetSize(SizeLayout(0, 1.f, 32, 0.f));
+        panelBar->SetColor(UIStyle::GetButtonColor());
+        panelBar->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxNoB"));
+        panelBar->SetCornerSize(Vector2i(10));
+
 
         m_closeButton = std::make_shared<UIIconButton>();
         m_closeButton->SetIconTexture(assetManager->LoadAsset<ITexture2D>("package1:Cross"));
@@ -30,13 +48,15 @@ namespace crystal
         });
 
         m_windowTitle = std::make_shared<UILabel>();
-        m_windowTitle->SetText("Title32154365465746588768969589");
+        m_windowTitle->SetText(title);
         m_windowTitle->SetAnchorPoint(Vector2f(0.f, 1.f));
         m_windowTitle->SetPivot(Vector2f(0.f, 1.f));
         m_windowTitle->SetPosition(Vector2f(10, -10));
 
-        AppendChild(m_closeButton);
+        AppendChild(panel);
+        AppendChild(panelBar);
         AppendChild(m_windowTitle);
+        AppendChild(m_closeButton);
 
         m_gameWindow = Engine::GetInstance()->GetWindow();
     }
@@ -58,11 +78,13 @@ namespace crystal
     void UIWidget::MouseJustPressed(UIMouseButtonEventArgs args)
     {
         m_isDragging = true;
+        UIElement::MouseJustPressed(args);
     }
 
     void UIWidget::MouseJustReleased(UIMouseButtonEventArgs args)
     {
         m_isDragging = false;
+        UIElement::MouseJustPressed(args);
     }
 
     void UIWidget::AddOnCloseEventListener(UIWidgetCloseEvent::Func listener)
@@ -72,14 +94,6 @@ namespace crystal
 
     void UIWidget::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        auto device = Engine::GetInstance()->GetGraphicsDevice();
-        auto assetManager = Engine::GetInstance()->GetAssetManager();
-        auto geometryRenderer = payload.GeometryRenderer;
-        auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
-        SpriteBatchUtils::DrawNineSquareTexture(payload.SpriteBatch, m_panelTexture,
-            m_cornerSize, BoundingBoxConvert<int>(m_calculatedInnerBound), Color4f(1.f));
-        spriteBatch->End();
     }
 
     void UIWidget::UpdateDragPos()

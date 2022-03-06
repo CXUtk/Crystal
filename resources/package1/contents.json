@@ -1,4 +1,4 @@
-{
+﻿{
     "shaders": [
         "shaders/sprite.json",
         "shaders/geometry.json",
@@ -8,6 +8,7 @@
     "textures": [
         "textures/box.json",
         "textures/boxBlack.json",
+        "textures/boxNoB.json",
         "textures/Cross.json"
     ]
 }

@@ -1,4 +1,4 @@
-﻿#include "UIElement.h"
+#include "UIElement.h"
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
@@ -96,8 +96,9 @@ namespace crystal
 
     std::shared_ptr<UIElement> UIElement::GetResponseElement(const Vector2f& screenPos)
     {
-        for (auto& child : m_pChildren)
+        for (auto it = m_pChildren.rbegin(); it != m_pChildren.rend(); ++it)
         {
+            auto& child = (*it);
             if (child->CanResponseEvent() && child->GetEventBound().Contains(screenPos))
             {
                 return child->GetResponseElement(screenPos);
@@ -210,11 +211,10 @@ namespace crystal
 
     void UIElement::DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        for (auto it = m_pChildren.rbegin(); it != m_pChildren.rend(); ++it)
+        for (auto& child : m_pChildren)
         {
-            auto& child = (*it);
             if (!child->m_isActive || !child->m_isVisible) continue;
-            (*it)->Draw(payload, gameTimer);
+            child->Draw(payload, gameTimer);
         }
     }
 

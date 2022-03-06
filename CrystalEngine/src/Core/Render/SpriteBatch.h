@@ -70,5 +70,7 @@ namespace crystal
     public:
         static void DrawNineSquareTexture(SpriteBatch* spriteBatch, std::shared_ptr<ITexture2D> texture,
             const Vector2i& cornerSize, const Bound2i& bound, const Color4f& color);
+        static void DrawSixSquareUpTexture(SpriteBatch* spriteBatch, std::shared_ptr<ITexture2D> texture,
+            const Vector2i& cornerSize, const Bound2i& bound, const Color4f& color);
     };
 }

@@ -1,11 +1,9 @@
-﻿#include "UILabel.h"
+#include "UILabel.h"
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
 #include <Core/Render/RenderExports.h>
 #include <Core/Input/InputController.h>
-
-#include "UIIconButton.h"
 
 namespace crystal
 {
@@ -15,6 +13,7 @@ namespace crystal
         m_pFont = assetManager->LoadAsset<Font>("Crystal:Consolas");
 
         m_textColor = Color4f(1.f);
+        m_propagationFlags = PropagationFlags::All;
     }
 
     UILabel::~UILabel()
@@ -22,11 +21,6 @@ namespace crystal
 
     void UILabel::UpdateSelf(const GameTimer& gameTimer)
     {
-        if (m_shouldRecalculateText)
-        {
-            RecalculateSelf();
-            m_shouldRecalculateText = false;
-        }
     }
 
     void UILabel::RecalculateSelf()

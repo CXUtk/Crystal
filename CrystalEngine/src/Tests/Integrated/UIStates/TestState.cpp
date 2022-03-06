@@ -1,4 +1,4 @@
-﻿#include "TestState.h"
+#include "TestState.h"
 
 #include <Engine.h>
 #include <Core/Asset/AssetManager.h>
@@ -60,15 +60,24 @@ namespace crystal
 
         //AppendElement(uibutton);
 
-        auto widget = std::make_shared<UIWidget>();
+        auto widget = std::make_shared<UIWidget>("Window");
+        widget->SetName("Window");
         widget->SetPivot(Vector2f(0.5f, 0.5f));
         widget->SetAnchorPoint(Vector2f(0.5f, 0.5f));
         widget->SetSize(SizeLayout(200, 200));
         widget->SetPosition(Vector2f(0, 0));
-        widget->Recalculate();
         widget->AddOnCloseEventListener([](UIEventArgs args) {
             args.Element->SetActive(false);
         });
+
+        auto button = std::make_shared<UITextButton>();
+        button->SetText("Test");
+        button->SetName("Button");
+        button->SetPivot(Vector2f(0.5f, 0.5f));
+        button->SetAnchorPoint(Vector2f(0.5f, 0.5f));
+        button->SetSize(SizeLayout(100, 50));
+
+        widget->AppendChild(button);
 
         AppendElement(widget);
     }

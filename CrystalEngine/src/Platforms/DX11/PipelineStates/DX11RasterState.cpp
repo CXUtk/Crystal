@@ -1,4 +1,4 @@
-﻿#include "DX11RasterState.h"
+#include "DX11RasterState.h"
 
 #include "../DX11GraphicsContext.h"
 #include "../DX11GraphicsDevice.h"
@@ -81,9 +81,9 @@ namespace crystal
 
             RECT scissorRect = {};
             scissorRect.left = minpos.x;
-            scissorRect.top = bufferSize.y - maxpos.y - 1;
+            scissorRect.top = bufferSize.y - maxpos.y;
             scissorRect.right = maxpos.x;
-            scissorRect.bottom = bufferSize.y - minpos.y - 1;
+            scissorRect.bottom = bufferSize.y - minpos.y;
             dx11Context->RSSetScissorRects(1, &scissorRect);
         }
 	}

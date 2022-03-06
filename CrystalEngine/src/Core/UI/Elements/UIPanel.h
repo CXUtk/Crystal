@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../Common/UICommon.h"
 #include "../Common/UIEventArgs.h"
 

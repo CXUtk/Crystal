@@ -31,6 +31,14 @@ namespace crystal
             throw std::exception(string_format("Failed to read file %s: %s", path.string().c_str(),
                 e.what()).c_str());
         }
+        // Get rid of UTF8 BOM
+        if (str.size() >= 3
+            && (unsigned char)str[0] == 0xEF
+            && (unsigned char)str[1] == 0xBB
+            && (unsigned char)str[2] == 0xBF)
+        {
+            return str.substr(3);
+        }
         return str;
 	}
 
