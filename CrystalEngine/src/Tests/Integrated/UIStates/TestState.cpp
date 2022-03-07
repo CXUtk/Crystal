@@ -105,10 +105,39 @@ namespace crystal
         scrollBar->SetSize(SizeLayout(16, 140));
         scrollBar->SetViewRange(0.1f);
 
+        auto scrollBarH = std::make_shared<UIScrollBarH>();
+        scrollBarH->SetName("Scroll Bar H");
+        scrollBarH->SetPivot(Vector2f(0.5f, 0.5f));
+        scrollBarH->SetAnchorPoint(Vector2f(0.5f));
+        scrollBarH->SetPosition(Vector2f(0.f, -140.f));
+        scrollBarH->SetSize(SizeLayout(140, 16));
+        scrollBarH->SetViewRange(0.1f);
+
+
+        auto uilist = std::make_shared<UIList>();
+        uilist->SetPivot(Vector2f(0.5f));
+        uilist->SetAnchorPoint(Vector2f(0.5f));
+        uilist->SetPosition(Vector2f(0.f, -120.f));
+        uilist->SetSize(SizeLayout(200, 200));
+
+        for (int i = 0; i < 80; i++)
+        {
+            auto text = std::make_shared<UILabel>();
+            text->SetPivot(Vector2f(0.5f));
+            text->SetAnchorPoint(Vector2f(0.5f));
+            text->SetPosition(Vector2f(0.f, -120.f));
+            text->SetSize(SizeLayout(200, 200));
+            text->SetText("ItemXXXX");
+
+            uilist->Add(text);
+        }
+
         widget->AppendChild(button);
         widget->AppendChild(m_slider);
         widget->AppendChild(uiValueLabel);
-        widget->AppendChild(scrollBar);
+        //widget->AppendChild(scrollBar);
+        //widget->AppendChild(scrollBarH);
+        widget->AppendChild(uilist);
 
         AppendElement(widget);
     }

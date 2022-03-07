@@ -57,8 +57,20 @@ namespace crystal
     {
         auto device = Engine::GetInstance()->GetGraphicsDevice();
         auto geometryRenderer = payload.GeometryRenderer;
+
+        auto minPos = m_calculatedInnerBound.GetMinPos();
+        auto maxPos = m_calculatedInnerBound.GetMaxPos();
+
+        auto height = m_calculatedInnerBound.GetSize().y;
+        auto width = m_calculatedInnerBound.GetSize().x - BAR_WIDTH * 2;
+        auto midStartPos = minPos + Vector2f(BAR_WIDTH, height * 0.5f);
+
+        auto barBound = Bound2f(midStartPos - Vector2f(0, BAR_WIDTH * 0.5f),
+            midStartPos + Vector2f(width, BAR_WIDTH * 0.5f));
+
+
         geometryRenderer->Begin(payload.PSO);
-        geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(m_barBound), m_barColor);
+        geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(barBound), m_barColor);
         geometryRenderer->End();
     }
 
@@ -73,26 +85,17 @@ namespace crystal
 
             auto offsetX = std::clamp(posTarget.x - BAR_WIDTH, 0.f, width);
 
-            SetValue((double)offsetX / width);
+            SetValue(std::clamp((double)offsetX / width, 0.0, 1.0));
         }
-    }
 
-    void UIValueSlider::RecalculateChildren()
-    {
-        m_value = std::clamp(m_value, 0.0, 1.0);
-
-        auto minPos = m_calculatedInnerBound.GetMinPos();
-        auto maxPos = m_calculatedInnerBound.GetMaxPos();
-
-        auto height = maxPos.y - minPos.y;
-        auto width = maxPos.x - minPos.x - BAR_WIDTH * 2;
-        auto midStartPos = minPos + Vector2f(BAR_WIDTH, height * 0.5f);
-
-        m_barBound = Bound2f(midStartPos - Vector2f(0, BAR_WIDTH * 0.5f),
-            midStartPos + Vector2f(width, BAR_WIDTH * 0.5f));
-
+        auto width = m_calculatedInnerBound.GetSize().x - BAR_WIDTH * 2;
         m_bar->SetPosition(Vector2f(BAR_WIDTH + width * m_value, 0.f));
-
-        UIElement::RecalculateChildren();
     }
+
+    //void UIValueSlider::RecalculateChildren()
+    //{
+
+
+    //    UIElement::RecalculateChildren();
+    //}
 }

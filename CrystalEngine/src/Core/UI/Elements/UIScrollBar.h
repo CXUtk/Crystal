@@ -7,11 +7,10 @@
 
 namespace crystal
 {
-    class UIScrollBarV : public IUIValueElement<double>
+    class UIScrollBarBase : public IUIValueElement<double>
     {
     public:
-        UIScrollBarV();
-        ~UIScrollBarV() override;
+        UIScrollBarBase();
 
         Color4f GetBarColor() const { return m_barColor; }
         void SetBarColor(const Color4f& color) { m_barColor = color; }
@@ -21,7 +20,7 @@ namespace crystal
 
         /**
          * @brief Get the view range / size of value bar
-         * @return 
+         * @return
         */
         double GetViewRange() const { return m_viewRange; }
         void SetViewRange(double range) { m_viewRange = range; }
@@ -36,11 +35,33 @@ namespace crystal
 
         double          m_viewRange = 0.f;
         bool            m_isDragging = false;
+        bool            m_isLocating = false;
+        Vector2i        m_posDragStartOffset{};
 
         std::shared_ptr<UIPanel>        m_bar = nullptr;
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
+    };
+
+    class UIScrollBarV : public UIScrollBarBase
+    {
+    public:
+        UIScrollBarV();
+        ~UIScrollBarV() override;
+
+    protected:
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
-        virtual void RecalculateChildren() override;
+    };
+
+    class UIScrollBarH : public UIScrollBarBase
+    {
+    public:
+        UIScrollBarH();
+        ~UIScrollBarH() override;
+
+    protected:
+        virtual void UpdateSelf(const GameTimer& gameTimer) override;
     };
 }
+
+   

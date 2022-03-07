@@ -77,7 +77,7 @@ namespace crystal
 
     void UIElement::AppendChild(std::shared_ptr<UIElement> element)
     {
-        if (element->m_pParent)
+        if (element->m_pParent && element->m_pParent != this)
         {
             element->m_pParent->RemoveChild(element);
         }
@@ -193,6 +193,13 @@ namespace crystal
     int UIElement::GetHeight() const
     {
         return m_calculatedInnerBound.GetMaxPos().y - m_calculatedInnerBound.GetMinPos().y;
+    }
+
+    Vector2i UIElement::GetEstimatedSize(UIElement* fakeParent) const
+    {
+        Vector2f relative(m_size.Width.Relative, m_size.Height.Relative);
+        Vector2f parentSize = fakeParent->m_calculatedInnerBound.GetSize();
+        return Vector2i(parentSize * relative) + Vector2i(m_size.Width.Absolute, m_size.Height.Absolute);
     }
 
     void UIElement::UpdateSelf(const GameTimer& gameTimer)

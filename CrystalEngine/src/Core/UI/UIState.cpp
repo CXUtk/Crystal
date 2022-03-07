@@ -14,10 +14,10 @@ namespace crystal
         auto engine = Engine::GetInstance();
         m_pInputController = engine->GetInputController();
         m_pGameWindow = engine->GetWindow();
-
         ReorderElements();
-
+        RecalculateAll();
         MouseEvent(gameTimer);
+
         for (auto& element : m_pUIElements)
         {
             if (element->IsActive())
@@ -25,8 +25,6 @@ namespace crystal
                 element->Update(gameTimer);
             }
         }
-
-        RecalculateAll();
     }
 
     void UIState::Draw(const RenderPayload& payload, const GameTimer& gameTimer)

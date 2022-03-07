@@ -60,6 +60,7 @@ namespace crystal
         void SetTooltip(const std::string& tooltip) { m_tooltip = tooltip; }
 
         OverflowStyle GetOverflowStyle() const { return m_overflowStyle; }
+        void SetOverflowStyle(OverflowStyle style) { m_overflowStyle = style; }
 
         PropagationFlags GetPropagationFlags() const { return m_propagationFlags; }
         void SetPropagationFlags(PropagationFlags flags) { m_propagationFlags = flags; }
@@ -78,6 +79,8 @@ namespace crystal
 
         int GetWidth() const;
         int GetHeight() const;
+
+        Vector2i GetEstimatedSize(UIElement* fakeParent) const;
 
         Bound2f GetEventBound() const { return m_calculatedOuterBound; }
         Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
