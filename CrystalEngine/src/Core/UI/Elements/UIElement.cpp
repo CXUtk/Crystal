@@ -3,6 +3,7 @@
 
 #include <Core/Asset/AssetManager.h>
 #include <Core/Render/RenderExports.h>
+#include <Core/UI/UIStateMachine.h>
 
 namespace crystal
 {
@@ -12,6 +13,24 @@ namespace crystal
     UIElement::~UIElement()
     {}
 
+    void UIElement::SetPosition(Vector2f pos)
+    {
+        if (m_position != pos)
+        {
+            m_isStateDirty = true;
+        }
+        m_position = pos;
+    }
+
+    void UIElement::SetPivot(Vector2f pivot)
+    {
+        if (m_pivot != pivot)
+        {
+            m_isStateDirty = true;
+        }
+        m_pivot = pivot;
+    }
+
     void UIElement::Update(const GameTimer& gameTimer)
     {
         UpdateSelf(gameTimer);
@@ -20,21 +39,33 @@ namespace crystal
 
     void UIElement::Draw(const RenderPayload& payload, const GameTimer& gameTimer)
     {
+        auto spriteBatch = payload.SpriteBatch;
+        if (m_isStateDirty)
+        {
+            Recalculate();
+        }
+
         if (m_isVisible)
         {
             DrawSelf(payload, gameTimer);
         }
         if constexpr (EnableDebugDraw)
         {
-            auto graphicsDevice = Engine::GetInstance()->GetGraphicsDevice();
+            auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
+            SliceInfo slice = {};
+            slice.Left = 1;
+            slice.Right = 1;
+            slice.Top = 1;
+            slice.Bot = 1;
+            slice.DrawFlags = Slice_Nine;
 
-            payload.GeometryRenderer->Begin();
-            Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
-            payload.GeometryRenderer->DrawBound2D(bound, Color4f(1.f, 1.f, 0.f, 1.f));
-            payload.GeometryRenderer->End();
+            spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice,
+                BoundingBoxConvert<int>(m_calculatedInnerBound), Color4f(1.f, 1.f, 0.f, 1.f));
         }
         if (m_overflowStyle == OverflowStyle::Hidden)
         {
+            spriteBatch->End();
+
             auto RSState = payload.PSO->GetRasterState();
             auto oldScissorState = RSState->GetScissorState();
             auto oldScissorBound = RSState->GetScissorBound();
@@ -44,10 +75,16 @@ namespace crystal
                 .IntersectWith(oldScissorBound);
             RSState->SetScissorBound(scissorBound);
 
+            spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
+
             DrawChildren(payload, gameTimer);
+
+            spriteBatch->End();
 
             RSState->SetScissorState(oldScissorState);
             RSState->SetScissorBound(oldScissorBound);
+
+            spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
         }
         else
         {
@@ -73,6 +110,8 @@ namespace crystal
                 m_calculatedOuterBound = m_calculatedOuterBound.Union(child->m_calculatedOuterBound);
             }
         }
+
+        m_isStateDirty = false;
     }
 
     void UIElement::AppendChild(std::shared_ptr<UIElement> element)
@@ -83,6 +122,7 @@ namespace crystal
         }
         element->m_pParent = this;
         m_pChildren.push_back(element);
+        element->Recalculate();
     }
 
     void UIElement::RemoveChild(std::shared_ptr<UIElement> element)
@@ -94,6 +134,15 @@ namespace crystal
         }
         m_pChildren.erase(p);
         element->m_pParent = nullptr;
+    }
+
+    void UIElement::RemoveAllChildren()
+    {
+        for (auto& child : m_pChildren)
+        {
+            child->m_pParent = nullptr;
+        }
+        m_pChildren.clear();
     }
 
     std::shared_ptr<UIElement> UIElement::GetResponseElement(const Vector2f& screenPos)

@@ -21,6 +21,8 @@ namespace crystal
 
         void AppendChild(std::shared_ptr<UIElement> element);
         void RemoveChild(std::shared_ptr<UIElement> element);
+        void RemoveAllChildren();
+
         std::shared_ptr<UIElement> GetChildByName(const std::string& name);
         /**
          * @brief Get the element that supposed to respond to the event at given position,
@@ -66,10 +68,10 @@ namespace crystal
         void SetPropagationFlags(PropagationFlags flags) { m_propagationFlags = flags; }
 
         Vector2f GetPivot() const { return m_pivot; }
-        void SetPivot(Vector2f pivot) { m_pivot = pivot; }
+        void SetPivot(Vector2f pivot);
 
         Vector2f GetPosition() const { return m_position; }
-        void SetPosition(Vector2f pos) { m_position = pos; }
+        void SetPosition(Vector2f pos);
 
         Vector2f GetAnchorPoint() const { return m_anchorPoint; }
         void SetAnchorPoint(Vector2f anchorPoint) { m_anchorPoint = anchorPoint; }
@@ -116,6 +118,7 @@ namespace crystal
         bool        m_isVisible = true;
         bool        m_noEvents = false;
         bool        m_isFocused = false;
+        bool        m_isStateDirty = true;
 
         std::string     m_name{};
         std::string     m_tooltip{};

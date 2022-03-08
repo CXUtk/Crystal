@@ -150,6 +150,12 @@ namespace crystal
         Vec _minPos, _maxPos;
     };
 
+    template<typename T, glm::length_t L, glm::qualifier Q>
+    inline BoundingBox<L, T, Q> operator+(const glm::vec<L, T, Q>& v, const BoundingBox<L, T, Q>& bbox)
+    {
+        return BoundingBox<L, T, Q>(v + bbox.GetMinPos(), v + bbox.GetMaxPos());
+    }
+
     template<glm::length_t L, typename T, glm::qualifier Q>
     inline BoundingBox<L, T, Q> CreateBBoxFromRect(const glm::vec<L, T, Q>& botLeft, const glm::vec<L, T, Q>& size)
     {

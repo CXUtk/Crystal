@@ -1,4 +1,4 @@
-﻿#include "SpriteBatch.h"
+#include "SpriteBatch.h"
 #include <Interfaces/Graphics/GraphicsInterfaces.h>
 #include <stdexcept>
 #include <Engine.h>
@@ -26,7 +26,7 @@ namespace crystal
         float							Depth = 0.f;
         float							Rotation = 0.f;
         std::shared_ptr<ITexture2D>		Texture = nullptr;
-        SpriteEffect					SpriteEffect = SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE;
+        SpriteEffect					SpriteEffect = SpriteEffect::None;
     };
 
     struct RenderStateSB
@@ -48,7 +48,7 @@ namespace crystal
     public:
         explicit Impl(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext);
         ~Impl();
-         
+
 
         void Begin(SpriteSortMode spriteSortMode,
             const Matrix4f* transform,
@@ -65,8 +65,8 @@ namespace crystal
         static constexpr int MAX_QUADS_PER_BATCH = 1 << 12;
         static constexpr int MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH << 2;
 
-        IGraphicsDevice*					m_pGraphicsDevice = nullptr;
-        IGraphicsContext*					m_pGraphicsContext = nullptr;
+        IGraphicsDevice* m_pGraphicsDevice = nullptr;
+        IGraphicsContext* m_pGraphicsContext = nullptr;
 
         std::shared_ptr<IPipelineResourceObject>	m_pDefaultPRO = nullptr;
         std::shared_ptr<IVertexBuffer>				m_pDefaultVertexBuffer = nullptr;
@@ -75,6 +75,7 @@ namespace crystal
         RenderStateSB					m_currentRenderState{};
         std::vector<BatchVertex2D>		m_vertices{};
         std::vector<SpriteInfo>			m_spriteQueue{};
+        std::shared_ptr<ITexture2D>     m_whiteTexture = nullptr;
         bool							m_isBatchingBegin = false;
 
         static BatchVertex2D					m_defaultVertices[4];
@@ -141,21 +142,21 @@ namespace crystal
         auto minPos = center - halfSize;
         auto maxPos = center + halfSize;
         m_pImpl->Draw(texture, Bound2f(minPos, maxPos), nullptr, color, Vector2f(0.f),
-            0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
+            0.f, SpriteEffect::None, 0.f);
     }
 
     void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Bound2i& drawRect, const Color4f& color)
     {
         Bound2f rect(drawRect.GetMinPos(), drawRect.GetMaxPos());
-        m_pImpl->Draw(texture, rect, nullptr, color, Vector2f(0.f), 
-            0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
+        m_pImpl->Draw(texture, rect, nullptr, color, Vector2f(0.f),
+            0.f, SpriteEffect::None, 0.f);
     }
 
     void SpriteBatch::Draw(std::shared_ptr<ITexture2D> texture, const Bound2i& drawRect, const Bound2i* srcRect, const Color4f& color)
     {
         Bound2f rect(drawRect.GetMinPos(), drawRect.GetMaxPos());
         m_pImpl->Draw(texture, rect, srcRect, color, Vector2f(0.f),
-            0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
+            0.f, SpriteEffect::None, 0.f);
     }
 
     void SpriteBatch::End()
@@ -173,6 +174,84 @@ namespace crystal
             origin * scale, rotation, effect, 0.f);
     }
 
+    void SpriteBatch::DrawSlicedTexture(std::shared_ptr<ITexture2D> texture, const SliceInfo& sliceInfo, const Bound2i& screenBound, const Color4f& color)
+    {
+        auto texSize = texture->GetSize();
+        auto minPos = screenBound.GetMinPos();
+        auto maxPos = screenBound.GetMaxPos();
+        auto boundSize = maxPos - minPos;
+        if (sliceInfo.Bot > 0)
+        {
+            if ((sliceInfo.DrawFlags & 1) && sliceInfo.Left > 0)
+            {
+                auto botLeft = Bound2i(Vector2i(0), Vector2i(sliceInfo.Left, sliceInfo.Bot));
+                auto texBotLeft = Bound2i(Vector2i(0), Vector2i(sliceInfo.Left, sliceInfo.Bot));
+                Draw(texture, minPos + botLeft, &texBotLeft, color);
+            }
+
+            if ((sliceInfo.DrawFlags & (1 << 1)) && sliceInfo.Left + sliceInfo.Right < boundSize.x)
+            {
+                auto botMid = Bound2i(Vector2i(sliceInfo.Left, 0), Vector2i(boundSize.x - sliceInfo.Right, sliceInfo.Bot));
+                auto texBotMid = Bound2i(Vector2i(sliceInfo.Left, 0), Vector2i(texSize.x - sliceInfo.Right, sliceInfo.Bot));
+                Draw(texture, minPos + botMid, &texBotMid, color);
+            }
+
+            if ((sliceInfo.DrawFlags & (1 << 2)) && sliceInfo.Right > 0)
+            {
+                auto botRight = Bound2i(Vector2i(boundSize.x - sliceInfo.Right, 0), Vector2i(boundSize.x, sliceInfo.Bot));
+                auto texBotRight = Bound2i(Vector2i(texSize.x - sliceInfo.Right, 0), Vector2i(texSize.x, sliceInfo.Bot));
+                Draw(texture, minPos + botRight, &texBotRight, color);
+            }
+        }
+        if (sliceInfo.Top + sliceInfo.Bot < boundSize.y)
+        {
+            if ((sliceInfo.DrawFlags & (1 << 3)) && sliceInfo.Left > 0)
+            {
+                auto midLeft = Bound2i(Vector2i(0, sliceInfo.Bot), Vector2i(sliceInfo.Left, boundSize.y - sliceInfo.Top));
+                auto texMidLeft = Bound2i(Vector2i(0, sliceInfo.Bot), Vector2i(sliceInfo.Left, texSize.y - sliceInfo.Top));
+                Draw(texture, minPos + midLeft, &texMidLeft, color);
+            }
+
+            if ((sliceInfo.DrawFlags & (1 << 4)) && sliceInfo.Left + sliceInfo.Right < boundSize.x)
+            {
+                auto midMid = Bound2i(Vector2i(sliceInfo.Left, sliceInfo.Bot), Vector2i(boundSize.x - sliceInfo.Right, boundSize.y - sliceInfo.Top));
+                auto texMidMid = Bound2i(Vector2i(sliceInfo.Left, sliceInfo.Bot), Vector2i(texSize.x - sliceInfo.Right, texSize.y - sliceInfo.Top));
+                Draw(texture, minPos + midMid, &texMidMid, color);
+            }
+
+            if ((sliceInfo.DrawFlags & (1 << 5)) && sliceInfo.Right > 0)
+            {
+                auto midRight = Bound2i(Vector2i(boundSize.x - sliceInfo.Right, sliceInfo.Bot), Vector2i(boundSize.x, boundSize.y - sliceInfo.Top));
+                auto texMidRight = Bound2i(Vector2i(texSize.x - sliceInfo.Right, sliceInfo.Bot), Vector2i(texSize.x, texSize.y - sliceInfo.Top));
+                Draw(texture, minPos + midRight, &texMidRight, color);
+            }
+        }
+
+        if (sliceInfo.Top > 0)
+        {
+            if ((sliceInfo.DrawFlags & (1 << 6)) && sliceInfo.Left > 0)
+            {
+                auto topLeft = Bound2i(Vector2i(0, boundSize.y - sliceInfo.Top), Vector2i(sliceInfo.Left, boundSize.y));
+                auto texTopLeft = Bound2i(Vector2i(0, texSize.y - sliceInfo.Top), Vector2i(sliceInfo.Left, texSize.y));
+                Draw(texture, minPos + topLeft, &texTopLeft, color);
+            }
+
+            if ((sliceInfo.DrawFlags & (1 << 7)) && sliceInfo.Left + sliceInfo.Right < boundSize.x)
+            {
+                auto topMid = Bound2i(Vector2i(sliceInfo.Left, boundSize.y - sliceInfo.Top), Vector2i(boundSize.x - sliceInfo.Right, boundSize.y));
+                auto texTopMid = Bound2i(Vector2i(sliceInfo.Left, texSize.y - sliceInfo.Top), Vector2i(texSize.x - sliceInfo.Right, texSize.y));
+                Draw(texture, minPos + topMid, &texTopMid, color);
+            }
+
+            if ((sliceInfo.DrawFlags & (1 << 8)) && sliceInfo.Right > 0)
+            {
+                auto topRight = Bound2i(Vector2i(boundSize.x - sliceInfo.Right, boundSize.y - sliceInfo.Top), Vector2i(boundSize.x, boundSize.y));
+                auto texTopRight = Bound2i(Vector2i(texSize.x - sliceInfo.Right, texSize.y - sliceInfo.Top), Vector2i(texSize.x, texSize.y));
+                Draw(texture, minPos + topRight, &texTopRight, color);
+            }
+        }
+    }
+
     void SpriteBatch::DrawString(std::shared_ptr<Font> font, const std::string& text, const Vector2f& pos, const Color4f& color)
     {
         Vector2f origin = pos;
@@ -187,7 +266,7 @@ namespace crystal
             auto maxPos = minPos + texScale;
 
             m_pImpl->Draw(character.Texture2D, Bound2f(minPos, maxPos), nullptr, color,
-                Vector2f(0.f), 0.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE, 0.f);
+                Vector2f(0.f), 0.f, SpriteEffect::None, 0.f);
             origin.x += character.Advance;
         }
     }
@@ -251,7 +330,7 @@ namespace crystal
 
         m_defaultRenderState.m_pSamplerState = m_pGraphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp);
         m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("package1:Sprite");
-        
+
         auto viewPortSize = m_pGraphicsDevice->GetContext()->GetCurrentFrameBufferSize();
         m_defaultRenderState.m_renderMatrix = glm::orthoLH_ZO(0.f, (float)viewPortSize.x, 0.f,
             (float)viewPortSize.y, -1.f, 1.f);
@@ -259,11 +338,10 @@ namespace crystal
     }
 
     SpriteBatch::Impl::~Impl()
-    {
-    }
+    {}
 
-    void SpriteBatch::Impl::Begin(SpriteSortMode spriteSortMode, 
-        const Matrix4f* transform, 
+    void SpriteBatch::Impl::Begin(SpriteSortMode spriteSortMode,
+        const Matrix4f* transform,
         std::shared_ptr<IPipelineStateObject> pso,
         std::shared_ptr<ISamplerState> samplerState,
         std::shared_ptr<IShaderProgram> shader)
@@ -354,7 +432,7 @@ namespace crystal
     void SpriteBatch::Impl::m_FlushThisBatch()
     {
         if (m_spriteQueue.empty()) return;
-        
+
         int spriteCount = m_spriteQueue.size();
         int currentCount = 0;
         for (int i = 0; i < spriteCount; i++)
@@ -410,13 +488,13 @@ namespace crystal
         vertices[2].TextureCoords = maxCoord;
         vertices[3].TextureCoords = Vector2f(minCoord.x, maxCoord.y);
 
-        if (sprite.SpriteEffect & SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL)
+        if (sprite.SpriteEffect & SpriteEffect::FlipHorizontal)
         {
             std::swap(vertices[0].TextureCoords, vertices[1].TextureCoords);
             std::swap(vertices[2].TextureCoords, vertices[3].TextureCoords);
         }
 
-        if (sprite.SpriteEffect & SpriteEffect::CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL)
+        if (sprite.SpriteEffect & SpriteEffect::FlipVertical)
         {
             std::swap(vertices[0].TextureCoords, vertices[3].TextureCoords);
             std::swap(vertices[1].TextureCoords, vertices[2].TextureCoords);
@@ -464,127 +542,126 @@ namespace crystal
         }
     }
 
-    void SpriteBatchUtils::DrawNineSquareTexture(SpriteBatch* spriteBatch,
-        std::shared_ptr<ITexture2D> texture,
-        const Vector2i& cornerSize,
-        const Bound2i& bound,
-        const Color4f& color)
-    {
-        auto texSize = texture->GetSize();
-        auto minPos = bound.GetMinPos();
-        auto maxPos = bound.GetMaxPos();
-        auto boundSize = bound.GetSize();
-        {
-            auto botLeft = Bound2i(Vector2i(0), cornerSize);
-            auto texBotLeft = Bound2i(Vector2i(0), cornerSize);
-            spriteBatch->Draw(texture, Bound2i(minPos + botLeft.GetMinPos(),
-                minPos + botLeft.GetMaxPos()), &texBotLeft, color);
+    //void SpriteBatchUtils::DrawNineSquareTexture(SpriteBatch* spriteBatch,
+    //    std::shared_ptr<ITexture2D> texture,
+    //    const Vector2i& cornerSize,
+    //    const Bound2i& bound,
+    //    const Color4f& color)
+    //{
+    //    auto texSize = texture->GetSize();
+    //    auto minPos = bound.GetMinPos();
+    //    auto maxPos = bound.GetMaxPos();
+    //    auto boundSize = bound.GetSize();
+    //    {
+    //        auto botLeft = Bound2i(Vector2i(0), cornerSize);
+    //        auto texBotLeft = Bound2i(Vector2i(0), cornerSize);
+    //        spriteBatch->Draw(texture, Bound2i(minPos + botLeft.GetMinPos(),
+    //            minPos + botLeft.GetMaxPos()), &texBotLeft, color);
 
-            auto botMid = Bound2i(Vector2i(cornerSize.x, 0),
-                Vector2i(boundSize.x - cornerSize.x, cornerSize.y));
-            auto texBotMid = Bound2i(Vector2i(cornerSize.x, 0),
-                Vector2i(texSize.x - cornerSize.x, cornerSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + botMid.GetMinPos(),
-                minPos + botMid.GetMaxPos()), &texBotMid, color);
+    //        auto botMid = Bound2i(Vector2i(cornerSize.x, 0),
+    //            Vector2i(boundSize.x - cornerSize.x, cornerSize.y));
+    //        auto texBotMid = Bound2i(Vector2i(cornerSize.x, 0),
+    //            Vector2i(texSize.x - cornerSize.x, cornerSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + botMid.GetMinPos(),
+    //            minPos + botMid.GetMaxPos()), &texBotMid, color);
 
-            auto botRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, 0),
-                Vector2i(boundSize.x, cornerSize.y));
-            auto texBotRight = Bound2i(Vector2i(texSize.x - cornerSize.x, 0),
-                Vector2i(texSize.x, cornerSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + botRight.GetMinPos(),
-                minPos + botRight.GetMaxPos()), &texBotRight, color);
-        }
+    //        auto botRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, 0),
+    //            Vector2i(boundSize.x, cornerSize.y));
+    //        auto texBotRight = Bound2i(Vector2i(texSize.x - cornerSize.x, 0),
+    //            Vector2i(texSize.x, cornerSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + botRight.GetMinPos(),
+    //            minPos + botRight.GetMaxPos()), &texBotRight, color);
+    //    }
 
-        {
-            auto midLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, boundSize.y - cornerSize.y));
-            auto texMidLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, texSize.y - cornerSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + midLeft.GetMinPos(),
-                minPos + midLeft.GetMaxPos()), &texMidLeft, color);
+    //    {
+    //        auto midLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, boundSize.y - cornerSize.y));
+    //        auto texMidLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, texSize.y - cornerSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + midLeft.GetMinPos(),
+    //            minPos + midLeft.GetMaxPos()), &texMidLeft, color);
 
-            auto midMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
-                Vector2i(boundSize - cornerSize));
-            auto texMidMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
-                Vector2i(texSize - cornerSize));
-            spriteBatch->Draw(texture, Bound2i(minPos + midMid.GetMinPos(),
-                minPos + midMid.GetMaxPos()), &texMidMid, color);
+    //        auto midMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
+    //            Vector2i(boundSize - cornerSize));
+    //        auto texMidMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
+    //            Vector2i(texSize - cornerSize));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + midMid.GetMinPos(),
+    //            minPos + midMid.GetMaxPos()), &texMidMid, color);
 
-            auto midRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, cornerSize.y),
-                Vector2i(boundSize.x, boundSize.y - cornerSize.y));
-            auto texMidRight = Bound2i(Vector2i(texSize.x - cornerSize.x, cornerSize.y),
-                Vector2i(texSize.x, texSize.y - cornerSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + midRight.GetMinPos(),
-                minPos + midRight.GetMaxPos()), &texMidRight, color);
-        }
+    //        auto midRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, cornerSize.y),
+    //            Vector2i(boundSize.x, boundSize.y - cornerSize.y));
+    //        auto texMidRight = Bound2i(Vector2i(texSize.x - cornerSize.x, cornerSize.y),
+    //            Vector2i(texSize.x, texSize.y - cornerSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + midRight.GetMinPos(),
+    //            minPos + midRight.GetMaxPos()), &texMidRight, color);
+    //    }
 
-        {
-            auto topLeft = Bound2i(Vector2i(0, boundSize.y - cornerSize.y), Vector2i(cornerSize.x, boundSize.y));
-            auto texTopLeft = Bound2i(Vector2i(0, texSize.y - cornerSize.y), Vector2i(cornerSize.x, texSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + topLeft.GetMinPos(),
-                minPos + topLeft.GetMaxPos()), &texTopLeft, color);
+    //    {
+    //        auto topLeft = Bound2i(Vector2i(0, boundSize.y - cornerSize.y), Vector2i(cornerSize.x, boundSize.y));
+    //        auto texTopLeft = Bound2i(Vector2i(0, texSize.y - cornerSize.y), Vector2i(cornerSize.x, texSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + topLeft.GetMinPos(),
+    //            minPos + topLeft.GetMaxPos()), &texTopLeft, color);
 
-            auto topMid = Bound2i(Vector2i(cornerSize.x, boundSize.y - cornerSize.y),
-                Vector2i(boundSize.x - cornerSize.x, boundSize.y));
-            auto texTopMid = Bound2i(Vector2i(cornerSize.x, texSize.y - cornerSize.y),
-                Vector2i(texSize.x - cornerSize.x, texSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + topMid.GetMinPos(),
-                minPos + topMid.GetMaxPos()), &texTopMid, color);
+    //        auto topMid = Bound2i(Vector2i(cornerSize.x, boundSize.y - cornerSize.y),
+    //            Vector2i(boundSize.x - cornerSize.x, boundSize.y));
+    //        auto texTopMid = Bound2i(Vector2i(cornerSize.x, texSize.y - cornerSize.y),
+    //            Vector2i(texSize.x - cornerSize.x, texSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + topMid.GetMinPos(),
+    //            minPos + topMid.GetMaxPos()), &texTopMid, color);
 
-            auto topRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, boundSize.y - cornerSize.y),
-                Vector2i(boundSize));
-            auto texTopRight = Bound2i(Vector2i(texSize.x - cornerSize.x, texSize.y - cornerSize.y),
-                Vector2i(texSize));
-            spriteBatch->Draw(texture, Bound2i(minPos + topRight.GetMinPos(),
-                minPos + topRight.GetMaxPos()), &texTopRight, color);
-        }
-    }
+    //        auto topRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, boundSize.y - cornerSize.y),
+    //            Vector2i(boundSize));
+    //        auto texTopRight = Bound2i(Vector2i(texSize.x - cornerSize.x, texSize.y - cornerSize.y),
+    //            Vector2i(texSize));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + topRight.GetMinPos(),
+    //            minPos + topRight.GetMaxPos()), &texTopRight, color);
+    //    }
+    //}
 
-    void SpriteBatchUtils::DrawSixSquareUpTexture(SpriteBatch* spriteBatch, std::shared_ptr<ITexture2D> texture, const Vector2i& cornerSize, const Bound2i& bound, const Color4f& color)
-    {
-        auto texSize = texture->GetSize();
-        auto minPos = bound.GetMinPos();
-        auto maxPos = bound.GetMaxPos();
-        auto boundSize = bound.GetSize();
-        {
-            auto topLeft = Bound2i(Vector2i(0, boundSize.y - cornerSize.y), Vector2i(cornerSize.x, boundSize.y));
-            auto texTopLeft = Bound2i(Vector2i(0, texSize.y - cornerSize.y), Vector2i(cornerSize.x, texSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + topLeft.GetMinPos(),
-                minPos + topLeft.GetMaxPos()), &texTopLeft, color);
+    //void SpriteBatchUtils::DrawSixSquareUpTexture(SpriteBatch* spriteBatch, std::shared_ptr<ITexture2D> texture, const Vector2i& cornerSize, const Bound2i& bound, const Color4f& color)
+    //{
+    //    auto texSize = texture->GetSize();
+    //    auto minPos = bound.GetMinPos();
+    //    auto maxPos = bound.GetMaxPos();
+    //    auto boundSize = bound.GetSize();
+    //    {
+    //        auto topLeft = Bound2i(Vector2i(0, boundSize.y - cornerSize.y), Vector2i(cornerSize.x, boundSize.y));
+    //        auto texTopLeft = Bound2i(Vector2i(0, texSize.y - cornerSize.y), Vector2i(cornerSize.x, texSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + topLeft.GetMinPos(),
+    //            minPos + topLeft.GetMaxPos()), &texTopLeft, color);
 
-            auto topMid = Bound2i(Vector2i(cornerSize.x, boundSize.y - cornerSize.y),
-                Vector2i(boundSize.x - cornerSize.x, boundSize.y));
-            auto texTopMid = Bound2i(Vector2i(cornerSize.x, texSize.y - cornerSize.y),
-                Vector2i(texSize.x - cornerSize.x, texSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + topMid.GetMinPos(),
-                minPos + topMid.GetMaxPos()), &texTopMid, color);
+    //        auto topMid = Bound2i(Vector2i(cornerSize.x, boundSize.y - cornerSize.y),
+    //            Vector2i(boundSize.x - cornerSize.x, boundSize.y));
+    //        auto texTopMid = Bound2i(Vector2i(cornerSize.x, texSize.y - cornerSize.y),
+    //            Vector2i(texSize.x - cornerSize.x, texSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + topMid.GetMinPos(),
+    //            minPos + topMid.GetMaxPos()), &texTopMid, color);
 
-            auto topRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, boundSize.y - cornerSize.y),
-                Vector2i(boundSize));
-            auto texTopRight = Bound2i(Vector2i(texSize.x - cornerSize.x, texSize.y - cornerSize.y),
-                Vector2i(texSize));
-            spriteBatch->Draw(texture, Bound2i(minPos + topRight.GetMinPos(),
-                minPos + topRight.GetMaxPos()), &texTopRight, color);
-        }
+    //        auto topRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, boundSize.y - cornerSize.y),
+    //            Vector2i(boundSize));
+    //        auto texTopRight = Bound2i(Vector2i(texSize.x - cornerSize.x, texSize.y - cornerSize.y),
+    //            Vector2i(texSize));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + topRight.GetMinPos(),
+    //            minPos + topRight.GetMaxPos()), &texTopRight, color);
+    //    }
 
-        {
-            auto botLeft = Bound2i(Vector2i(0, 0), Vector2i(cornerSize.x, boundSize.y - cornerSize.y));
-            auto texMidLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, texSize.y - cornerSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + botLeft.GetMinPos(),
-                minPos + botLeft.GetMaxPos()), &texMidLeft, color);
+    //    {
+    //        auto botLeft = Bound2i(Vector2i(0, 0), Vector2i(cornerSize.x, boundSize.y - cornerSize.y));
+    //        auto texMidLeft = Bound2i(Vector2i(0, cornerSize.y), Vector2i(cornerSize.x, texSize.y - cornerSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + botLeft.GetMinPos(),
+    //            minPos + botLeft.GetMaxPos()), &texMidLeft, color);
 
-            auto botMid = Bound2i(Vector2i(cornerSize.x, 0),
-                Vector2i(boundSize - cornerSize));
-            auto texMidMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
-                Vector2i(texSize - cornerSize));
-            spriteBatch->Draw(texture, Bound2i(minPos + botMid.GetMinPos(),
-                minPos + botMid.GetMaxPos()), &texMidMid, color);
+    //        auto botMid = Bound2i(Vector2i(cornerSize.x, 0),
+    //            Vector2i(boundSize - cornerSize));
+    //        auto texMidMid = Bound2i(Vector2i(cornerSize.x, cornerSize.y),
+    //            Vector2i(texSize - cornerSize));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + botMid.GetMinPos(),
+    //            minPos + botMid.GetMaxPos()), &texMidMid, color);
 
-            auto botRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, 0),
-                Vector2i(boundSize.x, boundSize.y - cornerSize.y));
-            auto texMidRight = Bound2i(Vector2i(texSize.x - cornerSize.x, cornerSize.y),
-                Vector2i(texSize.x, texSize.y - cornerSize.y));
-            spriteBatch->Draw(texture, Bound2i(minPos + botRight.GetMinPos(),
-                minPos + botRight.GetMaxPos()), &texMidRight, color);
-        }
-    }
-
+    //        auto botRight = Bound2i(Vector2i(boundSize.x - cornerSize.x, 0),
+    //            Vector2i(boundSize.x, boundSize.y - cornerSize.y));
+    //        auto texMidRight = Bound2i(Vector2i(texSize.x - cornerSize.x, cornerSize.y),
+    //            Vector2i(texSize.x, texSize.y - cornerSize.y));
+    //        spriteBatch->Draw(texture, Bound2i(minPos + botRight.GetMinPos(),
+    //            minPos + botRight.GetMaxPos()), &texMidRight, color);
+    //    }
+    //}
 }

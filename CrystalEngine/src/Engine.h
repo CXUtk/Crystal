@@ -7,11 +7,6 @@
 
 namespace crystal
 {
-	//using OnInitEventHandler = std::function<void()>;
-	//using OnUpdateEventHandler = std::function<void()>;
-	//using OnDrawEventHandler = std::function<void()>;
-	//using OnExitEventHandler = std::function<void()>;
-
 	class Engine final
 	{
 	public:
@@ -71,6 +66,9 @@ namespace crystal
 
 		AssetManager* GetAssetManager() const;
 
+
+        UIStateMachine* GetUIStateMachine() const;
+
         double GetCurrentTime() const;
 
 		/**
@@ -86,11 +84,12 @@ namespace crystal
 
 		std::unique_ptr<SpriteBatch>			m_spriteBatch = nullptr;
         std::unique_ptr<GeometryRenderer>	    m_pGeometryRenderer = nullptr;
+        std::unique_ptr<UIStateMachine>         m_pUIStateMachine = nullptr;
 
 		std::shared_ptr<AssetManager>			m_pAssetManager = nullptr;
 
 		double		m_fpsCap = 0.0;			// Maximum FPS
-        GameTimer	m_gameTimer{};		// Game timer
+        GameTimer	m_gameTimer{};		    // Game timer
 
         InitArgs	m_initArgs{};
 	

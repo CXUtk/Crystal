@@ -6,7 +6,12 @@
 
 namespace crystal
 {
-    void UIState::Preprocess()
+    void UIState::Activate()
+    {
+        RecalculateAll();
+    }
+
+    void UIState::DeActivate()
     {}
 
     void UIState::Update(const GameTimer& gameTimer)
@@ -14,8 +19,8 @@ namespace crystal
         auto engine = Engine::GetInstance();
         m_pInputController = engine->GetInputController();
         m_pGameWindow = engine->GetWindow();
+
         ReorderElements();
-        RecalculateAll();
         MouseEvent(gameTimer);
 
         for (auto& element : m_pUIElements)

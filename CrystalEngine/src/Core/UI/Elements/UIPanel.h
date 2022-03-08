@@ -22,6 +22,9 @@ namespace crystal
         Color4f     m_drawColor{};
         Color4f     m_borderColor{};
 
+        std::shared_ptr<ITexture2D>     m_frameTexture = nullptr;
+        std::shared_ptr<ITexture2D>     m_whiteTexture = nullptr;
+
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
     };
 }

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "../UIElement.h"
 #include "../UILabel.h"
@@ -32,7 +32,6 @@ namespace crystal
         UIWidgetCloseEvent              m_eventOnClose{};
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
-
 
     private:
         void UpdateDragPos();

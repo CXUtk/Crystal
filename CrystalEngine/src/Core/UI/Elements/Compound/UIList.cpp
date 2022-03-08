@@ -16,13 +16,12 @@ namespace crystal
     {
         m_propagationFlags = PropagationFlags::None;
 
-        m_scrollViewArea = std::make_shared<UIElement>();
-        m_scrollViewArea->SetPivot(Vector2f(0.f, 0.5f));
-        m_scrollViewArea->SetAnchorPoint(Vector2f(0.f, 0.5f));
-        m_scrollViewArea->SetSize(SizeLayout(-INNER_PADDING * 3 - SCROLL_WIDTH,
+        m_listView = std::make_shared<UIListView>();
+        m_listView->SetPivot(Vector2f(0.f, 0.5f));
+        m_listView->SetAnchorPoint(Vector2f(0.f, 0.5f));
+        m_listView->SetSize(SizeLayout(-INNER_PADDING * 3 - SCROLL_WIDTH,
             1.f, -INNER_PADDING * 2, 1.f));
-        m_scrollViewArea->SetPosition(Vector2f(INNER_PADDING, 0.f));
-        m_scrollViewArea->SetOverflowStyle(OverflowStyle::Hidden);
+        m_listView->SetPosition(Vector2f(INNER_PADDING, 0.f));
 
         m_scrollBarV = std::make_shared<UIScrollBarV>();
         m_scrollBarV->SetPivot(Vector2f(1.f, 0.5f));
@@ -31,7 +30,7 @@ namespace crystal
         m_scrollBarV->SetPosition(Vector2f(-INNER_PADDING, 0.f));
         m_scrollBarV->SetViewRange(.1f);
 
-        AppendChild(m_scrollViewArea);
+        AppendChild(m_listView);
         AppendChild(m_scrollBarV);
     }
 
@@ -43,15 +42,15 @@ namespace crystal
         element->SetPivot(Vector2f(0.f, 1.f));
         element->SetAnchorPoint(Vector2f(0.f, 1.f));
         m_items.push_back(element);
-        m_scrollViewArea->AppendChild(element);
+        m_listView->AppendChild(element);
+        element->Recalculate();
     }
 
-    void UIList::DrawSelf(const RenderPayload & payload, const GameTimer & gameTimer)
+    void UIList::MouseScroll(UIMouseScrollEventArgs args)
     {
-        if (true)
-        {
-
-        }
+        auto value = m_scrollBarV->GetValue();
+        auto viewRange = m_scrollBarV->GetViewRange();
+        m_scrollBarV->SetValue(std::clamp(value - args.Value.y * viewRange * 0.2, 0.0, 1.0));
     }
 
     void UIList::UpdateSelf(const GameTimer& gameTimer)
@@ -60,13 +59,14 @@ namespace crystal
         
         for (auto& item : m_items)
         {
-            auto itemSize = item->GetEstimatedSize(ptr(m_scrollViewArea));
+            if (!item->IsActive()) continue;
+            auto itemSize = item->GetInnerBound().GetSize();
             item->SetPosition(Vector2f(0.f, -m_itemsSize.y));
             m_itemsSize.y += itemSize.y;
             m_itemsSize.y += INNER_ITEM_PADDING;
-            m_itemsSize.x = std::max(m_itemsSize.x, itemSize.x);
+            m_itemsSize.x = std::max(m_itemsSize.x, (int)itemSize.x);
         }
-        auto innerBound = m_scrollViewArea->GetInnerBound();
+        auto innerBound = m_listView->GetInnerBound();
         int height = innerBound.GetSize().y;
         if (m_itemsSize.y == 0)
         {
@@ -78,21 +78,46 @@ namespace crystal
         }
 
         double offsetY = std::max(0.0, m_scrollBarV->GetValue() * (m_itemsSize.y - height));
-        float posY = 0.f;
+        //float posY = 0.f;
+        //m_listView->RemoveAllChildren();
+
         for (auto& item : m_items)
         {
-            item->SetPosition(Vector2f(0.f, -posY + offsetY));
-            auto itemSize = item->GetEstimatedSize(ptr(m_scrollViewArea));
-            posY += itemSize.y;
-            posY += INNER_ITEM_PADDING;
+            if (!item->IsActive()) continue;
+            item->SetPosition(item->GetPosition() + Vector2f(0, offsetY));
+        }
+
+    }
+
+    UIListView::UIListView()
+    {
+        m_overflowStyle = OverflowStyle::Hidden;
+    }
+
+    UIListView::~UIListView()
+    {}
+
+    void UIListView::UpdateChildren(const GameTimer& gameTimer)
+    {
+        for (auto& child : m_pChildren)
+        {
+            if (!child->IsActive() || !child->IsVisible()) continue;
+            auto pos = child->GetPosition();
+            auto height = child->GetHeight();
+            if (pos.y - height > 0 || pos.y < -GetHeight()) continue;
+            child->Update(gameTimer);
         }
     }
 
-    void UIList::RecalculateSelf()
+    void UIListView::DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        for (auto& item : m_items)
+        for (auto& child : m_pChildren)
         {
-            item->Recalculate();
+            if (!child->IsActive() || !child->IsVisible()) continue;
+            auto pos = child->GetPosition();
+            auto height = child->GetHeight();
+            if (pos.y - height > 0 || pos.y < -GetHeight()) continue;
+            child->Draw(payload, gameTimer);
         }
     }
 }

@@ -41,13 +41,14 @@ int main()
 
 	//std::cout << str << std::endl;
 	Engine* engine = Engine::GetInstance();
-	try
-	{
-		engine->Start(std::make_unique<UITest>());
-	}
-	catch (std::exception ex)
-	{
-		crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
-	}
+	//try
+	//{
+	//	engine->Start(std::make_unique<UITest>());
+	//}
+	////catch (std::exception ex)
+	////{
+	////	crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
+	////}
+    engine->Start(std::make_unique<UITest>());
 	return 0;
 }

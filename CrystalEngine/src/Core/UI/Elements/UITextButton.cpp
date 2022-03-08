@@ -12,6 +12,7 @@ namespace crystal
     {
         m_unhoverColor = UIStyle::GetButtonColor();
         m_hoverColor = UIStyle::GetButtonHoverColor();
+        m_propagationFlags = PropagationFlags::MouseScroll;
 
         m_penel = std::make_shared<UIPanel>();
         m_penel->SetPivot(Vector2f(0.f));
@@ -27,8 +28,6 @@ namespace crystal
 
         AppendChild(m_penel);
         AppendChild(m_buttonText);
-
-        m_propagationFlags = PropagationFlags::MouseScroll;
     }
 
     UITextButton::~UITextButton()
@@ -49,6 +48,6 @@ namespace crystal
     }
 
 
-    void UITextButton::DrawSelf(const RenderPayload & payload, const GameTimer & gameTimer)
+    void UITextButton::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {}
 }

@@ -5,6 +5,7 @@
 #include <Core/Asset/AssetManager.h>
 #include <Core/Render/RenderExports.h>
 #include <Core/Input/InputController.h>
+#include <Core/UI/UIStateMachine.h>
 
 namespace crystal
 {
@@ -55,8 +56,7 @@ namespace crystal
 
     void UIValueSlider::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        auto device = Engine::GetInstance()->GetGraphicsDevice();
-        auto geometryRenderer = payload.GeometryRenderer;
+        auto spriteBatch = payload.SpriteBatch;
 
         auto minPos = m_calculatedInnerBound.GetMinPos();
         auto maxPos = m_calculatedInnerBound.GetMaxPos();
@@ -68,10 +68,10 @@ namespace crystal
         auto barBound = Bound2f(midStartPos - Vector2f(0, BAR_WIDTH * 0.5f),
             midStartPos + Vector2f(width, BAR_WIDTH * 0.5f));
 
+        auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
 
-        geometryRenderer->Begin(payload.PSO);
-        geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(barBound), m_barColor);
-        geometryRenderer->End();
+        spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(barBound),
+            m_barColor);
     }
 
     void UIValueSlider::UpdateSelf(const GameTimer& gameTimer)
@@ -86,16 +86,11 @@ namespace crystal
             auto offsetX = std::clamp(posTarget.x - BAR_WIDTH, 0.f, width);
 
             SetValue(std::clamp((double)offsetX / width, 0.0, 1.0));
+
+            m_isStateDirty = true;
         }
 
         auto width = m_calculatedInnerBound.GetSize().x - BAR_WIDTH * 2;
         m_bar->SetPosition(Vector2f(BAR_WIDTH + width * m_value, 0.f));
     }
-
-    //void UIValueSlider::RecalculateChildren()
-    //{
-
-
-    //    UIElement::RecalculateChildren();
-    //}
 }

@@ -1,4 +1,4 @@
-﻿#include "QuadTest.h"
+#include "QuadTest.h"
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
@@ -120,9 +120,9 @@ namespace crystal
 		spriteBatch->Begin(SpriteSortMode::Deferred, m_PSO,
 			graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp));
 		spriteBatch->Draw(m_texture2D, Vector2f(300.f, 300.f), Color4f(1.f, 1.f, 1.f, 0.5f),
-			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::None);
 		spriteBatch->Draw(m_texture2D, Vector2f(400.f, 350.f), Color4f(1.f, 1.f, 1.f, 0.5f),
-			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::CRYSTAL_SPRITEEFFECT_NONE);
+			0.f, Vector2f(size) * 0.5f, 5.f, SpriteEffect::None);
 		spriteBatch->End();
 	}
 

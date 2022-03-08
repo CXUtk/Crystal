@@ -34,15 +34,13 @@ namespace crystal
 
         auto& isDragging = m_isDragging;
         auto& startOffset = m_posDragStartOffset;
-        m_bar->AddEventListener<UIEventType::OnMouseJustPressed>([&isDragging, &startOffset]
-        (UIMouseButtonEventArgs args) {
+        m_bar->AddEventListener<UIEventType::OnMouseJustPressed>([&isDragging, &startOffset](UIMouseButtonEventArgs args) {
             startOffset = args.Element->GetScreenPositionToLocalPos(args.MousePosScreen)
                 - args.Element->GetPosition();
             isDragging = true;
         });
 
-        m_bar->AddEventListener<UIEventType::OnMouseJustReleased>([&isDragging]
-        (UIMouseButtonEventArgs args) {
+        m_bar->AddEventListener<UIEventType::OnMouseJustReleased>([&isDragging](UIMouseButtonEventArgs args) {
             isDragging = false;
         });
 
@@ -62,11 +60,11 @@ namespace crystal
 
     void UIScrollBarBase::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        auto device = Engine::GetInstance()->GetGraphicsDevice();
-        auto geometryRenderer = payload.GeometryRenderer;
-        geometryRenderer->Begin(payload.PSO);
-        geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(m_calculatedInnerBound), m_barColor);
-        geometryRenderer->End();
+        //auto device = Engine::GetInstance()->GetGraphicsDevice();
+        //auto geometryRenderer = payload.GeometryRenderer;
+        //geometryRenderer->Begin(payload.PSO);
+        //geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(m_calculatedInnerBound), m_barColor);
+        //geometryRenderer->End();
     }
 
     UIScrollBarV::UIScrollBarV()
@@ -118,7 +116,7 @@ namespace crystal
             }
         }
 
-        m_bar->SetSize(SizeLayout(0, 1.f, 0.f, m_viewRange));
+        m_bar->SetSize(SizeLayout(0, 1.f, 0.f, std::max(0.01, m_viewRange)));
         m_bar->SetPosition(Vector2f(0.f, -height * m_value));
     }
 
@@ -171,7 +169,7 @@ namespace crystal
             }
         }
 
-        m_bar->SetSize(SizeLayout(0, m_viewRange, 0.f, 1.f));
+        m_bar->SetSize(SizeLayout(0, std::max(0.01, m_viewRange), 0.f, 1.f));
         m_bar->SetPosition(Vector2f(width * m_value, 0.f));
     }
 }

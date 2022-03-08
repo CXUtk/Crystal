@@ -10,7 +10,8 @@ namespace crystal
 	public:
         virtual ~UIState() = 0 {};
 
-        virtual void Preprocess();
+        virtual void Activate();
+        virtual void DeActivate();
         virtual void Update(const GameTimer& gameTimer);
         virtual void Draw(const RenderPayload& payload, const GameTimer& gameTimer);
 

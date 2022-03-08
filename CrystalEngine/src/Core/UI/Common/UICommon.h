@@ -9,7 +9,7 @@
 
 namespace crystal
 {
-    constexpr bool EnableDebugDraw = true;
+    constexpr bool EnableDebugDraw = false;
 
     class UIState;
     class UIStateMachine;
@@ -53,17 +53,7 @@ namespace crystal
     enum class ImageType
     {
         Full,
-        Sliced6,
-        Sliced8NoCenter,
-        Sliced9,
-    };
-
-    struct ImageDesc
-    {
-        Color4f                         DrawColor{};
-        std::shared_ptr<ITexture2D>     Texture = nullptr;
-        Vector2i                        CornerSize{};
-        ImageType                       DrawType = ImageType::Full;
+        Sliced
     };
 
     enum class OverflowStyle

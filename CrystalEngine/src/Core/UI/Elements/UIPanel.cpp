@@ -3,12 +3,16 @@
 
 #include <Core/Asset/AssetManager.h>
 #include <Core/Render/RenderExports.h>
+#include <Core/UI/UIStateMachine.h>
 
 namespace crystal
 {
     UIPanel::UIPanel() : UIElement()
     {
-        auto assetManager = Engine::GetInstance()->GetAssetManager();
+        auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
+        m_whiteTexture = stateMachine->GetWhiteTexture();
+        m_frameTexture = stateMachine->GetFrameTexture();
+
         m_drawColor = UIStyle::GetPanelInnerColor();
         m_borderColor = UIStyle::GetPanelBorderColor();
     }
@@ -16,13 +20,18 @@ namespace crystal
     UIPanel::~UIPanel()
     {}
 
-    void UIPanel::DrawSelf(const RenderPayload & payload, const GameTimer & gameTimer)
+    void UIPanel::DrawSelf(const RenderPayload& payload, const GameTimer & gameTimer)
     {
-        auto device = Engine::GetInstance()->GetGraphicsDevice();
-        auto geometryRenderer = payload.GeometryRenderer;
-        geometryRenderer->Begin(payload.PSO);
-        geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(m_calculatedInnerBound),
-            m_drawColor, m_borderColor);
-        geometryRenderer->End();
+        auto spriteBatch = payload.SpriteBatch;
+        SliceInfo slice = {};
+        slice.Left = 1;
+        slice.Right = 1;
+        slice.Top = 1;
+        slice.Bot = 1;
+        slice.DrawFlags = Slice_Nine;
+
+        auto bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+        spriteBatch->Draw(m_whiteTexture, bound, m_drawColor);
+        spriteBatch->DrawSlicedTexture(m_frameTexture, slice, bound, m_borderColor);
     }
 }

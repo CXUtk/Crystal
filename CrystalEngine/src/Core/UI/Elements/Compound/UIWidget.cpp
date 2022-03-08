@@ -14,24 +14,38 @@ namespace crystal
         auto assetManager = Engine::GetInstance()->GetAssetManager();
         m_overflowStyle = OverflowStyle::Hidden;
 
+        SliceInfo slice = {};
+        slice.Left = 10;
+        slice.Right = 10;
+        slice.Top = 10;
+        slice.Bot = 10;
+        slice.DrawFlags = Slice_Nine;
+
+        SliceInfo slice6 = {};
+        slice6.Left = 10;
+        slice6.Right = 10;
+        slice6.Top = 10;
+        slice6.Bot = 10;
+        slice6.DrawFlags = Slice_Six;
+
         std::shared_ptr<UIImage> panel = std::make_shared<UIImage>();
         panel->SetInline(false);
-        panel->SetImageType(ImageType::Sliced9);
+        panel->SetImageType(ImageType::Sliced);
         panel->SetPivot(Vector2f(0.f));
         panel->SetAnchorPoint(Vector2f(0.f));
         panel->SetSize(SizeLayout(0, 1.f, 0, 1.f));
         panel->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxBlack"));
-        panel->SetCornerSize(Vector2i(10));
+        panel->SetSliceInfo(slice);
 
         std::shared_ptr<UIImage> panelBar = std::make_shared<UIImage>();
         panelBar->SetInline(false);
-        panelBar->SetImageType(ImageType::Sliced6);
+        panelBar->SetImageType(ImageType::Sliced);
         panelBar->SetPivot(Vector2f(0.f, 1.f));
         panelBar->SetAnchorPoint(Vector2f(0.f, 1.f));
-        panelBar->SetSize(SizeLayout(0, 1.f, 32, 0.f));
+        panelBar->SetSize(SizeLayout(0, 1.f, 40, 0.f));
         panelBar->SetColor(UIStyle::GetButtonColor());
         panelBar->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxNoB"));
-        panelBar->SetCornerSize(Vector2i(10));
+        panelBar->SetSliceInfo(slice6);
 
 
         m_closeButton = std::make_shared<UIIconButton>();
@@ -70,7 +84,7 @@ namespace crystal
         if (m_isDragging)
         {
             UpdateDragPos();
-            RecalculateSelf();
+            Recalculate();
         }
         m_lastMousePos = m_gameWindow->GetMousePos();
     }

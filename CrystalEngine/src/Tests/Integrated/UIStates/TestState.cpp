@@ -85,6 +85,14 @@ namespace crystal
         m_slider->SetValue(0.f);
         m_slider->SetPosition(Vector2f(0.f, -80.f));
 
+        auto progressBar = std::make_shared<UIProgressBar>();
+        progressBar->SetName("Slider Label");
+        progressBar->SetPivot(Vector2f(0.5f, 0.5f));
+        progressBar->SetAnchorPoint(Vector2f(0.5f, 0.5f));
+        progressBar->SetSize(SizeLayout(200, 20));
+        progressBar->SetValue(0.5f);
+        progressBar->SetPosition(Vector2f(0.f, -130.f));
+
         auto uiValueLabel = std::make_shared<UILabel>();
         uiValueLabel->SetName("Slider Label");
         uiValueLabel->SetPivot(Vector2f(0, 0.5f));
@@ -117,27 +125,28 @@ namespace crystal
         auto uilist = std::make_shared<UIList>();
         uilist->SetPivot(Vector2f(0.5f));
         uilist->SetAnchorPoint(Vector2f(0.5f));
-        uilist->SetPosition(Vector2f(0.f, -120.f));
+        uilist->SetPosition(Vector2f(0.f, 0.f));
         uilist->SetSize(SizeLayout(200, 200));
 
-        for (int i = 0; i < 80; i++)
-        {
-            auto text = std::make_shared<UILabel>();
-            text->SetPivot(Vector2f(0.5f));
-            text->SetAnchorPoint(Vector2f(0.5f));
-            text->SetPosition(Vector2f(0.f, -120.f));
-            text->SetSize(SizeLayout(200, 200));
-            text->SetText("ItemXXXX");
+        //for (int i = 0; i < 111; i++)
+        //{
+        //    auto text = std::make_shared<UILabel>();
+        //    text->SetPivot(Vector2f(0.5f));
+        //    text->SetAnchorPoint(Vector2f(0.5f));
+        //    text->SetPosition(Vector2f(0.f, 0.f));
+        //    text->SetSize(SizeLayout(200, 200));
+        //    text->SetText("ItemXXXX");
 
-            uilist->Add(text);
-        }
+        //    uilist->Add(text);
+        //}
 
         widget->AppendChild(button);
         widget->AppendChild(m_slider);
         widget->AppendChild(uiValueLabel);
+        widget->AppendChild(progressBar);
         //widget->AppendChild(scrollBar);
         //widget->AppendChild(scrollBarH);
-        widget->AppendChild(uilist);
+        //widget->AppendChild(uilist);
 
         AppendElement(widget);
     }

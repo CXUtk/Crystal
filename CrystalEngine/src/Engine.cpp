@@ -8,6 +8,7 @@
 #include "Core/Asset/AssetManager.h"
 
 #include "Platforms/PlatformFactory.h"
+#include <Core/UI/UIExports.h>
 
 namespace crystal
 {
@@ -28,6 +29,7 @@ namespace crystal
     Engine::~Engine()
     {
         m_application.reset();
+        m_pUIStateMachine.reset();
         m_pGeometryRenderer.reset();
         m_spriteBatch.reset();
         m_pAssetManager.reset();
@@ -89,6 +91,7 @@ namespace crystal
 
         m_spriteBatch = std::make_unique<SpriteBatch>(graphicsDevice, graphicsContext);
         m_pGeometryRenderer = std::make_unique<GeometryRenderer>(graphicsDevice, graphicsContext);
+        m_pUIStateMachine = std::make_unique<UIStateMachine>();
 
         m_inputController = std::make_unique<InputController>(m_platformProvider->GetGameWindow());
     }
@@ -146,5 +149,10 @@ namespace crystal
     GraphicsAPIType crystal::Engine::GetGraphicsAPIType() const
     {
         return m_platformProvider->GetGraphicsAPIType();
+    }
+
+    UIStateMachine* Engine::GetUIStateMachine() const
+    {
+        return ptr(m_pUIStateMachine);
     }
 }

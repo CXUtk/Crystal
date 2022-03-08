@@ -18,26 +18,28 @@ namespace crystal
 
     void UITest::Initialize()
     {
-        m_pUIStateMachine = std::make_unique<UIStateMachine>();
+        auto UISM = Engine::GetInstance()->GetUIStateMachine();
 
-        m_pUIStateMachine->AddState("test", std::make_shared<TestState>());
-        m_pUIStateMachine->SetInitState("test");
+        UISM->AddState("test", std::make_shared<TestState>());
+        UISM->SetState("test");
     }
 
     void UITest::Update(const crystal::GameTimer& gameTimer)
     {
-        m_pUIStateMachine->Update(gameTimer);
+        auto UISM = Engine::GetInstance()->GetUIStateMachine();
+        UISM->Update(gameTimer);
     }
 
     void UITest::Draw(const crystal::GameTimer& gameTimer)
     {
         auto graphicsContext = m_engine->GetGraphicsContext();
+        auto UISM = Engine::GetInstance()->GetUIStateMachine();
         graphicsContext->Clear(
             crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
             | crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
             | crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
             crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-        m_pUIStateMachine->Draw(gameTimer);
+        UISM->Draw(gameTimer);
     }
 
     void UITest::Exit()

@@ -25,6 +25,7 @@ namespace crystal
 
     class SpriteBatch;
     class GeometryRenderer;
+    class UIStateMachine;
 
 	class AssetManager;
 

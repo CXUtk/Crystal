@@ -1,35 +1,9 @@
-﻿#pragma once
+#pragma once
 #include "RenderCommon.h"
 #include <Core/Asset/Content/Font.h>
 
 namespace crystal
 {
-	enum SpriteEffect : int
-	{
-		CRYSTAL_SPRITEEFFECT_NONE = 0,
-		CRYSTAL_SPRITEEFFECT_FLIP_HORIZONTAL = 1 << 0,
-		CRYSTAL_SPRITEEFFECT_FLIP_VERTICAL = 1 << 1,
-	};
-
-	inline SpriteEffect operator|(SpriteEffect a, SpriteEffect b)
-	{
-		return static_cast<SpriteEffect>(static_cast<int>(a) | static_cast<int>(b));
-	}
-
-	inline SpriteEffect operator&(SpriteEffect a, SpriteEffect b)
-	{
-		return static_cast<SpriteEffect>(static_cast<int>(a) & static_cast<int>(b));
-	}
-
-	enum class SpriteSortMode
-	{
-		Deferred,
-		Immediate,
-		Texture,
-		FrontToBack,
-		BackToFront
-	};
-
 	class SpriteBatch
 	{
 	public:
@@ -59,18 +33,12 @@ namespace crystal
 		void Draw(std::shared_ptr<ITexture2D> texture, const Vector2f& pos, const Color4f& color,
 			float rotation, const Vector2f& origin, float scale, SpriteEffect effect);
 
+        void DrawSlicedTexture(std::shared_ptr<ITexture2D> texture,
+            const SliceInfo& sliceInfo, const Bound2i& screenBound, const Color4f& color);
+
         void DrawString(std::shared_ptr<Font> font, const std::string& text, const Vector2f& pos, const Color4f& color);
 	private:
 		class Impl;
 		std::unique_ptr<Impl> m_pImpl;
 	};
-
-    class SpriteBatchUtils
-    {
-    public:
-        static void DrawNineSquareTexture(SpriteBatch* spriteBatch, std::shared_ptr<ITexture2D> texture,
-            const Vector2i& cornerSize, const Bound2i& bound, const Color4f& color);
-        static void DrawSixSquareUpTexture(SpriteBatch* spriteBatch, std::shared_ptr<ITexture2D> texture,
-            const Vector2i& cornerSize, const Bound2i& bound, const Color4f& color);
-    };
 }

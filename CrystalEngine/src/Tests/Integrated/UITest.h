@@ -24,6 +24,6 @@ namespace crystal
     private:
         bool    m_renderPause = false;
 
-        std::unique_ptr<UIStateMachine>     m_pUIStateMachine{};
+
     };
 }

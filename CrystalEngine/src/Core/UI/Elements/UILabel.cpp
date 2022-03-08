@@ -20,6 +20,10 @@ namespace crystal
 
     void UILabel::UpdateSelf(const GameTimer& gameTimer)
     {
+        if (m_shouldRecalculateText)
+        {
+            Recalculate();
+        }
     }
 
     void UILabel::RecalculateSelf()
@@ -29,16 +33,13 @@ namespace crystal
         m_size = SizeLayout(metric.Width, 0, height, 0);
         m_originOffset = Vector2f(0.f, -metric.yMin);
 
-        UIElement::RecalculateSelf();
+        m_shouldRecalculateText = false;
     }
 
     void UILabel::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        auto device = Engine::GetInstance()->GetGraphicsDevice();
         auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
         spriteBatch->DrawString(m_pFont, m_text, m_calculatedInnerBound.GetMinPos() + m_originOffset,
             Color4f(1.f));
-        spriteBatch->End();
     }
 }
