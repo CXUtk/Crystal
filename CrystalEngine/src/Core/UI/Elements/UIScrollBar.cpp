@@ -5,6 +5,7 @@
 #include <Core/Asset/AssetManager.h>
 #include <Core/Render/RenderExports.h>
 #include <Core/Input/InputController.h>
+#include <Core/UI/UIStateMachine.h>
 
 namespace crystal
 {
@@ -65,6 +66,9 @@ namespace crystal
         //geometryRenderer->Begin(payload.PSO);
         //geometryRenderer->DrawBound2DFill(BoundingBoxConvert<int>(m_calculatedInnerBound), m_barColor);
         //geometryRenderer->End();
+        auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
+        payload.SpriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(m_calculatedInnerBound),
+            m_barColor);
     }
 
     UIScrollBarV::UIScrollBarV()

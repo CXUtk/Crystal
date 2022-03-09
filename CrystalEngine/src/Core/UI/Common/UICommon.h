@@ -23,6 +23,14 @@ namespace crystal
     {
         Float Absolute;
         Float Relative;
+        bool operator==(const Layout1D& other) const
+        {
+            return Absolute == other.Absolute && Relative == other.Relative;
+        }
+        bool operator!=(const Layout1D& other) const
+        {
+            return !(*this == other);
+        }
     };
 
     struct SizeLayout

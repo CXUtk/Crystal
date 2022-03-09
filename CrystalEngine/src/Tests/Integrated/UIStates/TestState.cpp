@@ -144,8 +144,8 @@ namespace crystal
         widget->AppendChild(m_slider);
         widget->AppendChild(uiValueLabel);
         widget->AppendChild(progressBar);
-        //widget->AppendChild(scrollBar);
-        //widget->AppendChild(scrollBarH);
+        widget->AppendChild(scrollBar);
+        widget->AppendChild(scrollBarH);
         //widget->AppendChild(uilist);
 
         AppendElement(widget);

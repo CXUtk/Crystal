@@ -31,6 +31,24 @@ namespace crystal
         m_pivot = pivot;
     }
 
+    void UIElement::SetAnchorPoint(Vector2f anchorPoint)
+    {
+        if (m_anchorPoint != anchorPoint)
+        {
+            m_isStateDirty = true;
+        }
+        m_anchorPoint = anchorPoint;
+    }
+
+    void UIElement::SetSize(SizeLayout size)
+    {
+        if (size.Width != m_size.Width || size.Height != m_size.Height)
+        {
+            m_isStateDirty = true;
+        }
+        m_size = size;
+    }
+
     void UIElement::Update(const GameTimer& gameTimer)
     {
         UpdateSelf(gameTimer);

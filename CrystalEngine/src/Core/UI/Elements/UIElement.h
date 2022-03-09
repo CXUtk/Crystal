@@ -74,10 +74,10 @@ namespace crystal
         void SetPosition(Vector2f pos);
 
         Vector2f GetAnchorPoint() const { return m_anchorPoint; }
-        void SetAnchorPoint(Vector2f anchorPoint) { m_anchorPoint = anchorPoint; }
+        void SetAnchorPoint(Vector2f anchorPoint);
 
         SizeLayout GetSize() const { return m_size; }
-        void SetSize(SizeLayout size) { m_size = size; }
+        void SetSize(SizeLayout size);
 
         int GetWidth() const;
         int GetHeight() const;
