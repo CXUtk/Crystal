@@ -99,24 +99,54 @@ namespace crystal
 
     void UIListView::UpdateChildren(const GameTimer& gameTimer)
     {
-        for (auto& child : m_pChildren)
+        int topIndex = 0;
+        int botIndex = m_pChildren.size() - 1;
+
+        for (int i = topIndex; i <= botIndex; i++)
         {
-            if (!child->IsActive() || !child->IsVisible()) continue;
-            auto pos = child->GetPosition();
-            auto height = child->GetHeight();
-            if (pos.y - height > 0 || pos.y < -GetHeight()) continue;
+            auto& child = m_pChildren[i];
             child->Update(gameTimer);
         }
     }
 
     void UIListView::DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        for (auto& child : m_pChildren)
+        int topIndex = m_pChildren.size() - 1;
+        int botIndex = 0;
+        int L = 0, R = m_pChildren.size() - 1;
+        while (L <= R)
         {
-            if (!child->IsActive() || !child->IsVisible()) continue;
-            auto pos = child->GetPosition();
-            auto height = child->GetHeight();
-            if (pos.y - height > 0 || pos.y < -GetHeight()) continue;
+            int mid = (L + R) / 2;
+            auto& midElement = m_pChildren[mid];
+            if (midElement->GetPosition().y - midElement->GetHeight() <= 0)
+            {
+                topIndex = mid;
+                R = mid - 1;
+            }
+            else
+            {
+                L = mid + 1;
+            }
+        }
+        L = 0, R = m_pChildren.size() - 1;
+        while (L <= R)
+        {
+            int mid = (L + R) / 2;
+            auto& midElement = m_pChildren[mid];
+            if (midElement->GetPosition().y >= -GetHeight())
+            {
+                botIndex = mid;
+                L = mid + 1;
+            }
+            else
+            {
+                R = mid - 1;
+            }
+        }
+
+        for (int i = topIndex; i <= botIndex; i++)
+        {
+            auto& child = m_pChildren[i];
             child->Draw(payload, gameTimer);
         }
     }

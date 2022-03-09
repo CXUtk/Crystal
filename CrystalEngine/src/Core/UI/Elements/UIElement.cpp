@@ -123,7 +123,7 @@ namespace crystal
         // Becuase the overflowed child also respond to event
         for (auto& child : m_pChildren)
         {
-            if (child->CanResponseEvent() && child->GetOverflowStyle() == OverflowStyle::Overflow)
+            if (child->CanResponseEvent() && m_overflowStyle == OverflowStyle::Overflow)
             {
                 m_calculatedOuterBound = m_calculatedOuterBound.Union(child->m_calculatedOuterBound);
             }

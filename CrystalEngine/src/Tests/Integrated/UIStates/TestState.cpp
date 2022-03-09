@@ -128,25 +128,25 @@ namespace crystal
         uilist->SetPosition(Vector2f(0.f, 0.f));
         uilist->SetSize(SizeLayout(200, 200));
 
-        //for (int i = 0; i < 111; i++)
-        //{
-        //    auto text = std::make_shared<UILabel>();
-        //    text->SetPivot(Vector2f(0.5f));
-        //    text->SetAnchorPoint(Vector2f(0.5f));
-        //    text->SetPosition(Vector2f(0.f, 0.f));
-        //    text->SetSize(SizeLayout(200, 200));
-        //    text->SetText("ItemXXXX");
+        for (int i = 0; i < 111111; i++)
+        {
+            auto text = std::make_shared<UILabel>();
+            text->SetPivot(Vector2f(0.5f));
+            text->SetAnchorPoint(Vector2f(0.5f));
+            text->SetPosition(Vector2f(0.f, 0.f));
+            text->SetSize(SizeLayout(200, 200));
+            text->SetText("ItemXXXX");
 
-        //    uilist->Add(text);
-        //}
+            uilist->Add(text);
+        }
 
-        widget->AppendChild(button);
-        widget->AppendChild(m_slider);
-        widget->AppendChild(uiValueLabel);
-        widget->AppendChild(progressBar);
-        widget->AppendChild(scrollBar);
-        widget->AppendChild(scrollBarH);
-        //widget->AppendChild(uilist);
+        //widget->AppendChild(button);
+        //widget->AppendChild(m_slider);
+        //widget->AppendChild(uiValueLabel);
+        //widget->AppendChild(progressBar);
+        //widget->AppendChild(scrollBar);
+        //widget->AppendChild(scrollBarH);
+        widget->AppendChild(uilist);
 
         AppendElement(widget);
     }

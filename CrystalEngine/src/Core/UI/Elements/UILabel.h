@@ -40,7 +40,6 @@ namespace crystal
         }
 
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
-        virtual void RecalculateSelf() override;
 
     protected:
         Color4f             m_textColor{};
@@ -53,5 +52,6 @@ namespace crystal
         std::shared_ptr<Font>   m_pFont = nullptr;
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
+        virtual void RecalculateSelf() override;
     };
 }

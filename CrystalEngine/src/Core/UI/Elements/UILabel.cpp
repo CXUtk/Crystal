@@ -22,18 +22,8 @@ namespace crystal
     {
         if (m_shouldRecalculateText)
         {
-            Recalculate();
+            RecalculateSelf();
         }
-    }
-
-    void UILabel::RecalculateSelf()
-    {
-        auto metric = m_pFont->MeasureString(m_text);
-        auto height = metric.yMax - metric.yMin;
-        m_size = SizeLayout(metric.Width, 0, height, 0);
-        m_originOffset = Vector2f(0.f, -metric.yMin);
-
-        m_shouldRecalculateText = false;
     }
 
     void UILabel::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
@@ -41,5 +31,15 @@ namespace crystal
         auto spriteBatch = payload.SpriteBatch;
         spriteBatch->DrawString(m_pFont, m_text, m_calculatedInnerBound.GetMinPos() + m_originOffset,
             Color4f(1.f));
+    }
+
+    void UILabel::RecalculateSelf()
+    {
+        auto metric = m_pFont->MeasureString(m_text);
+        auto height = metric.yMax - metric.yMin;
+        SetSize(SizeLayout(metric.Width, 0, height, 0));
+        m_originOffset = Vector2f(0.f, -metric.yMin);
+
+        m_shouldRecalculateText = false;
     }
 }
