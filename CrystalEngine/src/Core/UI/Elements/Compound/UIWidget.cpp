@@ -81,12 +81,13 @@ namespace crystal
 
     void UIWidget::UpdateSelf(const GameTimer& gameTimer)
     {
+        auto mousePos = m_gameWindow->GetMousePos();
         if (m_isDragging)
         {
-            UpdateDragPos();
+            UpdateDragPos(mousePos);
             Recalculate();
         }
-        m_lastMousePos = m_gameWindow->GetMousePos();
+        m_lastMousePos = mousePos;
     }
 
     void UIWidget::MouseJustPressed(UIMouseButtonEventArgs args)
@@ -110,9 +111,8 @@ namespace crystal
     {
     }
 
-    void UIWidget::UpdateDragPos()
+    void UIWidget::UpdateDragPos(Point2i mousePos)
     {
-        auto mousePos = m_gameWindow->GetMousePos();
         auto offset = mousePos - m_lastMousePos;
 
         auto screenPos = GetLocalPositionToScreenPos(m_position);

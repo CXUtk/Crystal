@@ -55,17 +55,6 @@ namespace crystal
 
     void UIList::UpdateSelf(const GameTimer& gameTimer)
     {
-        m_itemsSize = Vector2i(0);
-        
-        for (auto& item : m_items)
-        {
-            if (!item->IsActive()) continue;
-            auto itemSize = item->GetInnerBound().GetSize();
-            item->SetPosition(Vector2f(0.f, -m_itemsSize.y));
-            m_itemsSize.y += itemSize.y;
-            m_itemsSize.y += INNER_ITEM_PADDING;
-            m_itemsSize.x = std::max(m_itemsSize.x, (int)itemSize.x);
-        }
         auto innerBound = m_listView->GetInnerBound();
         int height = innerBound.GetSize().y;
         if (m_itemsSize.y == 0)
@@ -78,15 +67,17 @@ namespace crystal
         }
 
         double offsetY = std::max(0.0, m_scrollBarV->GetValue() * (m_itemsSize.y - height));
-        //float posY = 0.f;
-        //m_listView->RemoveAllChildren();
 
+        m_itemsSize = Vector2f(0.f);
         for (auto& item : m_items)
         {
             if (!item->IsActive()) continue;
-            item->SetPosition(item->GetPosition() + Vector2f(0, offsetY));
+            auto itemSize = item->GetInnerBound().GetSize();
+            item->SetPosition(Vector2f(0.f, -m_itemsSize.y + offsetY));
+            m_itemsSize.y += itemSize.y;
+            m_itemsSize.y += INNER_ITEM_PADDING;
+            m_itemsSize.x = std::max(m_itemsSize.x, (int)itemSize.x);
         }
-
     }
 
     UIListView::UIListView()

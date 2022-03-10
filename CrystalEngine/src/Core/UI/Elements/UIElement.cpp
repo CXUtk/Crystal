@@ -52,6 +52,14 @@ namespace crystal
     void UIElement::Update(const GameTimer& gameTimer)
     {
         UpdateSelf(gameTimer);
+
+
+        UIUpdateEventArgs args = {};
+        args.Element = this;
+        args.TimeStamp = gameTimer.GetCurrentTime();
+        args.GameTimer = &gameTimer;
+        m_eventPostUpdate.Invoke(args);
+
         UpdateChildren(gameTimer);
     }
 
@@ -66,6 +74,13 @@ namespace crystal
         if (m_isVisible)
         {
             DrawSelf(payload, gameTimer);
+
+            UIDrawEventArgs args = {};
+            args.Element = this;
+            args.TimeStamp = gameTimer.GetCurrentTime();
+            args.GameTimer = &gameTimer;
+            args.Payload = &payload;
+            m_eventPostDraw.Invoke(args);
         }
         if constexpr (EnableDebugDraw)
         {

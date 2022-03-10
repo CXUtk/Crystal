@@ -103,6 +103,8 @@ namespace crystal
         UIEvent<UIEventType::OnMouseEnter>          m_eventOnMouseEnter{};
         UIEvent<UIEventType::OnMouseLeave>          m_eventOnMouseLeave{};
         UIEvent<UIEventType::OnMouseScroll>         m_eventOnMouseScroll{};
+        UIEvent<UIEventType::PostUpdate>            m_eventPostUpdate{};
+        UIEvent<UIEventType::PostDraw>              m_eventPostDraw{};
 
         // Relationship
 

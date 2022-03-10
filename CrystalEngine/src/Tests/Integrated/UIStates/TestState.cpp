@@ -128,16 +128,36 @@ namespace crystal
         uilist->SetPosition(Vector2f(0.f, 0.f));
         uilist->SetSize(SizeLayout(200, 200));
 
-        for (int i = 0; i < 111111; i++)
         {
-            auto text = std::make_shared<UILabel>();
-            text->SetPivot(Vector2f(0.5f));
-            text->SetAnchorPoint(Vector2f(0.5f));
-            text->SetPosition(Vector2f(0.f, 0.f));
-            text->SetSize(SizeLayout(200, 200));
-            text->SetText("ItemXXXX");
+            auto text1 = std::make_shared<UILabel>();
+            text1->SetPivot(Vector2f(0.5f));
+            text1->SetAnchorPoint(Vector2f(0.5f));
+            text1->SetPosition(Vector2f(0.f, 0.f));
+            text1->SetSize(SizeLayout(200, 200));
+            text1->SetText("ItemXXXX");
 
-            uilist->Add(text);
+            auto text2 = std::make_shared<UILabel>();
+            text2->SetPivot(Vector2f(0.5f));
+            text2->SetAnchorPoint(Vector2f(0.5f));
+            text2->SetPosition(Vector2f(0.f, 0.f));
+            text2->SetSize(SizeLayout(200, 200));
+            text2->SetText("ItemXXXX--2");
+
+            auto button = std::make_shared<UITextButton>();
+            button->SetSize(SizeLayout(100, 32));
+            button->SetText("Button");
+
+            auto slider = std::make_shared<UIValueSlider>();
+            slider->SetSize(SizeLayout(100, 16));
+
+            auto slider1 = std::make_shared<UIValueSlider>();
+            slider1->SetSize(SizeLayout(140, 24));
+
+            uilist->Add(text1);
+            uilist->Add(text2);
+            uilist->Add(button);
+            uilist->Add(slider);
+            uilist->Add(slider1);
         }
 
         //widget->AppendChild(button);

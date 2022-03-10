@@ -20,6 +20,17 @@ namespace crystal
     };
     BIT_FLAGS_END(MouseButtonFlags);
 
+    struct UIUpdateEventArgs : public UIEventArgs
+    {
+        const GameTimer*          GameTimer;
+    };
+
+    struct UIDrawEventArgs : public UIEventArgs
+    {
+        const GameTimer*          GameTimer;
+        const RenderPayload*      Payload;
+    };
+
     struct UIMouseEventArgs : public UIEventArgs
     {
         Vector2i            MousePosScreen;
@@ -46,6 +57,8 @@ namespace crystal
     using UIMouseButtonEvent = Event<UIMouseButtonEventArgs>;
     using UIMouseEvent = Event<UIMouseEventArgs>;
     using UIMouseScrollEvent = Event<UIMouseScrollEventArgs>;
+    using UIDrawEvent = Event<UIDrawEventArgs>;
+    using UIUpdateEvent = Event<UIUpdateEventArgs>;
     template<typename T>
     using UIValueChangeEvent = Event<UIValueChangeEventArgs<T>>;
 
@@ -58,7 +71,9 @@ namespace crystal
         OnMouseEnter,
         OnMouseLeave,
         OnMouseHover,
-        OnMouseScroll
+        OnMouseScroll,
+        PostUpdate,
+        PostDraw
     };
 
     template<UIEventType E>
@@ -111,6 +126,20 @@ namespace crystal
     {
         using Func_Type = typename UIMouseScrollEvent::Func;
         using Event_Type = UIMouseScrollEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::PostUpdate>
+    {
+        using Func_Type = typename UIUpdateEvent::Func;
+        using Event_Type = UIUpdateEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::PostDraw>
+    {
+        using Func_Type = typename UIDrawEvent::Func;
+        using Event_Type = UIDrawEvent;
     };
 
     template<UIEventType E>

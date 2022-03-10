@@ -34,6 +34,6 @@ namespace crystal
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
 
     private:
-        void UpdateDragPos();
+        void UpdateDragPos(Point2i mousePos);
     };
 }
