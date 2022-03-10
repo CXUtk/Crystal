@@ -59,7 +59,10 @@ namespace crystal
             i += offset;
 
             auto& ch = GetCharacter(charCode);
-            metric.Width += ch.Advance;
+            if (i < len)
+            {
+                metric.Width += ch.Advance;
+            }
             metric.yMin = std::min(metric.yMin, ch.Bearing.y - ch.Size.y);
             metric.yMax = std::max(metric.yMax, ch.Bearing.y);
         }

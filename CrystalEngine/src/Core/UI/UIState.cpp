@@ -8,6 +8,13 @@ namespace crystal
 {
     void UIState::Activate()
     {
+        auto engine = Engine::GetInstance();
+        m_pInputController = engine->GetInputController();
+        m_pGameWindow = engine->GetWindow();
+
+        m_pGameWindow->AppendOnResizeEvent([this](Vector2i size) {
+            this->RecalculateAll();
+        });
         RecalculateAll();
     }
 
@@ -16,10 +23,6 @@ namespace crystal
 
     void UIState::Update(const GameTimer& gameTimer)
     {
-        auto engine = Engine::GetInstance();
-        m_pInputController = engine->GetInputController();
-        m_pGameWindow = engine->GetWindow();
-
         ReorderElements();
         MouseEvent(gameTimer);
 

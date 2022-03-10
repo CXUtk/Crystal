@@ -14,6 +14,7 @@ namespace crystal
         virtual void DeActivate();
         virtual void Update(const GameTimer& gameTimer);
         virtual void Draw(const RenderPayload& payload, const GameTimer& gameTimer);
+        virtual void RecalculateAll();
 
     protected:
         std::vector<std::shared_ptr<UIElement>> m_pUIElements{};
@@ -30,8 +31,6 @@ namespace crystal
         void AppendElement(std::shared_ptr<UIElement> element);
 
         virtual void ReorderElements();
-        virtual void RecalculateAll();
-
     private:
         void MouseEvent(const GameTimer& gameTimer);
         void DrawTooltip();

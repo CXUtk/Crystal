@@ -6,7 +6,7 @@
 #include <Core/Render/SpriteBatch.h>
 
 #include <Core/UI/UIStateMachine.h>
-#include "UIStates/TestState.h"
+#include "UIStates/RayTracerState.h"
 
 namespace crystal
 {
@@ -20,7 +20,7 @@ namespace crystal
     {
         auto UISM = Engine::GetInstance()->GetUIStateMachine();
 
-        UISM->AddState("test", std::make_shared<TestState>());
+        UISM->AddState("test", std::make_shared<RayTracerState>());
         UISM->SetState("test");
     }
 
