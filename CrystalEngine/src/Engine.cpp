@@ -4,9 +4,11 @@
 #include "Core/Utils/GameTimer.h"
 #include "Core/Input/InputController.h"
 #include "Core/Utils/Logger.h"
-#include "Core/Render/SpriteBatch.h"
+#include "Core/Render/RenderExports.h"
 #include "Core/Asset/AssetManager.h"
+
 #include "Platforms/PlatformFactory.h"
+#include <Core/UI/UIExports.h>
 
 namespace crystal
 {
@@ -27,6 +29,10 @@ namespace crystal
     Engine::~Engine()
     {
         m_application.reset();
+        m_pUIStateMachine.reset();
+        m_pGeometryRenderer.reset();
+        m_spriteBatch.reset();
+        m_pAssetManager.reset();
         m_inputController.reset();
         m_platformProvider.reset();
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Destruct");
@@ -61,6 +67,11 @@ namespace crystal
     {
         return ptr(m_spriteBatch);
     }
+
+    GeometryRenderer* Engine::GetGeometryRenderer() const
+    {
+        return ptr(m_pGeometryRenderer);
+    }
     
     //IGraphicsDevice* Engine::GetGraphicsDevice() const
     //{
@@ -72,21 +83,28 @@ namespace crystal
         GraphicsCommons::InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(m_initArgs);
 
-        m_pAssetManager = AssetManager::LoadAssetPackage("resources/package1/contents.json");
-        m_spriteBatch = std::make_unique<SpriteBatch>(GetGraphicsDevice(), GetGraphicsContext());
+        m_pAssetManager = std::make_shared<AssetManager>();
+        m_pAssetManager->LoadAssetPackage("resources/package1/contents.json");
+
+        auto graphicsDevice = GetGraphicsDevice();
+        auto graphicsContext = GetGraphicsContext();
+
+        m_spriteBatch = std::make_unique<SpriteBatch>(graphicsDevice, graphicsContext);
+        m_pGeometryRenderer = std::make_unique<GeometryRenderer>(graphicsDevice, graphicsContext);
+        m_pUIStateMachine = std::make_unique<UIStateMachine>();
+
+        m_inputController = std::make_unique<InputController>(m_platformProvider->GetGameWindow());
     }
 
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
         m_Initialize();
 
+        auto window = m_platformProvider->GetGameWindow();
         m_application = std::move(application);
         m_application->SetEngine(this);
 
         m_application->Initialize();
-
-        auto window = this->GetWindow();
-        m_inputController = std::make_unique<InputController>(window);
 
         m_gameTimer.Start();
         double frameBeginTime = 0.0;
@@ -123,8 +141,18 @@ namespace crystal
         m_application->Exit();
     }
 
+    double Engine::GetCurrentTime() const
+    {
+        return m_gameTimer.GetCurrentTime();
+    }
+
     GraphicsAPIType crystal::Engine::GetGraphicsAPIType() const
     {
         return m_platformProvider->GetGraphicsAPIType();
+    }
+
+    UIStateMachine* Engine::GetUIStateMachine() const
+    {
+        return ptr(m_pUIStateMachine);
     }
 }

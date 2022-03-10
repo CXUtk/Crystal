@@ -1,6 +1,16 @@
 {
-  "shaders": [
-    "shaders/sprite.json",
-    "shaders/grayscale.json"
-  ]
+    "shaders": [
+        "shaders/sprite.json",
+        "shaders/geometry.json",
+        "shaders/model.json",
+        "shaders/grayscale.json"
+    ],
+    "textures": [
+        "textures/box.json",
+        "textures/boxBlack.json",
+        "textures/boxNoB.json",
+        "textures/Cross.json",
+        "textures/Panel.json",
+        "textures/Frame.json"
+    ]
 }

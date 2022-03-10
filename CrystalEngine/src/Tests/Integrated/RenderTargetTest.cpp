@@ -1,4 +1,4 @@
-#include "RenderTargetTest.h"
+﻿#include "RenderTargetTest.h"
 #include <Engine.h>
 #include <Interfaces/Interfaces.h>
 #include <Core/Utils/Logger.h>
@@ -8,6 +8,7 @@
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
+#include <Core/Asset/AssetManager.h>
 
 namespace crystal
 {
@@ -36,6 +37,7 @@ namespace crystal
 
 		auto window = m_engine->GetWindow();
 		auto windowSize = window->GetWindowSize();
+        auto assetManager = m_engine->GetAssetManager();
 		m_pCamera = std::make_shared<Camera>(1.0f, windowSize.x / windowSize.y, 0.5f, 100.f);
 		//Vertex vertices[] =
 		//{
@@ -75,8 +77,8 @@ namespace crystal
 		indices = loader.Triangles.size() * 3;
 		vertexBuffer->BindVertexLayout(vLayout);
 
-		//m_pShader = graphicsDevice->CreateShaderProgramFromFile("resources/model.json");
-		//m_pScreenShader = graphicsDevice->CreateShaderProgramFromFile("resources/grayscale.json");
+        m_pShader = assetManager->LoadAsset<IShaderProgram>("package1:Model");
+		m_pScreenShader = assetManager->LoadAsset<IShaderProgram>("package1:GrayScale");
 
 		Texture2DDescription texturedesc;
 		texturedesc.Format = RenderFormat::RGBA8ub;
@@ -135,29 +137,17 @@ namespace crystal
 		m_PROScreen->SetShaderProgram(m_pScreenShader);
 		m_PROScreen->SetShaderResource(m_renderTarget2D, 0);
 		m_PROScreen->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
-		//indexBuffer->Bind(0);
+        m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
 
+        auto BS = graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque);
+        auto RS = graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone);
+        m_PSO->SetBlendState(BS);
+        m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
+        m_PSO->SetRasterState(RS);
 
-		DepthStencilStateDescription DSSDesc = {};
-		DSSDesc.EnableDepthTest = true;
-		DSSDesc.EnableStencilTest = false;
-		auto defaultDepth = graphicsDevice->CreateDepthStencilState(DSSDesc);
-		DSSDesc.EnableDepthTest = false;
-		auto noDepth = graphicsDevice->CreateDepthStencilState(DSSDesc);
-
-
-		RasterStateDescription RSDesc = {};
-		RSDesc.CullMode = CullingMode::None;
-		RSDesc.FillMode = FillMode::SOLID;
-		RSDesc.Viewport = nullptr;
-		auto defaultRaster = graphicsDevice->CreateRasterState(RSDesc);
-		m_PSO->SetRasterState(defaultRaster);
-		m_PSO->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
-		m_PSO->SetDepthStencilState(defaultDepth);
-
-		m_PSOScreen->SetRasterState(defaultRaster);
-		m_PSOScreen->SetBlendState(graphicsDevice->GetCommonBlendState(BlendStates::Opaque));
-		m_PSOScreen->SetDepthStencilState(noDepth);
+        m_PSOScreen->SetBlendState(BS);
+		m_PSOScreen->SetRasterState(RS);
+		m_PSOScreen->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest));
 	}
 
 
@@ -202,55 +192,49 @@ namespace crystal
 		m_pCamera->SetAspectRatio(static_cast<crystal::Float>(windowSize.x) / windowSize.y);
 	}
 
-	void RenderTargetTest::Draw(const crystal::GameTimer& gameTimer)
-	{
-		auto windowSize = m_engine->GetWindow()->GetWindowSize();
-		auto graphicsContext = m_engine->GetGraphicsContext();
+    void RenderTargetTest::Draw(const crystal::GameTimer& gameTimer)
+    {
+        auto windowSize = m_engine->GetWindow()->GetWindowSize();
+        auto graphicsContext = m_engine->GetGraphicsContext();
 
-		graphicsContext->PushRenderTarget2D(m_renderTarget2D);
-		{
-			graphicsContext->Clear(
-				crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
-				| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
-				| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
-				crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-			//m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
-			//m_pShader->SetUniform1f("uBase", 1.0f);
-			m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
-			m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
-			auto P = m_pCamera->GetProjectionMatrix();
-			auto V = m_pCamera->GetViewMatrix();
-			m_pShader->SetUniformMat4f("VP", P * V);
+        graphicsContext->PushRenderTarget2D(m_renderTarget2D);
+        {
+            graphicsContext->Clear(
+                crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+                | crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+                | crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
+                crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
+            //m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
+            //m_pShader->SetUniform1f("uBase", 1.0f);
+            m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
+            m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
+            auto P = m_pCamera->GetProjectionMatrix();
+            auto V = m_pCamera->GetViewMatrix();
+            m_pShader->SetUniformMat4f("VP", P * V);
 
-			//graphicsDevice->SetPipelineStateObject(m_PSO);
-			graphicsContext->BeginPipeline(m_PSO);
-			{
-				graphicsContext->LoadPipelineResources(m_PRO);
-				{
-					graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
-				}
-				graphicsContext->UnloadPipelineResources();
-			}
-			graphicsContext->EndPipeline();
-		}
-		graphicsContext->PopRenderTarget2D();
+            //graphicsDevice->SetPipelineStateObject(m_PSO);
+            graphicsContext->LoadPipelineState(m_PSO);
+            graphicsContext->LoadPipelineResources(m_PRO);
+            {
+                graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, indices);
+            }
+            graphicsContext->UnloadPipelineResources();
+        }
+        graphicsContext->PopRenderTarget2D();
 
-		graphicsContext->Clear(
-			crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
-			| crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
-			| crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
-			crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
-		//graphicsDevice->SetPipelineStateObject(m_PSOScreen);
-		graphicsContext->BeginPipeline(m_PSOScreen);
-		{
-			graphicsContext->LoadPipelineResources(m_PROScreen);
-			{
-				graphicsContext->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
-			}
-			graphicsContext->UnloadPipelineResources();
-		}
-		graphicsContext->EndPipeline();
-	}
+        graphicsContext->Clear(
+            crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
+            | crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
+            | crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
+            crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
+        //graphicsDevice->SetPipelineStateObject(m_PSOScreen);
+        graphicsContext->LoadPipelineState(m_PSOScreen);
+        graphicsContext->LoadPipelineResources(m_PROScreen);
+        {
+            graphicsContext->DrawIndexedPrimitives(PrimitiveType::TRIANGLE_LIST, 6, 0, 0);
+        }
+        graphicsContext->UnloadPipelineResources();
+    }
 
 	void RenderTargetTest::Exit()
 	{

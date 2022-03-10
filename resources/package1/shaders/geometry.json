@@ -1,0 +1,14 @@
+{
+    "name": "Geometry",
+    "dx11Src": "geometry.hlsl",
+    "openGLVSSrc": "geometry.vert",
+    "openGLFSSrc": "geometry.frag",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "MVP",
+            "type": "mat4"
+        }
+    ]
+}

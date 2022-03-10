@@ -14,7 +14,6 @@ namespace crystal
 		virtual void GetShaderResourceHandle(void* pHandle) const override;
 	private:
 		DX11GraphicsDevice*					m_pGraphicsDevice = nullptr;
-		ComPtr<ID3D11Texture2D>				m_texture2D = nullptr;
 		ComPtr<ID3D11ShaderResourceView>	m_pSRV = nullptr;
 		Vector2i							m_size{};
 	};

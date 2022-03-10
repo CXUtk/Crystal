@@ -13,6 +13,10 @@ namespace crystal
 		virtual void SetDepthStencilState(std::shared_ptr<IDepthStencilState> depthStencilState) override;
 		virtual void SetBlendState(std::shared_ptr<IBlendState> blendState) override;
 
+        virtual std::shared_ptr<IRasterState> GetRasterState() override;
+        virtual std::shared_ptr<IDepthStencilState> GetDepthStencilState() override;
+        virtual std::shared_ptr<IBlendState> GetBlendState() override;
+
 		void Load();
 		void Unload();
 	private:

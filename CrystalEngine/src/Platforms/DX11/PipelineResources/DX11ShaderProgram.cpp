@@ -1,4 +1,4 @@
-﻿#include "DX11ShaderProgram.h"
+#include "DX11ShaderProgram.h"
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
 
@@ -38,7 +38,8 @@ namespace crystal
 	}
 
 	DX11ShaderProgram::~DX11ShaderProgram()
-	{}
+	{
+    }
 
 	//void DX11ShaderProgram::SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer)
 	//{

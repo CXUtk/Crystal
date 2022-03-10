@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "../DX11Common.h"
 #include <map>
 
@@ -9,7 +9,7 @@ namespace crystal
 	public:
 		DX11ShaderProgram(DX11GraphicsDevice* graphicsDevice, std::shared_ptr<IVertexShader> vertexShader,
 			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& uniforms);
-		~DX11ShaderProgram();
+		~DX11ShaderProgram() override;
 
 		//void SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer);
 

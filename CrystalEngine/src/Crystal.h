@@ -22,7 +22,11 @@ namespace crystal
 	class Application;
 	class GameTimer;
 	class InputController;
-	class SpriteBatch;
+
+    class SpriteBatch;
+    class GeometryRenderer;
+    class UIStateMachine;
+
 	class AssetManager;
 
 	// Data
@@ -93,4 +97,24 @@ namespace crystal
 	*/
 	template<typename T>
 	inline const T* cptr(const std::unique_ptr<T>& ptr) { return static_cast<const T*>(ptr.get()); }
+
+#define BIT_FLAGS_BEGIN(name, type) namespace Crystal_##name\
+    {\
+        enum Flags : type\
+
+#define BIT_FLAGS_END(name) inline constexpr Flags operator|(Flags a, Flags b)\
+    {\
+        return static_cast<Flags>(static_cast<int>(a) | static_cast<int>(b));\
+    }\
+    inline constexpr Flags operator&(Flags a, Flags b)\
+    {\
+        return static_cast<Flags>(static_cast<int>(a) & static_cast<int>(b));\
+    }\
+    inline constexpr Flags operator^(Flags a, Flags b)\
+    {\
+        return static_cast<Flags>(static_cast<int>(a) ^ static_cast<int>(b));\
+    }\
+};\
+    using name = Crystal_##name::Flags
+
 }

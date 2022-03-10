@@ -21,7 +21,7 @@ namespace crystal
 		virtual void PollEvents() override;
 
 
-		Vector2i GetMousePos() const override { return m_mousePos; }
+        Vector2i GetMousePos() const override;
 		Vector2i GetWindowSize() const override { return m_windowSize; }
 		bool IsPaused() const override { return m_AppPaused; }
 

@@ -24,7 +24,7 @@ if (CRYSTAL_USE_DX11)
 endif()
 
 
-# 将源代码添加到此项目的可执行文件。
+# 陆芦脭麓麓煤脗毛脤铆录脫碌陆麓脣脧卯脛驴碌脛驴脡脰麓脨脨脦脛录镁隆拢
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
 ${CrystalEngineSources_Core}
@@ -38,13 +38,13 @@ set_target_properties(CrystalEngine PROPERTIES
             CXX_EXTENSIONS OFF)
 
 
-# 调整GLFW的Flags，关掉无用的编译组件
+# 碌梅脮没GLFW碌脛Flags拢卢鹿脴碌么脦脼脫脙碌脛卤脿脪毛脳茅录镁
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 
-# 操作系统和图形接口判定
+# 虏脵脳梅脧碌脥鲁潞脥脥录脨脦陆脫驴脷脜脨露篓
 
 if (CRYSTAL_USE_OPENGL)
     if (UNIX)
@@ -52,15 +52,15 @@ if (CRYSTAL_USE_OPENGL)
         if (glfw3_FOUND)
             target_link_libraries(CrystalEngine PRIVATE glfw)
         else()
-            add_subdirectory("../external/GLFW")
+            add_subdirectory("../external/includes/GLFW")
             target_link_libraries(CrystalEngine PRIVATE glfw)
         endif()
         target_link_libraries (CrystalEngine PRIVATE dl X11 pthread)
     else()
-        add_subdirectory("../external/GLFW")
+        add_subdirectory("../external/includes/GLFW")
         target_link_libraries(CrystalEngine PRIVATE glfw)
     endif()
-    add_subdirectory("../external/glad")
+    add_subdirectory("../external/includes/glad")
 
     find_package(OpenGL REQUIRED)
     target_link_libraries(CrystalEngine PRIVATE OpenGL::GL)
@@ -71,5 +71,8 @@ if (CRYSTAL_USE_DX11)
     target_link_libraries(CrystalEngine PRIVATE d3d11.lib dxgi.lib dxguid.lib D3DCompiler.lib d2d1.lib dwrite.lib winmm.lib)
 endif()
 
-target_include_directories(CrystalEngine SYSTEM PUBLIC "../external")
+#target_link_directories(CrystalEngine PRIVATE "${PROJECT_SOURCE_DIR}/external/libs/freetype")
+target_link_libraries(CrystalEngine PRIVATE "${PROJECT_SOURCE_DIR}/external/libs/freetype/freetype.lib")
+
+target_include_directories(CrystalEngine SYSTEM PUBLIC "../external/includes")
 target_include_directories(CrystalEngine SYSTEM PUBLIC ".")

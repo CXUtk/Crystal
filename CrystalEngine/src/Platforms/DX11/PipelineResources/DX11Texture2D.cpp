@@ -48,9 +48,12 @@ namespace crystal
 	}
 
 	DX11Texture2D::DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
+        : m_pGraphicsDevice(graphicsDevice)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+        textureDesc.Width = texDesc.Size.x;
+        textureDesc.Height = texDesc.Size.y;
 		textureDesc.MipLevels = texDesc.MipmapLevels;
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DX11Common::RenderFormatConvert(texDesc.Format, true);
@@ -72,12 +75,24 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
-		DirectX::CreateWICTextureFromMemoryEx(graphicsDevice->GetD3DDevice(), src, size, 0, textureDesc.Usage, textureDesc.BindFlags,
-			textureDesc.CPUAccessFlags, textureDesc.MiscFlags, 0, nullptr, m_pSRV.GetAddressOf());
+        ComPtr<ID3D11Texture2D> pTexture2D = nullptr;
+        auto device = m_pGraphicsDevice->GetD3DDevice();
+
+        D3D11_SUBRESOURCE_DATA sData = {};
+        sData.pSysMem = src;
+        sData.SysMemPitch = texDesc.Size.x * DX11Common::RenderFormatToBytes(texDesc.Format);
+
+        HR(device->CreateTexture2D(&textureDesc, &sData, pTexture2D.GetAddressOf()));
+
+        HR(device->CreateShaderResourceView(pTexture2D.Get(), nullptr, m_pSRV.GetAddressOf()));
+
+        m_size.x = textureDesc.Width;
+        m_size.y = textureDesc.Height;
 	}
 
 	DX11Texture2D::~DX11Texture2D()
-	{}
+	{
+    }
 
 	void DX11Texture2D::GetShaderResourceHandle(void* pHandle) const
 	{

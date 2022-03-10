@@ -137,13 +137,34 @@ namespace crystal
             return area;
         }
 
+        bool Contains(const Vec& point) const
+        {
+            for (int i = 0; i < L; i++)
+            {
+                if (point[i] < _minPos[i] || point[i] > _maxPos[i]) return false;
+            }
+            return true;
+        }
+
     private:
         Vec _minPos, _maxPos;
     };
+
+    template<typename T, glm::length_t L, glm::qualifier Q>
+    inline BoundingBox<L, T, Q> operator+(const glm::vec<L, T, Q>& v, const BoundingBox<L, T, Q>& bbox)
+    {
+        return BoundingBox<L, T, Q>(v + bbox.GetMinPos(), v + bbox.GetMaxPos());
+    }
 
     template<glm::length_t L, typename T, glm::qualifier Q>
     inline BoundingBox<L, T, Q> CreateBBoxFromRect(const glm::vec<L, T, Q>& botLeft, const glm::vec<L, T, Q>& size)
     {
         return BoundingBox<L, T, Q>(botLeft, botLeft + size);
+    }
+
+    template<typename T1, typename T2, glm::length_t L, glm::qualifier Q>
+    inline BoundingBox<L, T1, Q> BoundingBoxConvert(const BoundingBox<L, T2, Q>& bbox)
+    {
+        return BoundingBox<L, T1, Q>(BoundingBox<L, T1, Q>::Vec(bbox.GetMinPos()), BoundingBox<L, T1, Q>::Vec(bbox.GetMaxPos()));
     }
 }

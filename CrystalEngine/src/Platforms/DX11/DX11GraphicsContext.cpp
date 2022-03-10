@@ -1,4 +1,4 @@
-#include "DX11GraphicsContext.h"
+Ôªø#include "DX11GraphicsContext.h"
 #include "DX11GraphicsDevice.h"
 #include "DX11PipelineResourceObject.h"
 #include "DX11PipelineStateObject.h"
@@ -14,13 +14,13 @@ namespace crystal
 {
 	DX11GraphicsContext::DX11GraphicsContext(DX11GraphicsDevice* graphicsDevice, Win32GameWindow* window,
 		ComPtr<ID3D11DeviceContext> context, const InitArgs& args)
-		: m_pGraphicsDevice(graphicsDevice), m_pWindow(window), m_pd3dImmediateContext(context)
+		: m_pd3dGraphicsDevice(graphicsDevice->GetD3DDevice()), m_pWindow(window), m_pd3dImmediateContext(context)
 	{
 		m_renderTargets.push_back(nullptr);
 		m_CreateSwapChainAndLink(args);
-		m_ResizeBuffer();
-		m_pWindow->AppendOnResizeEvent([this](Vector2i size) {
-			m_ResizeBuffer();
+		m_ResizeBuffer(graphicsDevice);
+		m_pWindow->AppendOnResizeEvent([this, graphicsDevice](Vector2i size) {
+			m_ResizeBuffer(graphicsDevice);
 		});
 
 	}
@@ -58,12 +58,13 @@ namespace crystal
 		m_pd3dImmediateContext->DrawIndexed(numIndices, indexOffset, vertexOffset);
 	}
 
-	void DX11GraphicsContext::m_ResizeBuffer()
+	void DX11GraphicsContext::m_ResizeBuffer(DX11GraphicsDevice* graphicsDevice)
 	{
-		auto dx11GraphicsDevice = m_pGraphicsDevice->GetD3DDevice();
 		assert(m_pd3dImmediateContext);
-		assert(dx11GraphicsDevice);
+		assert(m_pd3dGraphicsDevice);
 		assert(m_pSwapChain);
+
+        m_renderTargets[0].reset();
 
 		// Resize the buffer if window size was changed
 		auto newWindowSize = m_pWindow->GetWindowSize();
@@ -79,7 +80,7 @@ namespace crystal
 			ComPtr<ID3D11Texture2D> backBuffer;
 
 			m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
-			dx11GraphicsDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
+            m_pd3dGraphicsDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
 
 			// Set DEBUG name
 			d3dUtils::D3D11SetDebugObjectName(backBuffer.Get(), "BackBuffer[0]");
@@ -112,8 +113,8 @@ namespace crystal
 		// Create DepthStencil buffer and view
 		ComPtr<ID3D11Texture2D>	depthStencilBuffer;
 		ComPtr<ID3D11DepthStencilView> depthStencilView;
-		HR(dx11GraphicsDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencilBuffer.GetAddressOf()));
-		HR(dx11GraphicsDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.ReleaseAndGetAddressOf()));
+		HR(m_pd3dGraphicsDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencilBuffer.GetAddressOf()));
+		HR(m_pd3dGraphicsDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.ReleaseAndGetAddressOf()));
 
 		// Combine render targets and the depth stencil buffer to the pipeline
 		m_pd3dImmediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
@@ -134,16 +135,15 @@ namespace crystal
 		d3dUtils::D3D11SetDebugObjectName(depthStencilView.Get(), "DepthStencilView");
 		d3dUtils::D3D11SetDebugObjectName(renderTargetView.Get(), "BackBufferRTV[0]");
 
-		m_renderTargets[0].reset();
-		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(m_pGraphicsDevice, renderTargetView,
+		m_renderTargets[0] = std::make_shared<DX11RenderTarget2D>(graphicsDevice, renderTargetView,
 			nullptr, depthStencilView, screenViewport);
 	}
 
 	void DX11GraphicsContext::m_CreateSwapChainAndLink(const InitArgs& args)
 	{
-		auto dx11GraphicsDevice = m_pGraphicsDevice->GetD3DDevice();
+        auto dx11GraphicsDevice = m_pd3dGraphicsDevice.Get();
 
-		// ºÏ≤‚ MSAA÷ß≥÷µƒ÷ ¡øµ»º∂
+		// Ê£ÄÊµã MSAAÊîØÊåÅÁöÑË¥®ÈáèÁ≠âÁ∫ß
 		dx11GraphicsDevice->CheckMultisampleQualityLevels(
 			DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_MSAAQuality);
 		assert(m_MSAAQuality > 0);
@@ -169,7 +169,7 @@ namespace crystal
 		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-		//  «∑Òø™∆Ù4±∂∂‡÷ÿ≤…—˘£ø
+		// ÊòØÂê¶ÂºÄÂêØ4ÂÄçÂ§öÈáçÈááÊ†∑Ôºü
 		if (args.Enable4xMSAA)
 		{
 			sd.SampleDesc.Count = 4;
@@ -192,7 +192,7 @@ namespace crystal
 
 		dxgiFactory->MakeWindowAssociation(m_pWindow->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
 
-		// …Ë÷√µ˜ ‘∂‘œÛ√˚
+		// ËÆæÁΩÆË∞ÉËØïÂØπË±°Âêç
 		d3dUtils::D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");
 		d3dUtils::DXGISetDebugObjectName(m_pSwapChain.Get(), "SwapChain");
 	}
@@ -203,24 +203,10 @@ namespace crystal
 			options, color, depth, stencil);
 	}
 
-	void DX11GraphicsContext::BeginPipeline(std::shared_ptr<IPipelineStateObject> pipelineState)
+	void DX11GraphicsContext::LoadPipelineState(std::shared_ptr<IPipelineStateObject> pipelineState)
 	{
-		if (m_pCurrentPipelineState)
-		{
-			throw std::logic_error("Cannot begin a pipeline when a pipeline already started");
-		}
 		m_pCurrentPipelineState = std::dynamic_pointer_cast<DX11PipelineStateObject>(pipelineState);
 		m_pCurrentPipelineState->Load();
-	}
-
-	void DX11GraphicsContext::EndPipeline()
-	{
-		if (!m_pCurrentPipelineState)
-		{
-			throw std::logic_error("Cannot end a pipeline when there is no pipeline process");
-		}
-		m_pCurrentPipelineState->Unload();
-		m_pCurrentPipelineState.reset();
 	}
 
 	void DX11GraphicsContext::LoadPipelineResources(std::shared_ptr<IPipelineResourceObject> pipelineResource)
@@ -261,6 +247,23 @@ namespace crystal
 		m_renderTargets.back()->SetViewportToCurrentContext(this);
 		m_renderTargets.back()->SetToCurrentContext(this);
 	}
+
+    void DX11GraphicsContext::SetViewPort(const Viewport& viewport)
+    {
+        D3D11_VIEWPORT rsViewPort = {};
+
+        auto minPos = viewport.GetMinPos();
+        auto maxPos = viewport.GetMaxPos();
+        rsViewPort.TopLeftX = minPos.x;
+        rsViewPort.TopLeftY = minPos.y;
+        rsViewPort.Width = maxPos.x;
+        rsViewPort.TopLeftY = maxPos.y;
+        rsViewPort.MinDepth = minPos.z;
+        rsViewPort.MaxDepth = maxPos.z;
+
+        m_pd3dImmediateContext->RSSetViewports(1, &rsViewPort);
+    }
+
 	Vector2i DX11GraphicsContext::GetCurrentFrameBufferSize() const
 	{
 		return m_renderTargets.back()->GetSize();

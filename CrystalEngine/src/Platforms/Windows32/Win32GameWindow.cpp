@@ -58,6 +58,19 @@ namespace crystal
 		}
 	}
 
+    Vector2i Win32GameWindow::GetMousePos() const
+    {
+        POINT p;
+        if (GetCursorPos(&p))
+        {
+            if (ScreenToClient(m_hMainWnd, &p))
+            {
+                return Vector2i(p.x, m_windowSize.y - p.y - 1);
+            }
+        }
+        return Vector2i();
+    }
+
 	void Win32GameWindow::AppendOnResizeEvent(OnResizeEvent::Func eventHandler)
 	{
 		m_eventOnWindowResize += eventHandler;
