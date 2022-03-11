@@ -254,6 +254,24 @@ namespace crystal
         }
     }
 
+    void UIElement::OnFocused(UIEventArgs args)
+    {
+        m_eventOnFocused.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::Focus))
+        {
+            m_pParent->OnFocused(args);
+        }
+    }
+
+    void UIElement::OnUnFocused(UIEventArgs args)
+    {
+        m_eventOnUnFocused.Invoke(args);
+        if (m_pParent && (m_propagationFlags & PropagationFlags::UnFocus))
+        {
+            m_pParent->OnUnFocused(args);
+        }
+    }
+
     std::shared_ptr<UIElement> UIElement::GetChildByName(const std::string& name)
     {
         auto p = std::find_if(m_pChildren.begin(), m_pChildren.end(),

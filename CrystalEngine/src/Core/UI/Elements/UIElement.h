@@ -41,6 +41,9 @@ namespace crystal
         virtual void MouseEnter(UIMouseEventArgs args);
         virtual void MouseLeave(UIMouseEventArgs args);
         virtual void MouseScroll(UIMouseScrollEventArgs args);
+        virtual void OnFocused(UIEventArgs args);
+        virtual void OnUnFocused(UIEventArgs args);
+
 
 
         bool IsActive() const { return m_isActive; }
@@ -105,6 +108,8 @@ namespace crystal
         UIEvent<UIEventType::OnMouseScroll>         m_eventOnMouseScroll{};
         UIEvent<UIEventType::PostUpdate>            m_eventPostUpdate{};
         UIEvent<UIEventType::PostDraw>              m_eventPostDraw{};
+        UIEvent<UIEventType::OnFocused>             m_eventOnFocused{};
+        UIEvent<UIEventType::OnUnFocused>           m_eventOnUnFocused{};
 
         // Relationship
 
@@ -230,5 +235,21 @@ namespace crystal
         )
     {
         m_eventOnMouseDoubleClicked += listener;
+    }
+
+    template<>
+    inline void UIElement::AddEventListener<UIEventType::OnFocused>(
+        UIEventListener<UIEventType::OnFocused> listener
+        )
+    {
+        m_eventOnFocused += listener;
+    }
+
+    template<>
+    inline void UIElement::AddEventListener<UIEventType::OnUnFocused>(
+        UIEventListener<UIEventType::OnUnFocused> listener
+        )
+    {
+        m_eventOnUnFocused += listener;
     }
 }

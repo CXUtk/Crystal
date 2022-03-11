@@ -18,6 +18,7 @@ namespace crystal
         m_mainWindow->AddOnCloseEventListener([](UIEventArgs args) {
             args.Element->SetActive(false);
         });
+        AppendElement(m_mainWindow);
 
 
         m_body = std::make_shared<UIElement>();
@@ -68,11 +69,11 @@ namespace crystal
         m_properties->SetPosition(Vector2f(0, 0));
         layout->AppendElement(m_properties, Bound2f(Vector2f(0.7f, 0.f), Vector2f(1.f, 1.f)));
 
-        m_startRenderButton = std::make_shared<UITextButton>();
-        m_startRenderButton->SetSize(SizeLayout(72, 32));
-        m_startRenderButton->SetText("Button");
+        //m_startRenderButton = std::make_shared<UITextButton>();
+        //m_startRenderButton->SetSize(SizeLayout(72, 32));
+        //m_startRenderButton->SetText("Button");
 
-        AppendElement(m_mainWindow);
+
     }
 
     RayTracerState::~RayTracerState()

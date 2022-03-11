@@ -43,9 +43,9 @@ namespace crystal
     //    return p->second;
     //}
 
-    StringMetric Font::MeasureString(const std::string& str)
+    TextMetric Font::MeasureString(const std::string& str)
     {
-        StringMetric metric = {};
+        TextMetric metric = {};
 
         int len = str.size();
         for (int i = 0; i < len;)
@@ -56,15 +56,12 @@ namespace crystal
             {
                 throw std::exception("Font::MeasureString: Unsupported char code");
             }
-            i += offset;
-
             auto& ch = GetCharacter(charCode);
-            if (i < len)
-            {
-                metric.Width += ch.Advance;
-            }
+            metric.Width += ch.Advance;
             metric.yMin = std::min(metric.yMin, ch.Bearing.y - ch.Size.y);
             metric.yMax = std::max(metric.yMax, ch.Bearing.y);
+
+            i += offset;
         }
         return metric;
     }
@@ -85,6 +82,11 @@ namespace crystal
             res.push_back(charCode);
         }
         return res;
+    }
+
+    float Font::GetDescender() const
+    {
+        return std::floor((float)m_fontFace->descender * m_fontSize / m_fontFace->units_per_EM);
     }
 
     void Font::GenerateCharMap()
@@ -137,7 +139,6 @@ namespace crystal
              width * height * 4, texDesc);
             delete[] data;
         }
-
         Character character = {
             texture,
             Vector2i(bitmap.width, bitmap.rows),

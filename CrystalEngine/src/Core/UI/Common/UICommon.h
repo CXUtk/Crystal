@@ -73,14 +73,16 @@ namespace crystal
     BIT_FLAGS_BEGIN(PropagationFlags, uint32_t)
     {
         None = 0,
-        MouseJustDown = 1 << 0,
-        MouseJustUp = 1 << 1,
-        MouseClicked = 1 << 2,
-        MouseDoubleClicked = 1 << 3,
-        MouseEnter = 1 << 4,
-        MouseLeave = 1 << 5,
-        MouseScroll = 1 << 6,
-        All = -1
+            MouseJustDown = 1 << 0,
+            MouseJustUp = 1 << 1,
+            MouseClicked = 1 << 2,
+            MouseDoubleClicked = 1 << 3,
+            MouseEnter = 1 << 4,
+            MouseLeave = 1 << 5,
+            MouseScroll = 1 << 6,
+            Focus = 1 << 7,
+            UnFocus = 1 << 8,
+            All = -1
     };
     BIT_FLAGS_END(PropagationFlags);
 

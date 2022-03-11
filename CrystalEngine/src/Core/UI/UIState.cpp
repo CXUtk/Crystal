@@ -69,10 +69,10 @@ namespace crystal
         std::shared_ptr<UIElement> eventElement = nullptr;
 
         auto mousePos = m_pGameWindow->GetMousePos();
-        if (m_pFocusedElement)
+        if (m_pAttachedElement)
         {
             // If focused on an element then respond directly to that element
-            eventElement = m_pFocusedElement->GetResponseElement(mousePos);
+            eventElement = m_pAttachedElement->GetResponseElement(mousePos);
         }
         else
         {
@@ -98,15 +98,24 @@ namespace crystal
 
             UIMouseEventArgs mouseArgs = {};
             mouseArgs.MousePosScreen = mousePos;
-            mouseArgs.TimeStamp = gameTimer.GetPhysicalTime();
+            mouseArgs.TimeStamp = mouseButtonArgs.TimeStamp;
 
             // Mouse Just Press Events
             MouseButtonFlags mouseButtonsFlags = MouseButtonFlags::None;
             if (m_pInputController->IsMouseJustPressed(MouseButtonCode::LEFT_BUTTON))
             {
                 mouseButtonsFlags = mouseButtonsFlags | MouseButtonFlags::LeftButton;
-                m_pLastLeftMouseDownElement = eventElement;
+                m_pAttachedElement = eventElement;
+
+                UIEventArgs args = {};
+                args.Element = mouseArgs.Element;
+                args.TimeStamp = mouseArgs.TimeStamp;
+                if (m_pFocusedElement != nullptr && m_pFocusedElement != eventElement)
+                {
+                    m_pFocusedElement->OnUnFocused(args);
+                }
                 m_pFocusedElement = eventElement;
+                m_pFocusedElement->OnFocused(args);
             }
             if (m_pInputController->IsMouseJustPressed(MouseButtonCode::RIGHT_BUTTON))
             {
@@ -140,13 +149,11 @@ namespace crystal
             if (mouseButtonsFlags != MouseButtonFlags::None)
             {
                 eventElement->MouseJustReleased(mouseButtonArgs);
-                if ((mouseButtonsFlags & MouseButtonFlags::LeftButton) && m_pFocusedElement)
-                {
-                    m_pFocusedElement = nullptr;
-                }
 
                 // If up position is in the event bound, then it is a click event
-                if (m_pLastLeftMouseDownElement != nullptr && m_pLastLeftMouseDownElement == eventElement
+                if ((mouseButtonsFlags & MouseButtonFlags::LeftButton)
+                    && m_pAttachedElement != nullptr
+                    && m_pAttachedElement == eventElement
                     && eventElement->GetEventBound().Contains(mousePos))
                 {
                     if (mouseArgs.TimeStamp - m_lastLeftMouseClickTime > 0.25)
@@ -159,7 +166,11 @@ namespace crystal
                     }
                     m_lastLeftMouseClickTime = mouseArgs.TimeStamp;
                 }
-                m_pLastLeftMouseDownElement = nullptr;
+
+                if (mouseButtonsFlags & MouseButtonFlags::LeftButton)
+                {
+                    m_pAttachedElement = nullptr;
+                }
             }
 
             if (m_pPrevHoverElement != eventElement)

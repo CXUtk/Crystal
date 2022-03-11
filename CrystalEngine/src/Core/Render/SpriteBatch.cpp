@@ -259,14 +259,14 @@ namespace crystal
         for (auto c : codes)
         {
             auto& character = font->GetCharacter(c);
-            if (!character.Texture2D) continue;
-
-            auto texScale = Vector2f(character.Size);
-            auto minPos = origin + Vector2f(character.Bearing.x, character.Bearing.y - texScale.y);
-            auto maxPos = minPos + texScale;
-
-            m_pImpl->Draw(character.Texture2D, Bound2f(minPos, maxPos), nullptr, color,
-                Vector2f(0.f), 0.f, SpriteEffect::None, 0.f);
+            if (character.Texture2D)
+            {
+                auto texSize = Vector2f(character.Size);
+                auto minPos = origin + Vector2f(character.Bearing.x, character.Bearing.y - texSize.y);
+                auto maxPos = minPos + texSize;
+                m_pImpl->Draw(character.Texture2D, Bound2f(minPos, maxPos), nullptr, color,
+                    Vector2f(0.f), 0.f, SpriteEffect::None, 0.f);
+            }
             origin.x += character.Advance;
         }
     }

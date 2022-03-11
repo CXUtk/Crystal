@@ -54,6 +54,7 @@ namespace crystal
         T           Value;
     };
 
+    using UIActionEvent = Event< UIEventArgs>;
     using UIMouseButtonEvent = Event<UIMouseButtonEventArgs>;
     using UIMouseEvent = Event<UIMouseEventArgs>;
     using UIMouseScrollEvent = Event<UIMouseScrollEventArgs>;
@@ -73,7 +74,9 @@ namespace crystal
         OnMouseHover,
         OnMouseScroll,
         PostUpdate,
-        PostDraw
+        PostDraw,
+        OnFocused,
+        OnUnFocused
     };
 
     template<UIEventType E>
@@ -140,6 +143,20 @@ namespace crystal
     {
         using Func_Type = typename UIDrawEvent::Func;
         using Event_Type = UIDrawEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::OnFocused>
+    {
+        using Func_Type = typename UIActionEvent::Func;
+        using Event_Type = UIActionEvent;
+    };
+
+    template<>
+    struct UIEventDelegate<UIEventType::OnUnFocused>
+    {
+        using Func_Type = typename UIActionEvent::Func;
+        using Event_Type = UIActionEvent;
     };
 
     template<UIEventType E>
