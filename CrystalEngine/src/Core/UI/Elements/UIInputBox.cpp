@@ -65,44 +65,66 @@ namespace crystal
             BoundingBoxConvert<int>(outerBound),
             m_isFocused ? m_focusBorderColor : m_borderColor);
 
-        auto drawStringOrigin = m_calculatedInnerBound.GetMinPos()
-            + Vector2f(TEXT_PADDING - m_drawXOffset, TEXT_PADDING);
-        m_textDrawComponent->DrawWithBot(drawStringOrigin, payload);
+        spriteBatch->End();
 
-        auto font = m_textDrawComponent->GetFont();
-        auto textLength = m_inputComponent->GetLength();
-        auto bbox = font->GetBoundingBox();
-        if ((m_blinkTimer < 0.5 && m_isFocused) || m_isDragging)
+        auto RSState = payload.PSO->GetRasterState();
+        auto oldScissorState = RSState->GetScissorState();
+        auto oldScissorBound = RSState->GetScissorBound();
+
+        RSState->SetScissorState(true);
+        auto newBound = Bound2f(m_calculatedInnerBound.GetMinPos() + Vector2f(TEXT_PADDING),
+            m_calculatedInnerBound.GetMaxPos() - Vector2f(TEXT_PADDING));
+        auto scissorBound = BoundingBoxConvert<int>(newBound)
+            .IntersectWith(oldScissorBound);
+        RSState->SetScissorBound(scissorBound);
+
+        spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
         {
-            float xOffset = 0.f;
-            int carrot = m_inputComponent->GetCarrotPos();
-            if (carrot != 0)
+            auto drawStringOrigin = m_calculatedInnerBound.GetMinPos()
+                + Vector2f(TEXT_PADDING - m_drawXOffset, TEXT_PADDING);
+            m_textDrawComponent->DrawWithBot(drawStringOrigin, payload);
+
+            auto font = m_textDrawComponent->GetFont();
+            auto textLength = m_inputComponent->GetLength();
+            auto bbox = font->GetBoundingBox();
+            if ((m_blinkTimer < 0.5 && m_isFocused) || m_isDragging)
             {
-                xOffset = GetXOffsetByCarrot(carrot);
+                float xOffset = 0.f;
+                int carrot = m_inputComponent->GetCarrotPos();
+                if (carrot != 0)
+                {
+                    xOffset = GetXOffsetByCarrot(carrot);
+                }
+                Bound2f carrotBound = Bound2f(drawStringOrigin + Vector2f(xOffset, 0.f),
+                    drawStringOrigin + Vector2f(xOffset + 1, bbox.GetSize().y));
+                spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(carrotBound),
+                    Color4f(1.f));
             }
-            Bound2f carrotBound = Bound2f(drawStringOrigin + Vector2f(xOffset, 0.f),
-                drawStringOrigin + Vector2f(xOffset + 1, bbox.GetSize().y));
-            spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(carrotBound),
-                Color4f(1.f));
-        }
-        if (m_isFocused)
-        {
-            if (m_dragStartIndex != m_dragEndIndex)
+            if (m_isFocused)
             {
-                int left = m_dragStartIndex, right = m_dragEndIndex;
-                if (left > right) std::swap(left, right);
+                if (m_dragStartIndex != m_dragEndIndex)
+                {
+                    int left = m_dragStartIndex, right = m_dragEndIndex;
+                    if (left > right) std::swap(left, right);
 
-                float leftX = GetXOffsetByCarrot(left);
-                float rightX = GetXOffsetByCarrot(right);
+                    float leftX = GetXOffsetByCarrot(left);
+                    float rightX = GetXOffsetByCarrot(right);
 
-                Vector2f leftPos = Vector2f(leftX, 0.f) + drawStringOrigin;
-                Vector2f rightPos = Vector2f(rightX, bbox.GetSize().y) + drawStringOrigin;
-                Bound2f selectionBound = Bound2f(leftPos, rightPos);
+                    Vector2f leftPos = Vector2f(leftX, 0.f) + drawStringOrigin;
+                    Vector2f rightPos = Vector2f(rightX, bbox.GetSize().y) + drawStringOrigin;
+                    Bound2f selectionBound = Bound2f(leftPos, rightPos);
 
-                spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(selectionBound),
-                    Color4f(1.f, 1.f, 1.f, 0.5f));
+                    spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(selectionBound),
+                        Color4f(1.f, 1.f, 1.f, 0.5f));
+                }
             }
         }
+        spriteBatch->End();
+
+        RSState->SetScissorState(oldScissorState);
+        RSState->SetScissorBound(oldScissorBound);
+
+        spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
     }
 
     void UIInputBox::UpdateSelf(const GameTimer& gameTimer)
