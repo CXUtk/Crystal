@@ -207,6 +207,15 @@ namespace crystal
 
 		M[0x039] = KeyCode::CRYSTAL_SPACE_KEY;
 		M[0x001] = KeyCode::CRYSTAL_ESC_KEY;
+        M[0x00E] = KeyCode::CRYSTAL_BACK_KEY;
+        M[0x01A] = KeyCode::CRYSTAL_LEFT_BRACKET_KEY;
+        M[0x01B] = KeyCode::CRYSTAL_RIGHT_BRACKET_KEY;
+        M[0x02B] = KeyCode::CRYSTAL_LEFT_SLASH_KEY;
+        M[0x027] = KeyCode::CRYSTAL_SEMICOLON_KEY;
+        M[0x028] = KeyCode::CRYSTAL_QUOTE_KEY;
+        M[0x033] = KeyCode::CRYSTAL_COMMA_KEY;
+        M[0x034] = KeyCode::CRYSTAL_DOT_KEY;
+        M[0x035] = KeyCode::CRYSTAL_RIGHT_SLASH_KEY;
 		return M;
 	}
 
@@ -289,7 +298,7 @@ namespace crystal
 			scancode = MapVirtualKeyW((UINT)wParam, MAPVK_VK_TO_VSC);
 		}
 
-		//printf("0x%.4X\n", scancode);
+		printf("0x%.4X\n", scancode);
 		KeyCode keyCode = keyCodeMap[scancode];
 
 		KeyEventArgs args;
@@ -451,7 +460,6 @@ namespace crystal
 			return 0;
 		}
 		}
-
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 

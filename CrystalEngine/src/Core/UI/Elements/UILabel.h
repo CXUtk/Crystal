@@ -11,7 +11,7 @@ namespace crystal
     class UILabel : public UIElement
     {
     public:
-        UILabel();
+        UILabel(const std::string& text);
         ~UILabel() override;
 
         Color4f GetTextColor() const { return m_textDrawComponent->GetTextColor(); }
@@ -20,15 +20,8 @@ namespace crystal
         Color4f GetBorderColor() const { return m_textDrawComponent->GetBorderColor(); }
         void SetBorderColor(const Color4f& color) { m_textDrawComponent->SetBorderColor(color); }
 
-        std::string GetText() const { return m_textDrawComponent->GetText(); }
-        void SetText(const std::string& text)
-        {
-            if (m_textDrawComponent->GetText() != text)
-            {
-                m_shouldRecalculateText = true;
-            }
-            m_textDrawComponent->SetText(text);
-        }
+        std::string GetText() const;
+        void SetText(const std::string& text);
 
         std::shared_ptr<Font> GetFont() const { return m_textDrawComponent->GetFont(); }
         void SetFont(std::shared_ptr<Font> font)
@@ -44,7 +37,7 @@ namespace crystal
 
     protected:
         bool                m_shouldRecalculateText = true;
-        Vector2f            m_originOffset{};
+        std::u32string      m_text{};
 
         std::shared_ptr<UITextComponent>   m_textDrawComponent = nullptr;
 

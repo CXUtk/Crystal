@@ -8,7 +8,7 @@ namespace crystal
     constexpr int NAV_BAR_HEIGHT = 36;
     RayTracerState::RayTracerState()
     {
-        m_mainWindow = std::make_shared<UIWidget>("Crystal Tracer");
+        m_mainWindow = std::make_shared<UIWidget>(u8"Crystal Tracer");
         m_mainWindow->SetName("Main Window");
         m_mainWindow->SetPivot(Vector2f(0.5f, 0.5f));
         m_mainWindow->SetAnchorPoint(Vector2f(0.5f, 0.5f));
@@ -73,7 +73,12 @@ namespace crystal
         //m_startRenderButton->SetSize(SizeLayout(72, 32));
         //m_startRenderButton->SetText("Button");
 
-
+        auto input = std::make_shared<UIInputBox>();
+        input->SetPivot(Vector2f(0.5f, 0.5f));
+        input->SetAnchorPoint(Vector2f(0.5f, 0.5f));
+        input->SetSize(SizeLayout(160, 24));
+        input->SetPosition(Vector2f(0.f, -50.f));
+        m_displayer->AppendChild(input);
     }
 
     RayTracerState::~RayTracerState()

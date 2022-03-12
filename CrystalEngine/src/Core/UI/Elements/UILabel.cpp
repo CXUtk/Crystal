@@ -1,4 +1,6 @@
 #include "UILabel.h"
+#include <codecvt>
+
 #include <Engine.h>
 
 #include <Core/Asset/AssetManager.h>
@@ -7,7 +9,7 @@
 
 namespace crystal
 {
-    UILabel::UILabel()
+    UILabel::UILabel(const std::string& text)
     {
         auto assetManager = Engine::GetInstance()->GetAssetManager();
 
@@ -15,6 +17,25 @@ namespace crystal
             false);
 
         m_textDrawComponent->SetTextColor(Color4f(1.f));
+        SetText(text);
+    }
+
+    std::string UILabel::GetText() const
+    {
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+        return conv.to_bytes(m_text);
+    }
+
+    void UILabel::SetText(const std::string& text)
+    {
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+        auto text32 = conv.from_bytes(text);
+        if (m_text != text32)
+        {
+            m_shouldRecalculateText = true;
+        }
+        m_text = text32;
+        m_textDrawComponent->SetText32(m_text);
     }
 
     UILabel::~UILabel()
@@ -38,7 +59,6 @@ namespace crystal
         auto metric = m_textDrawComponent->MeasureSize();
         auto height = metric.yMax - metric.yMin;
         SetSize(SizeLayout(metric.Width, 0, height, 0));
-        m_originOffset = Vector2f(0.f, -metric.yMin);
 
         m_shouldRecalculateText = false;
     }

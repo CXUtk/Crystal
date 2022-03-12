@@ -30,7 +30,7 @@ namespace crystal
 
         std::shared_ptr<ITexture2D>     m_pIconTexture = nullptr;
 
-        bool    m_mouseHover = false;
+        bool        m_mouseHover = false;
 
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;

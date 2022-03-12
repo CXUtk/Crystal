@@ -42,34 +42,44 @@ namespace crystal
 		CRYSTAL_Y_KEY,
 		CRYSTAL_Z_KEY,
 
+        CRYSTAL_0_KEY,
+        CRYSTAL_1_KEY,
+        CRYSTAL_2_KEY,
+        CRYSTAL_3_KEY,
+        CRYSTAL_4_KEY,
+        CRYSTAL_5_KEY,
+        CRYSTAL_6_KEY,
+        CRYSTAL_7_KEY,
+        CRYSTAL_8_KEY,
+        CRYSTAL_9_KEY,
+
+        CRYSTAL_PLUS_KEY,
+        CRYSTAL_MINUS_KEY,
+        CRYSTAL_TILDE_KEY,
+        CRYSTAL_LEFT_BRACKET_KEY,
+        CRYSTAL_RIGHT_BRACKET_KEY,
+        CRYSTAL_LEFT_SLASH_KEY,
+        CRYSTAL_SEMICOLON_KEY,
+        CRYSTAL_QUOTE_KEY,
+        CRYSTAL_COMMA_KEY,
+        CRYSTAL_DOT_KEY,
+        CRYSTAL_RIGHT_SLASH_KEY,
+
+        CRYSTAL_SPACE_KEY,
+
 		CRYSTAL_UP_KEY,
 		CRYSTAL_DOWN_KEY,
 		CRYSTAL_LEFT_KEY,
 		CRYSTAL_RIGHT_KEY,
 
-		CRYSTAL_ENTER_KEY,
+        CRYSTAL_ENTER_KEY,
 		CRYSTAL_LEFT_CTRL_KEY,
 		CRYSTAL_LEFT_ALT_KEY,
 		CRYSTAL_RIGHT_CTRL_KEY,
 		CRYSTAL_RIGHT_ALT_KEY,
 
-		CRYSTAL_0_KEY,
-		CRYSTAL_1_KEY,
-		CRYSTAL_2_KEY,
-		CRYSTAL_3_KEY,
-		CRYSTAL_4_KEY,
-		CRYSTAL_5_KEY,
-		CRYSTAL_6_KEY,
-		CRYSTAL_7_KEY,
-		CRYSTAL_8_KEY,
-		CRYSTAL_9_KEY,
-
-		CRYSTAL_PLUS_KEY,
-		CRYSTAL_MINUS_KEY,
-		CRYSTAL_TILDE_KEY,
-
-		CRYSTAL_SPACE_KEY,
 		CRYSTAL_ESC_KEY,
+        CRYSTAL_BACK_KEY,
 
 		__COUNT,
 	};
@@ -108,4 +118,11 @@ namespace crystal
 		InputAction Action;
 		KeyMODState Mods;
 	};
+
+    class InputCommon
+    {
+    public:
+        static char KeyCodeToCharMapLower(KeyCode code);
+        static char KeyCodeToCharMapUpper(KeyCode code);
+    };
 }

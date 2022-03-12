@@ -18,19 +18,21 @@ namespace crystal
         Color4f GetBorderColor() const { return m_textBorderColor; }
         void SetBorderColor(const Color4f& color) { m_textBorderColor = color; }
 
-        std::string GetText() const { return m_text; }
-        void SetText(const std::string& text) { m_text = text; }
+        void SetText32(const std::u32string_view& text) { m_textView = text; }
 
         std::shared_ptr<Font> GetFont() const { return m_pFont; }
         void SetFont(std::shared_ptr<Font> font) { m_pFont = font; }
 
         void DrawWithBot(const Vector2f& botOrigin, const RenderPayload& payload);
         void DrawWithBase(const Vector2f& baseOrigin, const RenderPayload& payload);
-        TextMetric MeasureSize() const;
 
+        TextMetric MeasureSize() const;
+        std::vector<float> GetWidthsForAllChars() const;
+
+        Vector2f GetPosAt(int charIndex) const;
     private:
         std::shared_ptr<Font>   m_pFont = nullptr;
-        std::string             m_text{};
+        std::u32string_view     m_textView{};
         Color4f                 m_textBaseColor{};
         Color4f                 m_textBorderColor{};
         bool                    m_enableBorder = false;

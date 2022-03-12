@@ -37,7 +37,8 @@ namespace crystal
             const SliceInfo& sliceInfo, const Bound2i& screenBound, const Color4f& color);
 
         void DrawString(std::shared_ptr<Font> font, const std::string& text, const Vector2f& pos, const Color4f& color);
-	private:
+        void DrawString(std::shared_ptr<Font> font, const std::u32string_view& text, const Vector2f& pos, const Color4f& color);
+    private:
 		class Impl;
 		std::unique_ptr<Impl> m_pImpl;
 	};

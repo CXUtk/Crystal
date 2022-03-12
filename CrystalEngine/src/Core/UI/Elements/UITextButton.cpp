@@ -21,7 +21,7 @@ namespace crystal
         m_penel->SetFillColor(m_unhoverColor);
         m_penel->SetNoEvents(true);
 
-        m_buttonText = std::make_shared<UILabel>();
+        m_buttonText = std::make_shared<UILabel>("");
         m_buttonText->SetPivot(Vector2f(0.5f));
         m_buttonText->SetAnchorPoint(Vector2f(0.5f));
         m_buttonText->SetNoEvents(true);

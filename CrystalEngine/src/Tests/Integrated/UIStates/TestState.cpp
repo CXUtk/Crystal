@@ -93,7 +93,7 @@ namespace crystal
         progressBar->SetValue(0.5f);
         progressBar->SetPosition(Vector2f(0.f, -130.f));
 
-        auto uiValueLabel = std::make_shared<UILabel>();
+        auto uiValueLabel = std::make_shared<UILabel>("");
         uiValueLabel->SetName("Slider Label");
         uiValueLabel->SetPivot(Vector2f(0, 0.5f));
         uiValueLabel->SetAnchorPoint(Vector2f(0.5f));
@@ -129,19 +129,17 @@ namespace crystal
         uilist->SetSize(SizeLayout(200, 200));
 
         {
-            auto text1 = std::make_shared<UILabel>();
+            auto text1 = std::make_shared<UILabel>("ItemXXXX");
             text1->SetPivot(Vector2f(0.5f));
             text1->SetAnchorPoint(Vector2f(0.5f));
             text1->SetPosition(Vector2f(0.f, 0.f));
             text1->SetSize(SizeLayout(200, 200));
-            text1->SetText("ItemXXXX");
 
-            auto text2 = std::make_shared<UILabel>();
+            auto text2 = std::make_shared<UILabel>("ItemXXXX--2");
             text2->SetPivot(Vector2f(0.5f));
             text2->SetAnchorPoint(Vector2f(0.5f));
             text2->SetPosition(Vector2f(0.f, 0.f));
             text2->SetSize(SizeLayout(200, 200));
-            text2->SetText("ItemXXXX--2");
 
             auto button = std::make_shared<UITextButton>();
             button->SetSize(SizeLayout(100, 32));

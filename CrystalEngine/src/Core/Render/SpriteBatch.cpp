@@ -271,6 +271,24 @@ namespace crystal
         }
     }
 
+    void SpriteBatch::DrawString(std::shared_ptr<Font> font, const std::u32string_view& text, const Vector2f& pos, const Color4f& color)
+    {
+        Vector2f origin = pos;
+        for (auto c : text)
+        {
+            auto& character = font->GetCharacter(c);
+            if (character.Texture2D)
+            {
+                auto texSize = Vector2f(character.Size);
+                auto minPos = origin + Vector2f(character.Bearing.x, character.Bearing.y - texSize.y);
+                auto maxPos = minPos + texSize;
+                m_pImpl->Draw(character.Texture2D, Bound2f(minPos, maxPos), nullptr, color,
+                    Vector2f(0.f), 0.f, SpriteEffect::None, 0.f);
+            }
+            origin.x += character.Advance;
+        }
+    }
+
 
     SpriteBatch::Impl::Impl(IGraphicsDevice* graphicsDevice, IGraphicsContext* graphicsContext)
         : m_pGraphicsDevice(graphicsDevice), m_pGraphicsContext(graphicsContext)

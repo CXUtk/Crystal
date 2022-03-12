@@ -15,9 +15,14 @@ namespace crystal
 			_curMouseButtonDown[(int)args.ButtonCode] = downed;
 		});
 
-		window->AppendOnKeyChangeEvent([this](KeyEventArgs args) {
+        auto& keySeq = m_keySequence;
+		window->AppendOnKeyChangeEvent([this, &keySeq](KeyEventArgs args) {
 			bool downed = (args.Action != InputAction::RELEASE);
 			_curKeysDown[(int)args.KeyCode] = downed;
+            if (downed)
+            {
+                keySeq.push_back(args);
+            }
 		});
 
 		GlobalLogger::Log(SeverityLevel::Debug, "InputController construct");
@@ -30,6 +35,7 @@ namespace crystal
 
 	void InputController::SampleNewInput()
 	{
+        m_keySequence.clear();
 		_wasKeysDown = _curKeysDown;
 		_wasMouseButtonDown = _curMouseButtonDown;
 		_scrollWheel = Vector2f(0);

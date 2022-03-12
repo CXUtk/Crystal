@@ -66,6 +66,33 @@ namespace crystal
         return metric;
     }
 
+    TextMetric Font::MeasureString(const std::u32string_view& strView)
+    {
+        TextMetric metric = {};
+
+        for (auto c : strView)
+        {
+            auto& ch = GetCharacter(c);
+            metric.Width += ch.Advance;
+            metric.yMin = std::min(metric.yMin, ch.Bearing.y - ch.Size.y);
+            metric.yMax = std::max(metric.yMax, ch.Bearing.y);
+        }
+        return metric;
+    }
+
+    std::vector<float> Font::GetWidthsForAllChars(const std::u32string_view& str)
+    {
+        std::vector<float> metrics;
+        float width = 0.f;
+        for (auto c : str)
+        {
+            auto& ch = GetCharacter(c);
+            width += ch.Advance;
+            metrics.push_back(width);
+        }
+        return metrics;
+    }
+
     std::vector<uint32_t> Font::GetCodesFromString(const std::string& str)
     {
         std::vector<uint32_t> res;
@@ -84,9 +111,13 @@ namespace crystal
         return res;
     }
 
-    float Font::GetDescender() const
+    Bound2f Font::GetBoundingBox() const
     {
-        return std::floor((float)m_fontFace->descender * m_fontSize / m_fontFace->units_per_EM);
+        auto xMin = std::floor((float)m_fontFace->bbox.xMin * m_fontSize / m_fontFace->units_per_EM);
+        auto yMin = std::floor((float)m_fontFace->bbox.yMin * m_fontSize / m_fontFace->units_per_EM);
+        auto xMax = std::ceil((float)m_fontFace->bbox.xMax * m_fontSize / m_fontFace->units_per_EM);
+        auto yMax = std::ceil((float)m_fontFace->bbox.yMax * m_fontSize / m_fontFace->units_per_EM);
+        return Bound2f(Vector2f(xMin, yMin), Vector2f(xMax, yMax));
     }
 
     void Font::GenerateCharMap()

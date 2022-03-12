@@ -31,8 +31,10 @@ namespace crystal
 
         Character& GetCharacter(uint32_t code);
         TextMetric MeasureString(const std::string& str);
+        TextMetric MeasureString(const std::u32string_view& strView);
+        std::vector<float> GetWidthsForAllChars(const std::u32string_view& str);
         std::vector<uint32_t> GetCodesFromString(const std::string& str);
-        float GetDescender() const;
+        Bound2f GetBoundingBox() const;
     private:
         FT_Face     m_fontFace = nullptr;
         size_t      m_fontSize = 0;

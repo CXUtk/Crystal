@@ -9,12 +9,21 @@
 namespace crystal
 {
     static constexpr int TEXT_PADDING = 2;
+    static constexpr int TEXT_TRAILLING_OFFSET = 8;
     UIInputBox::UIInputBox()
     {
         m_backgroundColor = UIStyle::GetButtonColor();
         m_borderColor = UIStyle::GetPanelBorderColor();
         m_focusBorderColor = UIStyle::GetPanelBorderColorHighlight();
         m_propagationFlags = PropagationFlags::MouseScroll;
+
+        auto assetManager = Engine::GetInstance()->GetAssetManager();
+        auto font = assetManager->LoadAsset<Font>("Crystal:Consolas");
+        m_textDrawComponent = std::make_shared<UITextComponent>(font, false);
+
+        m_textDrawComponent->SetTextColor(Color4f(1.f));
+
+        m_inputComponent = std::make_shared<UIInputComponent>("");
     }
 
     UIInputBox::~UIInputBox()
@@ -23,6 +32,7 @@ namespace crystal
     void UIInputBox::OnFocused(UIEventArgs args)
     {
         m_isFocused = true;
+        m_blinkTimer = 0.f;
     }
 
     void UIInputBox::OnUnFocused(UIEventArgs args)
@@ -35,6 +45,10 @@ namespace crystal
         auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
         auto outerBound = BoundingBoxConvert<int>(m_calculatedInnerBound);
         auto spriteBatch = payload.SpriteBatch;
+
+        // Input
+        auto text32 = m_inputComponent->GetText32();
+        m_textDrawComponent->SetText32(text32);
 
         // Background
         spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(outerBound),
@@ -50,5 +64,140 @@ namespace crystal
         spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice,
             BoundingBoxConvert<int>(outerBound),
             m_isFocused ? m_focusBorderColor : m_borderColor);
+
+        auto drawStringOrigin = m_calculatedInnerBound.GetMinPos()
+            + Vector2f(TEXT_PADDING - m_drawXOffset, TEXT_PADDING);
+        m_textDrawComponent->DrawWithBot(drawStringOrigin, payload);
+
+        auto font = m_textDrawComponent->GetFont();
+        auto textLength = m_inputComponent->GetLength();
+        auto bbox = font->GetBoundingBox();
+        if ((m_blinkTimer < 0.5 && m_isFocused) || m_isDragging)
+        {
+            float xOffset = 0.f;
+            int carrot = m_inputComponent->GetCarrotPos();
+            if (carrot != 0)
+            {
+                xOffset = GetXOffsetByCarrot(carrot);
+            }
+            Bound2f carrotBound = Bound2f(drawStringOrigin + Vector2f(xOffset, 0.f),
+                drawStringOrigin + Vector2f(xOffset + 1, bbox.GetSize().y));
+            spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(carrotBound),
+                Color4f(1.f));
+        }
+        if (m_isFocused)
+        {
+            if (m_dragStartIndex != m_dragEndIndex)
+            {
+                int left = m_dragStartIndex, right = m_dragEndIndex;
+                if (left > right) std::swap(left, right);
+
+                float leftX = GetXOffsetByCarrot(left);
+                float rightX = GetXOffsetByCarrot(right);
+
+                Vector2f leftPos = Vector2f(leftX, 0.f) + drawStringOrigin;
+                Vector2f rightPos = Vector2f(rightX, bbox.GetSize().y) + drawStringOrigin;
+                Bound2f selectionBound = Bound2f(leftPos, rightPos);
+
+                spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(selectionBound),
+                    Color4f(1.f, 1.f, 1.f, 0.5f));
+            }
+        }
+    }
+
+    void UIInputBox::UpdateSelf(const GameTimer& gameTimer)
+    {
+        auto mousePos = Engine::GetInstance()->GetWindow()->GetMousePos();
+        if (m_isFocused)
+        {
+            if (m_isDragging)
+            {
+                m_dragEndIndex = GetCarrotByPos(mousePos);
+                m_inputComponent->MoveCarrot(m_dragEndIndex);
+
+                int left = m_dragStartIndex, right = m_dragEndIndex;
+                if (left > right) std::swap(left, right);
+                m_inputComponent->SetSelectionRange(left, right);
+
+                UpdateCarrotShift();
+            }
+
+            m_inputComponent->SampleInput();
+            m_blinkTimer += gameTimer.GetPhysicalDeltaTime();
+            if (m_blinkTimer > 1.f)
+            {
+                m_blinkTimer -= 1.f;
+            }
+
+            if (m_inputComponent->IsCarrotChanged())
+            {
+                auto font = m_textDrawComponent->GetFont();
+                m_charWidths = font->GetWidthsForAllChars(m_inputComponent->GetText32());
+
+                m_blinkTimer = 0.f;
+
+                m_inputComponent->GetSelectionRange(m_dragStartIndex, m_dragEndIndex);
+                UpdateCarrotShift();
+            }
+        }
+    }
+
+    void UIInputBox::RecalculateChildren()
+    {
+        UIElement::RecalculateChildren();
+    }
+
+    int UIInputBox::GetCarrotByPos(const Vector2i& screenPos)
+    {
+        float xPos = screenPos.x - m_calculatedInnerBound.GetMinPos().x - TEXT_PADDING + m_drawXOffset;
+        auto p = std::lower_bound(m_charWidths.begin(), m_charWidths.end(), xPos);
+        if (p == m_charWidths.end()) return m_inputComponent->GetLength();
+        int carrot = p - m_charWidths.begin();
+        if (xPos - GetXOffsetByCarrot(carrot) >= GetXOffsetByCarrot(carrot + 1) - xPos)
+        {
+            return carrot + 1;
+        }
+        else
+        {
+            return carrot;
+        }
+        return carrot;
+    }
+
+    float UIInputBox::GetXOffsetByCarrot(int carrot)
+    {
+        return carrot ? m_charWidths[carrot - 1] : 0;
+    }
+
+    void UIInputBox::UpdateCarrotShift()
+    {
+        int carrot = m_inputComponent->GetCarrotPos();
+        auto minPos = m_calculatedInnerBound.GetMinPos();
+        auto maxPos = m_calculatedInnerBound.GetMaxPos();
+        float actualX = GetXOffsetByCarrot(carrot) + minPos.x + TEXT_PADDING - m_drawXOffset;
+        if (isnan(actualX)) return;
+        if (actualX > maxPos.x - TEXT_PADDING - TEXT_TRAILLING_OFFSET)
+        {
+            m_drawXOffset += actualX - (maxPos.x - TEXT_PADDING - TEXT_TRAILLING_OFFSET);
+        }
+        else if (actualX < minPos.x + TEXT_PADDING)
+        {
+            m_drawXOffset -= minPos.x + TEXT_PADDING - actualX;
+        }
+    }
+
+    void UIInputBox::MouseJustPressed(UIMouseButtonEventArgs args)
+    {
+        m_dragStartIndex = GetCarrotByPos(args.MousePosScreen);
+        m_dragEndIndex = m_dragStartIndex;
+        m_inputComponent->MoveCarrot(m_dragStartIndex);
+        m_isDragging = true;
+        m_blinkTimer = 0.f;
+    }
+
+    void UIInputBox::MouseJustReleased(UIMouseButtonEventArgs args)
+    {
+        m_isDragging = false;
+        m_blinkTimer = 0.f;
     }
 }

@@ -61,8 +61,7 @@ namespace crystal
             m_eventOnClose.Invoke(closeArg);
         });
 
-        m_windowTitle = std::make_shared<UILabel>();
-        m_windowTitle->SetText(title);
+        m_windowTitle = std::make_shared<UILabel>(title);
         m_windowTitle->SetAnchorPoint(Vector2f(0.f, 1.f));
         m_windowTitle->SetPivot(Vector2f(0.f, 1.f));
         m_windowTitle->SetPosition(Vector2f(10, -10));

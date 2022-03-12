@@ -1,9 +1,10 @@
 #pragma once
-#include "InputCode.h"
+#include "InputCommon.h"
 
 #include <bitset>
 #include <Crystal.h>
 #include <Core/Utils/Geometry.h>
+#include <vector>
 
 
 namespace crystal
@@ -73,6 +74,8 @@ namespace crystal
 		*/
 		Point2i GetMousePos() const;
 
+        std::vector<KeyEventArgs> GetKeyDownSequence() const { return m_keySequence; }
+
 	private:
 
 		// Keys
@@ -85,6 +88,8 @@ namespace crystal
 		// Mouse button
 		std::bitset<(int)MouseButtonCode::__COUNT> _curMouseButtonDown;
 		std::bitset<(int)MouseButtonCode::__COUNT> _wasMouseButtonDown;
+
+        std::vector<KeyEventArgs>    m_keySequence{};
 
 		IGameWindow* _gameWindow = nullptr;
 	};

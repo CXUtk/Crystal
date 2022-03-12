@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Input/InputCode.h>
+#include <Core/Input/InputCommon.h>
 #include <Core/Utils/Event.h>
 #include <Core/Utils/Geometry.h>
 

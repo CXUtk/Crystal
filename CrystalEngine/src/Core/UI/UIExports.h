@@ -14,5 +14,6 @@
 #include "Elements/UIValueSlider.h"
 #include "Elements/UIScrollBar.h"
 #include "Elements/UILayout.h"
+#include "Elements/UIInputBox.h"
 #include "Elements/Compound/UIWidget.h"
 #include "Elements/Compound/UIList.h"

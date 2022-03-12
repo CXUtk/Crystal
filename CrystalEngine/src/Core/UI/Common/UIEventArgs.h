@@ -1,7 +1,7 @@
 #pragma once
 #include "UICommon.h"
 #include <Core/Utils/Event.h>
-#include <Core/Input/InputCode.h>
+#include <Core/Input/InputCommon.h>
 
 namespace crystal
 {
@@ -32,6 +32,11 @@ namespace crystal
     };
 
     struct UIMouseEventArgs : public UIEventArgs
+    {
+        Vector2i            MousePosScreen;
+    };
+
+    struct UIKeyboardEventArgs : public UIEventArgs
     {
         Vector2i            MousePosScreen;
     };
