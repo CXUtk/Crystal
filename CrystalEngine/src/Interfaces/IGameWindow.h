@@ -12,6 +12,7 @@ namespace crystal
 		using OnMouseScrollEvent =			Event<Vector2f>;
 		using OnMouseButtonChangeEvent =	Event<MouseButtonEventArgs>;
 		using OnKeyChangeEvent =			Event<KeyEventArgs>;
+        using CharInputEvent =              Event<CharInputArgs>;
 
 		virtual ~IGameWindow() = 0 {};
 
@@ -29,5 +30,6 @@ namespace crystal
 		virtual void AppendOnMouseScrollEvent(OnMouseScrollEvent::Func eventHandler) = 0;
 		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) = 0;
 		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) = 0;
+        virtual void AddCharInputEventListener(CharInputEvent::Func eventHandler) = 0;
 	};
 }

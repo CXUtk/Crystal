@@ -27,6 +27,13 @@ namespace crystal
     void UIInputComponent::SampleInput()
     {
         auto sequence = m_inputController->GetKeyDownSequence();
+        auto charInputs = m_inputController->GetInputCharSequence();
+
+        for (auto c : charInputs)
+        {
+            InsertValue(c, m_carrotPos);
+        }
+
         m_carrotChanged = !sequence.empty();
         for (auto& keyArgs : sequence)
         {
@@ -169,7 +176,6 @@ namespace crystal
         {
             if (m_carrotPos > 0)
             {
-
                 if (m_carrotPos == m_text.size())
                 {
                     m_text.pop_back();

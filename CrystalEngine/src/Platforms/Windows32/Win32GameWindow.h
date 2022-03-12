@@ -29,6 +29,7 @@ namespace crystal
 		virtual void AppendOnMouseScrollEvent(OnMouseScrollEvent::Func eventHandler) override;
 		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) override;
 		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) override;
+        virtual void AddCharInputEventListener(CharInputEvent::Func eventHandler) override;
 
 		HINSTANCE GetAppInst() const { return m_hWindowInstance; }
 		HWND GetHWND() const { return m_hMainWnd; }
@@ -59,6 +60,7 @@ namespace crystal
 		OnKeyChangeEvent			m_eventOnKeyChange;			// Keyboard event
 		OnMouseScrollEvent			m_eventOnMouseScroll;		// Mouse scroll event
 		OnMouseButtonChangeEvent	m_eventOnMouseButtonChange;	// Mouse button press event
+        CharInputEvent              m_eventOnCharInput;
 
 		std::bitset<(int)MouseButtonCode::__COUNT>				m_mouseDowned{};
 

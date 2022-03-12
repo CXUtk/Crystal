@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 namespace crystal
 {
@@ -118,6 +119,11 @@ namespace crystal
 		InputAction Action;
 		KeyMODState Mods;
 	};
+
+    struct CharInputArgs
+    {
+        uint64_t Code;
+    };
 
     class InputCommon
     {

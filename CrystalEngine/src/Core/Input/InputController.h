@@ -76,6 +76,7 @@ namespace crystal
 
         std::vector<KeyEventArgs> GetKeyDownSequence() const { return m_keySequence; }
 
+        std::u32string GetInputCharSequence() const;
 	private:
 
 		// Keys
@@ -89,7 +90,8 @@ namespace crystal
 		std::bitset<(int)MouseButtonCode::__COUNT> _curMouseButtonDown;
 		std::bitset<(int)MouseButtonCode::__COUNT> _wasMouseButtonDown;
 
-        std::vector<KeyEventArgs>    m_keySequence{};
+        std::vector<KeyEventArgs>       m_keySequence{};
+        std::wstring                    m_wString{};
 
 		IGameWindow* _gameWindow = nullptr;
 	};

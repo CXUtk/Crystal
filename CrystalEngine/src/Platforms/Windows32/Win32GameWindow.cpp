@@ -2,6 +2,7 @@
 #include <Core/InitArgs.h>
 #include <Core/Utils/Logger.h>
 
+#include <codecvt>
 #include <array>
 #include <windowsx.h>
 
@@ -91,11 +92,16 @@ namespace crystal
 		m_eventOnKeyChange += eventHandler;
 	}
 
+    void Win32GameWindow::AddCharInputEventListener(CharInputEvent::Func eventHandler)
+    {
+        m_eventOnCharInput += eventHandler;
+    }
+
 	bool Win32GameWindow::m_InitMainWindow()
 	{
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-		WNDCLASS wc;
+		WNDCLASSW wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = MainWndProc;
 		wc.cbClsExtra = 0;
@@ -105,11 +111,11 @@ namespace crystal
 		wc.hCursor = LoadCursor(0, IDC_ARROW);
 		wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
 		wc.lpszMenuName = 0;
-		wc.lpszClassName = "Win32WndClassName";
+		wc.lpszClassName = L"Win32WndClassName";
 
-		if (!RegisterClass(&wc))
+		if (!RegisterClassW(&wc))
 		{
-			MessageBox(0, "RegisterClass Failed.", 0, 0);
+			MessageBoxW(0, L"RegisterClass Failed.", 0, 0);
 			return false;
 		}
 
@@ -120,12 +126,14 @@ namespace crystal
 		int width = R.right - R.left;
 		int height = R.bottom - R.top;
 
-		m_hMainWnd = CreateWindow("Win32WndClassName", m_windowTitle.c_str(),
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+		m_hMainWnd = CreateWindowW(L"Win32WndClassName", converter.from_bytes(m_windowTitle).c_str(),
 			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height,
 			0, 0, m_hWindowInstance, 0);
 		if (!m_hMainWnd)
 		{
-			MessageBox(0, "CreateWindow Failed.", 0, 0);
+			MessageBoxW(0, L"CreateWindow Failed.", 0, 0);
 			return false;
 		}
 
@@ -298,7 +306,7 @@ namespace crystal
 			scancode = MapVirtualKeyW((UINT)wParam, MAPVK_VK_TO_VSC);
 		}
 
-		printf("0x%.4X\n", scancode);
+		//printf("0x%.4X\n", scancode);
 		KeyCode keyCode = keyCodeMap[scancode];
 
 		KeyEventArgs args;
@@ -459,7 +467,19 @@ namespace crystal
 			m_MouseScroll(Vector2f(-(SHORT)HIWORD(wParam) / (double)WHEEL_DELTA, 0.0));
 			return 0;
 		}
-		}
+  //      case WM_CHAR:
+  //      {
+  //          CharInputArgs args = {};
+  //          args.Code = wParam;
+  //          m_eventOnCharInput.Invoke(args);
+  //          break;
+  //      }
+  //      case WM_IME_CHAR:	//使用输入法输入字符时，触发 WM_IME_CHAR 消息。输入词组时，词组有多少个字符就触发多少次。
+  //          CharInputArgs args = {};
+  //          args.Code = wParam;
+  //          m_eventOnCharInput.Invoke(args);
+  //          break;
+	    }
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 
