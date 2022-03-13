@@ -32,6 +32,8 @@ namespace crystal
 		{
 			throw std::exception("[Win32GameWindow::Win32GameWindow] Unable to start Win32 window");
 		}
+
+        m_pClipBoard = std::make_unique<Win32ClipBoard>(this);
 	}
 
 	Win32GameWindow::~Win32GameWindow()
@@ -467,18 +469,18 @@ namespace crystal
 			m_MouseScroll(Vector2f(-(SHORT)HIWORD(wParam) / (double)WHEEL_DELTA, 0.0));
 			return 0;
 		}
-  //      case WM_CHAR:
-  //      {
-  //          CharInputArgs args = {};
-  //          args.Code = wParam;
-  //          m_eventOnCharInput.Invoke(args);
-  //          break;
-  //      }
-  //      case WM_IME_CHAR:	//使用输入法输入字符时，触发 WM_IME_CHAR 消息。输入词组时，词组有多少个字符就触发多少次。
-  //          CharInputArgs args = {};
-  //          args.Code = wParam;
-  //          m_eventOnCharInput.Invoke(args);
-  //          break;
+        case WM_CHAR:
+        {
+            CharInputArgs args = {};
+            args.Code = wParam;
+            m_eventOnCharInput.Invoke(args);
+            return 0;
+        }
+        case WM_IME_CHAR:	//使用输入法输入字符时，触发 WM_IME_CHAR 消息。输入词组时，词组有多少个字符就触发多少次。
+            CharInputArgs args = {};
+            args.Code = wParam;
+            m_eventOnCharInput.Invoke(args);
+            return 0;
 	    }
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}

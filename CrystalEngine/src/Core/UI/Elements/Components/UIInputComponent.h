@@ -24,6 +24,7 @@ namespace crystal
         int GetCarrotPos() const { return m_carrotPos; }
     private:
         InputController*                    m_inputController;
+        IGameWindow*                        m_gameWindow;
         std::u32string                      m_text{};
         int                                 m_carrotPos = 0;
         bool                                m_carrotChanged = false;
@@ -31,8 +32,8 @@ namespace crystal
         int                                 m_selectionRight = 0;
 
         bool HandleControls(const KeyEventArgs& args);
-        bool HandleCharacters(const KeyEventArgs& args);
-        void InsertValue(char32_t c, int index);
+        void EraseSelection();
+        void InsertValue(char32_t c);
         void BackValue(int count);
     };
 }

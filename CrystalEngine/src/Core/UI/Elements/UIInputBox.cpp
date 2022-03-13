@@ -9,7 +9,7 @@
 namespace crystal
 {
     static constexpr int TEXT_PADDING = 2;
-    static constexpr int TEXT_TRAILLING_OFFSET = 8;
+    static constexpr int TEXT_SPACING_OFFSET = 4;
     UIInputBox::UIInputBox()
     {
         m_backgroundColor = UIStyle::GetButtonColor();
@@ -198,13 +198,13 @@ namespace crystal
         auto maxPos = m_calculatedInnerBound.GetMaxPos();
         float actualX = GetXOffsetByCarrot(carrot) + minPos.x + TEXT_PADDING - m_drawXOffset;
         if (isnan(actualX)) return;
-        if (actualX > maxPos.x - TEXT_PADDING - TEXT_TRAILLING_OFFSET)
+        if (actualX > maxPos.x - TEXT_PADDING - TEXT_SPACING_OFFSET)
         {
-            m_drawXOffset += actualX - (maxPos.x - TEXT_PADDING - TEXT_TRAILLING_OFFSET);
+            m_drawXOffset += actualX - (maxPos.x - TEXT_PADDING - TEXT_SPACING_OFFSET);
         }
-        else if (actualX < minPos.x + TEXT_PADDING)
+        else if (actualX < minPos.x + TEXT_PADDING + TEXT_SPACING_OFFSET)
         {
-            m_drawXOffset -= minPos.x + TEXT_PADDING - actualX;
+            m_drawXOffset -= minPos.x + TEXT_PADDING + TEXT_SPACING_OFFSET - actualX;
         }
     }
 

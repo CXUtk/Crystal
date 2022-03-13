@@ -12,6 +12,7 @@ namespace crystal
     UIInputComponent::UIInputComponent(const std::string& initText)
     {
         m_inputController = Engine::GetInstance()->GetInputController();
+        m_gameWindow = Engine::GetInstance()->GetWindow();
     }
 
     UIInputComponent::~UIInputComponent()
@@ -29,12 +30,9 @@ namespace crystal
         auto sequence = m_inputController->GetKeyDownSequence();
         auto charInputs = m_inputController->GetInputCharSequence();
 
-        for (auto c : charInputs)
-        {
-            InsertValue(c, m_carrotPos);
-        }
+        m_carrotChanged = !sequence.empty() || !charInputs.empty();
 
-        m_carrotChanged = !sequence.empty();
+
         for (auto& keyArgs : sequence)
         {
             if (HandleControls(keyArgs))
@@ -42,17 +40,7 @@ namespace crystal
                 continue;
             }
             auto keyCode = keyArgs.KeyCode;
-            if (keyCode >= KeyCode::CRYSTAL_A_KEY && keyCode <= KeyCode::CRYSTAL_SPACE_KEY)
-            {
-                bool holdShift = keyArgs.Mods & KeyMODState::CRYSTAL_MOD_SHIFT;
-                InsertValue(holdShift ? InputCommon::KeyCodeToCharMapUpper(keyCode)
-                    : InputCommon::KeyCodeToCharMapLower(keyCode), m_carrotPos);
-            }
-            else if (keyCode == KeyCode::CRYSTAL_BACK_KEY)
-            {
-                BackValue(1);
-            }
-            else if (keyCode == KeyCode::CRYSTAL_LEFT_KEY)
+            if (keyCode == KeyCode::CRYSTAL_LEFT_KEY)
             {
                 if (keyArgs.Mods & KeyMODState::CRYSTAL_MOD_SHIFT)
                 {
@@ -117,6 +105,18 @@ namespace crystal
                 }
             }
         }
+
+        for (auto c : charInputs)
+        {
+            if (c == '\b')
+            {
+                BackValue(1);
+            }
+            else if(c >= ' ')
+            {
+                InsertValue(c);
+            }
+        }
     }
 
     void UIInputComponent::SetSelectionRange(int l, int r)
@@ -140,32 +140,53 @@ namespace crystal
     {
         if (args.Mods & KeyMODState::CRYSTAL_MOD_CTRL)
         {
+            auto clipboard = m_gameWindow->GetClipBoard();
             if (args.KeyCode == KeyCode::CRYSTAL_C_KEY)
             {
                 // Ctrl + C
+                clipboard->Copy(m_text.substr(m_selectionLeft, m_selectionRight - m_selectionLeft));
             }
             else if (args.KeyCode == KeyCode::CRYSTAL_V_KEY)
             {
                 // Ctrl + V
+                auto str = clipboard->Paste();
+                for (auto c : str)
+                {
+                    InsertValue(c);
+                }
             }
             else if (args.KeyCode == KeyCode::CRYSTAL_X_KEY)
             {
                 // Ctrl + X
+                clipboard->Copy(m_text.substr(m_selectionLeft, m_selectionRight - m_selectionLeft));
+                EraseSelection();
             }
             return true;
         }
         return false;
     }
 
-    void UIInputComponent::InsertValue(char32_t c, int index)
+    void UIInputComponent::EraseSelection()
     {
-        if (index == m_text.size())
+        m_text.erase(m_text.begin() + m_selectionLeft, m_text.begin() + m_selectionRight);
+        m_carrotPos = m_selectionLeft;
+        m_selectionRight = m_selectionLeft;
+    }
+
+    void UIInputComponent::InsertValue(char32_t c)
+    {
+        if (m_selectionLeft != m_selectionRight)
+        {
+            EraseSelection();
+        }
+
+        if (m_carrotPos == m_text.size())
         {
             m_text.push_back(c);
         }
         else
         {
-            m_text.insert(m_text.begin() + index, c);
+            m_text.insert(m_text.begin() + m_carrotPos, c);
         }
         m_carrotPos++;
     }
@@ -189,9 +210,7 @@ namespace crystal
         }
         else
         {
-            m_text.erase(m_text.begin() + m_selectionLeft, m_text.begin() + m_selectionRight);
-            m_carrotPos = m_selectionLeft;
-            m_selectionRight = m_selectionLeft;
+            EraseSelection();
         }
     }
 }

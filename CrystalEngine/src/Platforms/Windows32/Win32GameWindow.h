@@ -6,6 +6,8 @@
 #include <string>
 #include <bitset>
 
+#include "Win32ClipBoard.h"
+
 namespace crystal
 {
 	class Win32GameWindow : public IGameWindow
@@ -30,6 +32,8 @@ namespace crystal
 		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) override;
 		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) override;
         virtual void AddCharInputEventListener(CharInputEvent::Func eventHandler) override;
+
+        virtual IClipBoard* GetClipBoard() const override { return ptr(m_pClipBoard); }
 
 		HINSTANCE GetAppInst() const { return m_hWindowInstance; }
 		HWND GetHWND() const { return m_hMainWnd; }
@@ -63,6 +67,8 @@ namespace crystal
         CharInputEvent              m_eventOnCharInput;
 
 		std::bitset<(int)MouseButtonCode::__COUNT>				m_mouseDowned{};
+
+        std::unique_ptr<Win32ClipBoard>     m_pClipBoard = nullptr;
 
 
 		bool m_InitMainWindow();

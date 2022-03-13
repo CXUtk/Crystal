@@ -2,6 +2,7 @@
 #include <Core/Input/InputCommon.h>
 #include <Core/Utils/Event.h>
 #include <Core/Utils/Geometry.h>
+#include "IClipBoard.h"
 
 namespace crystal
 {
@@ -31,5 +32,7 @@ namespace crystal
 		virtual void AppendOnMouseButtonChangeEvent(OnMouseButtonChangeEvent::Func eventHandler) = 0;
 		virtual void AppendOnKeyChangeEvent(OnKeyChangeEvent::Func eventHandler) = 0;
         virtual void AddCharInputEventListener(CharInputEvent::Func eventHandler) = 0;
+
+        virtual IClipBoard* GetClipBoard() const = 0;
 	};
 }

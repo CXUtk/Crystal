@@ -31,7 +31,7 @@ namespace crystal
         window->AddCharInputEventListener([this, &charSeq](CharInputArgs args) {
             charSeq.push_back((wchar_t)args.Code);
             auto c = (wchar_t)args.Code;
-            printf("%08X\n", (wchar_t)args.Code);
+            printf("0x%04X\n", (wchar_t)args.Code);
         });
 
 		GlobalLogger::Log(SeverityLevel::Debug, "InputController construct");
