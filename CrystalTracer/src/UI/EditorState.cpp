@@ -8,6 +8,9 @@ using namespace crystal;
 namespace tracer
 {
     constexpr int NAV_BAR_HEIGHT = 36;
+    constexpr int CANVAS_WIDTH = 800;
+    constexpr int CANVAS_HEIGHT = 600;
+
     EditorState::EditorState()
     {
         m_mainWindow = std::make_shared<UIWidget>((const char*)u8"Crystal Tracer 渲染器");
@@ -54,7 +57,7 @@ namespace tracer
         m_toolBars->SetAnchorPoint(Vector2f(0.f, .5f));
         m_toolBars->SetSize(SizeLayout(0, .1f, 0, 1.f));
         m_toolBars->SetPosition(Vector2f(0, 0));
-        layout->AppendElement(m_toolBars, Bound2f(Vector2f(0.f), Vector2f(.1f, 1.f)));
+        layout->AppendElement(m_toolBars, Bound2f(Vector2f(0.f), Vector2f(0.08f, 1.f)));
 
         m_displayer = std::make_shared<UIElement>();
         m_displayer->SetName("Displayer");
@@ -62,7 +65,8 @@ namespace tracer
         m_displayer->SetAnchorPoint(Vector2f(0.f, .5f));
         m_displayer->SetSize(SizeLayout(0, .6f, 0, 1.f));
         m_displayer->SetPosition(Vector2f(0, 0));
-        layout->AppendElement(m_displayer, Bound2f(Vector2f(.1f, 0.f), Vector2f(.7f, 1.f)));
+        layout->AppendElement(m_displayer, Bound2f(Vector2f(.08f, 0.f), Vector2f(.75f, 1.f)));
+
 
         m_properties = std::make_shared<UIElement>();
         m_properties->SetName("Props");
@@ -70,18 +74,26 @@ namespace tracer
         m_properties->SetAnchorPoint(Vector2f(1.f, .5f));
         m_properties->SetSize(SizeLayout(0, .3f, 0, 1.f));
         m_properties->SetPosition(Vector2f(0, 0));
-        layout->AppendElement(m_properties, Bound2f(Vector2f(0.7f, 0.f), Vector2f(1.f, 1.f)));
+        layout->AppendElement(m_properties, Bound2f(Vector2f(0.75f, 0.f), Vector2f(1.f, 1.f)));
 
         //m_startRenderButton = std::make_shared<UITextButton>();
         //m_startRenderButton->SetSize(SizeLayout(72, 32));
         //m_startRenderButton->SetText("Button");
 
-        auto input = std::make_shared<UIInputBox>();
-        input->SetPivot(Vector2f(0.5f, 0.5f));
-        input->SetAnchorPoint(Vector2f(0.5f, 0.5f));
-        input->SetSize(SizeLayout(160, 24));
-        input->SetPosition(Vector2f(0.f, -50.f));
-        m_displayer->AppendChild(input);
+        m_renderProgressBar = std::make_shared<UIProgressBar>();
+        m_renderProgressBar->SetPivot(Vector2f(0.5f, 0.f));
+        m_renderProgressBar->SetAnchorPoint(Vector2f(0.5f, 0.f));
+        m_renderProgressBar->SetSize(SizeLayout(CANVAS_WIDTH, 24));
+        m_renderProgressBar->SetPosition(Vector2f(0.f, 16.f));
+        m_renderProgressBar->SetValue(0.5f);
+        m_displayer->AppendChild(m_renderProgressBar);
+
+        m_canvas = std::make_shared<Canvas>();
+        m_canvas->SetPivot(Vector2f(0.5f, 1.0f));
+        m_canvas->SetAnchorPoint(Vector2f(0.5f, 1.0f));
+        m_canvas->SetSize(SizeLayout(800, .0f, 600, 0.f));
+        m_canvas->SetPosition(Vector2f(0.f, -32.f));
+        m_displayer->AppendChild(m_canvas);
     }
 
     EditorState::~EditorState()

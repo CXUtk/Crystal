@@ -1,6 +1,6 @@
 {
     "Init": {
-        "WindowWidth": 1024,
+        "WindowWidth": 1350,
         "WindowHeight": 768,
         "WindowResizable": false,
         "FPSLimit": 60,
