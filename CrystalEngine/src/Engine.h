@@ -96,5 +96,6 @@ namespace crystal
 		Engine();
 
 		void m_Initialize();
+        void ReadConfig();
 	};
 }

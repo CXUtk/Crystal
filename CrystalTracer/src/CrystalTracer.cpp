@@ -1,53 +1,57 @@
-#include "UITest.h"
+#include "CrystalTracer.h"
+
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
 #include <Core/Input/InputController.h>
 #include <Core/Utils/GameTimer.h>
 #include <Core/Render/SpriteBatch.h>
-
 #include <Core/UI/UIStateMachine.h>
-#include "UIStates/RayTracerState.h"
 
-namespace crystal
+#include "UI/EditorState.h"
+
+using namespace crystal;
+
+namespace tracer
 {
-    UITest::UITest()
+    CrystalTracer::CrystalTracer()
     {}
 
-    UITest::~UITest()
+    CrystalTracer::~CrystalTracer()
     {}
 
-    void UITest::Initialize()
+    void CrystalTracer::Initialize()
     {
         auto UISM = Engine::GetInstance()->GetUIStateMachine();
 
-        UISM->AddState("test", std::make_shared<RayTracerState>());
-        UISM->SetState("test");
+        UISM->AddState("editor", std::make_shared<EditorState>());
+        UISM->SetState("editor");
     }
 
-    void UITest::Update(const crystal::GameTimer& gameTimer)
+    void CrystalTracer::Update(const crystal::GameTimer& gameTimer)
     {
         auto UISM = Engine::GetInstance()->GetUIStateMachine();
         UISM->Update(gameTimer);
     }
 
-    void UITest::Draw(const crystal::GameTimer& gameTimer)
+    void CrystalTracer::Draw(const crystal::GameTimer& gameTimer)
     {
         auto graphicsContext = m_engine->GetGraphicsContext();
-        auto UISM = Engine::GetInstance()->GetUIStateMachine();
         graphicsContext->Clear(
             crystal::ClearOptions::CRYSTAL_CLEAR_TARGET
             | crystal::ClearOptions::CRYSTAL_CLEAR_DEPTH
             | crystal::ClearOptions::CRYSTAL_CLEAR_STENCIL,
             crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
+
+        auto UISM = Engine::GetInstance()->GetUIStateMachine();
         UISM->Draw(gameTimer);
     }
 
-    void UITest::Exit()
+    void CrystalTracer::Exit()
     {
 
     }
 
-    bool UITest::Paused()
+    bool CrystalTracer::Paused()
     {
         return false;
     }

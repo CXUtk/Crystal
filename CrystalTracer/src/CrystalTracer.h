@@ -3,13 +3,13 @@
 #include "Engine.h"
 #include <Core/UI/UIExports.h>
 
-namespace crystal
+namespace tracer
 {
-    class UITest : public Application
+    class CrystalTracer : public crystal::Application
     {
     public:
-        UITest();
-        virtual ~UITest() override;
+        CrystalTracer();
+        virtual ~CrystalTracer() override;
 
         virtual void Initialize() override;
 
@@ -23,7 +23,5 @@ namespace crystal
 
     private:
         bool    m_renderPause = false;
-
-
     };
 }

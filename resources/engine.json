@@ -1,0 +1,11 @@
+{
+    "Init": {
+        "WindowWidth": 1024,
+        "WindowHeight": 768,
+        "WindowResizable": false,
+        "FPSLimit": 60,
+        "WindowTitle": "Title",
+        "Enable4xMSAA": false,
+        "MSAAQuality": 0
+    }
+}

@@ -71,7 +71,7 @@ namespace crystal
         std::unique_ptr<Win32ClipBoard>     m_pClipBoard = nullptr;
 
 
-		bool m_InitMainWindow();
+		bool m_InitMainWindow(const InitArgs& args);
 
 		LRESULT _msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		void m_Resize(Vector2i size);

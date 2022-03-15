@@ -2,11 +2,13 @@
 #include <CrystalEngine/src/Tests/Integrated/OrbitControllerTest.h>
 #include <CrystalEngine/src/Tests/Integrated/TriangleTest.h>
 #include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
-#include <CrystalEngine/src/Tests/Integrated/UITest.h>
 #include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>
 #include <SJson/SJson.hpp>
+
+#include "CrystalTracer.h"
 using namespace crystal;
+using namespace tracer;
 //
 //#include <Interfaces/FileSystem/File.h>
 //#include <type_traits>
@@ -49,6 +51,6 @@ int main()
 	////{
 	////	crystal::GlobalLogger::Log(SeverityLevel::Error, ex.what());
 	////}
-    engine->Start(std::make_unique<UITest>());
+    engine->Start(std::make_unique<CrystalTracer>());
 	return 0;
 }

@@ -14,15 +14,6 @@ namespace crystal
 {
     Engine::Engine()
     {
-        m_initArgs = {};
-        m_initArgs.WindowWidth = 800;
-        m_initArgs.WindowHeight = 600;
-        m_initArgs.WindowResizable = false;
-        m_initArgs.FPSLimit = 60;
-        strcpy(m_initArgs.WindowTitle, "Test");
-
-        m_fpsCap = 1.0 / m_initArgs.FPSLimit;
-
         GlobalLogger::Log(SeverityLevel::Debug, "Engine Construct");
     }
     
@@ -80,6 +71,7 @@ namespace crystal
 
     void Engine::m_Initialize()
     {
+        ReadConfig();
         GraphicsCommons::InitGraphicsCommons();
         m_platformProvider = PlatformFactory::GetPlatformProvider(m_initArgs);
 
@@ -154,5 +146,12 @@ namespace crystal
     UIStateMachine* Engine::GetUIStateMachine() const
     {
         return ptr(m_pUIStateMachine);
+    }
+
+    void Engine::ReadConfig()
+    {
+        auto&& node = SJson::JsonConvert::Parse(File::ReadAllText("resources/engine.json"));
+        m_initArgs = SJson::de_serialize<InitArgs>(node["Init"]);
+        m_fpsCap = 1.0 / m_initArgs.FPSLimit;
     }
 }

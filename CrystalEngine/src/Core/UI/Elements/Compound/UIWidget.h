@@ -15,6 +15,9 @@ namespace crystal
         UIWidget(const std::string& title);
         ~UIWidget() override;
 
+        bool IsDragable() const { return m_isDragable; }
+        void SetDragable(bool value) { m_isDragable = value; }
+
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
 
         virtual void MouseJustPressed(UIMouseButtonEventArgs args) override;
@@ -30,6 +33,7 @@ namespace crystal
         bool                            m_isDragging = false;
         Vector2i                        m_lastMousePos{};
         UIWidgetCloseEvent              m_eventOnClose{};
+        bool                            m_isDragable = true;
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
 

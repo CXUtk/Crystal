@@ -28,7 +28,7 @@ namespace crystal
 
 		m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 
-		if (!m_InitMainWindow())
+		if (!m_InitMainWindow(args))
 		{
 			throw std::exception("[Win32GameWindow::Win32GameWindow] Unable to start Win32 window");
 		}
@@ -99,7 +99,7 @@ namespace crystal
         m_eventOnCharInput += eventHandler;
     }
 
-	bool Win32GameWindow::m_InitMainWindow()
+	bool Win32GameWindow::m_InitMainWindow(const InitArgs& args)
 	{
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
@@ -121,17 +121,21 @@ namespace crystal
 			return false;
 		}
 
+        DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+        if (!args.WindowResizable)
+        {
+            dwStyle ^= (WS_THICKFRAME | WS_MAXIMIZEBOX);
+        }
 		// Compute window rectangle dimensions based on requested client area dimensions.
 		RECT R = { 0, 0, m_windowSize.x, m_windowSize.y };
-		AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+		AdjustWindowRect(&R, dwStyle, false);
 
 		int width = R.right - R.left;
 		int height = R.bottom - R.top;
 
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
 		m_hMainWnd = CreateWindowW(L"Win32WndClassName", converter.from_bytes(m_windowTitle).c_str(),
-			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height,
+            dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, width, height,
 			0, 0, m_hWindowInstance, 0);
 		if (!m_hMainWnd)
 		{

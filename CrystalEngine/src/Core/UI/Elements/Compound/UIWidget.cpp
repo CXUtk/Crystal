@@ -81,7 +81,7 @@ namespace crystal
     void UIWidget::UpdateSelf(const GameTimer& gameTimer)
     {
         auto mousePos = m_gameWindow->GetMousePos();
-        if (m_isDragging)
+        if (m_isDragable && m_isDragging)
         {
             UpdateDragPos(mousePos);
             Recalculate();

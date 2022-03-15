@@ -1,19 +1,22 @@
-#include "RayTracerState.h"
+#include "EditorState.h"
 
-#include <Engine.h>
-#include <Core/Asset/AssetManager.h>
+#include <CrystalEngine/src/Engine.h>
+#include <CrystalEngine/src/Core/Asset/AssetManager.h>
 
-namespace crystal
+using namespace crystal;
+
+namespace tracer
 {
     constexpr int NAV_BAR_HEIGHT = 36;
-    RayTracerState::RayTracerState()
+    EditorState::EditorState()
     {
-        m_mainWindow = std::make_shared<UIWidget>(u8"Crystal Tracer");
+        m_mainWindow = std::make_shared<UIWidget>((const char*)u8"Crystal Tracer 渲染器");
         m_mainWindow->SetName("Main Window");
         m_mainWindow->SetPivot(Vector2f(0.5f, 0.5f));
         m_mainWindow->SetAnchorPoint(Vector2f(0.5f, 0.5f));
         m_mainWindow->SetSize(SizeLayout(0, 1.f, 0, 1.f));
         m_mainWindow->SetPosition(Vector2f(0, 0));
+        m_mainWindow->SetDragable(false);
 
         m_mainWindow->AddOnCloseEventListener([](UIEventArgs args) {
             args.Element->SetActive(false);
@@ -81,10 +84,10 @@ namespace crystal
         m_displayer->AppendChild(input);
     }
 
-    RayTracerState::~RayTracerState()
+    EditorState::~EditorState()
     {}
 
-    void RayTracerState::Update(const GameTimer & gameTimer)
+    void EditorState::Update(const GameTimer & gameTimer)
     {
         UIState::Update(gameTimer);
     }

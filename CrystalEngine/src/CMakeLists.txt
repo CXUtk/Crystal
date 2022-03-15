@@ -34,7 +34,7 @@ ${CrystalEngineSources_PlatformFactory}
 ${CrystalEngineTests})
 
 set_target_properties(CrystalEngine PROPERTIES
-            CXX_STANDARD 17
+            CXX_STANDARD 20
             CXX_EXTENSIONS OFF)
 
 

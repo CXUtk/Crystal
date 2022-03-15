@@ -11,7 +11,7 @@ file(GLOB_RECURSE CrystalTracerHeaders "src/*.h")
 add_executable (CrystalTracer ${CrystalTracerSources} ${CrystalTracerHeaders})
 
 set_target_properties(CrystalTracer PROPERTIES
-            CXX_STANDARD 17
+            CXX_STANDARD 20
             CXX_EXTENSIONS OFF
             )
 

@@ -24,7 +24,7 @@ namespace crystal
     {
     public:
         using Vec = glm::vec<L, T, Q>;
-        Ray() { start = Vec(0), dir = Vec(0); }
+        Ray() : _start{}, _dir{} {};
         Ray(const Vec& start, const Vec& dir) : _start(start), _dir(dir) {}
 
         Vec Start() const { return _start; }
