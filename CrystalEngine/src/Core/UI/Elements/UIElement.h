@@ -49,6 +49,9 @@ namespace crystal
         bool IsActive() const { return m_isActive; }
         void SetActive(bool value) { m_isActive = value; }
 
+        bool IsEnabled() const { return m_isEnabled; }
+        void SetEnabled(bool value) { m_isEnabled = value; }
+
         bool IsVisible() const { return m_isVisible; }
         void SetVisible(bool value) { m_isVisible = value; }
 
@@ -56,7 +59,7 @@ namespace crystal
         void SetNoEvents(bool value) { m_noEvents = value; }
 
 
-        bool CanResponseEvent() const { return m_isActive && !m_noEvents; }
+        bool CanResponseEvent() const { return m_isActive && m_isEnabled && !m_noEvents; }
 
         std::string GetName() const { return m_name; }
         void SetName(const std::string& name) { m_name = name; }
@@ -122,6 +125,7 @@ namespace crystal
 
         // Properties
         bool        m_isActive = true;
+        bool        m_isEnabled = true;
         bool        m_isVisible = true;
         bool        m_noEvents = false;
         bool        m_isFocused = false;

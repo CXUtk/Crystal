@@ -8,8 +8,7 @@ using namespace crystal;
 namespace tracer
 {
     constexpr int NAV_BAR_HEIGHT = 36;
-    constexpr int CANVAS_WIDTH = 800;
-    constexpr int CANVAS_HEIGHT = 600;
+    constexpr int TABVIEW_PADDING = 16;
 
     EditorState::EditorState()
     {
@@ -76,24 +75,46 @@ namespace tracer
         m_properties->SetPosition(Vector2f(0, 0));
         layout->AppendElement(m_properties, Bound2f(Vector2f(0.75f, 0.f), Vector2f(1.f, 1.f)));
 
-        //m_startRenderButton = std::make_shared<UITextButton>();
-        //m_startRenderButton->SetSize(SizeLayout(72, 32));
-        //m_startRenderButton->SetText("Button");
-
         m_renderProgressBar = std::make_shared<UIProgressBar>();
         m_renderProgressBar->SetPivot(Vector2f(0.5f, 0.f));
         m_renderProgressBar->SetAnchorPoint(Vector2f(0.5f, 0.f));
-        m_renderProgressBar->SetSize(SizeLayout(CANVAS_WIDTH, 24));
+        m_renderProgressBar->SetSize(SizeLayout(-2 * TABVIEW_PADDING, 1.f, 24, 0.f));
         m_renderProgressBar->SetPosition(Vector2f(0.f, 16.f));
         m_renderProgressBar->SetValue(0.5f);
         m_displayer->AppendChild(m_renderProgressBar);
 
+        m_displayerTabView = std::make_shared<UITabView>();
+        m_displayerTabView->SetPivot(Vector2f(0.5f, 1.0f));
+        m_displayerTabView->SetAnchorPoint(Vector2f(0.5f, 1.0f));
+        m_displayerTabView->SetSize(SizeLayout(-2 *TABVIEW_PADDING, 1.f, -2* TABVIEW_PADDING, 0.9f));
+        m_displayerTabView->SetPosition(Vector2f(0.f, -32.f));
+        m_displayer->AppendChild(m_displayerTabView);
+
+        m_displayerTabView->AddTab("Scene", std::make_shared<UIElement>());
+
         m_canvas = std::make_shared<Canvas>();
-        m_canvas->SetPivot(Vector2f(0.5f, 1.0f));
-        m_canvas->SetAnchorPoint(Vector2f(0.5f, 1.0f));
-        m_canvas->SetSize(SizeLayout(800, .0f, 600, 0.f));
-        m_canvas->SetPosition(Vector2f(0.f, -32.f));
-        m_displayer->AppendChild(m_canvas);
+        m_canvas->SetPivot(Vector2f(0.5f, 0.5f));
+        m_canvas->SetAnchorPoint(Vector2f(0.5f, 0.5f));
+        m_canvas->SetSize(SizeLayout(0, 1.f, 0, 1.f));
+        m_canvas->SetPosition(Vector2f(0.f, 0.f));
+        m_displayerTabView->AddTab("Result", m_canvas);
+
+        auto button1 = std::make_shared<UITextButton>();
+        button1->SetPivot(Vector2f(0.5f, 1.f));
+        button1->SetAnchorPoint(Vector2f(0.5f, 1.f));
+        button1->SetPosition(Vector2f(0.f, -50.f));
+        button1->SetSize(SizeLayout(72, 32));
+        button1->SetText("Button");
+        m_properties->AppendChild(button1);
+
+        auto button2 = std::make_shared<UITextButton>();
+        button2->SetPivot(Vector2f(0.5f, 1.f));
+        button2->SetAnchorPoint(Vector2f(0.5f, 1.f));
+        button2->SetPosition(Vector2f(0.f, -100.f));
+        button2->SetSize(SizeLayout(72, 32));
+        button2->SetText("Button");
+        button2->SetEnabled(false);
+        m_properties->AppendChild(button2);
     }
 
     EditorState::~EditorState()

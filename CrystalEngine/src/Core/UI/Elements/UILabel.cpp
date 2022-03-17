@@ -49,6 +49,13 @@ namespace crystal
         }
     }
 
+    Vector2f UILabel::GetPredictedSize() const
+    {
+        auto metric = m_textDrawComponent->MeasureSize();
+        auto height = metric.yMax - metric.yMin;
+        return Vector2f(metric.Width, height);
+    }
+
     void UILabel::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         m_textDrawComponent->DrawWithBot(m_calculatedInnerBound.GetMinPos(), payload);

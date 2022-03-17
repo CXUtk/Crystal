@@ -59,7 +59,7 @@ namespace crystal
         T           Value;
     };
 
-    using UIActionEvent = Event< UIEventArgs>;
+    using UIActionEvent = Event<UIEventArgs>;
     using UIMouseButtonEvent = Event<UIMouseButtonEventArgs>;
     using UIMouseEvent = Event<UIMouseEventArgs>;
     using UIMouseScrollEvent = Event<UIMouseScrollEventArgs>;

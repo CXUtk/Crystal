@@ -17,3 +17,4 @@
 #include "Elements/UIInputBox.h"
 #include "Elements/Compound/UIWidget.h"
 #include "Elements/Compound/UIList.h"
+#include "Elements/Compound/UITabView.h"

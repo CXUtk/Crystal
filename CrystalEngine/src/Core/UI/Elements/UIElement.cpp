@@ -51,6 +51,7 @@ namespace crystal
 
     void UIElement::Update(const GameTimer& gameTimer)
     {
+        if (!m_isEnabled) return;
         UpdateSelf(gameTimer);
 
 

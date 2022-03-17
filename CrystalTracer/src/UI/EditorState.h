@@ -23,7 +23,9 @@ namespace tracer
         std::shared_ptr<crystal::UIElement>      m_displayer = nullptr;
         std::shared_ptr<crystal::UIElement>      m_properties = nullptr;
 
+        std::shared_ptr<crystal::UITabView>             m_displayerTabView = nullptr;
+        std::shared_ptr<crystal::UIProgressBar>         m_renderProgressBar = nullptr;
+
         std::shared_ptr<Canvas>                 m_canvas = nullptr;
-        std::shared_ptr<crystal::UIProgressBar>          m_renderProgressBar = nullptr;
     };
 }

@@ -28,7 +28,7 @@ namespace crystal
 
         for (auto& element : m_pUIElements)
         {
-            if (element->IsActive())
+            if (element->IsActive() && element->IsEnabled())
             {
                 element->Update(gameTimer);
             }

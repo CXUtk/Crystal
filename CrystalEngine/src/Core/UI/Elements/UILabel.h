@@ -35,6 +35,8 @@ namespace crystal
 
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
 
+        Vector2f GetPredictedSize() const;
+
     protected:
         bool                m_shouldRecalculateText = true;
         std::u32string      m_text{};
