@@ -10,8 +10,8 @@
 namespace crystal
 {
     constexpr int LABEL_PADDING_BOT = 2;
-    constexpr int LABEL_PADDING_LEFT = 2;
-    constexpr int LABEL_PADDING_RIGHT = 5;
+    constexpr int LABEL_PADDING_LEFT = 5;
+    constexpr int LABEL_PADDING_RIGHT = 8;
     UITabBar::UITabBar(const std::string& name)
     {
         m_propagationFlags = PropagationFlags::MouseScroll;
@@ -80,12 +80,12 @@ namespace crystal
 
         auto bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
         spriteBatch->Draw(stateMachine->GetWhiteTexture(), bound, (m_isSelected || m_isHovered) ? UIStyle::GetButtonHoverColor() : UIStyle::GetButtonColor());
-        spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice, bound, (m_isSelected || m_isHovered) ? UIStyle::GetPanelBorderColorHighlight() : UIStyle::GetPanelBorderColor());
+        //spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice, bound, (m_isSelected || m_isHovered) ? UIStyle::GetPanelBorderColorHighlight() : UIStyle::GetPanelBorderColor());
     }
 
 
     constexpr int CONTAINER_PADDING = 2;
-    constexpr int TAB_BAR_PADDING = 2;
+    constexpr int TAB_BAR_PADDING = 1;
     constexpr int TAB_BAR_HEIGHT = 32;
     UITabView::UITabView()
     {
@@ -146,6 +146,17 @@ namespace crystal
             bar->SetPosition(Vector2f(offsetX, 0.f));
             offsetX += bar->GetWidth() + TAB_BAR_PADDING;
         }
+    }
+
+    void UITabView::DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer)
+    {
+        UIElement::DrawChildren(payload, gameTimer);
+        auto spriteBatch = payload.SpriteBatch;
+        auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
+
+        auto tabBound = BoundingBoxConvert<int>(m_tabContainer->GetInnerBound());
+        auto bound = Bound2i(tabBound.GetMinPos() - Vector2i(0, 2), tabBound.GetMinPos() + Vector2i(tabBound.GetSize().x, 1));
+        spriteBatch->Draw(stateMachine->GetWhiteTexture(), bound, UIStyle::GetButtonHoverColor());
     }
 
     void UITabView::SwitchTab(int index)

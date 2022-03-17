@@ -78,7 +78,7 @@ namespace tracer
         m_renderProgressBar = std::make_shared<UIProgressBar>();
         m_renderProgressBar->SetPivot(Vector2f(0.5f, 0.f));
         m_renderProgressBar->SetAnchorPoint(Vector2f(0.5f, 0.f));
-        m_renderProgressBar->SetSize(SizeLayout(-2 * TABVIEW_PADDING, 1.f, 24, 0.f));
+        m_renderProgressBar->SetSize(SizeLayout(-2 * TABVIEW_PADDING - 4, 1.f, 24, 0.f));
         m_renderProgressBar->SetPosition(Vector2f(0.f, 16.f));
         m_renderProgressBar->SetValue(0.5f);
         m_displayer->AppendChild(m_renderProgressBar);
@@ -86,7 +86,7 @@ namespace tracer
         m_displayerTabView = std::make_shared<UITabView>();
         m_displayerTabView->SetPivot(Vector2f(0.5f, 1.0f));
         m_displayerTabView->SetAnchorPoint(Vector2f(0.5f, 1.0f));
-        m_displayerTabView->SetSize(SizeLayout(-2 *TABVIEW_PADDING, 1.f, -2* TABVIEW_PADDING, 0.9f));
+        m_displayerTabView->SetSize(SizeLayout(-2 * TABVIEW_PADDING, 1.f, -2 * TABVIEW_PADDING, 0.9f));
         m_displayerTabView->SetPosition(Vector2f(0.f, -32.f));
         m_displayer->AppendChild(m_displayerTabView);
 
@@ -102,7 +102,7 @@ namespace tracer
         auto button1 = std::make_shared<UITextButton>();
         button1->SetPivot(Vector2f(0.5f, 1.f));
         button1->SetAnchorPoint(Vector2f(0.5f, 1.f));
-        button1->SetPosition(Vector2f(0.f, -50.f));
+        button1->SetPosition(Vector2f(0.f, -32.f));
         button1->SetSize(SizeLayout(72, 32));
         button1->SetText("Button");
         m_properties->AppendChild(button1);
@@ -110,17 +110,48 @@ namespace tracer
         auto button2 = std::make_shared<UITextButton>();
         button2->SetPivot(Vector2f(0.5f, 1.f));
         button2->SetAnchorPoint(Vector2f(0.5f, 1.f));
-        button2->SetPosition(Vector2f(0.f, -100.f));
+        button2->SetPosition(Vector2f(0.f, -64.f));
         button2->SetSize(SizeLayout(72, 32));
         button2->SetText("Button");
         button2->SetEnabled(false);
         m_properties->AppendChild(button2);
+
+        auto slider1 = std::make_shared<UIValueSlider>();
+        slider1->SetPivot(Vector2f(0.5f, 1.f));
+        slider1->SetAnchorPoint(Vector2f(0.5f, 1.f));
+        slider1->SetPosition(Vector2f(0.f, -96.f));
+        slider1->SetSize(SizeLayout(108, 24));
+        m_properties->AppendChild(slider1);
+
+        auto list1 = std::make_shared<UIList>();
+        list1->SetPivot(Vector2f(0.5f, 1.f));
+        list1->SetAnchorPoint(Vector2f(0.5f, 1.f));
+        list1->SetPosition(Vector2f(0.f, -136.f));
+        list1->SetSize(SizeLayout(135, 135));
+        m_properties->AppendChild(list1);
+
+        {
+            auto text1 = std::make_shared<UILabel>("ItemXXXX");
+            text1->SetPivot(Vector2f(0.5f));
+            text1->SetAnchorPoint(Vector2f(0.5f));
+            text1->SetPosition(Vector2f(0.f, 0.f));
+            text1->SetSize(SizeLayout(200, 200));
+
+            auto text2 = std::make_shared<UILabel>("ItemXXXX--2");
+            text2->SetPivot(Vector2f(0.5f));
+            text2->SetAnchorPoint(Vector2f(0.5f));
+            text2->SetPosition(Vector2f(0.f, 0.f));
+            text2->SetSize(SizeLayout(200, 200));
+
+            list1->Add(text1);
+            list1->Add(text2);
+        }
     }
 
     EditorState::~EditorState()
     {}
 
-    void EditorState::Update(const GameTimer & gameTimer)
+    void EditorState::Update(const GameTimer& gameTimer)
     {
         UIState::Update(gameTimer);
     }

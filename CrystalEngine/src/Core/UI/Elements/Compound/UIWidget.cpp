@@ -42,8 +42,8 @@ namespace crystal
         panelBar->SetImageType(ImageType::Sliced);
         panelBar->SetPivot(Vector2f(0.f, 1.f));
         panelBar->SetAnchorPoint(Vector2f(0.f, 1.f));
-        panelBar->SetSize(SizeLayout(0, 1.f, 40, 0.f));
-        panelBar->SetColor(UIStyle::GetButtonColor());
+        panelBar->SetSize(SizeLayout(0, 1.f, 42, 0.f));
+        panelBar->SetColor(UIStyle::GetWindowLegendColor());
         panelBar->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxNoB"));
         panelBar->SetSliceInfo(slice6);
 

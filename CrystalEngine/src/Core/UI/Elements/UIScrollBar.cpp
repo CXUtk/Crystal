@@ -11,9 +11,9 @@ namespace crystal
 {
     UIScrollBarBase::UIScrollBarBase()
     {
-        m_barColor = UIStyle::GetDarkerBarColor();
-        m_sliderColor = UIStyle::GetButtonColor();
-        m_sliderHoverColor = UIStyle::GetButtonHoverColor();
+        m_barColor = UIStyle::GetSliderCenterColor();
+        m_sliderColor = UIStyle::GetScrollBarColor();
+        m_sliderHoverColor = UIStyle::GetScrollBarHoverColor();
 
         m_propagationFlags = PropagationFlags::MouseScroll;
 

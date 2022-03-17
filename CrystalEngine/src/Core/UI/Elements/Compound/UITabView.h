@@ -49,6 +49,7 @@ namespace crystal
         std::vector<std::shared_ptr<UIElement>>             m_items{};
 
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
+        virtual void DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer) override;
 
     private:
         void SwitchTab(int index);

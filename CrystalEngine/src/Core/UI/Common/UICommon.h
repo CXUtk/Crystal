@@ -9,7 +9,7 @@
 
 namespace crystal
 {
-    constexpr bool EnableDebugDraw = true;
+    constexpr bool EnableDebugDraw = false;
 
     class UIState;
     class UIStateMachine;

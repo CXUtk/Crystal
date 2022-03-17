@@ -14,9 +14,9 @@ namespace crystal
 
     UIValueSlider::UIValueSlider()
     {
-        m_barColor = UIStyle::GetDarkerBarColor();
-        m_sliderColor = UIStyle::GetButtonColor();
-        m_sliderHoverColor = UIStyle::GetButtonHoverColor();
+        m_barColor = UIStyle::GetSliderCenterColor();
+        m_sliderColor = UIStyle::GetScrollBarColor();
+        m_sliderHoverColor = UIStyle::GetScrollBarHoverColor();
 
         m_bar = std::make_shared<UIPanel>();
         m_bar->SetPivot(Vector2f(0.5f));
