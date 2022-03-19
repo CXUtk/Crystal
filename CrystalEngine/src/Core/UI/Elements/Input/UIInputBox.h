@@ -1,11 +1,11 @@
 #pragma once
-#include "../Common/UICommon.h"
-#include "../Common/UIEventArgs.h"
+#include "../../Common/UICommon.h"
+#include "../../Common/UIEventArgs.h"
 
-#include "UIElement.h"
-#include "UILabel.h"
-#include "Components/UITextComponent.h"
-#include "Components/UIInputComponent.h"
+#include "../UIElement.h"
+#include "../UILabel.h"
+#include "../Components/UITextComponent.h"
+#include "../Components/UIInputComponent.h"
 
 namespace crystal
 {
@@ -24,6 +24,9 @@ namespace crystal
             }
             m_textDrawComponent->SetFont(font);
         }
+
+        std::string GetText() const;
+        void SetText(const std::string& text);
 
         virtual void OnFocused(UIEventArgs args) override;
         virtual void OnUnFocused(UIEventArgs args) override;
@@ -47,6 +50,8 @@ namespace crystal
 
         std::vector<float>      m_charWidths{};
 
+        UIActionEvent       m_eventOnEnterPressed{};
+
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
         virtual void RecalculateChildren() override;
@@ -58,5 +63,6 @@ namespace crystal
         */
         float GetXOffsetByCarrot(int carrot);
         void UpdateCarrotShift();
+        void RespondToChange();
     };
 }

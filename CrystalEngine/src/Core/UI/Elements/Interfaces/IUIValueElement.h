@@ -11,6 +11,7 @@ namespace crystal
     class IUIValueElement : public UIElement
     {
     public:
+        virtual ~IUIValueElement() = 0 {};
         virtual T GetValue() const { return m_value; }
         virtual void SetValue(T value)
         {
@@ -20,7 +21,6 @@ namespace crystal
             }
             m_value = value;
         }
-
 
         virtual void AddOnValueChangedEventListener(typename UIValueChangeEvent<T>::Func listener)
         {

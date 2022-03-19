@@ -20,7 +20,7 @@ namespace crystal
 
     void UIInputComponent::MoveCarrot(int pos)
     {
-        assert(m_carrotPos >= 0 && m_carrotPos <= m_text.size());
+        assert(pos >= 0 && pos <= m_text.size());
         m_carrotPos = pos;
     }
 
@@ -134,6 +134,15 @@ namespace crystal
     {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
         return conv.to_bytes(m_text);
+    }
+
+    void UIInputComponent::SetText(const std::string& text)
+    {
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+        auto&& text32 = conv.from_bytes(text);
+        m_text = std::move(text32);
+        MoveCarrot(m_text.size());
+        m_selectionLeft = m_selectionRight = m_carrotPos;
     }
 
     bool UIInputComponent::HandleControls(const KeyEventArgs& args)

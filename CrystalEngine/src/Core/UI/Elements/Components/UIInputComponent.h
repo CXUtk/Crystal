@@ -22,6 +22,8 @@ namespace crystal
         std::u32string GetText32() const { return m_text; }
         size_t GetLength() const { return m_text.size(); }
         int GetCarrotPos() const { return m_carrotPos; }
+
+        void SetText(const std::string& text);
     private:
         InputController*                    m_inputController;
         IGameWindow*                        m_gameWindow;

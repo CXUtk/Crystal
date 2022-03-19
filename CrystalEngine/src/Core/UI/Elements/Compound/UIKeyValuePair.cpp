@@ -18,11 +18,22 @@ namespace crystal
         m_keyLabel->SetPosition(Vector2f(-KEY_PADDING, 0.f));
         AppendChild(m_keyLabel);
 
-        m_valueInput = std::make_shared<UIInputBox>();
+        m_valueInput = std::make_shared<UIValueInputBox<int>>(0);
         m_valueInput->SetPivot(Vector2f(0.f, 0.f));
         m_valueInput->SetAnchorPoint(Vector2f(0.5f, 0.f));
         m_valueInput->SetPosition(Vector2f(VALUE_PADDING, 0.f));
         m_valueInput->SetSize(SizeLayout(-2 * VALUE_PADDING, 0.5f, 0.f, 1.f));
+        m_valueInput->SetCheckFunction([](const std::string& v, int& output) -> bool {
+            try
+            {
+                output = std::stoi(v, nullptr, 10);
+                return true;
+            }
+            catch (std::exception& e)
+            {
+                return false;
+            }
+        });
         AppendChild(m_valueInput);
     }
 

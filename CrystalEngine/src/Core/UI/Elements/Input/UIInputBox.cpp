@@ -6,6 +6,7 @@
 #include <Core/Input/InputController.h>
 #include <Core/UI/UIStateMachine.h>
 
+
 namespace crystal
 {
     static constexpr int TEXT_PADDING = 2;
@@ -28,6 +29,17 @@ namespace crystal
 
     UIInputBox::~UIInputBox()
     {}
+
+    std::string UIInputBox::GetText() const
+    {
+        return m_inputComponent->GetText();
+    }
+
+    void UIInputBox::SetText(const std::string& text)
+    {
+        m_inputComponent->SetText(text);
+        RespondToChange();
+    }
 
     void UIInputBox::OnFocused(UIEventArgs args)
     {
@@ -153,12 +165,7 @@ namespace crystal
 
             if (m_inputComponent->IsCarrotChanged())
             {
-                auto font = m_textDrawComponent->GetFont();
-                m_charWidths = font->GetWidthsForAllChars(m_inputComponent->GetText32());
-
-                m_blinkTimer = 0.f;
-
-                m_inputComponent->GetSelectionRange(m_dragStartIndex, m_dragEndIndex);
+                RespondToChange();
                 UpdateCarrotShift();
             }
         }
@@ -206,6 +213,16 @@ namespace crystal
         {
             m_drawXOffset -= minPos.x + TEXT_PADDING + TEXT_SPACING_OFFSET - actualX;
         }
+    }
+
+    void UIInputBox::RespondToChange()
+    {
+        auto font = m_textDrawComponent->GetFont();
+        m_charWidths = font->GetWidthsForAllChars(m_inputComponent->GetText32());
+
+        m_blinkTimer = 0.f;
+
+        m_inputComponent->GetSelectionRange(m_dragStartIndex, m_dragEndIndex);
     }
 
     void UIInputBox::MouseJustPressed(UIMouseButtonEventArgs args)

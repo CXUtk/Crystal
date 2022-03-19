@@ -2,7 +2,7 @@
 
 #include "../UIElement.h"
 #include "../UILabel.h"
-#include "../UIInputBox.h"
+#include "../Input/UIValueInputBox.h"
 
 namespace crystal
 {
@@ -22,9 +22,9 @@ namespace crystal
         }
 
     protected:
-        std::shared_ptr<UILabel>        m_keyLabel = nullptr;
-        std::shared_ptr<UIInputBox>     m_valueInput = nullptr;
-        float                           m_divideRatio = 0.f;
+        std::shared_ptr<UILabel>                    m_keyLabel = nullptr;
+        std::shared_ptr<UIValueInputBox<int>>       m_valueInput = nullptr;
+        float                                       m_divideRatio = 0.f;
 
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
     };
