@@ -124,15 +124,15 @@ namespace crystal
 
 
         // Properties
+        std::string     m_name{};
+        std::string     m_tooltip{};
+
         bool        m_isActive = true;
         bool        m_isEnabled = true;
         bool        m_isVisible = true;
         bool        m_noEvents = false;
         bool        m_isFocused = false;
         bool        m_isStateDirty = true;
-
-        std::string     m_name{};
-        std::string     m_tooltip{};
 
         OverflowStyle       m_overflowStyle = OverflowStyle::Overflow;
         PropagationFlags    m_propagationFlags = PropagationFlags::All;

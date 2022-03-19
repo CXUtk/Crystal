@@ -9,29 +9,18 @@
 namespace crystal
 {
     static constexpr int SCROLL_WIDTH = 16;
-    static constexpr int INNER_PADDING = 2;
-    static constexpr int INNER_ITEM_PADDING = 2;
 
     UIList::UIList()
     {
         m_propagationFlags = PropagationFlags::None;
 
         m_listView = std::make_shared<UIListView>();
-        m_listView->SetPivot(Vector2f(0.f, 0.5f));
-        m_listView->SetAnchorPoint(Vector2f(0.f, 0.5f));
-        m_listView->SetSize(SizeLayout(-INNER_PADDING * 3 - SCROLL_WIDTH,
-            1.f, -INNER_PADDING * 2, 1.f));
-        m_listView->SetPosition(Vector2f(INNER_PADDING, 0.f));
-
-        m_scrollBarV = std::make_shared<UIScrollBarV>();
-        m_scrollBarV->SetPivot(Vector2f(1.f, 0.5f));
-        m_scrollBarV->SetAnchorPoint(Vector2f(1.f, 0.5f));
-        m_scrollBarV->SetSize(SizeLayout(SCROLL_WIDTH, 0.f, -INNER_PADDING * 2, 1.f));
-        m_scrollBarV->SetPosition(Vector2f(-INNER_PADDING, 0.f));
-        m_scrollBarV->SetViewRange(.1f);
+        m_listView->SetPivot(Vector2f(0.f, 0.f));
+        m_listView->SetAnchorPoint(Vector2f(0.f, 0.f));
+        m_listView->SetSize(SizeLayout(0.f, 1.f, 0.f, 1.f));
+        m_listView->SetPosition(Vector2f(0.f, 0.f));
 
         AppendChild(m_listView);
-        AppendChild(m_scrollBarV);
     }
 
     UIList::~UIList()
@@ -43,30 +32,105 @@ namespace crystal
         element->SetAnchorPoint(Vector2f(0.f, 1.f));
         m_items.push_back(element);
         m_listView->AppendChild(element);
-        element->Recalculate();
     }
+
+    void UIList::SetScrollBar(bool vertical, bool horizontal)
+    {
+        if (vertical && !m_scrollBarV)
+        {
+            m_scrollBarV = std::make_shared<UIScrollBarV>();
+            m_scrollBarV->SetName("ScrollBarV");
+            m_scrollBarV->SetPivot(Vector2f(1.f, 0.5f));
+            m_scrollBarV->SetAnchorPoint(Vector2f(1.f, 0.5f));
+            m_scrollBarV->SetSize(SizeLayout(SCROLL_WIDTH, 0.f, 0.f, 1.f));
+            m_scrollBarV->SetPosition(Vector2f(0.f, 0.f));
+            m_scrollBarV->SetViewRange(.1f);
+
+            auto&& innerSize = m_listView->GetSize();
+            m_listView->SetSize(SizeLayout(-SCROLL_WIDTH, 1.f, innerSize.Height.Absolute, innerSize.Height.Relative));
+
+            AppendChild(m_scrollBarV);
+        }
+        else if (!vertical && m_scrollBarV)
+        {
+            RemoveChild(m_scrollBarV);
+            auto&& innerSize = m_listView->GetSize();
+            m_listView->SetSize(SizeLayout(0.f, 1.f, innerSize.Height.Absolute, innerSize.Height.Relative));
+        }
+
+        if (horizontal && !m_scrollBarH)
+        {
+            m_scrollBarH = std::make_shared<UIScrollBarH>();
+            m_scrollBarH->SetName("ScrollBarH");
+            m_scrollBarH->SetPivot(Vector2f(0.5f, 0.f));
+            m_scrollBarH->SetAnchorPoint(Vector2f(0.5f, 0.f));
+            m_scrollBarH->SetSize(SizeLayout(0.f, 1.f, SCROLL_WIDTH, 0.f));
+            m_scrollBarH->SetPosition(Vector2f(0.f, 0.f));
+            m_scrollBarH->SetViewRange(.1f);
+
+            auto&& innerSize = m_listView->GetSize();
+            m_listView->SetSize(SizeLayout(innerSize.Width.Absolute, innerSize.Width.Relative,
+                -SCROLL_WIDTH, 1.f));
+
+            AppendChild(m_scrollBarH);
+        }
+        else if (!horizontal && m_scrollBarH)
+        {
+            RemoveChild(m_scrollBarH);
+            auto&& innerSize = m_listView->GetSize();
+            m_listView->SetSize(SizeLayout(innerSize.Width.Absolute, innerSize.Width.Relative,
+                0.f, 1.f));
+        }
+    }
+
+    void UIList::SetGap(float value)
+    {
+        if (m_itemGap != value)
+        {
+            m_itemGap = value;
+            m_isStateDirty = true;
+        }
+    }
+
 
     void UIList::MouseScroll(UIMouseScrollEventArgs args)
     {
-        auto value = m_scrollBarV->GetValue();
-        auto viewRange = m_scrollBarV->GetViewRange();
-        m_scrollBarV->SetValue(std::clamp(value - args.Value.y * viewRange * 0.2, 0.0, 1.0));
+        if (m_scrollBarV)
+        {
+            auto value = m_scrollBarV->GetValue();
+            auto viewRange = m_scrollBarV->GetViewRange();
+            m_scrollBarV->SetValue(std::clamp(value - args.Value.y * viewRange * 0.2, 0.0, 1.0));
+        }
     }
 
     void UIList::UpdateSelf(const GameTimer& gameTimer)
     {
-        auto innerBound = m_listView->GetInnerBound();
-        int height = innerBound.GetSize().y;
-        if (m_itemsSize.y == 0)
+        if (m_scrollBarV || m_scrollBarH)
         {
-            m_scrollBarV->SetViewRange(1.0f);
-        }
-        else
-        {
-            m_scrollBarV->SetViewRange(std::min(1.0, (double)height / m_itemsSize.y));
+            m_listView->SetOverflowStyle(OverflowStyle::Hidden);
         }
 
-        double offsetY = std::max(0.0, m_scrollBarV->GetValue() * (m_itemsSize.y - height));
+        auto innerBound = m_listView->GetInnerBound();
+        int height = innerBound.GetSize().y;
+
+        if (m_scrollBarV)
+        {
+            if (m_itemsSize.y == 0)
+            {
+                m_scrollBarV->SetViewRange(1.0f);
+            }
+            else
+            {
+                m_scrollBarV->SetViewRange(std::min(1.0, (double)height / m_itemsSize.y));
+            }
+        }
+
+        double offsetY = 0.f;
+
+        if (m_scrollBarV)
+        {
+            offsetY = std::max(0.0, m_scrollBarV->GetValue() * (m_itemsSize.y - height));
+        }
 
         m_itemsSize = Vector2f(0.f);
         for (auto& item : m_items)
@@ -75,14 +139,13 @@ namespace crystal
             auto itemSize = item->GetInnerBound().GetSize();
             item->SetPosition(Vector2f(0.f, -m_itemsSize.y + offsetY));
             m_itemsSize.y += itemSize.y;
-            m_itemsSize.y += INNER_ITEM_PADDING;
+            m_itemsSize.y += m_itemGap;
             m_itemsSize.x = std::max(m_itemsSize.x, (int)itemSize.x);
         }
     }
 
     UIListView::UIListView()
     {
-        m_overflowStyle = OverflowStyle::Hidden;
     }
 
     UIListView::~UIListView()

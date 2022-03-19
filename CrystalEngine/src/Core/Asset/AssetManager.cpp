@@ -1,4 +1,4 @@
-﻿#include "AssetManager.h"
+#include "AssetManager.h"
 #include <Engine.h>
 #include <Interfaces/FileSystem/File.h>
 #include <SJson/SJson.hpp>
@@ -28,7 +28,10 @@ namespace crystal
         assetPackage->LoadOneTexture2D("white",
             graphicsDevice->CreateTexture2DFromFile("resources/White.png", texDesc));
 
-        assetPackage->LoadOneFont("Consolas", m_pFontLoader->LoadFont("resources/fonts/simhei.ttf"));
+        assetPackage->LoadOneFont("Consolas24", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 24));
+        assetPackage->LoadOneFont("Consolas18", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 18));
+        assetPackage->LoadOneFont("Consolas14", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 14));
+        assetPackage->LoadOneFont("Consolas12", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 12));
 
         m_packagesMap["Crystal"] = assetPackage;
 

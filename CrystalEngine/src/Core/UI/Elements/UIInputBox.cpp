@@ -18,7 +18,7 @@ namespace crystal
         m_propagationFlags = PropagationFlags::MouseScroll;
 
         auto assetManager = Engine::GetInstance()->GetAssetManager();
-        auto font = assetManager->LoadAsset<Font>("Crystal:Consolas");
+        auto font = assetManager->LoadAsset<Font>("Crystal:Consolas18");
         m_textDrawComponent = std::make_shared<UITextComponent>(font, false);
 
         m_textDrawComponent->SetTextColor(Color4f(1.f));

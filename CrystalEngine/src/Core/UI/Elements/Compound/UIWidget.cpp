@@ -36,6 +36,7 @@ namespace crystal
         panel->SetSize(SizeLayout(0, 1.f, 0, 1.f));
         panel->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxBlack"));
         panel->SetSliceInfo(slice);
+        AppendChild(panel);
 
         std::shared_ptr<UIImage> panelBar = std::make_shared<UIImage>();
         panelBar->SetInline(false);
@@ -46,6 +47,7 @@ namespace crystal
         panelBar->SetColor(UIStyle::GetWindowLegendColor());
         panelBar->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxNoB"));
         panelBar->SetSliceInfo(slice6);
+        AppendChild(panelBar);
 
 
         m_closeButton = std::make_shared<UIIconButton>();
@@ -60,16 +62,13 @@ namespace crystal
             closeArg.TimeStamp = args.TimeStamp;
             m_eventOnClose.Invoke(closeArg);
         });
+        panelBar->AppendChild(m_closeButton);
 
         m_windowTitle = std::make_shared<UILabel>(title);
-        m_windowTitle->SetAnchorPoint(Vector2f(0.f, 1.f));
-        m_windowTitle->SetPivot(Vector2f(0.f, 1.f));
-        m_windowTitle->SetPosition(Vector2f(10, -10));
-
-        AppendChild(panel);
-        AppendChild(panelBar);
-        AppendChild(m_windowTitle);
-        AppendChild(m_closeButton);
+        m_windowTitle->SetAnchorPoint(Vector2f(0.f, 0.f));
+        m_windowTitle->SetPivot(Vector2f(0.f, 0.f));
+        m_windowTitle->SetPosition(Vector2f(10, 12));
+        panelBar->AppendChild(m_windowTitle);
 
         m_gameWindow = Engine::GetInstance()->GetWindow();
     }

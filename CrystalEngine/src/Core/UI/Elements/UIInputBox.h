@@ -15,6 +15,16 @@ namespace crystal
         UIInputBox();
         ~UIInputBox() override;
 
+        std::shared_ptr<Font> GetFont() const { return m_textDrawComponent->GetFont(); }
+        void SetFont(std::shared_ptr<Font> font)
+        {
+            if (m_textDrawComponent->GetFont() != font)
+            {
+                m_isStateDirty = true;
+            }
+            m_textDrawComponent->SetFont(font);
+        }
+
         virtual void OnFocused(UIEventArgs args) override;
         virtual void OnUnFocused(UIEventArgs args) override;
         virtual void MouseJustPressed(UIMouseButtonEventArgs args) override;

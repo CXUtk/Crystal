@@ -18,3 +18,4 @@
 #include "Elements/Compound/UIWidget.h"
 #include "Elements/Compound/UIList.h"
 #include "Elements/Compound/UITabView.h"
+#include "Elements/Compound/UIKeyValuePair.h"

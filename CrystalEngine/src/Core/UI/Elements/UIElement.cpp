@@ -156,7 +156,7 @@ namespace crystal
         }
         element->m_pParent = this;
         m_pChildren.push_back(element);
-        element->Recalculate();
+        //element->Recalculate();
     }
 
     void UIElement::RemoveChild(std::shared_ptr<UIElement> element)

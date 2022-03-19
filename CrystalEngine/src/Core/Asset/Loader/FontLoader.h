@@ -17,7 +17,7 @@ namespace crystal
 		FontLoader();
 		~FontLoader();
 
-        std::shared_ptr<Font> LoadFont(const path_type& path);
+        std::shared_ptr<Font> LoadFont(const path_type& path, int size);
 
 	private:
 		FT_Library	m_fontLibrary = nullptr;

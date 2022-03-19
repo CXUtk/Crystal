@@ -24,13 +24,18 @@ namespace crystal
         ~UIList() override;
 
         void Add(std::shared_ptr<UIElement> element);
+        void SetScrollBar(bool vertical, bool horizontal);
+        void SetGap(float value);
+
         virtual void MouseScroll(UIMouseScrollEventArgs args) override;
     protected:
         std::shared_ptr<UIListView>             m_listView = nullptr;
         std::shared_ptr<UIScrollBarV>           m_scrollBarV = nullptr;
+        std::shared_ptr<UIScrollBarH>           m_scrollBarH = nullptr;
         std::vector<std::shared_ptr<UIElement>> m_items{};
 
         Vector2i        m_itemsSize{};
+        float           m_itemGap = 5.f;
 
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
 
