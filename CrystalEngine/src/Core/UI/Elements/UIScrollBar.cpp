@@ -106,7 +106,7 @@ namespace crystal
         else if (m_isLocating)
         {
             auto mousePos = Engine::GetInstance()->GetWindow()->GetMousePos();
-            auto estBarHeight = m_bar->GetHeight();
+            auto estBarHeight = m_bar->GetPredictedHeight(this);
             auto posTarget = m_bar->GetScreenPositionToLocalPos(mousePos + Vector2i(0, estBarHeight / 2));
             auto offsetY = std::clamp(posTarget.y, -height, 0.f);
 
@@ -159,7 +159,7 @@ namespace crystal
         else if (m_isLocating)
         {
             auto mousePos = Engine::GetInstance()->GetWindow()->GetMousePos();
-            auto estBarWidth = m_bar->GetWidth();
+            auto estBarWidth = m_bar->GetPredictedWidth(this);
             auto posTarget = m_bar->GetScreenPositionToLocalPos(mousePos - Vector2i(estBarWidth / 2, 0));
 
             auto offsetX = std::clamp(posTarget.x, 0.f, width);

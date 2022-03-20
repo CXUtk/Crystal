@@ -37,6 +37,9 @@ namespace crystal
 
         Vector2f GetPredictedSize() const;
 
+        virtual int GetPredictedWidth(UIElement* fakeParent) const override;
+        virtual int GetPredictedHeight(UIElement* fakeParent) const override;
+
     protected:
         bool                m_shouldRecalculateText = true;
         std::u32string      m_text{};

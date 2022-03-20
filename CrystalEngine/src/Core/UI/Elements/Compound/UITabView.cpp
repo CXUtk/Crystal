@@ -62,8 +62,7 @@ namespace crystal
 
     void UITabBar::RecalculateSelf()
     {
-        auto size = m_label->GetPredictedSize();
-        SetSize(SizeLayout(LABEL_PADDING_LEFT + LABEL_PADDING_RIGHT + size.x, 0.f, 0.f, 1.f));
+        SetSize(SizeLayout(LABEL_PADDING_LEFT + LABEL_PADDING_RIGHT + m_label->GetPredictedWidth(this), 0.f, 0.f, 1.f));
     }
 
     void UITabBar::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
@@ -144,7 +143,7 @@ namespace crystal
         {
             auto& bar = m_tabBars[i];
             bar->SetPosition(Vector2f(offsetX, 0.f));
-            offsetX += bar->GetWidth() + TAB_BAR_PADDING;
+            offsetX += bar->GetPredictedWidth(this) + TAB_BAR_PADDING;
         }
     }
 

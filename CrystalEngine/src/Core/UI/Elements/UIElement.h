@@ -85,8 +85,11 @@ namespace crystal
         SizeLayout GetSize() const { return m_size; }
         void SetSize(SizeLayout size);
 
-        int GetWidth() const;
-        int GetHeight() const;
+        virtual int GetPredictedWidth(UIElement* fakeParent) const;
+        virtual int GetPredictedHeight(UIElement* fakeParent) const;
+        //virtual int GetPredictedWidth(UIElement* fakeParent) const;
+        ////int GetWidth() const;
+        //int GetHeight() const;
 
         Vector2i GetEstimatedSize(UIElement* fakeParent) const;
 

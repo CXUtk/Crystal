@@ -172,7 +172,7 @@ namespace crystal
         {
             int mid = (L + R) / 2;
             auto& midElement = m_pChildren[mid];
-            if (midElement->GetPosition().y - midElement->GetHeight() <= 0)
+            if (midElement->GetPosition().y - midElement->GetPredictedHeight(this) <= 0)
             {
                 topIndex = mid;
                 R = mid - 1;
@@ -187,7 +187,7 @@ namespace crystal
         {
             int mid = (L + R) / 2;
             auto& midElement = m_pChildren[mid];
-            if (midElement->GetPosition().y >= -GetHeight())
+            if (midElement->GetPosition().y >= -(m_calculatedInnerBound.GetSize().y))
             {
                 botIndex = mid;
                 L = mid + 1;

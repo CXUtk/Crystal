@@ -38,54 +38,90 @@ namespace tracer
         auto font18 = assetManager->LoadAsset<Font>("Crystal:Consolas18");
         auto font14 = assetManager->LoadAsset<Font>("Crystal:Consolas14");
 
-        auto frameBufferSizeList = std::make_shared<UIList>();
-        frameBufferSizeList->SetPivot(Vector2f(0.f, 1.f));
-        frameBufferSizeList->SetAnchorPoint(Vector2f(0.f, 1.f));
-        frameBufferSizeList->SetPosition(Vector2f(0.f, -16.f));
-        frameBufferSizeList->SetSize(SizeLayout(0, 1.f, 55, 0.f));
-        frameBufferSizeList->SetGap(2.f);
-        innerList->Add(frameBufferSizeList);
+
+        auto checkInt = [](const std::string& val, int& output) -> bool {
+            try
+            {
+                output = std::stoi(val, nullptr, 10);
+                return true;
+            }
+            catch (std::exception& ex)
+            {
+                return false;
+            }
+        };
 
 
-        auto frameBufferWidthKV = std::make_shared<UIKeyValuePair>("X");
-        frameBufferWidthKV->SetFont(font14);
-        frameBufferWidthKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
-        frameBufferWidthKV->SetDividerRatio(0.4f);
+        auto checkFloat = [](const std::string& val, float& output) -> bool {
+            try
+            {
+                output = std::stof(val, nullptr);
+                return true;
+            }
+            catch (std::exception& ex)
+            {
+                return false;
+            }
+        };
 
-        auto frameBufferHeightKV = std::make_shared<UIKeyValuePair>("Y");
-        frameBufferHeightKV->SetFont(font14);
-        frameBufferHeightKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
-        frameBufferHeightKV->SetDividerRatio(0.4f);
+        const char* keys[2] = { "X", "Y" };
+        auto frameBufferSizeUI = std::make_shared<UIVecf<int, 2>>(keys, "Resolution");
+        frameBufferSizeUI->SetFont(font14);
+        frameBufferSizeUI->SetDividerRatio(0.4f);
+        frameBufferSizeUI->SetCheckFunction(checkInt);
+        innerList->Add(frameBufferSizeUI);
 
-        frameBufferSizeList->Add(frameBufferWidthKV);
-        frameBufferSizeList->Add(frameBufferHeightKV);
-
-
-        auto frameBufferSizeLabel = std::make_shared<UILabel>("Resolution");
-        frameBufferSizeLabel->SetPivot(Vector2f(0.f, 0.f));
-        frameBufferSizeLabel->SetAnchorPoint(Vector2f(0.f, 0.f));
-        frameBufferSizeLabel->SetPosition(Vector2f(8.f, 0.f));
-        frameBufferSizeLabel->SetFont(font14);
-        frameBufferWidthKV->AppendChild(frameBufferSizeLabel);
-
+        //auto frameBufferSizeList = std::make_shared<UIList>();
+        //frameBufferSizeList->SetPivot(Vector2f(0.f, 1.f));
+        //frameBufferSizeList->SetAnchorPoint(Vector2f(0.f, 1.f));
+        //frameBufferSizeList->SetPosition(Vector2f(0.f, -16.f));
+        //frameBufferSizeList->SetSize(SizeLayout(0, 1.f, 55, 0.f));
+        //frameBufferSizeList->SetGap(2.f);
+        //innerList->Add(frameBufferSizeList);
 
 
-        auto SPPKV = std::make_shared<UIKeyValuePair>("Samples");
+        //auto frameBufferWidthKV = std::make_shared<UIKeyValuePair>("X");
+        //frameBufferWidthKV->SetFont(font14);
+        //frameBufferWidthKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
+        //frameBufferWidthKV->SetDividerRatio(0.4f);
+
+        //auto frameBufferHeightKV = std::make_shared<UIKeyValuePair>("Y");
+        //frameBufferHeightKV->SetFont(font14);
+        //frameBufferHeightKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
+        //frameBufferHeightKV->SetDividerRatio(0.4f);
+
+        //frameBufferSizeList->Add(frameBufferWidthKV);
+        //frameBufferSizeList->Add(frameBufferHeightKV);
+
+
+        //auto frameBufferSizeLabel = std::make_shared<UILabel>("Resolution");
+        //frameBufferSizeLabel->SetPivot(Vector2f(0.f, 0.f));
+        //frameBufferSizeLabel->SetAnchorPoint(Vector2f(0.f, 0.f));
+        //frameBufferSizeLabel->SetPosition(Vector2f(8.f, 0.f));
+        //frameBufferSizeLabel->SetFont(font14);
+        //frameBufferWidthKV->AppendChild(frameBufferSizeLabel);
+
+
+
+        auto SPPKV = std::make_shared<UIKeyValuePair<int>>("Samples");
         SPPKV->SetFont(font14);
         SPPKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
         SPPKV->SetDividerRatio(0.4f);
+        SPPKV->SetCheckFunction(checkInt);
         innerList->Add(SPPKV);
 
-        auto CoresKV = std::make_shared<UIKeyValuePair>("# Cores");
+        auto CoresKV = std::make_shared<UIKeyValuePair<int>>("# Cores");
         CoresKV->SetFont(font14);
         CoresKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
         CoresKV->SetDividerRatio(0.4f);
+        CoresKV->SetCheckFunction(checkInt);
         innerList->Add(CoresKV);
 
-        auto AccKV = std::make_shared<UIKeyValuePair>("Acc. Structure");
+        auto AccKV = std::make_shared<UIKeyValuePair<int>>("Acc. Structure");
         AccKV->SetFont(font14);
         AccKV->SetSize(SizeLayout(0, 1.f, 24, 0.f));
         AccKV->SetDividerRatio(0.4f);
+        AccKV->SetCheckFunction(checkInt);
         innerList->Add(AccKV);
         //auto button2 = std::make_shared<UITextButton>();
         //button2->SetPivot(Vector2f(0.5f, 1.f));

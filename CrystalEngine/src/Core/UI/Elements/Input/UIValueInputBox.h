@@ -20,11 +20,11 @@ namespace crystal
             m_value = value;
         }
 
-        UIValueInputBox(T defaultValue)
-            : m_value(defaultValue)
+        UIValueInputBox()
         {
-            SetText(std::to_string(defaultValue));
+            SetText(std::to_string(m_value));
         }
+
         ~UIValueInputBox() override
         {
 
@@ -38,7 +38,7 @@ namespace crystal
         virtual void OnUnFocused(UIEventArgs args) override
         {
             auto newText = this->m_inputComponent->GetText();
-            T newValue;
+            T newValue{};
             if (m_checkValue(newText, newValue))
             {
                 this->SetValue(newValue);

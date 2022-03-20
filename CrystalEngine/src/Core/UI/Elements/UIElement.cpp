@@ -49,6 +49,24 @@ namespace crystal
         m_size = size;
     }
 
+    int UIElement::GetPredictedWidth(UIElement* fakeParent) const
+    {
+        if (m_size.Width.Relative == 0.f)
+        {
+            return m_size.Width.Absolute;
+        }
+        return fakeParent->m_calculatedInnerBound.GetSize().x * m_size.Width.Relative + m_size.Width.Absolute;
+    }
+
+    int UIElement::GetPredictedHeight(UIElement* fakeParent) const
+    {
+        if (m_size.Height.Relative == 0.f)
+        {
+            return m_size.Height.Absolute;
+        }
+        return fakeParent->m_calculatedInnerBound.GetSize().y * m_size.Height.Relative + m_size.Height.Absolute;
+    }
+
     void UIElement::Update(const GameTimer& gameTimer)
     {
         if (!m_isEnabled) return;
@@ -284,16 +302,6 @@ namespace crystal
             return nullptr;
         }
         return *p;
-    }
-
-    int UIElement::GetWidth() const
-    {
-        return m_calculatedInnerBound.GetMaxPos().x - m_calculatedInnerBound.GetMinPos().x;
-    }
-
-    int UIElement::GetHeight() const
-    {
-        return m_calculatedInnerBound.GetMaxPos().y - m_calculatedInnerBound.GetMinPos().y;
     }
 
     Vector2i UIElement::GetEstimatedSize(UIElement* fakeParent) const

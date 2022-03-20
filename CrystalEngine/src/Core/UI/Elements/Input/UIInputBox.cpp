@@ -25,6 +25,8 @@ namespace crystal
         m_textDrawComponent->SetTextColor(Color4f(1.f));
 
         m_inputComponent = std::make_shared<UIInputComponent>("");
+
+        m_drawXOffset = -TEXT_SPACING_OFFSET;
     }
 
     UIInputBox::~UIInputBox()
