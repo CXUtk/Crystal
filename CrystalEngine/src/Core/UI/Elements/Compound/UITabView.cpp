@@ -22,6 +22,9 @@ namespace crystal
         m_label->SetPosition(Vector2f(LABEL_PADDING_LEFT, LABEL_PADDING_BOT));
         AppendChild(m_label);
 
+        SetSize(SizeLayout(0, 0.f, 0, 1.f));
+
+        m_dependOnChildrenWidth = true;
     }
 
     UITabBar::~UITabBar()
@@ -60,9 +63,10 @@ namespace crystal
         m_isHovered = false;
     }
 
-    void UITabBar::RecalculateSelf()
+    void UITabBar::RecalculateWidth()
     {
-        SetSize(SizeLayout(LABEL_PADDING_LEFT + LABEL_PADDING_RIGHT + m_label->GetPredictedWidth(this), 0.f, 0.f, 1.f));
+        UIElement::RecalculateWidth();
+        m_calculatedWidth = LABEL_PADDING_LEFT + LABEL_PADDING_RIGHT + m_label->GetWidth();
     }
 
     void UITabBar::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
@@ -77,7 +81,7 @@ namespace crystal
 
         auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
 
-        auto bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+        auto bound = BoundingBoxConvert<int>(GetInnerBound());
         spriteBatch->Draw(stateMachine->GetWhiteTexture(), bound, (m_isSelected || m_isHovered) ? UIStyle::GetButtonHoverColor() : UIStyle::GetButtonColor());
         //spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice, bound, (m_isSelected || m_isHovered) ? UIStyle::GetPanelBorderColorHighlight() : UIStyle::GetPanelBorderColor());
     }
@@ -143,7 +147,11 @@ namespace crystal
         {
             auto& bar = m_tabBars[i];
             bar->SetPosition(Vector2f(offsetX, 0.f));
-            offsetX += bar->GetPredictedWidth(this) + TAB_BAR_PADDING;
+            offsetX += bar->GetWidth();
+            if (i != size - 1)
+            {
+                offsetX += TAB_BAR_PADDING;
+            }
         }
     }
 

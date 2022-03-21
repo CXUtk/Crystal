@@ -35,6 +35,5 @@ namespace crystal
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
-        //virtual void RecalculateChildren() override;
     };
 }

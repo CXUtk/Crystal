@@ -13,7 +13,11 @@ namespace crystal
 
         virtual void Update(const GameTimer& gameTimer);
         virtual void Draw(const RenderPayload& payload, const GameTimer& gameTimer);
-        virtual void Recalculate();
+        virtual void Recalculate(RecalculateMask mask = RecalculateMask::None);
+
+        virtual void RecalculateWidth();
+        virtual void RecalculateHeight();
+        virtual void RecalculatePosition();
 
         // Add Listeners
         template<UIEventType E>
@@ -85,16 +89,17 @@ namespace crystal
         SizeLayout GetSize() const { return m_size; }
         void SetSize(SizeLayout size);
 
-        virtual int GetPredictedWidth(UIElement* fakeParent) const;
-        virtual int GetPredictedHeight(UIElement* fakeParent) const;
+
         //virtual int GetPredictedWidth(UIElement* fakeParent) const;
-        ////int GetWidth() const;
-        //int GetHeight() const;
+        int GetWidth() const { return m_calculatedWidth; }
+        int GetHeight() const { return m_calculatedHeight; }
 
-        Vector2i GetEstimatedSize(UIElement* fakeParent) const;
-
-        Bound2f GetEventBound() const { return m_calculatedOuterBound; }
-        Bound2f GetInnerBound() const { return m_calculatedInnerBound; }
+        //Bound2f GetEventBound() const { return m_calculatedOuterBound; }
+        Bound2f GetInnerBound() const
+        {
+            return Bound2f(m_calculatedBotLeft,
+                    m_calculatedBotLeft + Vector2f(m_calculatedWidth, m_calculatedHeight));
+        }
 
         Vector2f GetPivotScreenPos() const;
         Bound2f GetParentBound() const;
@@ -137,6 +142,9 @@ namespace crystal
         bool        m_isFocused = false;
         bool        m_isStateDirty = true;
 
+        bool        m_dependOnChildrenWidth = false;
+        bool        m_dependOnChildrenHeight = false;
+
         OverflowStyle       m_overflowStyle = OverflowStyle::Overflow;
         PropagationFlags    m_propagationFlags = PropagationFlags::All;
 
@@ -166,8 +174,11 @@ namespace crystal
         Float           m_rotation{};
 
         // Auxiliary data
-        Bound2f         m_calculatedInnerBound{};
-        Bound2f         m_calculatedOuterBound{};
+        //Bound2f         m_calculatedInnerBound{};
+        //Bound2f         m_calculatedOuterBound{};
+        Vector2f        m_calculatedBotLeft{};
+        int             m_calculatedWidth = 0.f;
+        int             m_calculatedHeight = 0.f;
 
 
         // Virtual
@@ -177,9 +188,7 @@ namespace crystal
         virtual void DrawChildren(const RenderPayload& payload, const GameTimer& gameTimer);
 
         virtual void RecalculateSelf();
-        virtual void RecalculateChildren();
-
-        void CalculateBounds();
+        virtual void RecalculateChildren(RecalculateMask mask);
     };
 
     template<UIEventType E>

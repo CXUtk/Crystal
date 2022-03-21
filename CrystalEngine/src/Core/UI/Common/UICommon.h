@@ -88,4 +88,13 @@ namespace crystal
 
     constexpr PropagationFlags MouseClickEvents = PropagationFlags::MouseJustDown | PropagationFlags::MouseJustUp
         | PropagationFlags::MouseClicked | PropagationFlags::MouseDoubleClicked;
+
+    BIT_FLAGS_BEGIN(RecalculateMask, uint32_t)
+    {
+        None = 0,
+        Mask_Width = 1 << 0,
+        Mask_Height = 1 << 1,
+        Mask_Pos = 1 << 2
+    };
+    BIT_FLAGS_END(RecalculateMask);
 }

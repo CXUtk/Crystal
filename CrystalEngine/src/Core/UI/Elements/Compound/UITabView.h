@@ -18,9 +18,10 @@ namespace crystal
         virtual void UnSelect();
         void MouseEnter(UIMouseEventArgs args) override;
         void MouseLeave(UIMouseEventArgs args) override;
+        virtual void RecalculateWidth() override;
     protected:
-        virtual void RecalculateSelf() override;
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
+
         //virtual void UpdateChildren(const GameTimer& gameTimer) override;
         
 

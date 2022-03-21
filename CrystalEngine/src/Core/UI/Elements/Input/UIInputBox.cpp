@@ -57,7 +57,7 @@ namespace crystal
     void UIInputBox::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
-        auto outerBound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+        auto outerBound = BoundingBoxConvert<int>(GetInnerBound());
         auto spriteBatch = payload.SpriteBatch;
 
         // Input
@@ -86,15 +86,15 @@ namespace crystal
         auto oldScissorBound = RSState->GetScissorBound();
 
         RSState->SetScissorState(true);
-        auto newBound = Bound2f(m_calculatedInnerBound.GetMinPos() + Vector2f(TEXT_PADDING),
-            m_calculatedInnerBound.GetMaxPos() - Vector2f(TEXT_PADDING));
+        auto newBound = Bound2f(outerBound.GetMinPos() + Vector2i(TEXT_PADDING),
+            outerBound.GetMaxPos() - Vector2i(TEXT_PADDING));
         auto scissorBound = BoundingBoxConvert<int>(newBound)
             .IntersectWith(oldScissorBound);
         RSState->SetScissorBound(scissorBound);
 
         spriteBatch->Begin(SpriteSortMode::Deferred, payload.PSO);
         {
-            auto drawStringOrigin = m_calculatedInnerBound.GetMinPos()
+            auto drawStringOrigin = Vector2f(outerBound.GetMinPos())
                 + Vector2f(TEXT_PADDING - m_drawXOffset, TEXT_PADDING);
             m_textDrawComponent->DrawWithBot(drawStringOrigin, payload);
 
@@ -173,14 +173,10 @@ namespace crystal
         }
     }
 
-    void UIInputBox::RecalculateChildren()
-    {
-        UIElement::RecalculateChildren();
-    }
 
     int UIInputBox::GetCarrotByPos(const Vector2i& screenPos)
     {
-        float xPos = screenPos.x - m_calculatedInnerBound.GetMinPos().x - TEXT_PADDING + m_drawXOffset;
+        float xPos = screenPos.x - GetInnerBound().GetMinPos().x - TEXT_PADDING + m_drawXOffset;
         auto p = std::lower_bound(m_charWidths.begin(), m_charWidths.end(), xPos);
         if (p == m_charWidths.end()) return m_inputComponent->GetLength();
         int carrot = p - m_charWidths.begin();
@@ -203,8 +199,10 @@ namespace crystal
     void UIInputBox::UpdateCarrotShift()
     {
         int carrot = m_inputComponent->GetCarrotPos();
-        auto minPos = m_calculatedInnerBound.GetMinPos();
-        auto maxPos = m_calculatedInnerBound.GetMaxPos();
+
+        auto bound = GetInnerBound();
+        auto minPos = bound.GetMinPos();
+        auto maxPos = bound.GetMaxPos();
         float actualX = GetXOffsetByCarrot(carrot) + minPos.x + TEXT_PADDING - m_drawXOffset;
         if (isnan(actualX)) return;
         if (actualX > maxPos.x - TEXT_PADDING - TEXT_SPACING_OFFSET)

@@ -58,11 +58,12 @@ namespace crystal
     {
         auto spriteBatch = payload.SpriteBatch;
 
-        auto minPos = m_calculatedInnerBound.GetMinPos();
-        auto maxPos = m_calculatedInnerBound.GetMaxPos();
+        auto bound = GetInnerBound();
+        auto minPos = bound.GetMinPos();
+        auto maxPos = bound.GetMaxPos();
 
-        auto height = m_calculatedInnerBound.GetSize().y;
-        auto width = m_calculatedInnerBound.GetSize().x - BAR_WIDTH * 2;
+        auto height = bound.GetSize().y;
+        auto width = bound.GetSize().x - BAR_WIDTH * 2;
         auto midStartPos = minPos + Vector2f(BAR_WIDTH, height * 0.5f);
 
         auto barBound = Bound2f(midStartPos - Vector2f(0, BAR_WIDTH * 0.5f),
@@ -81,7 +82,7 @@ namespace crystal
             auto mousePos = Engine::GetInstance()->GetWindow()->GetMousePos();
             auto posTarget = m_bar->GetScreenPositionToLocalPos(mousePos);
 
-            auto width = m_calculatedInnerBound.GetSize().x - BAR_WIDTH * 2;
+            float width = GetWidth() - BAR_WIDTH * 2;
 
             auto offsetX = std::clamp(posTarget.x - BAR_WIDTH, 0.f, width);
 
@@ -90,7 +91,7 @@ namespace crystal
             m_isStateDirty = true;
         }
 
-        auto width = m_calculatedInnerBound.GetSize().x - BAR_WIDTH * 2;
+        auto width = GetWidth() - BAR_WIDTH * 2;
         m_bar->SetPosition(Vector2f(BAR_WIDTH + width * m_value, 0.f));
     }
 }

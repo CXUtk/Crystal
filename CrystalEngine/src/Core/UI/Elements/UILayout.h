@@ -17,6 +17,6 @@ namespace crystal
     protected:
         std::vector<Bound2f>    m_layouts;
 
-        virtual void RecalculateChildren() override;
+        virtual void RecalculateChildren(RecalculateMask mask) override;
     };
 }

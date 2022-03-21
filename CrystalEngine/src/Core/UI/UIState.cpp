@@ -79,7 +79,7 @@ namespace crystal
             for (auto it = m_pUIElements.rbegin(); it != m_pUIElements.rend(); ++it)
             {
                 auto& child = (*it);
-                if (child->CanResponseEvent() && child->GetEventBound().Contains(mousePos))
+                if (child->CanResponseEvent() && child->GetInnerBound().Contains(mousePos))
                 {
                     eventElement = child->GetResponseElement(mousePos);
                     break;
@@ -154,7 +154,7 @@ namespace crystal
                 if ((mouseButtonsFlags & MouseButtonFlags::LeftButton)
                     && m_pAttachedElement != nullptr
                     && m_pAttachedElement == eventElement
-                    && eventElement->GetEventBound().Contains(mousePos))
+                    && eventElement->GetInnerBound().Contains(mousePos))
                 {
                     if (mouseArgs.TimeStamp - m_lastLeftMouseClickTime > 0.25)
                     {

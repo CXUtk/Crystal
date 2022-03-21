@@ -54,7 +54,6 @@ namespace crystal
 
         virtual void DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer) override;
         virtual void UpdateSelf(const GameTimer& gameTimer) override;
-        virtual void RecalculateChildren() override;
         int GetCarrotByPos(const Vector2i& screenPos);
         /**
          * @brief Get the exact width from the beginning of the string to the carrot postition

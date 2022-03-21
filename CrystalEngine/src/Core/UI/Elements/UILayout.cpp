@@ -24,16 +24,17 @@ namespace crystal
         m_layouts.push_back(targetLayout);
     }
 
-    void UILayout::RecalculateChildren()
+    void UILayout::RecalculateChildren(RecalculateMask mask)
     {
         int size = m_layouts.size();
-        auto bound = m_calculatedInnerBound;
+        auto bound = GetInnerBound();
         auto boundSize = bound.GetSize();
         for (int i = 0; i < size; i++)
         {
             auto start = m_layouts[i].GetMinPos();
             m_pChildren[i]->SetPosition(start * boundSize);
         }
-        UIElement::RecalculateChildren();
+        UIElement::RecalculateChildren(mask);
     }
+
 }

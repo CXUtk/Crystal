@@ -56,24 +56,21 @@ namespace crystal
         return Vector2f(metric.Width, height);
     }
 
-    int UILabel::GetPredictedWidth(UIElement* fakeParent) const
+    void UILabel::RecalculateWidth()
     {
         auto metric = m_textDrawComponent->MeasureSize();
-
-        return metric.Width;
+        m_calculatedWidth = metric.Width;
     }
 
-    int UILabel::GetPredictedHeight(UIElement* fakeParent) const
+    void UILabel::RecalculateHeight()
     {
         auto metric = m_textDrawComponent->MeasureSize();
-        return metric.yMax - metric.yMin;
+        m_calculatedHeight = metric.yMax - metric.yMin;
     }
-
-
 
     void UILabel::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
-        m_textDrawComponent->DrawWithBot(m_calculatedInnerBound.GetMinPos(), payload);
+        m_textDrawComponent->DrawWithBot(GetInnerBound().GetMinPos(), payload);
     }
 
     void UILabel::RecalculateSelf()

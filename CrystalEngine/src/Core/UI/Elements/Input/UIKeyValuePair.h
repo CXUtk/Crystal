@@ -22,8 +22,10 @@ namespace crystal
             m_valueInput->SetPivot(Vector2f(0.f, 0.f));
             m_valueInput->SetAnchorPoint(Vector2f(0.5f, 0.f));
             m_valueInput->SetPosition(Vector2f(VALUE_PADDING, 0.f));
-            m_valueInput->SetSize(SizeLayout(-2 * VALUE_PADDING, 0.5f, 0.f, 1.f));
+            m_valueInput->SetSize(SizeLayout(-2 * VALUE_PADDING, 0.5f, 0.f, 0.f));
             AppendChild(m_valueInput);
+
+            m_dependOnChildrenHeight = true;
         }
         ~UIKeyValuePair() override {}
 
@@ -36,9 +38,10 @@ namespace crystal
             m_valueInput->SetFont(font);
         }
 
-        virtual int GetPredictedHeight(UIElement* fakeParent) const override
+        virtual void RecalculateHeight() override
         {
-            return m_keyLabel->GetPredictedHeight(fakeParent) + INPUT_PADDING_TOP * 2;
+            UIElement::RecalculateHeight();
+            m_calculatedHeight = m_keyLabel->GetHeight() + INPUT_PADDING_TOP * 2;
         }
 
         void SetCheckFunction(std::function<bool(const std::string& val, T& output)> func)
@@ -56,7 +59,7 @@ namespace crystal
             m_keyLabel->SetAnchorPoint(Vector2f(m_divideRatio, 0.f));
             m_valueInput->SetAnchorPoint(Vector2f(m_divideRatio, 0.f));
 
-            int maxHeight = m_keyLabel->GetPredictedHeight(this) + INPUT_PADDING_TOP * 2;
+            int maxHeight = m_keyLabel->GetHeight() + INPUT_PADDING_TOP * 2;
             m_valueInput->SetSize(SizeLayout(-2 * VALUE_PADDING, 1.f - m_divideRatio,
                 maxHeight, 0.f));
 

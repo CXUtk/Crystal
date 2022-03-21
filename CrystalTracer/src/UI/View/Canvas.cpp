@@ -20,7 +20,7 @@ namespace tracer
     {
         auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
         auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(m_calculatedInnerBound),
+        spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(GetInnerBound()),
                 Color4f(0.f, 0.f, 0.f, 1.f));
     }
 }

@@ -23,8 +23,10 @@ namespace crystal
         m_frameTexture = assetManager->LoadAsset<ITexture2D>("package1:Frame");
         m_panelTexture = assetManager->LoadAsset<ITexture2D>("package1:Panel");
     }
+
 	UIStateMachine::~UIStateMachine()
 	{}
+
     void UIStateMachine::Update(const GameTimer& gameTimer)
     {
         if (m_pNextUIState)
@@ -35,6 +37,7 @@ namespace crystal
         if (!m_pCurrentUIState) return;
         m_pCurrentUIState->Update(gameTimer);
     }
+
     void UIStateMachine::Draw(const GameTimer & gameTimer)
     {
         if (!m_pCurrentUIState) return;
@@ -46,11 +49,12 @@ namespace crystal
         payload.PSO = m_PSO;
 
         spriteBatch->Begin(SpriteSortMode::Deferred, m_PSO);
-
-        m_pCurrentUIState->Draw(payload, gameTimer);
-
+        {
+            m_pCurrentUIState->Draw(payload, gameTimer);
+        }
         spriteBatch->End();
     }
+
     void UIStateMachine::AddState(const std::string& name, std::shared_ptr<UIState> state)
     {
         auto p = m_UIStates.find(name);
@@ -63,6 +67,7 @@ namespace crystal
             throw std::invalid_argument("Name already exist");
         }
     }
+
     void UIStateMachine::SetState(const std::string& name)
     {
         auto& nextState = m_UIStates[name];

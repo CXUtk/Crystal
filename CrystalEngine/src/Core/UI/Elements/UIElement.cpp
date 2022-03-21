@@ -49,24 +49,6 @@ namespace crystal
         m_size = size;
     }
 
-    int UIElement::GetPredictedWidth(UIElement* fakeParent) const
-    {
-        if (m_size.Width.Relative == 0.f)
-        {
-            return m_size.Width.Absolute;
-        }
-        return fakeParent->m_calculatedInnerBound.GetSize().x * m_size.Width.Relative + m_size.Width.Absolute;
-    }
-
-    int UIElement::GetPredictedHeight(UIElement* fakeParent) const
-    {
-        if (m_size.Height.Relative == 0.f)
-        {
-            return m_size.Height.Absolute;
-        }
-        return fakeParent->m_calculatedInnerBound.GetSize().y * m_size.Height.Relative + m_size.Height.Absolute;
-    }
-
     void UIElement::Update(const GameTimer& gameTimer)
     {
         if (!m_isEnabled) return;
@@ -87,8 +69,13 @@ namespace crystal
         auto spriteBatch = payload.SpriteBatch;
         if (m_isStateDirty)
         {
+            if (m_pParent && m_pParent->m_dependOnChildrenHeight)
+            {
+
+            }
             Recalculate();
         }
+        auto innerBound = GetInnerBound();
 
         if (m_isVisible)
         {
@@ -112,7 +99,7 @@ namespace crystal
             slice.DrawFlags = Slice_Nine;
 
             spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice,
-                BoundingBoxConvert<int>(m_calculatedInnerBound), Color4f(1.f, 1.f, 0.f, 1.f));
+                BoundingBoxConvert<int>(innerBound), Color4f(1.f, 1.f, 0.f, 1.f));
         }
         if (m_overflowStyle == OverflowStyle::Hidden)
         {
@@ -123,7 +110,7 @@ namespace crystal
             auto oldScissorBound = RSState->GetScissorBound();
 
             RSState->SetScissorState(true);
-            auto scissorBound = BoundingBoxConvert<int>(m_calculatedInnerBound)
+            auto scissorBound = BoundingBoxConvert<int>(innerBound)
                 .IntersectWith(oldScissorBound);
             RSState->SetScissorBound(scissorBound);
 
@@ -144,26 +131,113 @@ namespace crystal
         }
     }
 
-    void UIElement::Recalculate()
+    void UIElement::Recalculate(RecalculateMask mask)
     {
-        RecalculateSelf();
-        CalculateBounds();
-
-        RecalculateChildren();
-
-        m_calculatedOuterBound = m_calculatedInnerBound;
-
-        // If the child is overflow, we will combine its outer bound as ours outer bound
-        // Becuase the overflowed child also respond to event
+#ifdef _DEBUG
+        bool widthDependant = false;
+        bool heightDependant = false;
         for (auto& child : m_pChildren)
         {
-            if (child->CanResponseEvent() && m_overflowStyle == OverflowStyle::Overflow)
+            if (child->IsActive())
             {
-                m_calculatedOuterBound = m_calculatedOuterBound.Union(child->m_calculatedOuterBound);
+                if (child->m_size.Width.Relative != 0.f)
+                {
+                    widthDependant = true;
+                }
+                if (child->m_size.Height.Relative != 0.f)
+                {
+                    heightDependant = true;
+                }
             }
         }
+        // Should not depend on both parent width and children width
+        assert(!(m_dependOnChildrenWidth && widthDependant));
+        // Should not depend on both parent height and children height
+        assert(!(m_dependOnChildrenHeight && heightDependant));
+#endif
+
+        RecalculateMask next_mask = RecalculateMask::None;
+        if (m_dependOnChildrenWidth)
+        {
+            next_mask = next_mask | RecalculateMask::Mask_Width;
+        }
+        if (m_dependOnChildrenHeight)
+        {
+            next_mask = next_mask | RecalculateMask::Mask_Height;
+        }
+
+        if (!(mask & RecalculateMask::Mask_Width))
+        {
+            RecalculateWidth();
+        }
+        if (!(mask & RecalculateMask::Mask_Width))
+        {
+            RecalculateHeight();
+        }
+        RecalculatePosition();
+
+        RecalculateSelf();
+
+        RecalculateChildren(next_mask);
+
+        //m_calculatedOuterBound = m_calculatedInnerBound;
+
+        //// If the child is overflow, we will combine its outer bound as ours outer bound
+        //// Becuase the overflowed child also respond to event
+        //for (auto& child : m_pChildren)
+        //{
+        //    if (child->CanResponseEvent() && m_overflowStyle == OverflowStyle::Overflow)
+        //    {
+        //        m_calculatedOuterBound = m_calculatedOuterBound.Union(child->m_calculatedOuterBound);
+        //    }
+        //}
 
         m_isStateDirty = false;
+    }
+
+    void UIElement::RecalculateWidth()
+    {
+        if (m_dependOnChildrenWidth)
+        {
+            for (auto& child : m_pChildren)
+            {
+                if (child->IsActive())
+                {
+                    child->RecalculateWidth();
+                }
+            }
+        }
+        else
+        {
+            auto parentSize = GetParentBound().GetSize();
+            m_calculatedWidth = parentSize.x * m_size.Width.Relative + m_size.Width.Absolute;
+        }
+    }
+
+    void UIElement::RecalculateHeight()
+    {
+        if (m_dependOnChildrenHeight)
+        {
+            for (auto& child : m_pChildren)
+            {
+                if (child->IsActive())
+                {
+                    child->RecalculateHeight();
+                }
+            }
+        }
+        else
+        {
+            auto parentSize = GetParentBound().GetSize();
+            m_calculatedHeight = parentSize.y * m_size.Height.Relative + m_size.Height.Absolute;
+        }
+    }
+
+    void UIElement::RecalculatePosition()
+    {
+        auto pivotScreenPos = GetPivotScreenPos();
+        auto selfSize = Vector2f(m_calculatedWidth, m_calculatedHeight);
+        m_calculatedBotLeft = pivotScreenPos - selfSize * m_pivot;
     }
 
     void UIElement::AppendChild(std::shared_ptr<UIElement> element)
@@ -202,7 +276,7 @@ namespace crystal
         for (auto it = m_pChildren.rbegin(); it != m_pChildren.rend(); ++it)
         {
             auto& child = (*it);
-            if (child->CanResponseEvent() && child->GetEventBound().Contains(screenPos))
+            if (child->CanResponseEvent() && child->GetInnerBound().Contains(screenPos))
             {
                 return child->GetResponseElement(screenPos);
             }
@@ -304,13 +378,6 @@ namespace crystal
         return *p;
     }
 
-    Vector2i UIElement::GetEstimatedSize(UIElement* fakeParent) const
-    {
-        Vector2f relative(m_size.Width.Relative, m_size.Height.Relative);
-        Vector2f parentSize = fakeParent->m_calculatedInnerBound.GetSize();
-        return Vector2i(parentSize * relative) + Vector2i(m_size.Width.Absolute, m_size.Height.Absolute);
-    }
-
     void UIElement::UpdateSelf(const GameTimer& gameTimer)
     {}
 
@@ -340,25 +407,18 @@ namespace crystal
     {
     }
 
-    void UIElement::RecalculateChildren()
+    void UIElement::RecalculateChildren(RecalculateMask mask)
     {
-        for (auto& child : m_pChildren)
+        if (!m_dependOnChildrenWidth)
         {
-            child->Recalculate();
+            for (auto& child : m_pChildren)
+            {
+                if (child->IsActive())
+                {
+                    child->Recalculate(mask);
+                }
+            }
         }
-    }
-
-    void UIElement::CalculateBounds()
-    {
-        Bound2f parentBound = GetParentBound();
-        auto pivotScreenPos = GetPivotScreenPos();
-
-        auto parentSize = parentBound.GetMaxPos() - parentBound.GetMinPos();
-        auto selfSize = Vector2f(m_size.Width.Relative * parentSize.x + m_size.Width.Absolute,
-            m_size.Height.Relative * parentSize.y + m_size.Height.Absolute);
-
-        m_calculatedInnerBound = Bound2f(pivotScreenPos - selfSize * m_pivot,
-            pivotScreenPos + selfSize * (Vector2f(1.f) - m_pivot));
     }
 
     Vector2f UIElement::GetPivotScreenPos() const
@@ -372,7 +432,7 @@ namespace crystal
     {
         if (m_pParent)
         {
-            return m_pParent->m_calculatedInnerBound;
+            return m_pParent->GetInnerBound();
         }
         else
         {

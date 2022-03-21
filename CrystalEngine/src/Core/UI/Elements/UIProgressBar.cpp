@@ -22,9 +22,9 @@ namespace crystal
     void UIProgressBar::DrawSelf(const RenderPayload& payload, const GameTimer& gameTimer)
     {
         auto stateMachine = Engine::GetInstance()->GetUIStateMachine();
-        auto outerBound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+        auto outerBound = BoundingBoxConvert<int>(GetInnerBound());
         auto spriteBatch = payload.SpriteBatch;
-        spriteBatch->Draw(stateMachine->GetWhiteTexture(), BoundingBoxConvert<int>(outerBound),
+        spriteBatch->Draw(stateMachine->GetWhiteTexture(), outerBound,
             m_backgroundColor);
         SliceInfo slice = {};
         slice.Left = 1;
@@ -32,7 +32,7 @@ namespace crystal
         slice.Top = 1;
         slice.Bot = 1;
         slice.DrawFlags = Slice_Nine;
-        spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice, BoundingBoxConvert<int>(outerBound),
+        spriteBatch->DrawSlicedTexture(stateMachine->GetFrameTexture(), slice, outerBound,
             m_borderColor);
 
         auto minPos = outerBound.GetMinPos();

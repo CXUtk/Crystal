@@ -15,6 +15,7 @@ namespace crystal
             static_assert(N > 0, "UIVecf<T, N>: Components number is invalid");
 
             SetSize(SizeLayout(0, 1.f, 0, 0.f));
+            m_dependOnChildrenHeight = true;
 
             for (int i = 0; i < N; i++)
             {
@@ -73,6 +74,23 @@ namespace crystal
             return m_valueInputs[Idx]->GetValue();
         }
 
+        virtual void RecalculateHeight() override
+        {
+            UIElement::RecalculateHeight();
+            float offsetY = 0.f;
+            for (int i = 0; i < N; i++)
+            {
+                m_valueInputs[i]->SetPosition(Vector2f(0.f, -offsetY));
+                auto height = m_valueInputs[i]->GetHeight();
+                offsetY += height;
+                if (i != N - 1)
+                {
+                    offsetY += m_componentsGap;
+                }
+            }
+            m_calculatedHeight = offsetY;
+        }
+
     protected:
         std::shared_ptr<UIKeyValuePair<T>>  m_valueInputs[N]{};
         std::shared_ptr<UILabel>                m_legend = nullptr;
@@ -83,19 +101,6 @@ namespace crystal
         virtual void UpdateSelf(const GameTimer& gameTimer) override
         {
 
-        }
-
-        virtual void RecalculateSelf() override
-        {
-            float offsetY = 0.f;
-            for (int i = 0; i < N; i++)
-            {
-                m_valueInputs[i]->SetPosition(Vector2f(0.f, -offsetY));
-                auto height = m_valueInputs[i]->GetPredictedHeight(this);
-                offsetY += height;
-                offsetY += m_componentsGap;
-            }
-            SetSize(SizeLayout(0, 1.f, offsetY, 0.f));
         }
     };
 }

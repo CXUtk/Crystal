@@ -30,7 +30,8 @@ namespace crystal
     {
         auto device = Engine::GetInstance()->GetGraphicsDevice();
 
-        Bound2i bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
-        payload.SpriteBatch->Draw(m_pIconTexture, m_calculatedInnerBound.GetCenter(), m_mouseHover ? m_hoverColor : m_unhoverColor);
+        auto innerBound = GetInnerBound();
+        Bound2i bound = BoundingBoxConvert<int>(innerBound);
+        payload.SpriteBatch->Draw(m_pIconTexture, innerBound.GetCenter(), m_mouseHover ? m_hoverColor : m_unhoverColor);
     }
 }

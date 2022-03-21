@@ -30,7 +30,7 @@ namespace crystal
         slice.Bot = 1;
         slice.DrawFlags = Slice_Nine;
 
-        auto bound = BoundingBoxConvert<int>(m_calculatedInnerBound);
+        auto bound = BoundingBoxConvert<int>(GetInnerBound());
         if (m_drawColor != Color4f(0.f))
         {
             spriteBatch->Draw(m_whiteTexture, bound, m_drawColor);

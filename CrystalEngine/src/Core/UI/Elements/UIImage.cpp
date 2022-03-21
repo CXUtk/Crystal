@@ -56,12 +56,12 @@ namespace crystal
 
         if (m_drawType == ImageType::Full)
         {
-            spriteBatch->Draw(m_texture, BoundingBoxConvert<int>(m_calculatedInnerBound), m_drawColor);
+            spriteBatch->Draw(m_texture, BoundingBoxConvert<int>(GetInnerBound()), m_drawColor);
         }
         else
         {
             spriteBatch->DrawSlicedTexture(m_texture, m_sliceInfo,
-                BoundingBoxConvert<int>(m_calculatedInnerBound), m_drawColor);
+                BoundingBoxConvert<int>(GetInnerBound()), m_drawColor);
         }
     }
 }
