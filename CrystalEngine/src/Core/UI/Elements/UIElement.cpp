@@ -69,10 +69,6 @@ namespace crystal
         auto spriteBatch = payload.SpriteBatch;
         if (m_isStateDirty)
         {
-            if (m_pParent && m_pParent->m_dependOnChildrenHeight)
-            {
-
-            }
             Recalculate();
         }
         auto innerBound = GetInnerBound();

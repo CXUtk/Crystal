@@ -4,6 +4,7 @@
 #include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
 #include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>
+#include <CrystalEngine/src/Core/Utils/MemoryAlloc.h>
 #include <SJson/SJson.hpp>
 
 #include "CrystalTracer.h"
