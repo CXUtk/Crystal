@@ -14,6 +14,7 @@ using namespace crystal;
 namespace tracer
 {
     CrystalTracer::CrystalTracer()
+        : crystal::Application()
     {}
 
     CrystalTracer::~CrystalTracer()
