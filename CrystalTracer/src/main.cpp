@@ -4,7 +4,7 @@
 #include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
 #include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
 #include <CrystalEngine/src/Core/Utils/Logger.h>
-#include <CrystalEngine/src/Core/Utils/MemoryAlloc.h>
+#include <CrystalEngine/src/Core/Utils/MemoryPool.h>
 #include <SJson/SJson.hpp>
 
 #include "CrystalTracer.h"
@@ -54,7 +54,7 @@ int main()
     ////}
 
 
-    FreeListPool allocator;
+    ImplicitListPool allocator;
 
     auto ptr1 = allocator.Malloc(6);
     auto ptr2 = allocator.Malloc(6);
