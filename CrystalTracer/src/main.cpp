@@ -56,12 +56,14 @@ int main()
 
     ImplicitListPool allocator;
 
-    auto ptr1 = allocator.Malloc(6);
-    auto ptr2 = allocator.Malloc(6);
-    auto ptr3 = allocator.Malloc(6);
+    auto ptr1 = allocator.Malloc(7);
+    auto ptr2 = allocator.Malloc(7);
     allocator.Free(ptr2);
-    auto ptr4 = allocator.Malloc(4);
     allocator.Free(ptr1);
+    auto ptr3 = allocator.Malloc(15);
+    //allocator.Free(ptr2);
+    //auto ptr4 = allocator.Malloc(4);
+    //allocator.Free(ptr1);
     allocator.Free(ptr3);
     for (int i = 0; i < 10; i++)
     {
@@ -69,7 +71,6 @@ int main()
         *tracer = CrystalTracer();
         allocator.Free(tracer);
     }
-    allocator.Free(ptr4);
 
     auto uptr = std::make_unique<CrystalTracer>();
     engine->Start(std::move(uptr));

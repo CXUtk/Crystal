@@ -24,6 +24,7 @@ namespace crystal
 
         virtual void* Malloc(size_t size) = 0;
         virtual void  Free(void* ptr) = 0;
+        virtual void* Realloc(void* ptr, size_t bSize) = 0;
 
     protected:
         // Size for each block entry is the size of entire block
@@ -46,10 +47,15 @@ namespace crystal
 
         inline size_t word_to_byte(size_t wSize) const { return wSize * WordSize; }
         inline void put_word(void* ptr, word_t value) { *((word_t*)ptr) = value; }
+        inline void put_word_keep_alloc_tag(void* ptr, word_t value)
+        {
+            word_t prev_mask = *((word_t*)ptr) & 2;
+            *((word_t*)ptr) = value | prev_mask;
+        }
         inline void copy_word(void* src, void* dest) { *((word_t*)dest) = *((word_t*)src); }
 
 
-        inline word_t create_word(word_t bSize, bool prevAlloc, bool isAlloc)
+        inline word_t create_word_with_alloc_tag(word_t bSize, bool prevAlloc, bool isAlloc)
         {
             assert(!(bSize & AlignMask));
             return bSize | ((word_t)prevAlloc << 1) | (word_t)isAlloc;
@@ -78,7 +84,8 @@ namespace crystal
     class ImplicitListPool : public IMemPool<3>
     {
     public:
-        static constexpr size_t    MinimumSizeInWords = 2;
+        static const size_t     BlockOverheadAlloced = WordSize;
+        static const size_t     BlockOverheadUnAlloced = WordSize * 2;
 
         //static inline Header* nextHeader(Header* p) { return p + p->w_size; }
         //static inline Header* getEnd(Header* p) { return p + p->w_size - 1; }
@@ -87,9 +94,8 @@ namespace crystal
         virtual ~ImplicitListPool() override {}
 
         void* Malloc(size_t bSize) override;
-
-
         void Free(void* ptr) override;
+        void* Realloc(void* ptr, size_t bSize) override;
         //{
         //    RemoveBlock(reinterpret_cast<Header*>(ptr) - 1);
         //}
@@ -100,6 +106,34 @@ namespace crystal
         void* find_first(size_t bSize);
         void place_block(void* blockPtr, size_t bSize);
         void free_block(void* blockPtr);
+
+        void* find_next_fit(size_t bSize)
+        {
+            static void* lastBlock = NULL;
+
+            if (lastBlock == NULL)
+            {
+                lastBlock = heap_low();
+            }
+
+            void* end = heap_hi();
+            for (void* p = get_next_adj_block(lastBlock); ;)
+            {
+                if (p == end)
+                {
+                    p = heap_low();
+                }
+                size_t curSize = get_block_size(p);
+                if (!block_is_alloc(p) && curSize >= bSize)
+                {
+                    lastBlock = p;
+                    return p;
+                }
+                if (p == lastBlock) break;
+                p = get_next_adj_block(p);
+            }
+            return NULL;
+        }
 
         inline void* get_block_footer(void* ptr)
         {
@@ -126,6 +160,29 @@ namespace crystal
         inline bool block_is_prev_alloc(void* ptr)
         {
             return (*(word_t*)ptr) & 2;
+        }
+
+        inline void set_block_is_alloc(void* ptr, bool value)
+        {
+            if (value)
+            {
+                (*(word_t*)ptr) |= 1;
+            }
+            else
+            {
+                (*(word_t*)ptr) &= ~1;
+            }
+        }
+        inline void set_block_is_prev_alloc(void* ptr, bool value)
+        {
+            if (value)
+            {
+                (*(word_t*)ptr) |= 2;
+            }
+            else
+            {
+                (*(word_t*)ptr) &= ~2;
+            }
         }
         //Header* FindFirst(size_t wSize)
         //{
@@ -198,6 +255,74 @@ namespace crystal
         //}
     };
 
+    class FreeListPool : public IMemPool<3>
+    {
+    public:
+        static constexpr size_t    BlockOverhead = 4 * WordSize;
+
+        FreeListPool();
+        virtual ~FreeListPool() override {}
+
+    private:
+
+        inline size_t get_block_size(void* ptr)
+        {
+            return (*(word_t*)ptr) & (~AlignMask);
+        }
+        inline void* get_next_adj_block(void* ptr)
+        {
+            return increase_bytes(ptr, get_block_size(ptr));
+        }
+        inline bool block_is_alloc(void* ptr)
+        {
+            return (*(word_t*)ptr) & 1;
+        }
+        inline bool block_is_prev_alloc(void* ptr)
+        {
+            return (*(word_t*)ptr) & 2;
+        }
+        inline void* get_block_footer(void* ptr)
+        {
+            return increase_words(increase_bytes(ptr, get_block_size(ptr)), -1);
+        }
+        inline void* get_block_header(void* ptr)
+        {
+            return increase_words(increase_bytes(ptr, -get_block_size(ptr)), 1);
+        }
+
+        inline size_t get_block_next_ptr(void* ptr)
+        {
+            return *((word_t*)increase_words(ptr, 1));
+        }
+        inline size_t get_block_prev_ptr(void* ptr)
+        {
+            return *((word_t*)increase_words(ptr, 2));
+        }
+        inline void* get_next_block(void* ptr)
+        {
+            return (byte_t*)heap_low() + get_block_next_ptr(ptr);
+        }
+        inline void* get_prev_block(void* ptr)
+        {
+            return (byte_t*)heap_low() + get_block_prev_ptr(ptr);
+        }
+        inline void set_block_prev_ptr(void* ptr, word_t value)
+        {
+            *((word_t*)increase_words(ptr, 2)) = value;
+        }
+        inline void set_block_next_ptr(void* ptr, word_t value)
+        {
+            *((word_t*)increase_words(ptr, 1)) = value;
+        }
+
+        void* free_list_start = nullptr;
+
+        void* extend_heap(size_t bSize);
+        void* coalesce(void* blockPtr);
+        void* find_first(size_t bSize);
+        void place_block(void* blockPtr, size_t bSize);
+        void free_block(void* blockPtr);
+    };
 
     //class FreeListPool : public IMemPool<2>
     //{
