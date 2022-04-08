@@ -1,24 +1,24 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.14)
 
 
-file(GLOB CrystalEngineSources_Extra "*.cpp")
+file(GLOB CrystalEngineSources_Extra CONFIGURE_DEPENDS "*.cpp")
 set(CrystalEngineSources_PlatformFactory "Platforms/PlatformFactory.cpp" "Platforms/PlatformFactory.h")
-file(GLOB_RECURSE CrystalEngineSources_Core "Core/*.cpp")
-file(GLOB_RECURSE CrystalEngineInterfaces_Core "Interfaces/*.cpp")
-file(GLOB_RECURSE CrystalEngineTests "Tests/*.cpp")
+file(GLOB_RECURSE CrystalEngineSources_Core CONFIGURE_DEPENDS "Core/*.cpp")
+file(GLOB_RECURSE CrystalEngineInterfaces_Core CONFIGURE_DEPENDS "Interfaces/*.cpp")
+file(GLOB_RECURSE CrystalEngineTests CONFIGURE_DEPENDS "Tests/*.cpp")
 
 if (CRYSTAL_USE_OPENGL MATCHES ON AND CRYSTAL_USE_DX11 MATCHES ON)
     message(FATAL_ERROR "CRYSTAL_USE_GLFW and CRYSTAL_USE_DX11 cannot both be true")
 endif()
 
 if (CRYSTAL_USE_OPENGL)
-    file(GLOB_RECURSE CrystalEngineSources_Platform "Platforms/OpenGL/*.cpp")
+    file(GLOB_RECURSE CrystalEngineSources_Platform CONFIGURE_DEPENDS "Platforms/OpenGL/*.cpp")
     file(GLOB_RECURSE tmp "Platforms/GLFW/*.cpp")
     list(APPEND CrystalEngineSources_Platform ${tmp})
 endif()
 
 if (CRYSTAL_USE_DX11)
-    file(GLOB_RECURSE CrystalEngineSources_Platform "Platforms/DX11/*.cpp")
+    file(GLOB_RECURSE CrystalEngineSources_Platform CONFIGURE_DEPENDS "Platforms/DX11/*.cpp")
     file(GLOB_RECURSE tmp "Platforms/Windows32/*.cpp")
     list(APPEND CrystalEngineSources_Platform ${tmp})
 endif()
@@ -33,11 +33,10 @@ ${CrystalEngineSources_Platform}
 ${CrystalEngineSources_PlatformFactory}
 ${CrystalEngineTests})
 
-if(MSVC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-else()
-target_compile_features(CrystalEngine PRIVATE cxx_std_17)
-endif(MSVC)
+set_target_properties(CrystalEngine PROPERTIES
+CXX_STANDARD 17
+CXX_STANDARD_REQUIRED TRUE
+)
 
 
 
@@ -72,7 +71,7 @@ if (CRYSTAL_USE_DX11)
 endif()
 
 #target_link_directories(CrystalEngine PRIVATE "${PROJECT_SOURCE_DIR}/external/libs/freetype")
-target_link_libraries(CrystalEngine PRIVATE "${PROJECT_SOURCE_DIR}/external/libs/freetype/freetype.lib")
+target_link_libraries(CrystalEngine PRIVATE ${PROJECT_SOURCE_DIR}/external/libs/freetype/freetype.lib)
 
-target_include_directories(CrystalEngine SYSTEM PUBLIC "../external/includes")
+target_include_directories(CrystalEngine SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/external/includes)
 target_include_directories(CrystalEngine SYSTEM PUBLIC ".")

@@ -29,8 +29,8 @@ if (CRYSTAL_USE_DEBUG)
 endif()
 
 enable_testing()
-add_subdirectory ("external/includes/gtest")
-include_directories("external/includes/gtest/googletest/include")
+add_subdirectory (${PROJECT_SOURCE_DIR}/external/includes/gtest)
+include_directories(${PROJECT_SOURCE_DIR}/external/includes/gtest/googletest/include)
 add_subdirectory ("src")
 add_subdirectory ("test")
 # TODO: 如有需要，请添加测试并安装目标。
