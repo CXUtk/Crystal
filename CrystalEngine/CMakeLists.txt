@@ -9,6 +9,7 @@ option(CRYSTAL_USE_OPENGL "Use OpenGL and GLFW for graphics interface" OFF)
 option(CRYSTAL_USE_DX11 "Use DX11 and Win32 for graphics interface" ON)
 option(CRYSTAL_USE_DEBUG "Enable debug infomation and outputs" ON)
 
+
 if (UNIX)
     add_compile_definitions(CRYSTAL_USE_UNIX)
 elseif(WIN32)

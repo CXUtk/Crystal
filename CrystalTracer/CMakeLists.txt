@@ -10,10 +10,11 @@ file(GLOB_RECURSE CrystalTracerHeaders "src/*.h")
 # 将源代码添加到此项目的可执行文件。
 add_executable (CrystalTracer ${CrystalTracerSources} ${CrystalTracerHeaders})
 
-set_target_properties(CrystalTracer PROPERTIES
-            CXX_STANDARD 20
-            CXX_EXTENSIONS OFF
-            )
+if(MSVC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+else()
+target_compile_features(CrystalEngine PRIVATE cxx_std_17)
+endif(MSVC)
 
 target_include_directories(CrystalTracer SYSTEM PUBLIC "src")
 target_include_directories(CrystalTracer SYSTEM PRIVATE "..")

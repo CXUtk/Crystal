@@ -88,8 +88,7 @@ namespace SRefl
 		(static_cast<void>(f(std::integral_constant<T, S>{})), ...);
 	}
 
-	template<typename T, typename F>
-	requires SRefl::has_fields_v<T>
+	template<typename T, typename F, std::enable_if_t<SRefl::has_fields_v<T>, nullptr_t> = nullptr>
 	inline constexpr void ForEachField(F&& func)
 	{
 		constexpr auto nTypes = std::tuple_size<decltype(TypeInfo<T>::_FIELDLIST())>::value;
@@ -102,8 +101,7 @@ namespace SRefl
 		});
 	}
 
-	template<typename T, typename F>
-	requires SRefl::has_bases_v<T>
+	template<typename T, typename F, std::enable_if_t<SRefl::has_bases_v<T>, nullptr_t> = nullptr>
 	inline constexpr void ForEachBase(F&& func)
 	{
 		constexpr auto nTypes = std::tuple_size_v<decltype(TypeInfo<T>::_BASELIST())>;
@@ -116,8 +114,7 @@ namespace SRefl
 		});
 	}
 
-	template<typename T, typename F>
-	requires std::is_enum_v<T>
+	template<typename T, typename F, std::enable_if_t<std::is_enum_v<T>, nullptr_t> = nullptr>
 	inline constexpr void ForEachEnumItem(F&& func)
 	{
 		constexpr auto nTypes = std::tuple_size<decltype(EnumInfo<T>::_ENUMLIST())>::value;

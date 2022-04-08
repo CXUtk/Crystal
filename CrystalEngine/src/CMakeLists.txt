@@ -24,7 +24,7 @@ if (CRYSTAL_USE_DX11)
 endif()
 
 
-# ½«Ô´´úÂëÌí¼Óµ½´ËÏîÄ¿µÄ¿ÉÖ´ÐÐÎÄ¼þ¡£
+
 add_library (CrystalEngine
 ${CrystalEngineSources_Extra} 
 ${CrystalEngineSources_Core}
@@ -33,18 +33,18 @@ ${CrystalEngineSources_Platform}
 ${CrystalEngineSources_PlatformFactory}
 ${CrystalEngineTests})
 
-set_target_properties(CrystalEngine PROPERTIES
-            CXX_STANDARD 20
-            CXX_EXTENSIONS OFF)
+if(MSVC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+else()
+target_compile_features(CrystalEngine PRIVATE cxx_std_17)
+endif(MSVC)
 
 
-# µ÷ÕûGLFWµÄFlags£¬¹ØµôÎÞÓÃµÄ±àÒë×é¼þ
+
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-
-# ²Ù×÷ÏµÍ³ºÍÍ¼ÐÎ½Ó¿ÚÅÐ¶¨
 
 if (CRYSTAL_USE_OPENGL)
     if (UNIX)
