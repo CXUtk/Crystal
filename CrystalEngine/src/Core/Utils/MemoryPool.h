@@ -315,13 +315,24 @@ namespace crystal
             *((word_t*)increase_words(ptr, 1)) = value;
         }
 
-        void* free_list_start = nullptr;
+        void* free_list_head = nullptr;
 
         void* extend_heap(size_t bSize);
         void* coalesce(void* blockPtr);
         void* find_first(size_t bSize);
         void place_block(void* blockPtr, size_t bSize);
         void free_block(void* blockPtr);
+
+        void erase_link_node(void* blockPtr)
+        {
+            void* prev = get_prev_block(blockPtr);
+            void* next = get_next_block(blockPtr);
+            if (prev != free_list_head)
+            {
+                set_block_next_ptr(prev, (byte_t *)next - free_list_head);
+
+            }
+        }
     };
 
     //class FreeListPool : public IMemPool<2>

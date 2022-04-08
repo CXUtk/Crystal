@@ -23,7 +23,17 @@ namespace crystal
         void* block = NULL;
         if (!(block = find_first(allocSize)))
         {
-            block = extend_heap(allocSize);
+            void* end = heap_hi();
+            if (!block_is_prev_alloc(end))
+            {
+                size_t lastBlockSize = get_block_size(increase_words(end, -1));
+                size_t newSize = allocSize - lastBlockSize;
+                block = extend_heap(newSize);
+            }
+            else
+            {
+                block = extend_heap(allocSize);
+            }
             if (!block)
             {
                 return NULL;
