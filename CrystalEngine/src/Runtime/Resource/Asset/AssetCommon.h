@@ -1,7 +1,7 @@
 #pragma once
 #include <Crystal.h>
 #include <memory>
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 
 namespace crystal
 {

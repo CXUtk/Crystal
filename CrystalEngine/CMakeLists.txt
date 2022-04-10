@@ -7,6 +7,16 @@ set(ENGINE_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/external")
 set(ENGINE_ASSET_DIR "/asset")
 
+
+# set cmake compile options
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+if(MSVC)
+    string(APPEND CMAKE_CXX_FLAGS " /Zc:__cplusplus")
+endif()
+
+
 # graphics interface
 option(CRYSTAL_USE_OPENGL "Use OpenGL for graphics interface" OFF)
 option(CRYSTAL_USE_DX11 "Use DX11 and Win32 for graphics interface" ON)

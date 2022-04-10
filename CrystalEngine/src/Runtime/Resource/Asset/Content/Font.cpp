@@ -153,11 +153,11 @@ namespace crystal
         if (bitmap.buffer)
         {
             unsigned char* data = new unsigned char[width * height * 4];
-            for (int i = 0; i < height; i++)
+            for (size_t i = 0; i < height; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (size_t j = 0; j < width; j++)
                 {
-                    int id = (i * width + j);
+                    size_t id = (i * width + j);
                     unsigned char r = bitmap.buffer[id];
                     for (int k = 0; k < 3; k++)
                     {

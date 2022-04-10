@@ -1,9 +1,9 @@
 #include "UIElement.h"
 #include <Engine.h>
 
-#include <Core/Asset/AssetManager.h>
-#include <Core/Render/RenderExports.h>
-#include <Core/UI/UIStateMachine.h>
+#include "Resource/Asset/AssetManager.h"
+#include "Function/Render/RenderExports.h"
+#include "Function/UI/UIStateMachine.h"
 
 namespace crystal
 {

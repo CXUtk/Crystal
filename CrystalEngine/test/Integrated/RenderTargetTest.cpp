@@ -1,14 +1,14 @@
 ﻿#include "RenderTargetTest.h"
 #include <Engine.h>
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
-#include <Core/Input/InputController.h>
+#include "Function/Input/InputController.h"
 #include <Core/Utils/GameTimer.h>
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/ObjLoader.h>
-#include <Core/Asset/AssetManager.h>
+#include "Resource/Asset/AssetManager.h"
 
 namespace crystal
 {

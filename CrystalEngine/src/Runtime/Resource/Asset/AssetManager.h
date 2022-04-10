@@ -1,6 +1,6 @@
 #pragma once
 #include "AssetCommon.h"
-#include <Interfaces/FileSystem/FSCommon.h>
+#include "Platform/RHI/FileSystem/FSCommon.h"
 #include <Core/Utils/Misc.h>
 
 #include "AssetPackage.h"

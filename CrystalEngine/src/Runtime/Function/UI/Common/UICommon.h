@@ -1,6 +1,6 @@
 #pragma once
-#include <Interfaces/Graphics/GraphicsCommon.h>
-#include <Core/Render/RenderCommon.h>
+#include "Platform/RHI/Graphics/GraphicsCommon.h"
+#include "Function/Render/RenderCommon.h"
 #include <string>
 #include <chrono>
 #include <memory>
@@ -82,7 +82,7 @@ namespace crystal
             MouseScroll = 1 << 6,
             Focus = 1 << 7,
             UnFocus = 1 << 8,
-            All = -1
+            All = (unsigned)-1
     };
     BIT_FLAGS_END(PropagationFlags);
 

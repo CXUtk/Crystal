@@ -1,6 +1,6 @@
 #pragma once
-#include <Interfaces/Graphics/GraphicsCommon.h>
-#include <Core/Render/RenderCommon.h>
+#include "Platform/RHI/Graphics/GraphicsCommon.h"
+#include "Function/Render/RenderCommon.h"
 #include "UICommon.h"
 
 namespace crystal

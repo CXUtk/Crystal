@@ -1,6 +1,6 @@
 #include "AssetManager.h"
 #include <Engine.h>
-#include <Interfaces/FileSystem/File.h>
+#include "Platform/RHI/FileSystem/FSCommon.h"
 #include <SJson/SJson.hpp>
 #include <vector>
 

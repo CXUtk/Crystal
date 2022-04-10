@@ -1,6 +1,8 @@
 #include "Win32ClipBoard.h"
 #include <Windows.h>
-#include <codecvt>
+#include <utf8.h>
+
+#include "Utils/Encoding.h"
 #include "Win32GameWindow.h"
 
 namespace crystal
@@ -19,9 +21,7 @@ namespace crystal
 
         EmptyClipboard();
 
-        std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert32;
-        auto wstr = convert.from_bytes(convert32.to_bytes(text));
+        auto wstr = Win32Encoding::Utf8StringToWString(utf8::utf32to8(text));
 
         HANDLE hglbCopy = GlobalAlloc(GMEM_MOVEABLE,
             (wstr.size() + 1) * sizeof(wchar_t));
@@ -73,9 +73,6 @@ namespace crystal
             }
         }
         CloseClipboard();
-
-        std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert32;
-        return convert32.from_bytes(convert.to_bytes(text));
+        return utf8::utf8to32(Win32Encoding::WStringToUtf8String(text));
     }
 }

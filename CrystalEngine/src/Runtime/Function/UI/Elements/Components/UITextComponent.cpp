@@ -3,9 +3,9 @@
 
 #include <Engine.h>
 
-#include <Core/Asset/AssetManager.h>
-#include <Core/Render/RenderExports.h>
-#include <Core/Input/InputController.h>
+#include "Resource/Asset/AssetManager.h"
+#include "Function/Render/RenderExports.h"
+#include "Function/Input/InputController.h"
 
 
 namespace crystal

@@ -1,8 +1,8 @@
 #include "InputController.h"
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 #include <Core/Utils/Logger.h>
 #include <iostream>
-#include <codecvt>
+#include <utf8.h>
 
 namespace crystal
 {
@@ -27,9 +27,9 @@ namespace crystal
             }
 		});
 
-        auto& charSeq = m_wString;
+        auto& charSeq = m_inputSequence;
         window->AddCharInputEventListener([this, &charSeq](CharInputArgs args) {
-            charSeq.push_back((wchar_t)args.Code);
+            charSeq.push_back(args.Code);
         });
 
 		GlobalLogger::Log(SeverityLevel::Debug, "InputController construct");
@@ -43,7 +43,7 @@ namespace crystal
 	void InputController::SampleNewInput()
 	{
         m_keySequence.clear();
-        m_wString.clear();
+        m_inputSequence.clear();
 		_wasKeysDown = _curKeysDown;
 		_wasMouseButtonDown = _curMouseButtonDown;
 		_scrollWheel = Vector2f(0);
@@ -56,10 +56,6 @@ namespace crystal
 
     std::u32string InputController::GetInputCharSequence() const
     {
-        if (m_wString.empty()) return std::u32string();
-        std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert32;
-        auto u8String = convert.to_bytes(m_wString);
-        return convert32.from_bytes(u8String);
+        return m_inputSequence;
     }
 }

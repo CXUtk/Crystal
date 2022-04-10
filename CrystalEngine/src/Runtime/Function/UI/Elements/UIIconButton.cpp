@@ -1,8 +1,8 @@
 #include "UIIconButton.h"
 
 #include <Engine.h>
-#include <Core/Asset/AssetManager.h>
-#include <Core/Render/RenderExports.h>
+#include "Resource/Asset/AssetManager.h"
+#include "Function/Render/RenderExports.h"
 
 namespace crystal
 {

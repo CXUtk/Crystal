@@ -1,7 +1,7 @@
 #include "DX11Common.h"
 #include <array>
 #include <map>
-#include <Interfaces/Graphics/GraphicsCommon.h>
+#include "Platform/RHI/Graphics/GraphicsCommon.h"
 #include <Core/Utils/Geometry.h>
 
 namespace crystal

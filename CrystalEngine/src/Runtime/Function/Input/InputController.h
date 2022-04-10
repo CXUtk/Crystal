@@ -91,7 +91,7 @@ namespace crystal
 		std::bitset<(int)MouseButtonCode::__COUNT> _wasMouseButtonDown;
 
         std::vector<KeyEventArgs>       m_keySequence{};
-        std::wstring                    m_wString{};
+        std::u32string                  m_inputSequence{};
 
 		IGameWindow* _gameWindow = nullptr;
 	};

@@ -3,7 +3,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <Core/InitArgs.h>
+#include "Resource/Config/InitArgs.h"
 #include <Core/Utils/Logger.h>
 
 namespace crystal

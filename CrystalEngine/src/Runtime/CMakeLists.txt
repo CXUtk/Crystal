@@ -74,6 +74,7 @@ CXX_STANDARD_REQUIRED ON)
 # link libraries
 target_link_libraries(${TARGET_NAME} PUBLIC glm)
 target_link_libraries(${TARGET_NAME} PUBLIC freetype)
+target_link_libraries(${TARGET_NAME} PUBLIC utf8cpp)
 
 
 if (CRYSTAL_USE_OPENGL)

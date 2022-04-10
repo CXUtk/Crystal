@@ -122,7 +122,7 @@ namespace crystal
 
     struct CharInputArgs
     {
-        uint64_t Code;
+        char32_t Code;
     };
 
     class InputCommon

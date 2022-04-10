@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <wrl/client.h>
 #include <d3d11_1.h>
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 
 namespace crystal
 {

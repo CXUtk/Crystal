@@ -578,8 +578,7 @@ namespace SJson
         case SJson::ValueType::String:
         {
             std::string arrayStr = "\"";
-            auto strValue = std::get<std::string>(m_value);
-            arrayStr.append(strValue);
+            arrayStr.append(std::get<std::string>(m_value));
             arrayStr.push_back('\"');
             return arrayStr;
         }
@@ -1415,7 +1414,7 @@ namespace SJson
         }
         else if constexpr (is_vector<T>::value)
         {
-            T vec;
+            T vec{};
             node.foreach([&](const JsonNode& e) {
                 vec.push_back(de_serialize<typename T::value_type>(e));
             });
@@ -1423,7 +1422,7 @@ namespace SJson
         }
         else if constexpr (is_map<T>::value)
         {
-            T mapp;
+            T mapp{};
             node.foreach([&](const JsonNode& e) {
                 auto key = de_serialize<typename T::key_type>(e["key"]);
                 auto value = de_serialize<typename T::mapped_type>(e["value"]);
@@ -1437,7 +1436,7 @@ namespace SJson
         }
         else if constexpr (SRefl::has_fields_v<T>)
         {
-            T result;
+            T result{};
             SRefl::ForEachField<T>([&result, &node](auto field) {
                 result.*(field.MemberPtr) = de_serialize<decltype(field)::_Type>(node[field.Name]);
                 });

@@ -1,7 +1,7 @@
 #include "TestState.h"
 
 #include <Engine.h>
-#include <Core/Asset/AssetManager.h>
+#include "Resource/Asset/AssetManager.h"
 
 namespace crystal
 {

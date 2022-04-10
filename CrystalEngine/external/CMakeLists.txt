@@ -28,3 +28,8 @@ endif()
 if(NOT TARGET freetype)
     add_subdirectory("freetype1.12")
 endif()
+
+
+if(NOT TARGET utf8cpp)
+    add_subdirectory("utfcpp-3.2.1")
+endif()

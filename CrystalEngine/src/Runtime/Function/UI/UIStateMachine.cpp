@@ -2,8 +2,8 @@
 #include "UIState.h"
 #include <Engine.h>
 
-#include <Core/Render/RenderExports.h>
-#include <Core/Asset/AssetManager.h>
+#include "Function/Render/RenderExports.h"
+#include "Resource/Asset/AssetManager.h"
 
 namespace crystal
 {

@@ -1,4 +1,4 @@
-﻿#include "DX11GraphicsDevice.h"
+#include "DX11GraphicsDevice.h"
 #include "d3dUtils.h"
 #include "dxTrace.h"
 
@@ -18,7 +18,7 @@
 #include "PipelineStates/DX11DepthStencilState.h"
 #include "DX11GraphicsContext.h"
 
-#include <Core/InitArgs.h>
+#include "Resource/Config/InitArgs.h"
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/IO.h>
 #include <SJson/SJson.hpp>

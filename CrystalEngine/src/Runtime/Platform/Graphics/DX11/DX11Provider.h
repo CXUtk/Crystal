@@ -1,5 +1,5 @@
 #pragma once
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 #include <Crystal.h>
 
 #include "DX11Common.h"

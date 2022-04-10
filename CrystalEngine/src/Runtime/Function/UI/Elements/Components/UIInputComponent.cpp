@@ -1,11 +1,11 @@
 #include "UIInputComponent.h"
-#include <codecvt>
+#include <utf8.h>
 
 #include <Engine.h>
 
-#include <Core/Asset/AssetManager.h>
-#include <Core/Render/RenderExports.h>
-#include <Core/Input/InputController.h>
+#include "Resource/Asset/AssetManager.h"
+#include "Function/Render/RenderExports.h"
+#include "Function/Input/InputController.h"
 
 namespace crystal
 {
@@ -132,14 +132,12 @@ namespace crystal
 
     std::string UIInputComponent::GetText() const
     {
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-        return conv.to_bytes(m_text);
+        return utf8::utf32to8(m_text);
     }
 
     void UIInputComponent::SetText(const std::string& text)
     {
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-        auto&& text32 = conv.from_bytes(text);
+        auto&& text32 = utf8::utf8to32(text);
         m_text = std::move(text32);
         MoveCarrot(m_text.size());
         m_selectionLeft = m_selectionRight = m_carrotPos;

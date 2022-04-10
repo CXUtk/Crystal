@@ -1,6 +1,6 @@
 #pragma once
-#include <Core/Input/InputCommon.h>
-#include <Core/Utils/Event.h>
+#include "Function/Input/InputCommon.h"
+#include "Core/Utils/Event.h"
 #include <Core/Utils/Geometry.h>
 #include "IClipBoard.h"
 

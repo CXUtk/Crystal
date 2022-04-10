@@ -1,6 +1,6 @@
 #pragma once
 #include <Crystal.h>
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 
 using namespace crystal;
 

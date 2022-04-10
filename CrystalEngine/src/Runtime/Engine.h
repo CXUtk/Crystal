@@ -1,8 +1,8 @@
 #pragma once
 #include "Crystal.h"
 #include "Core/Utils/GameTimer.h"
-#include "Interfaces/Interfaces.h"
-#include "Core/InitArgs.h"
+#include "Platform/RHI/Interfaces.h"
+#include "Resource/Config/InitArgs.h"
 #include <functional>
 
 namespace crystal

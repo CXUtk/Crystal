@@ -1,8 +1,9 @@
 #include "Win32GameWindow.h"
-#include <Core/InitArgs.h>
+#include "Resource/Config/InitArgs.h"
 #include <Core/Utils/Logger.h>
 
-#include <codecvt>
+#include "Utils/Encoding.h"
+#include <utf8.h>
 #include <array>
 #include <windowsx.h>
 
@@ -103,7 +104,7 @@ namespace crystal
 	{
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-		WNDCLASSW wc;
+        WNDCLASSW wc = {};
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = MainWndProc;
 		wc.cbClsExtra = 0;
@@ -133,8 +134,7 @@ namespace crystal
 		int width = R.right - R.left;
 		int height = R.bottom - R.top;
 
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		m_hMainWnd = CreateWindowW(L"Win32WndClassName", converter.from_bytes(m_windowTitle).c_str(),
+		m_hMainWnd = CreateWindowW(L"Win32WndClassName", Win32Encoding::Utf8StringToWString(m_windowTitle).c_str(),
             dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, width, height,
 			0, 0, m_hWindowInstance, 0);
 		if (!m_hMainWnd)
@@ -287,7 +287,7 @@ namespace crystal
 		}
 
 		m_mouseDowned[(int)button] = (action == InputAction::PRESS);
-		MouseButtonEventArgs args;
+        MouseButtonEventArgs args = {};
 		args.Action = action;
 		args.ButtonCode = button;
 		args.Mods = getKeyMods();
@@ -315,7 +315,7 @@ namespace crystal
 		//printf("0x%.4X\n", scancode);
 		KeyCode keyCode = keyCodeMap[scancode];
 
-		KeyEventArgs args;
+        KeyEventArgs args = {};
 		args.KeyCode = keyCode;
 		args.Action = action;
 		args.Mods = mods;
@@ -476,13 +476,17 @@ namespace crystal
         case WM_CHAR:
         {
             CharInputArgs args = {};
-            args.Code = wParam;
+            std::wstring wstr;
+            wstr.push_back((wchar_t)wParam);
+            args.Code = utf8::utf8to32(Win32Encoding::WStringToUtf8String(wstr))[0];
             m_eventOnCharInput.Invoke(args);
             return 0;
         }
         case WM_IME_CHAR:	//使用输入法输入字符时，触发 WM_IME_CHAR 消息。输入词组时，词组有多少个字符就触发多少次。
             CharInputArgs args = {};
-            args.Code = wParam;
+            std::wstring wstr;
+            wstr.push_back((wchar_t)wParam);
+            args.Code = utf8::utf8to32(Win32Encoding::WStringToUtf8String(wstr))[0];
             m_eventOnCharInput.Invoke(args);
             return 0;
 	    }

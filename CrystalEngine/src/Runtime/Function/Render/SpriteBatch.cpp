@@ -1,8 +1,8 @@
 #include "SpriteBatch.h"
-#include <Interfaces/Graphics/GraphicsInterfaces.h>
+#include "Platform/RHI/Graphics/GraphicsCommon.h"
 #include <stdexcept>
 #include <Engine.h>
-#include <Core/Asset/AssetManager.h>
+#include "Resource/Asset/AssetManager.h"
 
 
 namespace crystal

@@ -1,6 +1,8 @@
-#include <Core/Utils/Misc.h>
+#include "Core/Utils/Misc.h"
 
 #include "../test.h"
+
+using namespace crystal;
 
 TEST(Test_Utils_Misc, String_Trim)
 {

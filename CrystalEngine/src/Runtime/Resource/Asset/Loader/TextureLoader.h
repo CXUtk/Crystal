@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include <Interfaces/Interfaces.h>
+#include "Platform/RHI/Interfaces.h"
 #include <SJson/SJson.hpp>
-#include <Interfaces/FileSystem/File.h>
+#include "Platform/RHI/FileSystem/File.h"
 
 namespace crystal
 {

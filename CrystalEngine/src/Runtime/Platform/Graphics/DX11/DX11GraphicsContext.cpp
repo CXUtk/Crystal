@@ -1,14 +1,15 @@
-﻿#include "DX11GraphicsContext.h"
+#include "DX11GraphicsContext.h"
 #include "DX11GraphicsDevice.h"
 #include "DX11PipelineResourceObject.h"
 #include "DX11PipelineStateObject.h"
 
 #include "PipelineResources/DX11RenderTarget2D.h"
 
-#include <Platforms/DX11/dxTrace.h>
-#include <Platforms/Windows32/Win32GameWindow.h>
-#include <Core/InitArgs.h>
-#include <Platforms/DX11/d3dUtils.h>
+#include "dxTrace.h"
+#include "d3dUtils.h"
+
+#include "Platform/System/Windows32/Win32GameWindow.h"
+#include "Resource/Config/InitArgs.h"
 
 namespace crystal
 {

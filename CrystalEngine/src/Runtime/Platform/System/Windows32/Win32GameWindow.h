@@ -1,11 +1,10 @@
 #pragma once
-#include <Interfaces/IGameWindow.h>
 #include <Crystal.h>
-
 #include <wrl/client.h>
 #include <string>
 #include <bitset>
 
+#include "Platform/RHI/IGameWindow.h"
 #include "Win32ClipBoard.h"
 
 namespace crystal

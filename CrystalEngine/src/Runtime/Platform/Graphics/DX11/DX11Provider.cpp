@@ -1,7 +1,8 @@
 #include "DX11Provider.h"
-#include <Platforms/Windows32/Win32GameWindow.h>
-#include <Platforms/DX11/DX11GraphicsDevice.h>
-#include <Platforms/DX11/DX11GraphicsContext.h>
+
+#include "Platform/System/Windows32/Win32GameWindow.h"
+#include "DX11GraphicsDevice.h"
+#include "DX11GraphicsContext.h"
 
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Misc.h>

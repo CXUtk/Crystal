@@ -1,8 +1,10 @@
 #pragma once
 #include <memory>
-#include <Interfaces/Interfaces.h>
+
+#include "Platform/RHI/Interfaces.h"
+#include "Platform/RHI/FileSystem/FSCommon.h"
+
 #include <SJson/SJson.hpp>
-#include <Interfaces/FileSystem/File.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
