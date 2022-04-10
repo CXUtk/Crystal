@@ -1,7 +1,7 @@
 #include "EditorState.h"
 
-#include <CrystalEngine/src/Engine.h>
-#include <CrystalEngine/src/Core/Asset/AssetManager.h>
+#include <Engine.h>
+#include <Resource/Asset/AssetManager.h>
 
 using namespace crystal;
 

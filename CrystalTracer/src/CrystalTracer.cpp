@@ -2,10 +2,11 @@
 
 #include <Core/Utils/Logger.h>
 #include <Core/Utils/Geometry.h>
-#include <Core/Input/InputController.h>
 #include <Core/Utils/GameTimer.h>
-#include <Core/Render/SpriteBatch.h>
-#include <Core/UI/UIStateMachine.h>
+
+#include <Function/Input/InputController.h>
+#include <Function/Render/SpriteBatch.h>
+#include <Function/UI/UIStateMachine.h>
 
 #include "UI/EditorState.h"
 

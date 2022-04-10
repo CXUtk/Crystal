@@ -15,7 +15,7 @@ endif()
 
 
 if(NOT TARGET glm)
-    option(BUILD_STATIC_LIBS "" ON)
+    option(BUILD_STATIC_LIBS "" OFF)
     option(BUILD_TESTING "" OFF)
     option(GLM_TEST_ENABLE "" OFF)
     add_subdirectory("glm")

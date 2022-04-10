@@ -1,10 +1,10 @@
-#include <CrystalEngine/src/Engine.h>
-#include <CrystalEngine/src/Tests/Integrated/OrbitControllerTest.h>
-#include <CrystalEngine/src/Tests/Integrated/TriangleTest.h>
-#include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
-#include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
-#include <CrystalEngine/src/Core/Utils/Logger.h>
-#include <CrystalEngine/src/Core/Utils/MemoryPool.h>
+#include <Engine.h>
+//#include <CrystalEngine/src/Tests/Integrated/OrbitControllerTest.h>
+//#include <CrystalEngine/src/Tests/Integrated/TriangleTest.h>
+//#include <CrystalEngine/src/Tests/Integrated/QuadTest.h>
+//#include <CrystalEngine/src/Tests/Integrated/RenderTargetTest.h>
+//#include <CrystalEngine/src/Core/Utils/Logger.h>
+//#include <CrystalEngine/src/Core/Utils/MemoryPool.h>
 #include <SJson/SJson.hpp>
 
 #include "CrystalTracer.h"

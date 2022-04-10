@@ -71,6 +71,13 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 CXX_STANDARD 17
 CXX_STANDARD_REQUIRED ON)
 
+set_target_properties(${TARGET_NAME}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
 # link libraries
 target_link_libraries(${TARGET_NAME} PUBLIC glm)
 target_link_libraries(${TARGET_NAME} PUBLIC freetype)

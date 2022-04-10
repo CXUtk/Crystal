@@ -15,6 +15,8 @@ set(CRYSTAL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_INSTALL_PREFIX "${CRYSTAL_ROOT_DIR}/install")
 set(BINARY_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/")
 
+
+
 message(${CMAKE_INSTALL_PREFIX})
 
 add_subdirectory ("CrystalTracer")

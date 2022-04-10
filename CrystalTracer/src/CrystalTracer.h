@@ -1,7 +1,7 @@
 #pragma once
-#include <Core/Application.h>
-#include "Engine.h"
-#include <Core/UI/UIExports.h>
+#include <Application.h>
+#include <Engine.h>
+#include <Function/UI/UIExports.h>
 
 namespace tracer
 {
