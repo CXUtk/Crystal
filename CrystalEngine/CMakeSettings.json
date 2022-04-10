@@ -5,8 +5,8 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
@@ -20,6 +20,21 @@
           "name": "CMAKE_CXX_FLAGS_DEBUG",
           "value": "/MTd /Zi /Ob0 /Od /RTC1",
           "type": "STRING"
+        },
+        {
+          "name": "CRYSTAL_USE_DEBUG",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "CRYSTAL_USE_DX11",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "CRYSTAL_USE_WIN32",
+          "value": "True",
+          "type": "BOOL"
         }
       ]
     },
@@ -32,8 +47,7 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
+      "inheritEnvironments": [ "msvc_x64_x64" ]
     }
   ]
 }

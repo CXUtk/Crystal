@@ -1,0 +1,33 @@
+cmake_minimum_required (VERSION 3.14)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Add interface files
+set(ENGINE_PLATFORM_FACTORY "PlatformFactory.cpp" "PlatformFactory.h")
+file(GLOB_RECURSE ENGINE_PLATFORM_RHI CONFIGURE_DEPENDS "RHI/*.cpp" "RHI/*.h")
+
+# Different platform options cannot all be on
+if (CRYSTAL_USE_OPENGL MATCHES ON AND CRYSTAL_USE_DX11 MATCHES ON)
+    message(FATAL_ERROR "CRYSTAL_USE_GLFW and CRYSTAL_USE_DX11 cannot both be true")
+endif()
+
+if (CRYSTAL_USE_OPENGL)
+    file(GLOB_RECURSE ENGINE_PLATFORM_GRAPHIC CONFIGURE_DEPENDS "Graphics/OpenGL/*.cpp" "Graphics/OpenGL/*.h")
+    file(GLOB_RECURSE ENGINE_PLATFORM_SYSTEM CONFIGURE_DEPENDS "System/GLFW/*.cpp" "System/GLFW/*.h")
+endif()
+
+if (CRYSTAL_USE_DX11)
+    file(GLOB_RECURSE ENGINE_PLATFORM_GRAPHIC CONFIGURE_DEPENDS "Graphics/DX11/*.cpp" "Graphics/DX11/*.h")
+    file(GLOB_RECURSE ENGINE_PLATFORM_SYSTEM CONFIGURE_DEPENDS "System/Windows32/*.cpp" "System/Windows32/*.h")
+endif()
+
+file(GLOB_RECURSE ENGINE_PLATFORM_CORE CONFIGURE_DEPENDS "RHI/*.cpp" "RHI/*.h")
+
+
+add_library (CrystalEngine_Platform OBJECT
+${ENGINE_PLATFORM_FACTORY} 
+${ENGINE_PLATFORM_RHI}
+${ENGINE_PLATFORM_GRAPHIC}
+${ENGINE_PLATFORM_SYSTEM})
+

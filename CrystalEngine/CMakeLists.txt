@@ -1,12 +1,21 @@
-# CMakeList.txt: Crystal 的 CMake 项目，在此处包括源代码并定义
-# 项目特定的逻辑。
-#
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.14)
 
 project(CrystalEngine)
 
-option(CRYSTAL_USE_OPENGL "Use OpenGL and GLFW for graphics interface" OFF)
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+set(ENGINE_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/external")
+set(ENGINE_ASSET_DIR "/asset")
+
+# graphics interface
+option(CRYSTAL_USE_OPENGL "Use OpenGL for graphics interface" OFF)
 option(CRYSTAL_USE_DX11 "Use DX11 and Win32 for graphics interface" ON)
+
+# platform interface
+option(CRYSTAL_USE_GLFW "Use GLFW for system platform provider" OFF)
+option(CRYSTAL_USE_WIN32 "Use WIN32 for system platform provider" ON)
+
+# other options
 option(CRYSTAL_USE_DEBUG "Enable debug infomation and outputs" ON)
 
 
@@ -24,14 +33,20 @@ endif()
 if (CRYSTAL_USE_DX11)
     add_compile_definitions(CRYSTAL_USE_DX11)
 endif()
+
+if (CRYSTAL_USE_GLFW)
+    add_compile_definitions(CRYSTAL_USE_GLFW)
+endif()
+if (CRYSTAL_USE_WIN32)
+    add_compile_definitions(CRYSTAL_USE_WIN32)
+endif()
+
 if (CRYSTAL_USE_DEBUG)
     add_compile_definitions(CRYSTAL_USE_DEBUG)
 endif()
 
-enable_testing()
-add_subdirectory (${PROJECT_SOURCE_DIR}/external/includes/gtest)
-include_directories(${PROJECT_SOURCE_DIR}/external/includes/gtest/googletest/include)
-add_subdirectory ("src")
+add_subdirectory ("external")
+add_subdirectory ("src/Runtime")
+add_subdirectory ("src/Editor")
 add_subdirectory ("test")
-# TODO: 如有需要，请添加测试并安装目标。
 
