@@ -2,9 +2,12 @@
 #include <Engine.h>
 
 #include "Resource/Asset/AssetManager.h"
+#include "Resource/Asset/Content/Fonts/Font.h"
+
 #include "Function/Render/RenderExports.h"
 #include "Function/Input/InputController.h"
 #include "Function/UI/UIStateMachine.h"
+
 
 
 namespace crystal
@@ -19,7 +22,7 @@ namespace crystal
         m_propagationFlags = PropagationFlags::MouseScroll;
 
         auto assetManager = Engine::GetInstance()->GetAssetManager();
-        auto font = assetManager->LoadAsset<Font>("Crystal:Consolas18");
+        auto font = assetManager->LoadAssetBuiltIn<FontFamily>("consola")->GetFont(18);
         m_textDrawComponent = std::make_shared<UITextComponent>(font, false);
 
         m_textDrawComponent->SetTextColor(Color4f(1.f));

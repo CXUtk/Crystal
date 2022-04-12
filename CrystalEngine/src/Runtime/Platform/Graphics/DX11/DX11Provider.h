@@ -11,7 +11,7 @@ namespace crystal
 	class DX11Provider : public IPlatformProvider
 	{
 	public:
-		DX11Provider(const InitArgs& args);
+		DX11Provider();
 		~DX11Provider() override;
 
 		virtual IGameWindow* GetGameWindow() const override;

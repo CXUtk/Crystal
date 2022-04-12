@@ -9,6 +9,7 @@
 #include "Function/UI/UIExports.h"
 
 #include "Resource/Asset/AssetManager.h"
+#include "Resource/Config/ConfigManager.h"
 
 #include "Platform/PlatformFactory.h"
 #include "Platform/RHI/FileSystem/File.h"
@@ -39,6 +40,11 @@ namespace crystal
         return ptr(m_pAssetManager);
     }
 
+    ConfigManager* Engine::GetConfigManager() const
+    {
+        return ptr(m_pConfigManager);
+    }
+
     IGameWindow* Engine::GetWindow() const
     {
         return m_platformProvider->GetGameWindow();
@@ -56,7 +62,7 @@ namespace crystal
 
     IGraphicsContext* Engine::GetGraphicsContext() const
     {
-        return m_platformProvider->GetGraphicsDevice()->GetContext().get();
+        return m_platformProvider->GetGraphicsContext();
     }
 
     SpriteBatch* Engine::GetSpriteBatch() const
@@ -78,10 +84,10 @@ namespace crystal
     {
         ReadConfig();
         GraphicsCommons::InitGraphicsCommons();
-        m_platformProvider = PlatformFactory::GetPlatformProvider(m_initArgs);
+        m_platformProvider = PlatformFactory::GetPlatformProvider();
 
         m_pAssetManager = std::make_shared<AssetManager>();
-        m_pAssetManager->LoadAssetPackage("resources/package1/contents.json");
+        m_pAssetManager->Initialize();
 
         auto graphicsDevice = GetGraphicsDevice();
         auto graphicsContext = GetGraphicsContext();
@@ -157,8 +163,10 @@ namespace crystal
 
     void Engine::ReadConfig()
     {
-        auto&& node = SJson::JsonConvert::Parse(File::ReadAllText("resources/engine.json"));
-        m_initArgs = SJson::de_serialize<InitArgs>(node["Init"]);
-        m_fpsCap = 1.0 / m_initArgs.FPSLimit;
+        m_pConfigManager = std::make_unique<ConfigManager>();
+        m_pConfigManager->LoadConfigs();
+
+        auto& initArgs = m_pConfigManager->GetAppInitArgs();
+        m_fpsCap = 1.0 / initArgs.FPSLimit;
     }
 }

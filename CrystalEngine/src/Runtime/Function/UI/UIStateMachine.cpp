@@ -19,9 +19,9 @@ namespace crystal
         m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest));
         m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
 
-        m_whiteTexture = assetManager->LoadAsset<ITexture2D>("Crystal:white");
-        m_frameTexture = assetManager->LoadAsset<ITexture2D>("package1:Frame");
-        m_panelTexture = assetManager->LoadAsset<ITexture2D>("package1:Panel");
+        m_whiteTexture = assetManager->LoadAssetBuiltIn<ITexture2D>("White");
+        m_frameTexture = assetManager->LoadAsset<ITexture2D>("ui:Frame");
+        m_panelTexture = assetManager->LoadAsset<ITexture2D>("ui:Panel");
     }
 
 	UIStateMachine::~UIStateMachine()

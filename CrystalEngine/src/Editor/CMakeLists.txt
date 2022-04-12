@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.14)
 set(TARGET_NAME "CrystalEngine_Editor")
 
 file(GLOB_RECURSE CrystalTracerSources CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
-add_executable (${TARGET_NAME} "src/main.cpp")
+add_executable (${TARGET_NAME} ${CrystalTracerSources})
 
 set_target_properties(${TARGET_NAME}
     PROPERTIES
@@ -21,9 +21,10 @@ target_include_directories(${TARGET_NAME} PRIVATE "src")
 
 target_link_libraries(${TARGET_NAME} PRIVATE "CrystalEngine_Runtime")
 
+
 get_target_property(CRYSTAL_RUNTIME_OUTPUT_DIRECTORY ${TARGET_NAME} RUNTIME_OUTPUT_DIRECTORY)
-# add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-# COMMAND ${CMAKE_COMMAND} -E remove_directory "${BINARY_ROOT_DIR}/${ENGINE_ASSET_DIR}"
-# COMMAND ${CMAKE_COMMAND} -E copy_directory "${ENGINE_ROOT_DIR}/${ENGINE_ASSET_DIR}" "${BINARY_ROOT_DIR}/${ENGINE_ASSET_DIR}"
-# )
+add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E remove_directory "${BINARY_ROOT_DIR}/${ENGINE_ASSET_DIR}"
+COMMAND ${CMAKE_COMMAND} -E copy_directory "${ENGINE_ROOT_DIR}/${ENGINE_ASSET_DIR}" "${CRYSTAL_RUNTIME_OUTPUT_DIRECTORY}/${ENGINE_ASSET_DIR}"
+)
 execute_process(COMMAND python ${PROJECT_SOURCE_DIR}/build.py "${ENGINE_ROOT_DIR}/${ENGINE_ASSET_DIR}" "${CRYSTAL_RUNTIME_OUTPUT_DIRECTORY}")

@@ -14,8 +14,8 @@ namespace crystal
     {
         auto assetManager = Engine::GetInstance()->GetAssetManager();
 
-        m_textDrawComponent = std::make_shared<UITextComponent>(assetManager->LoadAsset<Font>("Crystal:Consolas18"),
-            false);
+        auto font = assetManager->LoadAssetBuiltIn<FontFamily>("consola")->GetFont(18);
+        m_textDrawComponent = std::make_shared<UITextComponent>(font, false);
 
         m_textDrawComponent->SetTextColor(Color4f(1.f));
         SetText(text);

@@ -4,7 +4,7 @@
 
 namespace crystal
 {
-	struct EngineInitArguments
+	struct AppInitArguments
 	{
         // Core
 		uint32_t	WindowWidth, WindowHeight;
@@ -15,15 +15,15 @@ namespace crystal
 		uint32_t	MSAAQuality;
 
         // Asset
-        std::string                 BuiltinPackagePath;
+        std::string                 BuiltinPackage;
         std::vector<std::string>    ExtraPackages;
 	};
 }
 
 template<>
-struct SRefl::TypeInfo<crystal::EngineInitArguments>
+struct SRefl::TypeInfo<crystal::AppInitArguments>
 {
-    SREFL_TYPEINFO_HEADER(crystal::EngineInitArguments);
+    SREFL_TYPEINFO_HEADER(crystal::AppInitArguments);
     constexpr static auto _FIELDLIST()
     {
         return std::make_tuple(
@@ -35,7 +35,7 @@ struct SRefl::TypeInfo<crystal::EngineInitArguments>
             SREFL_FIELD(Enable4xMSAA),
             SREFL_FIELD(MSAAQuality),
 
-            SREFL_FIELD(BuiltinPackagePath),
+            SREFL_FIELD(BuiltinPackage),
             SREFL_FIELD(ExtraPackages)
         );
     }

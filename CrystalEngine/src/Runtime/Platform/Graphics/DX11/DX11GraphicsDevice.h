@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "DX11Common.h"
 
 namespace crystal
@@ -8,7 +8,7 @@ namespace crystal
 	class DX11GraphicsDevice : public IGraphicsDevice
 	{
 	public:
-		DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window);
+		DX11GraphicsDevice(Win32GameWindow* window);
 		~DX11GraphicsDevice() override;
 
 		ID3D11Device* GetD3DDevice() const { return m_pd3dDevice.Get(); }
@@ -49,7 +49,7 @@ namespace crystal
 		class CommonStates;
 		std::unique_ptr<CommonStates>			m_commonStates = nullptr;
 
-		bool m_InitD3DX11(const InitArgs& args);
+		bool m_InitD3DX11();
 		ComPtr<ID3DBlob> m_GetShaderBlobFromMemory(const char* src, size_t size, 
 			const std::string& name, const std::string& entryPoint, ShaderType type);
 	};

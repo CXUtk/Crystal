@@ -1,0 +1,15 @@
+{
+
+    "WindowWidth": 1350,
+    "WindowHeight": 768,
+    "WindowResizable": false,
+    "FPSLimit": 60,
+    "WindowTitle": "Title",
+    "Enable4xMSAA": false,
+    "MSAAQuality": 0,
+
+    "BuiltinPackage": "engine",
+    "ExtraPackages": [
+        "ui"
+    ]
+}

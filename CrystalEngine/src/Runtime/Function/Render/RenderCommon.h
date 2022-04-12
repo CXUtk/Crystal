@@ -45,4 +45,5 @@ namespace crystal
 
     constexpr int Slice_Nine = 0x1FF;
     constexpr int Slice_Six = 0x1F8;
+    constexpr int Slice_Hallow = 0x1EF;
 }

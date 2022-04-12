@@ -1,7 +1,8 @@
 #include "Win32GameWindow.h"
-#include "Resource/Config/InitArgs.h"
-#include <Core/Utils/Logger.h>
+#include "Engine.h"
+#include "Resource/Config/ConfigManager.h"
 
+#include "Core/Utils/Logger.h"
 #include "Utils/Encoding.h"
 #include <utf8.h>
 #include <array>
@@ -22,14 +23,12 @@ namespace crystal
 		return g_win32Window->_msgProc(hwnd, msg, wParam, lParam);
 	}
 
-	Win32GameWindow::Win32GameWindow(const InitArgs& args, HINSTANCE hInstance)
+	Win32GameWindow::Win32GameWindow(HINSTANCE hInstance)
 		: m_hWindowInstance(hInstance)
 	{
 		g_win32Window = this;
 
-		m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
-
-		if (!m_InitMainWindow(args))
+		if (!m_InitMainWindow())
 		{
 			throw std::exception("[Win32GameWindow::Win32GameWindow] Unable to start Win32 window");
 		}
@@ -100,8 +99,10 @@ namespace crystal
         m_eventOnCharInput += eventHandler;
     }
 
-	bool Win32GameWindow::m_InitMainWindow(const InitArgs& args)
+	bool Win32GameWindow::m_InitMainWindow()
 	{
+        const auto& args = Engine::GetInstance()->GetConfigManager()->GetAppInitArgs();
+        m_windowSize = Vector2i(args.WindowWidth, args.WindowHeight);
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
         WNDCLASSW wc = {};

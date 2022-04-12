@@ -98,4 +98,14 @@ namespace crystal
         return str.substr(l, r - l + 1);
     }
 
+    inline std::string RemoveExtension(const std::string& path)
+    {
+        auto p = path.rfind('.');
+        if (p == std::string::npos)
+        {
+            return path;
+        }
+        return path.substr(0, p);
+    }
+
 }

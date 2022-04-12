@@ -64,7 +64,7 @@ ${ENGINE_RESOURCE_SRC}
 ${ENGINE_PLATFORM_FACTORY} 
 ${ENGINE_PLATFORM_RHI}
 ${ENGINE_PLATFORM_GRAPHIC}
-${ENGINE_PLATFORM_SYSTEM})
+${ENGINE_PLATFORM_SYSTEM} ${CPP_HINT_DIR})
 
 # set compile options
 set_target_properties(${TARGET_NAME} PROPERTIES
@@ -80,8 +80,8 @@ set_target_properties(${TARGET_NAME}
     PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # link libraries
-target_link_libraries(${TARGET_NAME} PUBLIC glm)
 target_link_libraries(${TARGET_NAME} PUBLIC freetype)
+target_link_libraries(${TARGET_NAME} PUBLIC glm)
 target_link_libraries(${TARGET_NAME} PUBLIC utf8cpp)
 
 

@@ -319,6 +319,8 @@ namespace SJson
         void push_back(JsonNode&& node);
         void push_back(const JsonNode& node);
 
+        bool Contains(const std::string& name) const;
+
         JsonNode& operator[](const std::string& name);
         const JsonNode& operator[](const std::string& name) const;
         JsonNode& operator[](size_t index);
@@ -407,6 +409,14 @@ namespace SJson
         {
             static_assert(false, "Cannot get an un-supportted type");
         }
+    }
+
+    inline bool JsonNode::Contains(const std::string& name) const
+    {
+        assert(m_type == ValueType::Object);
+        auto& map = std::get<object_type>(m_value);
+        auto it = map.find(name);
+        return it != map.end();
     }
 
     template<>

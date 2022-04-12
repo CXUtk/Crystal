@@ -27,10 +27,9 @@ namespace crystal
     class GeometryRenderer;
     class UIStateMachine;
 
+    // Resources
 	class AssetManager;
-
-	// Data
-	struct InitArgs;
+    class ConfigManager;
 
 	// Platforms & GraphicsAPI
 	

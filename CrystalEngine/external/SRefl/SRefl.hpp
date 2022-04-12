@@ -167,6 +167,5 @@ namespace SRefl
 			return it->second;\
 		}\
 		throw std::invalid_argument("Invalid enum type");\
-	}\
-
+	}
 };

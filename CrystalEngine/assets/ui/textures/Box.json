@@ -1,0 +1,5 @@
+{
+    "type": "Texture2D",
+    "target": "Box.png",
+    "format": "RGBA8ub"
+}

@@ -18,7 +18,9 @@
 #include "PipelineStates/DX11DepthStencilState.h"
 #include "DX11GraphicsContext.h"
 
-#include "Resource/Config/InitArgs.h"
+#include "Engine.h"
+#include "Resource/Config/ConfigManager.h"
+
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/IO.h>
 #include <SJson/SJson.hpp>
@@ -51,10 +53,10 @@ namespace crystal
         DX11GraphicsDevice*		m_pGraphicsDevice;
     };
 
-    DX11GraphicsDevice::DX11GraphicsDevice(const InitArgs& args, Win32GameWindow* window)
+    DX11GraphicsDevice::DX11GraphicsDevice( Win32GameWindow* window)
         : m_pWindow(window)
     {
-        if (!m_InitD3DX11(args))
+        if (!m_InitD3DX11())
         {
             throw std::exception("[DX11GraphicsDevice::DX11GraphicsDevice] Unable to start Dx11");
         }
@@ -147,8 +149,9 @@ namespace crystal
         return std::make_shared<DX11DepthStencilState>(this, DSSDesc);
     }
 
-    bool DX11GraphicsDevice::m_InitD3DX11(const InitArgs& args)
+    bool DX11GraphicsDevice::m_InitD3DX11()
     {
+        const auto& args = Engine::GetInstance()->GetConfigManager()->GetAppInitArgs();
         HRESULT hr = S_OK;
 
         // Create D3D device and D3D device context
@@ -191,7 +194,7 @@ namespace crystal
             return false;
         }
 
-        m_pGraphicsContext = std::make_shared<DX11GraphicsContext>(this, m_pWindow, immediateContext, args);
+        m_pGraphicsContext = std::make_shared<DX11GraphicsContext>(this, m_pWindow, immediateContext);
         return true;
     }
 

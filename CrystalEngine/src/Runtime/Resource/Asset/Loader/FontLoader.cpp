@@ -18,7 +18,7 @@ namespace crystal
         FT_Done_FreeType(m_fontLibrary);
     }
 
-    std::shared_ptr<Font> FontLoader::LoadFont(const path_type& path, int size)
+    std::shared_ptr<FontFamily> FontLoader::LoadFontFamily(const path_type& path)
     {
         FT_Face face;
 
@@ -28,6 +28,6 @@ namespace crystal
         {
             throw std::runtime_error(string_format("FontLoader::LoadFont(): Failed to load font: %s\n", pathStr.c_str()));
         }
-        return std::make_shared<Font>(face, size);
+        return std::make_shared<FontFamily>(face);
     }
 }

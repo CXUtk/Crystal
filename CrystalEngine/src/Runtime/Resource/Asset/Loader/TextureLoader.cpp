@@ -7,13 +7,16 @@ namespace crystal
     {
         auto engine = Engine::GetInstance();
         auto graphicsDevice = engine->GetGraphicsDevice();
-        auto path = curPath / path_type(metaData["path"].Get<std::string>());
+
+        auto target = metaData["target"].Get<std::string>();
+
+        auto pathToTarget = curPath / target;
 
         Texture2DDescription texDesc = {};
-        texDesc.Format = RenderFormat::RGBA8ub;
+        texDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
         texDesc.MipmapLevels = 1;
         texDesc.Usage = BufferUsage::Immutable;
 
-        return  graphicsDevice->CreateTexture2DFromFile(path.string(), texDesc);
+        return  graphicsDevice->CreateTexture2DFromFile(pathToTarget.string(), texDesc);
     }
 }

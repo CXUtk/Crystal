@@ -2,12 +2,14 @@
 #include "Crystal.h"
 #include "Core/Utils/GameTimer.h"
 #include "Platform/RHI/Interfaces.h"
-#include "Resource/Config/EngineInitArguments.h"
+#include "Resource/Config/ConfigManager.h"
 #include <functional>
+
+
 
 namespace crystal
 {
-    class DLLEXPROT Engine final
+    class Engine final
     {
     public:
         ~Engine();
@@ -22,53 +24,21 @@ namespace crystal
             return &engine;
         }
 
-        /**
-         * @brief Get instance of current running window
-         * @return
-        */
+        // Platform
         IGameWindow* GetWindow() const;
-
-        /**
-         * @brief GEt instance of engine input controller
-         * @return
-        */
-        InputController* GetInputController() const;
-
-        /**
-         * @brief
-         * @return
-        */
         IGraphicsDevice* GetGraphicsDevice() const;
-
-        /**
-         * @brief
-         * @return
-        */
         IGraphicsContext* GetGraphicsContext() const;
-
-        /**
-         * @brief
-         * @return
-        */
-        SpriteBatch* GetSpriteBatch() const;
-
-        /**
-         * @brief
-         * @return
-        */
-        GeometryRenderer* GetGeometryRenderer() const;
-
-        /**
-         * @brief
-         * @return
-        */
         GraphicsAPIType	GetGraphicsAPIType() const;
 
-
-        AssetManager* GetAssetManager() const;
-
-
+        // Funtcion
+        InputController* GetInputController() const;
+        SpriteBatch* GetSpriteBatch() const;
+        GeometryRenderer* GetGeometryRenderer() const;
         UIStateMachine* GetUIStateMachine() const;
+
+        // Resource
+        AssetManager* GetAssetManager() const;
+        ConfigManager* GetConfigManager() const;
 
         double GetCurrentTime() const;
 
@@ -88,15 +58,15 @@ namespace crystal
         std::unique_ptr<UIStateMachine>         m_pUIStateMachine = nullptr;
 
         std::shared_ptr<AssetManager>			m_pAssetManager = nullptr;
+        std::unique_ptr<ConfigManager>          m_pConfigManager = nullptr;
 
         double		m_fpsCap = 0.0;			// Maximum FPS
         GameTimer	m_gameTimer{};		    // Game timer
-
-        EngineInitArguments	m_initArgs{};
 
         Engine();
 
         void m_Initialize();
         void ReadConfig();
+        void LoadAssets();
     };
 }

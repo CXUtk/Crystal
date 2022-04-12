@@ -35,8 +35,10 @@ namespace tracer
 
         auto engine = Engine::GetInstance();
         auto assetManager = engine->GetAssetManager();
-        auto font18 = assetManager->LoadAsset<Font>("Crystal:Consolas18");
-        auto font14 = assetManager->LoadAsset<Font>("Crystal:Consolas14");
+
+        auto font = assetManager->LoadAssetBuiltIn<FontFamily>("consola");
+        auto font18 = font->GetFont(18);
+        auto font14 = font->GetFont(14);
 
 
         auto checkInt = [](const std::string& val, int& output) -> bool {

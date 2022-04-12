@@ -1,0 +1,5 @@
+{
+    "type": "Texture2D",
+    "target": "White.png",
+    "format": "RGBA8ub"
+}

@@ -12,7 +12,7 @@ namespace crystal
 	class Win32GameWindow : public IGameWindow
 	{
 	public:
-		Win32GameWindow(const InitArgs& args, HINSTANCE hInstance);
+		Win32GameWindow( HINSTANCE hInstance);
 		~Win32GameWindow();
 
 		virtual void BeginFrame() override;
@@ -70,7 +70,7 @@ namespace crystal
         std::unique_ptr<Win32ClipBoard>     m_pClipBoard = nullptr;
 
 
-		bool m_InitMainWindow(const InitArgs& args);
+		bool m_InitMainWindow();
 
 		LRESULT _msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		void m_Resize(Vector2i size);

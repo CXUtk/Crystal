@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "DX11Common.h"
 
 namespace crystal
@@ -9,7 +9,7 @@ namespace crystal
 	{
 	public:
 		DX11GraphicsContext(DX11GraphicsDevice* graphicsDevice, Win32GameWindow* window,
-			ComPtr<ID3D11DeviceContext> context, const InitArgs& args);
+			ComPtr<ID3D11DeviceContext> context);
 		~DX11GraphicsContext() override;
 
 		ID3D11DeviceContext* GetD3DContext() const { return m_pd3dImmediateContext.Get(); }
@@ -53,6 +53,6 @@ namespace crystal
 		std::shared_ptr<DX11PipelineStateObject>			m_pCurrentPipelineState;
 
 		void m_ResizeBuffer(DX11GraphicsDevice* graphicsDevice);
-		void m_CreateSwapChainAndLink(const InitArgs& args);
+		void m_CreateSwapChainAndLink();
 	};
 }

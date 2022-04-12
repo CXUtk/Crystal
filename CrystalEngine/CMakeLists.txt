@@ -1,10 +1,11 @@
 cmake_minimum_required (VERSION 3.14)
 
-project(CrystalEngine)
+project(CrystalEngine LANGUAGES CXX C)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(ENGINE_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/external")
+set(CPP_HINT_DIR "${ENGINE_ROOT_DIR}/cpp.hint")
 set(ENGINE_ASSET_DIR "assets")
 set(BINARY_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/")
 
@@ -60,4 +61,3 @@ add_subdirectory ("external")
 add_subdirectory ("src/Runtime")
 add_subdirectory ("src/Editor")
 add_subdirectory ("test")
-

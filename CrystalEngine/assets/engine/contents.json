@@ -1,0 +1,13 @@
+{
+    "shaders": [
+        "Sprite",
+        "Geometry"
+    ],
+    "textures": [
+        "White"
+    ],
+    "fonts": [
+        "arial.ttf",
+        "consola.ttf"
+    ]
+}

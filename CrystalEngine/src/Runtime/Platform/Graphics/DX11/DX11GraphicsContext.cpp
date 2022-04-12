@@ -8,17 +8,19 @@
 #include "dxTrace.h"
 #include "d3dUtils.h"
 
+#include "Engine.h"
+#include "Resource/Config/ConfigManager.h"
 #include "Platform/System/Windows32/Win32GameWindow.h"
-#include "Resource/Config/InitArgs.h"
+
 
 namespace crystal
 {
 	DX11GraphicsContext::DX11GraphicsContext(DX11GraphicsDevice* graphicsDevice, Win32GameWindow* window,
-		ComPtr<ID3D11DeviceContext> context, const InitArgs& args)
+		ComPtr<ID3D11DeviceContext> context)
 		: m_pd3dGraphicsDevice(graphicsDevice->GetD3DDevice()), m_pWindow(window), m_pd3dImmediateContext(context)
 	{
 		m_renderTargets.push_back(nullptr);
-		m_CreateSwapChainAndLink(args);
+		m_CreateSwapChainAndLink();
 		m_ResizeBuffer(graphicsDevice);
 		m_pWindow->AppendOnResizeEvent([this, graphicsDevice](Vector2i size) {
 			m_ResizeBuffer(graphicsDevice);
@@ -140,8 +142,9 @@ namespace crystal
 			nullptr, depthStencilView, screenViewport);
 	}
 
-	void DX11GraphicsContext::m_CreateSwapChainAndLink(const InitArgs& args)
+	void DX11GraphicsContext::m_CreateSwapChainAndLink()
 	{
+        const auto& args = Engine::GetInstance()->GetConfigManager()->GetAppInitArgs();
         auto dx11GraphicsDevice = m_pd3dGraphicsDevice.Get();
 
 		// 检测 MSAA支持的质量等级

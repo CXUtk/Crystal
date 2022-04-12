@@ -7,33 +7,81 @@
 
 namespace crystal
 {
-    AssetPackage::AssetPackage()
+    AssetPackage::AssetPackage(const std::string& name)
+        : m_packageName(name)
     {}
 
     AssetPackage::~AssetPackage()
     {}
 
-    void AssetPackage::LoadShaders(const std::vector<path_type>& paths)
+    void AssetPackage::LoadShaders(const path_type& parentPath, const std::vector<std::string>& entries)
     {
-        for (auto& path : paths)
+        for (auto& name : entries)
         {
+            auto path = parentPath / (name + ".json");
             auto shaderMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
-            auto name = shaderMetaInfo["name"].Get<std::string>();
+            if (m_shadersMap.find(name) != m_shadersMap.end())
+            {
+                throw std::logic_error(string_format("Asset Name Conflict: Shader %s already exist", name.c_str()));
+            }
             m_shadersMap[name] = ShaderLoader::LoadShader(shaderMetaInfo, path.parent_path());
         }
     }
 
-    void AssetPackage::LoadTextures(const std::vector<path_type>& paths)
+    void AssetPackage::LoadTextures(const path_type& parentPath, const std::vector<std::string>& entries)
+    {
+        for (auto& name : entries)
+        {
+            auto path = parentPath / (name + ".json");
+
+            auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
+            auto type = textureMetaInfo["type"].Get<std::string>();
+
+            if (type == "Texture2D")
+            {
+                if (m_texture2DMap.find(name) != m_texture2DMap.end())
+                {
+                    throw std::logic_error(string_format("Asset Name Conflict: Texture2D %s already exist", name.c_str()));
+                }
+                m_texture2DMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
+            }
+            else if (type == "Cubemap")
+            {
+                throw std::exception("Not Implemented");
+            }
+            
+        }
+    }
+
+    void AssetPackage::LoadMeshes(const std::vector<path_type>& paths)
     {
         for (auto& path : paths)
         {
             auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
             auto name = textureMetaInfo["name"].Get<std::string>();
-            m_texture2DMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
+            if (m_meshesMap.find(name) != m_meshesMap.end())
+            {
+                throw std::logic_error(string_format("Asset Name Conflict: Mesh %s already exist", name.c_str()));
+            }
+            // m_meshesMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
         }
     }
 
-    void AssetPackage::LoadOneFont(std::string name, std::shared_ptr<Font> font)
+    //void AssetPackage::LoadFonts(const std::vector<path_type>&paths)
+    //{
+    //    for (auto& path : paths)
+    //    {
+    //        auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
+    //        auto name = textureMetaInfo["name"].Get<std::string>();
+    //        if (m_fontMap.find(name) != m_fontMap.end())
+    //        {
+    //            throw std::logic_error(string_format("Asset Name Conflict: Font %s already exist", name.c_str()));
+    //        }
+    //        // m_fontMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
+    //    }
+    //}
+
+    void AssetPackage::LoadOneFont(std::string name, std::shared_ptr<FontFamily> font)
     {
         auto p = m_fontMap.find(name);
         if (p != m_fontMap.end())
@@ -72,12 +120,21 @@ namespace crystal
         }
         return p->second;
     }
-    std::shared_ptr<Font> AssetPackage::GetFont(const URI& uri) const
+    std::shared_ptr<FontFamily> AssetPackage::GetFontFamily(const URI& uri) const
     {
         auto p = m_fontMap.find(uri);
         if (p == m_fontMap.end())
         {
             throw std::invalid_argument(string_format("Cannot find given font asset: %s", uri.c_str()));
+        }
+        return p->second;
+    }
+    std::shared_ptr<Mesh> AssetPackage::GetMesh(const URI& uri) const
+    {
+        auto p = m_meshesMap.find(uri);
+        if (p == m_meshesMap.end())
+        {
+            throw std::invalid_argument(string_format("Cannot find given mesh asset: %s", uri.c_str()));
         }
         return p->second;
     }

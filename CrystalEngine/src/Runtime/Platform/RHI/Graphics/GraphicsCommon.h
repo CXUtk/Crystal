@@ -1,10 +1,11 @@
-﻿#pragma once
+#pragma once
 #include <Crystal.h>
 #include <vector>
 #include <string>
 #include <map>
 #include <glm/gtc/type_ptr.hpp>
 #include <Core/Utils/Geometry.h>
+#include <SRefl/SRefl.hpp>
 
 namespace crystal
 {
@@ -220,6 +221,8 @@ namespace crystal
 
 		__COUNT
 	};
+
+
 
 
 	enum class SemanticType
@@ -493,3 +496,33 @@ namespace crystal
 		static size_t ComponentFormatToSizeConvert(ComponentFormat format);
 	};
 }
+
+using namespace crystal;
+template<>
+struct SRefl::EnumInfo<RenderFormat>
+{
+    SREFL_TYPEINFO_HEADER(RenderFormat);
+    constexpr static auto _ENUMLIST()
+    {
+        return std::make_tuple(
+            SREFL_ENUM_TERM(R32f),
+            SREFL_ENUM_TERM(RG32f),
+            SREFL_ENUM_TERM(RGB32f),
+            SREFL_ENUM_TERM(RGBA32f),
+
+            SREFL_ENUM_TERM(R32ui),
+            SREFL_ENUM_TERM(RG32ui),
+            SREFL_ENUM_TERM(RGB32ui),
+            SREFL_ENUM_TERM(RGBA32ui),
+
+            SREFL_ENUM_TERM(R8ub),
+            SREFL_ENUM_TERM(RG8ub),
+            SREFL_ENUM_TERM(RGBA8ub)
+        );
+    }
+#define LISTFUNC(F) F(R32f) F(RG32f) F(RGB32f) F(RGBA32f) \
+F(R32ui) F(RG32ui) F(RGB32ui) F(RGBA32ui)\
+F(R8ub) F(RG8ub) F(RGBA8ub)
+    GENERATE_ENUM_MAPPING(RenderFormat, LISTFUNC)
+#undef LISTFUNC
+};

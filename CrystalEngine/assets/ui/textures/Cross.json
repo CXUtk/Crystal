@@ -1,0 +1,5 @@
+{
+    "type": "Texture2D",
+    "target": "Cross.png",
+    "format": "RGBA8ub"
+}

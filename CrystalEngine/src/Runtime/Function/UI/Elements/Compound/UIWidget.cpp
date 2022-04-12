@@ -34,7 +34,7 @@ namespace crystal
         panel->SetPivot(Vector2f(0.f));
         panel->SetAnchorPoint(Vector2f(0.f));
         panel->SetSize(SizeLayout(0, 1.f, 0, 1.f));
-        panel->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxBlack"));
+        panel->SetTexture(assetManager->LoadAsset<ITexture2D>("ui:BoxBlack"));
         panel->SetSliceInfo(slice);
         AppendChild(panel);
 
@@ -45,13 +45,13 @@ namespace crystal
         panelBar->SetAnchorPoint(Vector2f(0.f, 1.f));
         panelBar->SetSize(SizeLayout(0, 1.f, 42, 0.f));
         panelBar->SetColor(UIStyle::GetWindowLegendColor());
-        panelBar->SetTexture(assetManager->LoadAsset<ITexture2D>("package1:BoxNoB"));
+        panelBar->SetTexture(assetManager->LoadAsset<ITexture2D>("ui:BoxNoB"));
         panelBar->SetSliceInfo(slice6);
         AppendChild(panelBar);
 
 
         m_closeButton = std::make_shared<UIIconButton>();
-        m_closeButton->SetIconTexture(assetManager->LoadAsset<ITexture2D>("package1:Cross"));
+        m_closeButton->SetIconTexture(assetManager->LoadAsset<ITexture2D>("ui:Cross"));
         m_closeButton->SetAnchorPoint(Vector2f(1.f));
         m_closeButton->SetPivot(Vector2f(.5f));
         m_closeButton->SetSize(SizeLayout(22, 22));

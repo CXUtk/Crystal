@@ -4,7 +4,7 @@
 
 #include "UIElement.h"
 #include "Components/UITextComponent.h"
-#include "Resource/Asset/Content/Font.h"
+#include <Resource/Asset/Content/Fonts/FontFamily.h>
 
 namespace crystal
 {

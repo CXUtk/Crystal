@@ -9,7 +9,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "../Content/Font.h"
+#include "../Content/Fonts/FontFamily.h"
 
 namespace crystal
 {
@@ -19,7 +19,7 @@ namespace crystal
 		FontLoader();
 		~FontLoader();
 
-        std::shared_ptr<Font> LoadFont(const path_type& path, int size);
+        std::shared_ptr<FontFamily> LoadFontFamily(const path_type& path);
 
 	private:
 		FT_Library	m_fontLibrary = nullptr;

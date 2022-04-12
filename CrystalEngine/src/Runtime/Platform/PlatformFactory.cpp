@@ -8,12 +8,12 @@
 
 namespace crystal
 {
-	std::unique_ptr<IPlatformProvider> PlatformFactory::GetPlatformProvider(const InitArgs& args)
+	std::unique_ptr<IPlatformProvider> PlatformFactory::GetPlatformProvider()
 	{
 #ifdef CRYSTAL_USE_OPENGL
-		return std::make_unique<OpenGLProvider>(args);
+		return std::make_unique<OpenGLProvider>();
 #elif CRYSTAL_USE_DX11
-		return std::make_unique<DX11Provider>(args);
+		return std::make_unique<DX11Provider>();
 #endif
 	}
 }

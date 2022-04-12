@@ -86,7 +86,7 @@ namespace crystal
         defPSO->SetRasterState(m_pGraphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
         defPSO->SetBlendState(m_pGraphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
         defPSO->SetDepthStencilState(m_pGraphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest));
-        m_defaultRenderState.m_pShaderProgram = assetManager->LoadAsset<IShaderProgram>("package1:Geometry");
+        m_defaultRenderState.m_pShaderProgram = assetManager->LoadAssetBuiltIn<IShaderProgram>("Geometry");
     }
 
     GeometryRenderer::Impl::~Impl()

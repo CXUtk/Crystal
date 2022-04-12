@@ -1,0 +1,6 @@
+// 提示文件帮助 Visual Studio IDE 解释 Visual C++ 标识符,
+// 如函数和宏的名称。
+// 有关详细信息，请参见 https://go.microsoft.com/fwlink/?linkid=865984
+#define SREFL_TYPEINFO_HEADER(Type)
+#define SREFL_ENUM_TERM(member) SRefl::_enumTerm(_Type::member, #member)
+#define GENERATE_ENUM_MAPPING(T, LISTFUNC) static std::string enum_to_string(T v) { using ENUM_TYPE = T; switch (v) { LISTFUNC(ENUM_KEY) default: break; } throw std::logic_error("Invalid enum type"); } static T string_to_enum(const std::string& str) { using ENUM_TYPE = T; static std::map<std::string, ENUM_TYPE> stringmap = { LISTFUNC(ENUM_VALUE) }; std::map<std::string, ENUM_TYPE>::iterator it; if ((it = stringmap.find(str)) != stringmap.end()) { return it->second; } throw std::invalid_argument("Invalid enum type"); }

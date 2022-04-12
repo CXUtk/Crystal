@@ -1,0 +1,5 @@
+{
+    "type": "Texture2D",
+    "target": "Frame.png",
+    "format": "RGBA8ub"
+}

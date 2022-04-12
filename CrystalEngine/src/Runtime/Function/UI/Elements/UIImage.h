@@ -3,7 +3,7 @@
 #include "../Common/UIEventArgs.h"
 
 #include "UIElement.h"
-#include "Resource/Asset/Content/Font.h"
+#include <Resource/Asset/Content/Fonts/FontFamily.h>
 
 namespace crystal
 {

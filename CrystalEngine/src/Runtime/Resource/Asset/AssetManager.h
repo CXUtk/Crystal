@@ -1,6 +1,6 @@
 #pragma once
 #include "AssetCommon.h"
-#include "Platform/RHI/FileSystem/FSCommon.h"
+#include "Platform/RHI/FileSystem/FSCommon.h"/
 #include <Core/Utils/Misc.h>
 
 #include "AssetPackage.h"
@@ -14,14 +14,23 @@ namespace crystal
         AssetManager();
         ~AssetManager();
 
-        void LoadAssetPackage(const path_type& path);
+        static fs::path GetAssetRootPath();
+        static fs::path GetAssetPackageConfigFileName();
+
+        void Initialize();
+        void LoadAssetPackage(const std::string& name, const path_type& path);
 
         template<typename T>
         std::shared_ptr<T> LoadAsset(const URI& uri);
+        template<typename T>
+        std::shared_ptr<T> LoadAssetBuiltIn(const URI& uri);
     private:
         std::map<std::string, std::shared_ptr<AssetPackage>>    m_packagesMap{};
-
         std::unique_ptr<FontLoader>     m_pFontLoader = nullptr;
+
+        void LoadBuiltinPackage();
+        void LoadExtraPackages();
+
     };
 
     inline std::string GetPackageName(const URI& uri)
@@ -61,13 +70,18 @@ namespace crystal
         {
             return p->second->GetTexture2D(resPath);
         }
-        else if constexpr (std::is_same<T, Font>::value)
+        else if constexpr (std::is_same<T, FontFamily>::value)
         {
-            return p->second->GetFont(resPath);
+            return p->second->GetFontFamily(resPath);
         }
         else
         {
             static_assert(false, "AssetManager does not support this asset type");
         }
+    }
+    template<typename T>
+    inline std::shared_ptr<T> AssetManager::LoadAssetBuiltIn(const URI& uri)
+    {
+        return LoadAsset<T>("engine:" + uri);
     }
 }

@@ -7,11 +7,11 @@
 
 namespace crystal
 {
-    Font::Font(FT_Face face, size_t fontSize)
-        : m_fontFace(face), m_fontSize(fontSize)
+    Font::Font(FontFamily* fontFamily, size_t fontSize)
+        : m_fontFamily(fontFamily), m_fontSize(fontSize)
     {
         FT_Error error = 0;
-        if (error = FT_Set_Pixel_Sizes(face, 0, m_fontSize))
+        if (error = FT_Set_Pixel_Sizes(fontFamily->GetFontFace(), 0, m_fontSize))
         {
             throw std::runtime_error(string_format("Font::FT_Set_Pixel_Sizes(): Error setting font size, Message: %s\n", FT_Error_String(error)));
         }
@@ -20,7 +20,6 @@ namespace crystal
 
     Font::~Font()
     {
-        FT_Done_Face(m_fontFace);
     }
 
     Character& Font::GetCharacter(uint32_t code)
@@ -113,10 +112,11 @@ namespace crystal
 
     Bound2f Font::GetBoundingBox() const
     {
-        auto xMin = std::floor((float)m_fontFace->bbox.xMin * m_fontSize / m_fontFace->units_per_EM);
-        auto yMin = std::floor((float)m_fontFace->bbox.yMin * m_fontSize / m_fontFace->units_per_EM);
-        auto xMax = std::ceil((float)m_fontFace->bbox.xMax * m_fontSize / m_fontFace->units_per_EM);
-        auto yMax = std::ceil((float)m_fontFace->bbox.yMax * m_fontSize / m_fontFace->units_per_EM);
+        auto fontFace = m_fontFamily->GetFontFace();
+        auto xMin = std::floor((float)fontFace->bbox.xMin * m_fontSize / fontFace->units_per_EM);
+        auto yMin = std::floor((float)fontFace->bbox.yMin * m_fontSize / fontFace->units_per_EM);
+        auto xMax = std::ceil((float)fontFace->bbox.xMax * m_fontSize / fontFace->units_per_EM);
+        auto yMax = std::ceil((float)fontFace->bbox.yMax * m_fontSize / fontFace->units_per_EM);
         return Bound2f(Vector2f(xMin, yMin), Vector2f(xMax, yMax));
     }
 
@@ -130,15 +130,16 @@ namespace crystal
 
     void Font::LoadChar(uint32_t code)
     {
-        // load character glyph 
-        if (FT_Load_Char(m_fontFace, code, FT_LOAD_RENDER))
+        // load character glyph
+        auto fontFace = m_fontFamily->GetFontFace();
+        if (FT_Load_Char(fontFace, code, FT_LOAD_RENDER))
         {
             throw std::exception("Font::LoadChar: Failed to load freetype char");
         }
         auto engine = Engine::GetInstance();
         auto graphicsDevice = engine->GetGraphicsDevice();
 
-        auto& bitmap = m_fontFace->glyph->bitmap;
+        auto& bitmap = fontFace->glyph->bitmap;
         auto width = bitmap.width;
         auto height = bitmap.rows;
 
@@ -173,8 +174,8 @@ namespace crystal
         Character character = {
             texture,
             Vector2i(bitmap.width, bitmap.rows),
-            Vector2i(m_fontFace->glyph->bitmap_left, m_fontFace->glyph->bitmap_top),
-            (m_fontFace->glyph->advance.x >> 6)
+            Vector2i(fontFace->glyph->bitmap_left, fontFace->glyph->bitmap_top),
+            (fontFace->glyph->advance.x >> 6)
         };
         m_charMap.insert(std::pair<uint32_t, Character>(code, character));
     }

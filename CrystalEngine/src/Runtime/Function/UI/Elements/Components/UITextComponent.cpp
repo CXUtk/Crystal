@@ -7,6 +7,8 @@
 #include "Function/Render/RenderExports.h"
 #include "Function/Input/InputController.h"
 
+#include "Resource/Asset/Content/Fonts/Font.h"
+
 
 namespace crystal
 {

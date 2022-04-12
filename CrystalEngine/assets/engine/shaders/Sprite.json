@@ -1,0 +1,13 @@
+{
+    "dx11Src": "Sprite.hlsl",
+    "openGLVSSrc": "Sprite.vert",
+    "openGLFSSrc": "Sprite.frag",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "MVP",
+            "type": "mat4"
+        }
+    ]
+}

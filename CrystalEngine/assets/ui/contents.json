@@ -1,0 +1,10 @@
+{
+    "textures": [
+        "Box",
+        "BoxBlack",
+        "BoxNoB",
+        "Cross",
+        "Frame",
+        "Panel"
+    ]
+}

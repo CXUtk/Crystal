@@ -11,30 +11,15 @@
 
 namespace crystal
 {
+    static std::string ShadersDirectoryName = "shaders";
+    static std::string FontsDirectoryName = "fonts";
+    static std::string TexturesDirectoryName = "textures";
+    static std::string MeshesDirectoryName = "meshes";
+
+
     AssetManager::AssetManager()
     {
-        auto engine = Engine::GetInstance();
-        auto graphicsDevice = engine->GetGraphicsDevice();
-
         m_pFontLoader = std::make_unique<FontLoader>();
-
-        std::shared_ptr<AssetPackage> assetPackage = std::make_shared<AssetPackage>();
-
-        Texture2DDescription texDesc = {};
-        texDesc.Format = RenderFormat::RGBA8ub;
-        texDesc.MipmapLevels = 1;
-        texDesc.Usage = BufferUsage::Immutable;
-        uint32_t pureWhite = 0xffffffff;
-        assetPackage->LoadOneTexture2D("white",
-            graphicsDevice->CreateTexture2DFromFile("resources/White.png", texDesc));
-
-        assetPackage->LoadOneFont("Consolas24", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 24));
-        assetPackage->LoadOneFont("Consolas18", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 18));
-        assetPackage->LoadOneFont("Consolas14", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 14));
-        assetPackage->LoadOneFont("Consolas12", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 12));
-
-        m_packagesMap["Crystal"] = assetPackage;
-
     }
 
     AssetManager::~AssetManager()
@@ -43,32 +28,114 @@ namespace crystal
         m_pFontLoader.reset();
     }
 
-    void AssetManager::LoadAssetPackage(const path_type& path)
+    fs::path AssetManager::GetAssetRootPath()
     {
-        std::shared_ptr<AssetPackage> assetPackage = std::make_shared<AssetPackage>();
+        return fs::path("assets/");
+    }
+
+    fs::path AssetManager::GetAssetPackageConfigFileName()
+    {
+        return fs::path("contents.json");
+    }
+
+    void AssetManager::Initialize()
+    {
+        auto engine = Engine::GetInstance();
+        auto graphicsDevice = engine->GetGraphicsDevice();
+
+        LoadBuiltinPackage();
+        LoadExtraPackages();
+
+        //Texture2DDescription texDesc = {};
+        //texDesc.Format = RenderFormat::RGBA8ub;
+        //texDesc.MipmapLevels = 1;
+        //texDesc.Usage = BufferUsage::Immutable;
+        //assetPackage->LoadOneTexture2D("white",
+        //    graphicsDevice->CreateTexture2DFromFile("resources/White.png", texDesc));
+
+        //assetPackage->LoadOneFont("Consolas24", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 24));
+        //assetPackage->LoadOneFont("Consolas18", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 18));
+        //assetPackage->LoadOneFont("Consolas14", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 14));
+        //assetPackage->LoadOneFont("Consolas12", m_pFontLoader->LoadFont("resources/fonts/consola.ttf", 12));
+
+        //m_packagesMap["Crystal"] = assetPackage;
+
+        //m_pAssetManager->LoadAssetPackage("resources/package1/contents.json");
+    }
+
+    void AssetManager::LoadAssetPackage(const std::string& name, const path_type& path)
+    {
+        std::shared_ptr<AssetPackage> assetPackage = std::make_shared<AssetPackage>(name);
         auto contents = SJson::JsonConvert::Parse(File::ReadAllText(path));
         auto parentPath = path.parent_path();
 
+        if(contents.Contains(ShadersDirectoryName))
         {
             // Load shaders
-            std::vector<path_type> shaderPaths;
-            contents["shaders"].foreach([&](const SJson::JsonNode& node) {
-                shaderPaths.push_back(parentPath / node.Get<std::string>());
+            std::vector<std::string> shaderEntries;
+            contents[ShadersDirectoryName].foreach([&](const SJson::JsonNode& node) {                    
+                shaderEntries.push_back(node.Get<std::string>());
             });
-            assetPackage->LoadShaders(shaderPaths);
+            assetPackage->LoadShaders(parentPath / ShadersDirectoryName, shaderEntries);
         }
 
+        if(contents.Contains(TexturesDirectoryName))
         {
             // Load textures
-            std::vector<path_type> texturePaths;
-            contents["textures"].foreach([&](const SJson::JsonNode& node) {
-                texturePaths.push_back(parentPath / node.Get<std::string>());
+            std::vector<std::string> textureEntries;
+            contents[TexturesDirectoryName].foreach([&](const SJson::JsonNode& node) {
+                textureEntries.push_back(node.Get<std::string>());
             });
-            assetPackage->LoadTextures(texturePaths);
+            assetPackage->LoadTextures(parentPath / TexturesDirectoryName, textureEntries);
         }
 
-        auto s = path.parent_path().stem().string();
-        m_packagesMap[s] = assetPackage;
+        if (contents.Contains(FontsDirectoryName))
+        {
+            // Load fonts
+            contents[FontsDirectoryName].foreach([&](const SJson::JsonNode& node) {
+                auto fileName = node.Get<std::string>();
+                auto path = parentPath / FontsDirectoryName / fileName;
+                auto name = RemoveExtension(fileName);
+                assetPackage->LoadOneFont(name, m_pFontLoader->LoadFontFamily(path));
+            });
+        }
+
+        if (contents.Contains(MeshesDirectoryName))
+        {
+            // Load meshes
+            std::vector<path_type> meshPaths;
+            contents[MeshesDirectoryName].foreach([&](const SJson::JsonNode& node) {
+                auto path = parentPath / node.Get<std::string>();
+                path.append(".json");
+
+                meshPaths.push_back(path);
+            });
+            assetPackage->LoadMeshes(meshPaths);
+        }
+
+        m_packagesMap[name] = assetPackage;
+    }
+
+    void AssetManager::LoadBuiltinPackage()
+    {
+        const auto& initArgs = Engine::GetInstance()->GetConfigManager()->GetAppInitArgs();
+        auto builtinPackagePath = GetAssetRootPath() / initArgs.BuiltinPackage;
+        auto builtinPackageConfigPath = builtinPackagePath / GetAssetPackageConfigFileName();
+
+        LoadAssetPackage(initArgs.BuiltinPackage, builtinPackageConfigPath);
+
+        // Additional?
+    }
+
+    void AssetManager::LoadExtraPackages()
+    {
+        const auto& initArgs = Engine::GetInstance()->GetConfigManager()->GetAppInitArgs();
+
+        for (auto& package : initArgs.ExtraPackages)
+        {
+            auto packageConfigPath = GetAssetRootPath() / package / GetAssetPackageConfigFileName();
+            LoadAssetPackage(package, packageConfigPath);
+        }
     }
 
 }

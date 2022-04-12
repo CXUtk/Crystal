@@ -73,10 +73,6 @@ namespace tracer
         m_properties->SetSize(SizeLayout(0, .3f, 0, 1.f));
         m_properties->SetPosition(Vector2f(0, 0));
         layout->AppendElement(m_properties, Bound2f(Vector2f(0.75f, 0.f), Vector2f(1.f, 1.f)));
-
-
-
-        
     }
 
     EditorState::~EditorState()
