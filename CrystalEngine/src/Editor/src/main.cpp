@@ -8,6 +8,7 @@
 #include <SJson/SJson.hpp>
 
 #include "CrystalTracer.h"
+#include "Core/Pattern/Singleton.h"
 using namespace crystal;
 using namespace tracer;
 //
@@ -21,22 +22,26 @@ using namespace tracer;
 
 int main(int argc, char** argv)
 {
-    FixedThreadPool pool(8);
+    //FixedThreadPool pool(8);
 
-    for (int i = 0; i < 16; i++)
-    {
-        pool.AddTask(FixedThreadPool::Task{
-            [i]() {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                printf("Thread %d Finished!\n", i);
-            } });
-    }
+    //for (int i = 0; i < 16; i++)
+    //{
+    //    pool.AddTask(FixedThreadPool::Task{
+    //        [i]() {
+    //            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //            printf("Thread %d Finished!\n", i);
+    //        } });
+    //}
 
-    while (true)
-    {
+    //while (true)
+    //{
 
-    }
-    //Engine* engine = Engine::GetInstance();
+    //}
+    Engine* engine = Engine::GetInstance();
+    engine->GetTest();
+    auto test2 = &Pilot::PublicSingleton<Test>::getInstance();
+    printf("EXE: %p\n", test2);
+
     //auto uptr = std::make_unique<CrystalTracer>();
     //engine->Start(std::move(uptr));
     return 0;

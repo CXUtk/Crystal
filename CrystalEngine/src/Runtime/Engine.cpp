@@ -13,6 +13,8 @@
 #include "Platform/PlatformFactory.h"
 #include "Platform/RHI/FileSystem/File.h"
 
+#include "Core/Pattern/Singleton.h"
+
 namespace crystal
 {
     Engine::Engine()
@@ -93,6 +95,8 @@ namespace crystal
 
     void Engine::Start(std::unique_ptr<Application>&& application)
     {
+        //auto s = &Pilot::PublicSingleton<Test>::getInstance();
+        //GlobalLogger::Log(SeverityLevel::Debug, "DLL: %p\n", s);
         m_Initialize();
 
         auto window = m_platformProvider->GetGameWindow();

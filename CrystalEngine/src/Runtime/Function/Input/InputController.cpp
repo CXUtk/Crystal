@@ -31,8 +31,9 @@ namespace crystal
         window->AddCharInputEventListener([this, &charSeq](CharInputArgs args) {
             charSeq.push_back(args.Code);
         });
-
+        GlobalLogger::Log(SeverityLevel::Debug, "????????? construct");
 		GlobalLogger::Log(SeverityLevel::Debug, "InputController construct");
+
 	}
 
 	InputController::~InputController()

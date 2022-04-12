@@ -117,4 +117,6 @@ namespace crystal
 };\
     using name = Crystal_##name::Flags
 
+
+#define DLLEXPROT __declspec(dllexport)
 }

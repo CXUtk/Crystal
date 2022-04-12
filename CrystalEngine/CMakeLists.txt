@@ -5,7 +5,8 @@ project(CrystalEngine)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(ENGINE_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/external")
-set(ENGINE_ASSET_DIR "/asset")
+set(ENGINE_ASSET_DIR "assets")
+set(BINARY_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/")
 
 
 # set cmake compile options
