@@ -70,6 +70,10 @@ namespace crystal
         {
             return p->second->GetTexture2D(resPath);
         }
+        else if constexpr (std::is_same<T, ITextureCubemap>::value)
+        {
+            return p->second->GetTextureCubemap(resPath);
+        }
         else if constexpr (std::is_same<T, FontFamily>::value)
         {
             return p->second->GetFontFamily(resPath);

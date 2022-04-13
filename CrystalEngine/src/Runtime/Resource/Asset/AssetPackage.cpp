@@ -116,6 +116,15 @@ namespace crystal
         }
         return p->second;
     }
+    std::shared_ptr<ITextureCubemap> AssetPackage::GetTextureCubemap(const URI& uri) const
+    {
+        auto p = m_textureCubeMap.find(uri);
+        if (p == m_textureCubeMap.end())
+        {
+            throw std::invalid_argument(string_format("Cannot find given cubemap asset: %s", uri.c_str()));
+        }
+        return p->second;
+    }
     std::shared_ptr<FontFamily> AssetPackage::GetFontFamily(const URI& uri) const
     {
         auto p = m_fontMap.find(uri);

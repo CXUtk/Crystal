@@ -1,0 +1,15 @@
+{
+    "dx11Src": "Skybox.hlsl",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "ViewRemoveTranslation",
+            "type": "mat4"
+        },
+        {
+            "name": "Proj",
+            "type": "mat4"
+        }
+    ]
+}

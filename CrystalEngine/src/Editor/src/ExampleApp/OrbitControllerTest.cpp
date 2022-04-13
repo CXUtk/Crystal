@@ -74,6 +74,9 @@ namespace crystal
 		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
 		m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
 		//indexBuffer->Bind(0);
+
+        InitSkybox();
+
 	}
 
 
@@ -154,6 +157,8 @@ namespace crystal
         }
         graphicsContext->UnloadPipelineResources();
 
+        RenderSkybox();
+
     }
 
 	void OrbitControllerTest::Exit()
@@ -165,4 +170,63 @@ namespace crystal
 	{
 		return m_renderPause;
 	}
+
+    void OrbitControllerTest::RenderSkybox()
+    {
+        auto graphicsContext = m_engine->GetGraphicsContext();
+
+        auto P = m_pCamera->GetProjectionMatrix();
+        // Remove translation
+        auto V = Matrix4f(Matrix3f(m_pCamera->GetViewMatrix()));
+        m_pSkyboxShader->SetUniformMat4f("ViewRemoveTranslation", V);
+        m_pSkyboxShader->SetUniformMat4f("Proj", P);
+
+        graphicsContext->LoadPipelineState(m_pSkyboxPSO);
+        graphicsContext->LoadPipelineResources(m_pSkyboxPRO);
+        {
+            graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 36);
+        }
+        graphicsContext->UnloadPipelineResources();
+    }
+
+    void OrbitControllerTest::InitSkybox()
+    {
+        auto assetManager = m_engine->GetAssetManager();
+        m_pSkyboxShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("Skybox");
+        m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox");
+
+        std::vector<ElementDescription> elements = {
+            { SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
+        };
+
+        VertexLayout vLayout(elements, sizeof(Vector3f));
+
+        auto graphicsDevice = m_engine->GetGraphicsDevice();
+        auto model = assetManager->LoadAssetBuiltIn<Mesh>("Cube");
+
+        std::vector<Vector3f> vertices;
+        for (const auto& data : model->GetData())
+        {
+            vertices.push_back(data.Position);
+        }
+
+        VertexBufferDescription bufferDesc{};
+        bufferDesc.Usage = BufferUsage::Immutable;
+
+        auto vertexBuffer = graphicsDevice->CreateVertexBuffer(bufferDesc,
+            vertices.data(), sizeof(Vector3f) * vertices.size());
+
+        vertexBuffer->BindVertexLayout(vLayout);
+
+        m_pSkyboxPRO = graphicsDevice->CreatePipelineResourceObject();
+        m_pSkyboxPRO->SetVertexBuffer(vertexBuffer);
+        m_pSkyboxPRO->SetShaderProgram(m_pSkyboxShader);
+        m_pSkyboxPRO->SetShaderResource(m_skyBox, 0);
+        m_pSkyboxPRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 0);
+
+        m_pSkyboxPSO = graphicsDevice->CreatePipelineStateObject();
+        m_pSkyboxPSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
+        m_pSkyboxPSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
+        m_pSkyboxPSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
+    }
 }

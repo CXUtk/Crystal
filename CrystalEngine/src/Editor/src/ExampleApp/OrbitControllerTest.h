@@ -28,5 +28,13 @@ namespace crystal
 		std::shared_ptr<IPipelineStateObject>		m_PSO = nullptr;
 		std::shared_ptr<ITexture2D>					m_texture2D = nullptr;
 		std::shared_ptr<IPipelineResourceObject>	m_PRO = nullptr;
+
+        std::shared_ptr<ITextureCubemap>            m_skyBox = nullptr;
+        std::shared_ptr<IShaderProgram>				m_pSkyboxShader = nullptr;
+        std::shared_ptr<IPipelineResourceObject>    m_pSkyboxPRO = nullptr;
+        std::shared_ptr<IPipelineStateObject>       m_pSkyboxPSO = nullptr;
+
+        void RenderSkybox();
+        void InitSkybox();
 	};
 }

@@ -19,6 +19,7 @@ public:
     Matrix4f GetProjectionMatrix() const;
     Matrix4f GetViewMatrix() const;
 
+
 private:
     Point3f     m_EyePos, m_LookAt;
     Vector3f    m_Up;

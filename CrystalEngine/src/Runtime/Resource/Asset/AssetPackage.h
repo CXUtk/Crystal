@@ -25,6 +25,7 @@ namespace crystal
 
         std::shared_ptr<IShaderProgram> GetShader(const URI& uri) const;
         std::shared_ptr<ITexture2D> GetTexture2D(const URI& uri) const;
+        std::shared_ptr<ITextureCubemap> GetTextureCubemap(const URI& uri) const;
         std::shared_ptr<FontFamily> GetFontFamily(const URI& uri) const;
         std::shared_ptr<Mesh> GetMesh(const URI& uri) const;
 

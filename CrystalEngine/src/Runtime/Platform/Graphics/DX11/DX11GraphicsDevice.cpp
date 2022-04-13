@@ -397,7 +397,7 @@ namespace crystal
 
         DSDesc.EnableDepthTest = true;
         DSDesc.EnableDepthWrite = true;
-        DSDesc.DepthFunction = ComparisonFunction::Less;
+        DSDesc.DepthFunction = ComparisonFunction::LessEqual;
         DSDesc.StencilReadMask = 0xFF;
         DSDesc.StencilWriteMask = 0xFF;
         DefaultDepthTest = DSDesc;
