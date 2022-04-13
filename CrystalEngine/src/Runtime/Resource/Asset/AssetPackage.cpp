@@ -48,9 +48,12 @@ namespace crystal
             }
             else if (type == "Cubemap")
             {
-                throw std::exception("Not Implemented");
-            }
-            
+                if (m_textureCubeMap.find(name) != m_textureCubeMap.end())
+                {
+                    throw std::logic_error(string_format("Asset Name Conflict: Cubemap %s already exist", name.c_str()));
+                }
+                m_textureCubeMap[name] = TextureLoader::LoadCubemap(textureMetaInfo, path.parent_path());
+            }   
         }
     }
 

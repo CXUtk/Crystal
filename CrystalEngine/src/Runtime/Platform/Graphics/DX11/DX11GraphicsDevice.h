@@ -14,6 +14,7 @@ namespace crystal
 		ID3D11Device* GetD3DDevice() const { return m_pd3dDevice.Get(); }
 		ComPtr<ID3D11Buffer> CreateBuffer(void* src, size_t size,
 			BufferUsage usage, UINT bindFlags);
+        std::shared_ptr<DX11GraphicsContext> GetD3DContext();
 
 		virtual std::shared_ptr<IGraphicsContext> GetContext() override;
 
@@ -27,7 +28,8 @@ namespace crystal
 			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& variables) override;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) override;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) override;
-		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
+        virtual std::shared_ptr<ITextureCubemap> CreateCubemapFromTexture6(const CubemapTexture6& tex6, const Texture2DDescription& texDesc) override;
+        virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) override;
 
 		virtual std::shared_ptr<IRasterState> CreateRasterState(const RasterStateDescription& rasterDesc) override;
 		virtual std::shared_ptr<IBlendState> CreateBlendState(const BlendStateDescription& blendDesc) override;

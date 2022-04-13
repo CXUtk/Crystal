@@ -74,6 +74,10 @@ namespace crystal
         {
             return p->second->GetFontFamily(resPath);
         }
+        else if constexpr (std::is_same<T, Mesh>::value)
+        {
+            return p->second->GetMesh(resPath);
+        }
         else
         {
             static_assert(false, "AssetManager does not support this asset type");

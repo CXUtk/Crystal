@@ -11,6 +11,7 @@
 #include "PipelineResources/DX11FragmentShader.h"
 #include "PipelineResources/DX11ShaderProgram.h"
 #include "PipelineResources/DX11Texture2D.h"
+#include "PipelineResources/DX11TextureCubemap.h"
 #include "PipelineResources/DX11RenderTarget2D.h"
 #include "PipelineResources/DX11SamplerState.h"
 #include "PipelineStates/DX11BlendState.h"
@@ -71,6 +72,11 @@ namespace crystal
         return m_pGraphicsContext;
     }
 
+    std::shared_ptr<DX11GraphicsContext> DX11GraphicsDevice::GetD3DContext()
+    {
+        return m_pGraphicsContext;
+    }
+
     std::shared_ptr<IPipelineStateObject> DX11GraphicsDevice::CreatePipelineStateObject()
     {
         return std::make_shared<DX11PipelineStateObject>(this, ptr(m_pGraphicsContext));
@@ -127,6 +133,11 @@ namespace crystal
     std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
     {
         return std::make_shared<DX11Texture2D>(this, src, size, texDesc);
+    }
+
+    std::shared_ptr<ITextureCubemap> DX11GraphicsDevice::CreateCubemapFromTexture6(const CubemapTexture6& tex6, const Texture2DDescription& texDesc)
+    {
+        return std::make_shared<DX11TextureCubemap>(this, tex6, texDesc);
     }
 
     std::shared_ptr<IRenderTarget2D> DX11GraphicsDevice::CreateRenderTarget2D(const RenderTarget2DDescription& desc)

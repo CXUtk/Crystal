@@ -33,6 +33,7 @@ namespace crystal
         std::map<std::string, std::shared_ptr<FontFamily>>      m_fontMap;
         std::map<std::string, std::shared_ptr<IShaderProgram>>  m_shadersMap;
         std::map<std::string, std::shared_ptr<ITexture2D>>      m_texture2DMap;
+        std::map<std::string, std::shared_ptr<ITextureCubemap>> m_textureCubeMap;
         std::map<std::string, std::shared_ptr<Mesh>>            m_meshesMap;
     };
 }

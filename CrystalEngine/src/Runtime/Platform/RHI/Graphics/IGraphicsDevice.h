@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "GraphicsCommon.h"
 
 namespace crystal
@@ -24,6 +24,7 @@ namespace crystal
 			std::shared_ptr<IFragmentShader> fragmentShader, const UniformVariableCollection& variables) = 0;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromFile(const std::string& path, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<ITexture2D> CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc) = 0;
+        virtual std::shared_ptr<ITextureCubemap> CreateCubemapFromTexture6(const CubemapTexture6& tex6, const Texture2DDescription& texDesc) = 0;
 		virtual std::shared_ptr<IRenderTarget2D> CreateRenderTarget2D(const RenderTarget2DDescription& desc) = 0;
 		virtual std::shared_ptr<IRasterState> CreateRasterState(const RasterStateDescription& rasterDesc) = 0;
 		virtual std::shared_ptr<IBlendState> CreateBlendState(const BlendStateDescription& blendDesc) = 0;

@@ -5,11 +5,7 @@ namespace crystal
 {
     std::shared_ptr<ITexture2D> TextureLoader::LoadTexture2D(const SJson::JsonNode& metaData, const path_type& curPath)
     {
-        auto engine = Engine::GetInstance();
-        auto graphicsDevice = engine->GetGraphicsDevice();
-
         auto target = metaData["target"].Get<std::string>();
-
         auto pathToTarget = curPath / target;
 
         Texture2DDescription texDesc = {};
@@ -17,6 +13,50 @@ namespace crystal
         texDesc.MipmapLevels = 1;
         texDesc.Usage = BufferUsage::Immutable;
 
-        return  graphicsDevice->CreateTexture2DFromFile(pathToTarget.string(), texDesc);
+        return LoadTexture2DFromFile(pathToTarget, texDesc);
+    }
+    std::shared_ptr<ITextureCubemap> TextureLoader::LoadCubemap(const SJson::JsonNode& metaData, const path_type& curPath)
+    {
+        Texture2DDescription texDesc = {};
+        texDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
+        texDesc.MipmapLevels = 1;
+        texDesc.Usage = BufferUsage::Immutable;
+
+        CubemapTexture6 cubemapTexs;
+
+        auto target = metaData["posx"].Get<std::string>();
+        cubemapTexs.posX = LoadTexture2DFromFile(curPath / target, texDesc);
+
+        texDesc.Size = cubemapTexs.posX->GetSize();
+
+        target = metaData["negx"].Get<std::string>();
+        cubemapTexs.negX = LoadTexture2DFromFile(curPath / target, texDesc);
+
+        target = metaData["posy"].Get<std::string>();
+        cubemapTexs.posY = LoadTexture2DFromFile(curPath / target, texDesc);
+
+        target = metaData["negy"].Get<std::string>();
+        cubemapTexs.negY = LoadTexture2DFromFile(curPath / target, texDesc);
+
+        target = metaData["posz"].Get<std::string>();
+        cubemapTexs.posZ = LoadTexture2DFromFile(curPath / target, texDesc);
+
+        target = metaData["negz"].Get<std::string>();
+        cubemapTexs.negZ = LoadTexture2DFromFile(curPath / target, texDesc);
+
+        auto engine = Engine::GetInstance();
+        auto graphicsDevice = engine->GetGraphicsDevice();
+        if (texDesc.Usage == BufferUsage::Immutable)
+        {
+            texDesc.Usage = BufferUsage::Default;
+        }
+        return graphicsDevice->CreateCubemapFromTexture6(cubemapTexs, texDesc);
+    }
+    std::shared_ptr<ITexture2D> TextureLoader::LoadTexture2DFromFile(const path_type& path,
+        const Texture2DDescription& desc)
+    {
+        auto engine = Engine::GetInstance();
+        auto graphicsDevice = engine->GetGraphicsDevice();
+        return graphicsDevice->CreateTexture2DFromFile(path.string(), desc);
     }
 }

@@ -1,0 +1,10 @@
+{
+    "type": "Cubemap",
+    "format": "RGBA8ub",
+    "posx": "posx.jpg",
+    "negx": "negx.jpg",
+    "posy": "posy.jpg",
+    "negy": "negy.jpg",
+    "posz": "posz.jpg",
+    "negz": "negz.jpg"
+}

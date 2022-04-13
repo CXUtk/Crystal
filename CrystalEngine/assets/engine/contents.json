@@ -1,10 +1,12 @@
 {
     "shaders": [
         "Sprite",
-        "Geometry"
+        "Geometry",
+        "model"
     ],
     "textures": [
-        "White"
+        "White",
+        "Cubemaps/Sky2/Skybox"
     ],
     "fonts": [
         "arial.ttf",

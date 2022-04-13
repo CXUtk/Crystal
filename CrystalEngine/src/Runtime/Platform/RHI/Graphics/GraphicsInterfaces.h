@@ -8,6 +8,7 @@
 #include "PipelineResources/IShaderResource.h"
 #include "PipelineResources/IRenderTarget2D.h"
 #include "PipelineResources/ITexture2D.h"
+#include "PipelineResources/ITextureCubemap.h"
 #include "PipelineResources/IShaderProgram.h"
 #include "PipelineResources/IFragmentShader.h"
 #include "PipelineResources/IVertexShader.h"

@@ -1,4 +1,4 @@
-﻿#include "DX11Texture2D.h"
+#include "DX11Texture2D.h"
 #include "DX11ShaderProgram.h"
 #include "DX11VertexShader.h"
 #include "DX11FragmentShader.h"
@@ -37,11 +37,10 @@ namespace crystal
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
 
-		ComPtr<ID3D11Texture2D> pTexture2D = nullptr;
 		DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
 			0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
-			textureDesc.MiscFlags, 0, reinterpret_cast<ID3D11Resource**>(pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
-		pTexture2D->GetDesc(&textureDesc);
+			textureDesc.MiscFlags, 0, reinterpret_cast<ID3D11Resource**>(m_pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
+        m_pTexture2D->GetDesc(&textureDesc);
 
 		m_size.x = textureDesc.Width;
 		m_size.y = textureDesc.Height;
@@ -75,16 +74,15 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
-        ComPtr<ID3D11Texture2D> pTexture2D = nullptr;
         auto device = m_pGraphicsDevice->GetD3DDevice();
 
         D3D11_SUBRESOURCE_DATA sData = {};
         sData.pSysMem = src;
         sData.SysMemPitch = texDesc.Size.x * DX11Common::RenderFormatToBytes(texDesc.Format);
 
-        HR(device->CreateTexture2D(&textureDesc, &sData, pTexture2D.GetAddressOf()));
+        HR(device->CreateTexture2D(&textureDesc, &sData, m_pTexture2D.GetAddressOf()));
 
-        HR(device->CreateShaderResourceView(pTexture2D.Get(), nullptr, m_pSRV.GetAddressOf()));
+        HR(device->CreateShaderResourceView(m_pTexture2D.Get(), nullptr, m_pSRV.GetAddressOf()));
 
         m_size.x = textureDesc.Width;
         m_size.y = textureDesc.Height;

@@ -23,6 +23,7 @@ namespace crystal
 	class IShaderProgram;
 	class IShaderResource;
 	class IRenderTarget2D;
+    class ITextureCubemap;
 	class ITexture2D;
 	class ISamplerState;
 
@@ -396,6 +397,16 @@ namespace crystal
 		uint32_t			ByteOffset;
 	};
 
+    struct CubemapTexture6
+    {
+        std::shared_ptr<ITexture2D> posX;
+        std::shared_ptr<ITexture2D> negX;
+        std::shared_ptr<ITexture2D> posY;
+        std::shared_ptr<ITexture2D> negY;
+        std::shared_ptr<ITexture2D> posZ;
+        std::shared_ptr<ITexture2D> negZ;
+    };
+
 
 	//struct VertexElement
 	//{
@@ -418,6 +429,14 @@ namespace crystal
 		RenderFormat	Format;
 		BufferUsage		Usage;
 	};
+
+    struct TextureCubemapDescription
+    {
+        Vector2i	    Size;
+        int				MipmapLevels;
+        RenderFormat	Format;
+        BufferUsage		Usage;
+    };
 
 	struct RenderTarget2DDescription
 	{

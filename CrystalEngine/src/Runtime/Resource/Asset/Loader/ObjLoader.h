@@ -50,7 +50,7 @@ namespace crystal
         std::vector<Vector3f> Normals;
 
         std::vector<glm::ivec3> Triangles;
-        std::vector<VertexData> Vertices;
+        std::vector<MeshVertexData> Vertices;
 
         std::shared_ptr<Mesh> GetMesh();
     private:

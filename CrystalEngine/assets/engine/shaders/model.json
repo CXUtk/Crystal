@@ -1,5 +1,4 @@
 {
-    "name": "Model",
     "dx11Src": "model.hlsl",
     "openGLVSSrc": "model.vert",
     "openGLFSSrc": "model.frag",
