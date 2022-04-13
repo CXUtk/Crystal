@@ -103,14 +103,11 @@ namespace crystal
         if (contents.Contains(MeshesDirectoryName))
         {
             // Load meshes
-            std::vector<path_type> meshPaths;
+            std::vector<std::string> meshEntries;
             contents[MeshesDirectoryName].foreach([&](const SJson::JsonNode& node) {
-                auto path = parentPath / node.Get<std::string>();
-                path.append(".json");
-
-                meshPaths.push_back(path);
+                meshEntries.push_back(node.Get<std::string>());
             });
-            assetPackage->LoadMeshes(meshPaths);
+            assetPackage->LoadMeshes(parentPath / MeshesDirectoryName, meshEntries);
         }
 
         m_packagesMap[name] = assetPackage;

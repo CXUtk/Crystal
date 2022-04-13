@@ -4,6 +4,7 @@
 
 #include "Loader/ShaderLoader.h"
 #include "Loader/TextureLoader.h"
+#include "Loader/ObjLoader.h"
 
 namespace crystal
 {
@@ -53,33 +54,25 @@ namespace crystal
         }
     }
 
-    void AssetPackage::LoadMeshes(const std::vector<path_type>& paths)
+    void AssetPackage::LoadMeshes(const path_type& parentPath, const std::vector<std::string>& entries)
     {
-        for (auto& path : paths)
+        ObjLoader loader;
+        for (auto& name : entries)
         {
-            auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
-            auto name = textureMetaInfo["name"].Get<std::string>();
+            auto path = parentPath / (name + ".json");
+            auto meshMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
             if (m_meshesMap.find(name) != m_meshesMap.end())
             {
                 throw std::logic_error(string_format("Asset Name Conflict: Mesh %s already exist", name.c_str()));
             }
-            // m_meshesMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
+
+            auto target = meshMetaInfo["target"].Get<std::string>();
+            auto pathToTarget = path.parent_path() / target;
+            loader.load(pathToTarget);
+
+            m_meshesMap[name] = loader.GetMesh();
         }
     }
-
-    //void AssetPackage::LoadFonts(const std::vector<path_type>&paths)
-    //{
-    //    for (auto& path : paths)
-    //    {
-    //        auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
-    //        auto name = textureMetaInfo["name"].Get<std::string>();
-    //        if (m_fontMap.find(name) != m_fontMap.end())
-    //        {
-    //            throw std::logic_error(string_format("Asset Name Conflict: Font %s already exist", name.c_str()));
-    //        }
-    //        // m_fontMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
-    //    }
-    //}
 
     void AssetPackage::LoadOneFont(std::string name, std::shared_ptr<FontFamily> font)
     {

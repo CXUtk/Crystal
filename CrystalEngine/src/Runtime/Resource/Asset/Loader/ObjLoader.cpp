@@ -1,8 +1,9 @@
 #include "ObjLoader.h"
 #include <map>
 #include <glm/gtx/transform.hpp>
+#include <Core/Utils/Misc.h>
 
-namespace objloader
+namespace crystal
 {
     char ObjLoader::lineBuffer[MAX_BUFFER];
     struct cmpVec3
@@ -20,7 +21,7 @@ namespace objloader
             return false;
         }
     };
-    void ObjLoader::load(const std::string& path)
+    void ObjLoader::load(const path_type& path)
     {
         Positions.clear();
         TexCoords.clear();
@@ -31,10 +32,10 @@ namespace objloader
 
         _totV = 0;
 
-        FILE* file = fopen(path.c_str(), "r");
+        FILE* file = fopen(path.string().c_str(), "r");
         if (!file)
         {
-            throw std::exception(("Cannot open file " + path).c_str());
+            throw std::exception(string_format("Cannot open file %s", path.string().c_str()).c_str());
             return;
         }
         while (fgets(lineBuffer, MAX_BUFFER, file))
@@ -77,6 +78,10 @@ namespace objloader
         return true;
     }
 
+    std::shared_ptr<Mesh> ObjLoader::GetMesh()
+    {
+        return std::make_shared<Mesh>(Vertices, Triangles);
+    }
 
     //std::vector<DrawTriangle> ObjLoader::GetDrawTriangles() const {
     //    std::vector<DrawTriangle> triangles;

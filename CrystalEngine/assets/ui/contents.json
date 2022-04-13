@@ -5,6 +5,8 @@
         "BoxNoB",
         "Cross",
         "Frame",
-        "Panel"
+        "Panel",
+
+        "Test/Dots"
     ]
 }

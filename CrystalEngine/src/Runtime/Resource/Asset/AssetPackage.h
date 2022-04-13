@@ -16,7 +16,7 @@ namespace crystal
 
         void LoadShaders(const path_type& parentPath, const std::vector<std::string>& entries);
         void LoadTextures(const path_type& parentPath, const std::vector<std::string>& entries);
-        void LoadMeshes(const std::vector<path_type>& paths);
+        void LoadMeshes(const path_type& parentPath, const std::vector<std::string>& entries);
         // void LoadFonts(const std::vector<path_type>& paths);
 
         void LoadOneShader();

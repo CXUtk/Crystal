@@ -9,5 +9,8 @@
     "fonts": [
         "arial.ttf",
         "consola.ttf"
+    ],
+    "meshes": [
+        "Cube"
     ]
 }
