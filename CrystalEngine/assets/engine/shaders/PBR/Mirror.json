@@ -1,0 +1,23 @@
+{
+    "dx11Src": "Mirror.hlsl",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "M",
+            "type": "mat4"
+        },
+        {
+            "name": "MN",
+            "type": "mat3"
+        },
+        {
+            "name": "VP",
+            "type": "mat4"
+        },
+        {
+            "name": "uCameraPos",
+            "type": "vec3"
+        }
+    ]
+}

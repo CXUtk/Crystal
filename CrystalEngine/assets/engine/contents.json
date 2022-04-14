@@ -3,17 +3,26 @@
         "Sprite",
         "Geometry",
         "model",
-        "Skybox"
+        "Skybox",
+
+        "PBR/Mirror",
+        "PBR/Microfacet",
+        "PBR/Irradiance",
+        "PBR/Basic"
     ],
     "textures": [
         "White",
-        "Cubemaps/Sky2/Skybox"
+        "Cubemaps/Sky2/Skybox",
+        "Cubemaps/Sky2/Skybox_Irradiance"
     ],
     "fonts": [
         "arial.ttf",
         "consola.ttf"
     ],
     "meshes": [
-        "Cube"
+        "Cube",
+        "Sphere",
+        "Capsule",
+        "Bunny"
     ]
 }

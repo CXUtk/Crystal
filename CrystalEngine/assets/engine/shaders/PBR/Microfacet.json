@@ -1,0 +1,39 @@
+{
+    "dx11Src": "Microfacet.hlsl",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "M",
+            "type": "mat4"
+        },
+        {
+            "name": "MN",
+            "type": "mat3"
+        },
+        {
+            "name": "VP",
+            "type": "mat4"
+        },
+        {
+            "name": "uCameraPos",
+            "type": "vec3"
+        },
+        {
+            "name": "uLightPos",
+            "type": "vec3"
+        },
+        {
+            "name": "uLightIntensity",
+            "type": "vec3"
+        },
+        {
+            "name": "uRoughness",
+            "type": "float"
+        },
+        {
+            "name": "uF0",
+            "type": "vec3"
+        }
+    ]
+}

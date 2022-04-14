@@ -10,6 +10,7 @@
 
 namespace crystal
 {
+    static constexpr size_t AlignSize = 16;
 	DX11ShaderProgram::DX11ShaderProgram(DX11GraphicsDevice* graphicsDevice,
 		std::shared_ptr<IVertexShader> vertexShader,
 		std::shared_ptr<IFragmentShader> fragmentShader,
@@ -22,11 +23,16 @@ namespace crystal
 		size_t size = 0;
 		for (auto& var : uniforms.Variables)
 		{
+            size_t tmpSize = GraphicsCommons::ComponentFormatToSizeConvert(var.Format);
+            if ((size % AlignSize) + tmpSize > AlignSize)
+            {
+                size = (size + AlignSize - 1) / AlignSize * AlignSize;
+            }
 			m_uniformMap[var.Name] = size;
-			size += GraphicsCommons::ComponentFormatToSizeConvert(var.Format);
+            size += tmpSize;
 		}
 		// For const buffer the ByteWidth (value = 4) must be a multiple of 16.
-		size = (size + 15) / 16 * 16;
+		size = (size + AlignSize - 1) / AlignSize * AlignSize;
 		if (size)
 		{
 			m_pConstantBuffer = m_pGraphicsDevice->CreateBuffer(nullptr, size,
@@ -66,6 +72,33 @@ namespace crystal
 		memcpy_s(&m_pConstantBufferData[iter->second], sizeof(float), &value, sizeof(float));
 		m_constBufferDirty = true;
 	}
+
+    void DX11ShaderProgram::SetUniformVec3f(const std::string& name, const Vector3f& value)
+    {
+        auto iter = m_uniformMap.find(name);
+        if (iter == m_uniformMap.end())
+        {
+            throw std::exception("Cannot find uniform variable");
+        }
+
+        auto vec4 = Vector4f(value, 0.f);
+        memcpy_s(&m_pConstantBufferData[iter->second], sizeof(Vector4f),
+            &vec4, sizeof(Vector4f));
+        m_constBufferDirty = true;
+    }
+
+    void DX11ShaderProgram::SetUniformMat3f(const std::string& name, const Matrix3f& value)
+    {
+        auto iter = m_uniformMap.find(name);
+        if (iter == m_uniformMap.end())
+        {
+            throw std::exception("Cannot find uniform variable");
+        }
+        auto mat4 = Matrix4f(value);
+        memcpy_s(&m_pConstantBufferData[iter->second], sizeof(Matrix4f),
+            crystal_value_ptr(glm::transpose(mat4)), sizeof(Matrix4f));
+        m_constBufferDirty = true;
+    }
 
 	void DX11ShaderProgram::SetUniformMat4f(const std::string& name, const Matrix4f& value)
 	{

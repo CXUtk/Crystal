@@ -1,0 +1,10 @@
+{
+    "type": "Cubemap",
+    "format": "RGBA8ub",
+    "posx": "posx_irradiance.jpg",
+    "negx": "negx_irradiance.jpg",
+    "posy": "posy_irradiance.jpg",
+    "negy": "negy_irradiance.jpg",
+    "posz": "posz_irradiance.jpg",
+    "negz": "negz_irradiance.jpg"
+}

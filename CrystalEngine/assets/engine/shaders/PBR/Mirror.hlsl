@@ -1,11 +1,16 @@
 Texture2D diffuseTexture : register(t0);
+Texture2D specularTexture : register(t1);
+TextureCube environmentTexture : register(t2);
+
 SamplerState mySampler0 : register(s0);
+SamplerState mySampler1 : register(s1);
 
 cbuffer ConstantBuffer : register(b0)
 {
 	float4x4 M;
-	float4x4 MN;
+	float3x3 MN;
 	float4x4 VP;
+	float3 uCameraPos;
 }
 
 struct VertexIn
@@ -18,6 +23,7 @@ struct VertexIn
 struct VertexOut
 {
 	float4 posH : SV_POSITION;
+	float3 position : POSITION;
 	float2 texCoord : TEXCOORD;
 	float3 normal : NORMAL;
 };
@@ -26,14 +32,17 @@ struct VertexOut
 VertexOut VS(VertexIn vIn)
 {
 	VertexOut vout;
-	vout.posH = mul(mul(float4(vIn.pos, 1.0), M), VP);
+	float4 pos = mul(float4(vIn.pos, 1.0), M);
+	vout.position = pos;
+	vout.posH = mul(pos, VP);
 	vout.texCoord = vIn.texCoord;
-	vout.normal = mul(float4(vIn.normal, 0.0), MN);
+	vout.normal = mul(vIn.normal, MN);
 	return vout;
 }
 
 float4 PS(VertexOut pIn) : SV_Target
 {
 	float3 normal = normalize(pIn.normal);
-	return float4(0.5 + 0.5 * normal, 1.0) * diffuseTexture.Sample(mySampler0, pIn.texCoord);
+	float3 I = normalize(pIn.position - uCameraPos);
+	return environmentTexture.Sample(mySampler0, reflect(I, normal));
 }

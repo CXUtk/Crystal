@@ -27,7 +27,9 @@ namespace crystal
 		virtual ~IShaderProgram() = 0 {};
 
 		virtual void SetUniform1f(const std::string& name, float value) = 0;
-		virtual void SetUniformMat4f(const std::string& name, const glm::mat4& value) = 0;
+        virtual void SetUniformVec3f(const std::string& name, const Vector3f& value) = 0;
+        virtual void SetUniformMat3f(const std::string& name, const Matrix3f& value) = 0;
+		virtual void SetUniformMat4f(const std::string& name, const Matrix4f& value) = 0;
 		virtual ShaderMask GetShaderMask() const = 0;
 	};
 }

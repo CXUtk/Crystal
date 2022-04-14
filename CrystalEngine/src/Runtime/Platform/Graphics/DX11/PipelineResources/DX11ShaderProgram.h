@@ -14,6 +14,8 @@ namespace crystal
 		//void SetShaderResources(int startSlot, int count, ID3D11ShaderResourceView* const* srvBuffer, ID3D11SamplerState* const* samplerBuffer);
 
 		virtual void SetUniform1f(const std::string& name, float value) override;
+        virtual void SetUniformVec3f(const std::string& name, const Vector3f& value) override;
+        virtual void SetUniformMat3f(const std::string& name, const Matrix3f& value) override;
 		virtual void SetUniformMat4f(const std::string& name, const Matrix4f& value) override;
 		virtual ShaderMask GetShaderMask() const override { return m_shaderMask; }
 

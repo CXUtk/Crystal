@@ -35,7 +35,9 @@ namespace crystal
         auto assetManager = m_engine->GetAssetManager();
 		m_pCamera = std::make_shared<Camera>(1.0f, windowSize.x / windowSize.y, 0.5f, 100.f);
 
-        auto model = assetManager->LoadAssetBuiltIn<Mesh>("Cube");
+        InitSkybox();
+
+        auto model = assetManager->LoadAssetBuiltIn<Mesh>("Sphere");
 
 		std::vector<ElementDescription> elements = {
 			{ SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
@@ -62,26 +64,27 @@ namespace crystal
 
         VNum = meshData.size();
 
-        m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("model");
-        m_texture2D = assetManager->LoadAsset<ITexture2D>("ui:Test/Dots");
+        m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("PBR/Basic");
+        m_texture2D = assetManager->LoadAsset<ITexture2D>("engine:White");
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PRO->SetVertexBuffer(vertexBuffer);
 		m_PRO->SetShaderProgram(m_pShader);
 		m_PRO->SetShaderResource(m_texture2D, 0);
+        m_PRO->SetShaderResource(m_skyBoxIrradiance, 1);
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
+        m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 1);
+
 		m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
 		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
 		m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
 		//indexBuffer->Bind(0);
-
-        InitSkybox();
-
 	}
 
 
 	static Vector2f orbitControl = Vector2f(-glm::half_pi<float>(), glm::half_pi<float>());
 	static Point2i oldMousePos;
+    static float distanceFactor = 0.f;
 	void OrbitControllerTest::Update(const crystal::GameTimer& gameTimer)
 	{
 		auto window = m_engine->GetWindow();
@@ -121,6 +124,10 @@ namespace crystal
 			//printf("Time: %lf\n", gameTimer.GetLogicalDeltaTime());
 		}
 
+        distanceFactor -= inputController->GetScrollValue().y * 0.04f;
+        distanceFactor = glm::clamp(distanceFactor, -1.f, 1.f);
+        
+
 		auto sinTheta = std::sin(orbitControl.y);
 		auto cosTheta = std::sqrt(1.f - sinTheta * sinTheta);
 		if (orbitControl.y > glm::half_pi<float>())
@@ -128,7 +135,7 @@ namespace crystal
 			cosTheta = -cosTheta;
 		}
 		Point3f eyePos(sinTheta * std::cos(orbitControl.x), cosTheta, -sinTheta * std::sin(orbitControl.x));
-		m_pCamera->SetEyePos(eyePos * 5.f);
+		m_pCamera->SetEyePos(eyePos * 5.f * std::exp(distanceFactor * 2.5f));
 		m_pCamera->SetLookAt(Point3f(0.f));
 		m_pCamera->SetAspectRatio(static_cast<crystal::Float>(windowSize.x) / windowSize.y);
 	}
@@ -144,21 +151,37 @@ namespace crystal
             crystal::Color4f(0.f, 0.f, 0.f, 0.f), 1.0f, 0.f);
         //m_pShader->SetUniform1f("M", 0.5f + 0.5f * std::sin(gameTimer.GetLogicTime()));
         //m_pShader->SetUniform1f("uBase", 1.0f);
-        m_pShader->SetUniformMat4f("M", glm::identity<Matrix4f>());
-        m_pShader->SetUniformMat4f("MN", glm::identity<Matrix4f>());
+
         auto P = m_pCamera->GetProjectionMatrix();
         auto V = m_pCamera->GetViewMatrix();
+
+
+        m_pShader->SetUniformMat3f("MN", glm::identity<Matrix3f>());
         m_pShader->SetUniformMat4f("VP", P * V);
+        m_pShader->SetUniformVec3f("uCameraPos", m_pCamera->GetEyePos());
+        m_pShader->SetUniformVec3f("uLightPos", Vector3f(5.f, 5.f, 50.f));
+        m_pShader->SetUniformVec3f("uLightIntensity", Vector3f(1.f));
+        m_pShader->SetUniformVec3f("uAlbedo", Vector3f(1.f, 0.f, 0.f));
 
+        auto identity = glm::identity<Matrix4f>();
         graphicsContext->LoadPipelineState(m_PSO);
-        graphicsContext->LoadPipelineResources(m_PRO);
+
+        for (int i = 0; i <= 10; i++)
         {
-            graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, VNum);
+            for (int j = 0; j <= 10; j++)
+            {
+                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 5, j - 5, 0) * 3.f));
+                m_pShader->SetUniform1f("uRoughness", i * 0.1);
+                m_pShader->SetUniform1f("uMetallic", j * 0.1);
+
+                graphicsContext->LoadPipelineResources(m_PRO);
+                {
+                    graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, VNum);
+                }
+                graphicsContext->UnloadPipelineResources();
+            }
         }
-        graphicsContext->UnloadPipelineResources();
-
         RenderSkybox();
-
     }
 
 	void OrbitControllerTest::Exit()
@@ -171,6 +194,7 @@ namespace crystal
 		return m_renderPause;
 	}
 
+    static int CubeMapVertices = 0;
     void OrbitControllerTest::RenderSkybox()
     {
         auto graphicsContext = m_engine->GetGraphicsContext();
@@ -184,7 +208,7 @@ namespace crystal
         graphicsContext->LoadPipelineState(m_pSkyboxPSO);
         graphicsContext->LoadPipelineResources(m_pSkyboxPRO);
         {
-            graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, 36);
+            graphicsContext->DrawPrimitives(PrimitiveType::TRIANGLE_LIST, 0, CubeMapVertices);
         }
         graphicsContext->UnloadPipelineResources();
     }
@@ -194,6 +218,7 @@ namespace crystal
         auto assetManager = m_engine->GetAssetManager();
         m_pSkyboxShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("Skybox");
         m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox");
+        m_skyBoxIrradiance = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox_Irradiance");
 
         std::vector<ElementDescription> elements = {
             { SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },
@@ -210,6 +235,8 @@ namespace crystal
             vertices.push_back(data.Position);
         }
 
+        CubeMapVertices = vertices.size();
+
         VertexBufferDescription bufferDesc{};
         bufferDesc.Usage = BufferUsage::Immutable;
 
@@ -222,6 +249,7 @@ namespace crystal
         m_pSkyboxPRO->SetVertexBuffer(vertexBuffer);
         m_pSkyboxPRO->SetShaderProgram(m_pSkyboxShader);
         m_pSkyboxPRO->SetShaderResource(m_skyBox, 0);
+        m_pSkyboxPRO->SetShaderResource(m_skyBoxIrradiance, 1);
         m_pSkyboxPRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 0);
 
         m_pSkyboxPSO = graphicsDevice->CreatePipelineStateObject();
