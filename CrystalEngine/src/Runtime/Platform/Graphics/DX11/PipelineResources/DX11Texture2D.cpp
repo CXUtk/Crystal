@@ -4,6 +4,7 @@
 #include "DX11FragmentShader.h"
 
 #include "../DX11GraphicsDevice.h"
+#include "../DX11GraphicsContext.h"
 #include "../WICTextureLoader.h"
 #include "../dxTrace.h"
 
@@ -37,10 +38,34 @@ namespace crystal
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
 
-		DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
-			0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
-			textureDesc.MiscFlags, 0, reinterpret_cast<ID3D11Resource**>(m_pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
+
+        if (textureDesc.MipLevels > 1)
+        {
+            textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+            textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        }
+
+        auto d3dContext = m_pGraphicsDevice->GetD3DContext()->GetD3DContext();
+
+        if (textureDesc.MipLevels > 1)
+        {
+            DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), d3dContext, DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
+                        0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
+                        textureDesc.MiscFlags, DirectX::WIC_LOADER_DEFAULT, reinterpret_cast<ID3D11Resource**>(m_pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
+        }
+        else
+        {
+            DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
+                        0, textureDesc.Usage, textureDesc.BindFlags, textureDesc.CPUAccessFlags,
+                        textureDesc.MiscFlags, DirectX::WIC_LOADER_DEFAULT, reinterpret_cast<ID3D11Resource**>(m_pTexture2D.GetAddressOf()), m_pSRV.GetAddressOf());
+        }
+		
         m_pTexture2D->GetDesc(&textureDesc);
+
+        //if (textureDesc.MipLevels > 1)
+        //{
+        //    d3dContext->GenerateMips(m_pSRV.Get());
+        //}
 
 		m_size.x = textureDesc.Width;
 		m_size.y = textureDesc.Height;
@@ -74,6 +99,13 @@ namespace crystal
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
 		}
+
+        if (textureDesc.MipLevels > 1)
+        {
+            textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+            textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        }
+
         auto device = m_pGraphicsDevice->GetD3DDevice();
 
         D3D11_SUBRESOURCE_DATA sData = {};
@@ -83,6 +115,11 @@ namespace crystal
         HR(device->CreateTexture2D(&textureDesc, &sData, m_pTexture2D.GetAddressOf()));
 
         HR(device->CreateShaderResourceView(m_pTexture2D.Get(), nullptr, m_pSRV.GetAddressOf()));
+
+        if (textureDesc.MipLevels > 1)
+        {
+            m_pGraphicsDevice->GetD3DContext()->GetD3DContext()->GenerateMips(m_pSRV.Get());
+        }
 
         m_size.x = textureDesc.Width;
         m_size.y = textureDesc.Height;

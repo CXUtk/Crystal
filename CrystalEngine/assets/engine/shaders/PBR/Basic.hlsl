@@ -4,6 +4,9 @@ SamplerState mySampler0 : register(s0);
 TextureCube irradianceMap : register(t1);
 SamplerState irradianceSampler : register(s1);
 
+TextureCube spcularMap : register(t2);
+SamplerState spcularSampler : register(s2);
+
 cbuffer ConstantBuffer : register(b0)
 {
 	float4x4 M;
@@ -120,6 +123,9 @@ float4 PS(VertexOut pIn) : SV_Target
 
 	
 	color += pow(irradianceMap.Sample(irradianceSampler, N).xyz, 2.2) * Kd * uAlbedo;
+	
+	float lod = lerp(0.0, 12.0, uRoughness);
+	color += pow(spcularMap.SampleLevel(spcularSampler, reflect(-V, N), lod).xyz, 2.2) * f;
 	
 	color = color / (color + 1.0);
 	color = pow(color, 1.0 / 2.2);

@@ -6,5 +6,6 @@
     "posy": "posy.jpg",
     "negy": "negy.jpg",
     "posz": "posz.jpg",
-    "negz": "negz.jpg"
+    "negz": "negz.jpg",
+    "mipmapLevels": 11
 }

@@ -41,9 +41,20 @@ namespace crystal
             cubeTexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE;
         }
 
+        //if (cubeTexDesc.MipLevels > 1)
+        //{
+        //    cubeTexDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+        //    cubeTexDesc.MiscFlags |= D3D10_RESOURCE_MISC_GENERATE_MIPS;
+        //}
+
         ComPtr<ID3D11Texture2D> cubeTexture = nullptr;
         auto device = m_pGraphicsDevice->GetD3DDevice();
         HR(device->CreateTexture2D(&cubeTexDesc, nullptr, cubeTexture.GetAddressOf()));
+
+        //if (cubeTexDesc.MipLevels > 1)
+        //{
+        //    m_pGraphicsDevice->GetD3DContext()->GetD3DContext()->GenerateMips(m_pSRV.Get());
+        //}
 
         auto deviceContext = m_pGraphicsDevice->GetD3DContext()->GetD3DContext();
 

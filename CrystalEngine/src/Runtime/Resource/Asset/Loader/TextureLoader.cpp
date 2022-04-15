@@ -11,6 +11,11 @@ namespace crystal
         Texture2DDescription texDesc = {};
         texDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
         texDesc.MipmapLevels = 1;
+
+        if (metaData.Contains("mipmapLevels"))
+        {
+            texDesc.MipmapLevels = metaData["mipmapLevels"].Get<int>();
+        }
         texDesc.Usage = BufferUsage::Immutable;
 
         return LoadTexture2DFromFile(pathToTarget, texDesc);
@@ -20,7 +25,11 @@ namespace crystal
         Texture2DDescription texDesc = {};
         texDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
         texDesc.MipmapLevels = 1;
-        texDesc.Usage = BufferUsage::Immutable;
+        if (metaData.Contains("mipmapLevels"))
+        {
+            texDesc.MipmapLevels = metaData["mipmapLevels"].Get<int>();
+        }
+        texDesc.Usage = BufferUsage::Default;
 
         CubemapTexture6 cubemapTexs;
 
@@ -46,10 +55,6 @@ namespace crystal
 
         auto engine = Engine::GetInstance();
         auto graphicsDevice = engine->GetGraphicsDevice();
-        if (texDesc.Usage == BufferUsage::Immutable)
-        {
-            texDesc.Usage = BufferUsage::Default;
-        }
         return graphicsDevice->CreateCubemapFromTexture6(cubemapTexs, texDesc);
     }
     std::shared_ptr<ITexture2D> TextureLoader::LoadTexture2DFromFile(const path_type& path,

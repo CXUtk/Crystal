@@ -72,8 +72,10 @@ namespace crystal
 		m_PRO->SetShaderProgram(m_pShader);
 		m_PRO->SetShaderResource(m_texture2D, 0);
         m_PRO->SetShaderResource(m_skyBoxIrradiance, 1);
+        m_PRO->SetShaderResource(m_skyBox, 2);
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
         m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 1);
+        m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 2);
 
 		m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
 		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
@@ -161,7 +163,7 @@ namespace crystal
         m_pShader->SetUniformVec3f("uCameraPos", m_pCamera->GetEyePos());
         m_pShader->SetUniformVec3f("uLightPos", Vector3f(5.f, 5.f, 50.f));
         m_pShader->SetUniformVec3f("uLightIntensity", Vector3f(1.f));
-        m_pShader->SetUniformVec3f("uAlbedo", Vector3f(1.f, 0.f, 0.f));
+        m_pShader->SetUniformVec3f("uAlbedo", Vector3f(1.f, 1.f, 1.f));
 
         auto identity = glm::identity<Matrix4f>();
         graphicsContext->LoadPipelineState(m_PSO);
