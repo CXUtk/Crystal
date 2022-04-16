@@ -8,5 +8,6 @@ namespace crystal
     {
     public:
         virtual ~ITextureCubemap() = 0 {};
+        virtual void ReplaceMipmap(std::shared_ptr<ITextureCubemap> mipCubemap, int mipLevel) = 0;
     };
 }

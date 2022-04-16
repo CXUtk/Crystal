@@ -7,6 +7,9 @@ SamplerState irradianceSampler : register(s1);
 TextureCube spcularMap : register(t2);
 SamplerState spcularSampler : register(s2);
 
+Texture2D LUTTexture : register(t3);
+SamplerState LUTSampler : register(s3);
+
 cbuffer ConstantBuffer : register(b0)
 {
 	float4x4 M;
@@ -19,6 +22,7 @@ cbuffer ConstantBuffer : register(b0)
 
 	float3 uAlbedo;
 	float uRoughness;
+	float3 uSpecular;
 	float uMetallic;
 }
 
@@ -59,7 +63,8 @@ static float EPS = 1e-4;
 
 float D(float3 N, float3 H)
 {
-	float a2 = square(uRoughness);
+	float a = square(uRoughness);
+	float a2 = square(a);
 	float NdotH = max(0.0, dot(N, H));
 	return a2 / (PI * square(square(NdotH) * (a2 - 1.0) + 1.0));
 }
@@ -82,7 +87,7 @@ float3 F(float3 F0, float3 H, float3 V)
 	return F0 + (1.0 - F0) * pow(1.0 - HdotV, 5.0);
 }
 
-float3 BRDF(float3 N, float3 V, float3 L, float3 H, float3 F0)
+float3 BRDF(float3 N, float3 V, float3 L, float3 H, float3 F0, float3 F1)
 {
 	float NdotV = max(0.0, dot(N, V));
 	float NdotL = max(0.0, dot(N, L));
@@ -90,6 +95,7 @@ float3 BRDF(float3 N, float3 V, float3 L, float3 H, float3 F0)
 	float d = D(N, H);
 	float g = G(N, V, L);
 	float3 f = F(F0, H, V);
+	float3 f1 = F(F1, H, V);
 	
 	float3 Kd = (1.0 - f);
 	
@@ -97,7 +103,7 @@ float3 BRDF(float3 N, float3 V, float3 L, float3 H, float3 F0)
 	{
 		return float3(0, 0, 0);
 	}
-	float3 cook_torrance = (d * g * f) / (4.0 * NdotV * NdotL + EPS);
+	float3 cook_torrance = (d * g * f1) / (4.0 * NdotV * NdotL + EPS);
 	
 	float3 lambertian = uAlbedo * Kd / PI;
 	
@@ -110,23 +116,27 @@ float4 PS(VertexOut pIn) : SV_Target
 	float3 V = normalize(uCameraPos - pIn.position);
 	float3 L = normalize(uLightPos - pIn.position);
 	float3 H = normalize(V + L);
-	
+
 	float NdotL = max(0.0, dot(N, L));
-	
+	float VdotN = max(0.0, dot(V, N));
+
 	float3 F0 = float3(0.04, 0.04, 0.04);
 	F0 = lerp(F0, uAlbedo, uMetallic);
 	
-	float3 color = BRDF(N, V, L, H, F0) * uLightIntensity * NdotL;
-	
-	float3 f = F(F0, N, V);
-	float3 Kd = (1.0 - f);
+	float3 F1 = float3(0.04, 0.04, 0.04);
+	F1 = lerp(F1, uSpecular, uMetallic);
 
+	float3 color = BRDF(N, V, L, H, F0, F1) * uLightIntensity * NdotL;
+
+	float3 f = F(F0, N, V);
+	float3 Kd = (1.0 - f) * (1.0 - uMetallic);
+
+	color += pow(irradianceMap.SampleLevel(irradianceSampler, N, 0).xyz, 2.2) * Kd * uAlbedo;
 	
-	color += pow(irradianceMap.Sample(irradianceSampler, N).xyz, 2.2) * Kd * uAlbedo;
-	
-	float lod = lerp(0.0, 12.0, uRoughness);
-	color += pow(spcularMap.SampleLevel(spcularSampler, reflect(-V, N), lod).xyz, 2.2) * f;
-	
+	float lod = uRoughness * 4.0;
+	float4 fSplit = LUTTexture.Sample(LUTSampler, float2(VdotN, 1.0 - uRoughness));
+	color += pow(spcularMap.SampleLevel(spcularSampler, reflect(-V, N), lod).xyz, 2.2) * (F1 * fSplit.x + fSplit.yyy);
+
 	color = color / (color + 1.0);
 	color = pow(color, 1.0 / 2.2);
 	return float4(color, 1.0);

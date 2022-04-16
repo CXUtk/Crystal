@@ -7,7 +7,7 @@ using namespace crystal;
 int main(int argc, char** argv)
 {
     Engine* engine = Engine::GetInstance();
-    auto uptr = std::make_unique<TreeTest>();
+    auto uptr = std::make_unique<OrbitControllerTest>();
     engine->Start(std::move(uptr));
     return 0;
 }

@@ -1,0 +1,11 @@
+{
+    "type": "Cubemap_mips",
+    "mipmapLevels": 5,
+    "format": "RGBA8ub",
+    "posx": "Prefilter/posx_specular_mipmap.jpg",
+    "negx": "Prefilter/negx_specular_mipmap.jpg",
+    "posy": "Prefilter/posy_specular_mipmap.jpg",
+    "negy": "Prefilter/negy_specular_mipmap.jpg",
+    "posz": "Prefilter/posz_specular_mipmap.jpg",
+    "negz": "Prefilter/negz_specular_mipmap.jpg"
+}

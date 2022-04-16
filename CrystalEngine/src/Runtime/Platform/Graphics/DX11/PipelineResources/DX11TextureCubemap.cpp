@@ -47,9 +47,8 @@ namespace crystal
         //    cubeTexDesc.MiscFlags |= D3D10_RESOURCE_MISC_GENERATE_MIPS;
         //}
 
-        ComPtr<ID3D11Texture2D> cubeTexture = nullptr;
         auto device = m_pGraphicsDevice->GetD3DDevice();
-        HR(device->CreateTexture2D(&cubeTexDesc, nullptr, cubeTexture.GetAddressOf()));
+        HR(device->CreateTexture2D(&cubeTexDesc, nullptr, m_pCubemapTexture.GetAddressOf()));
 
         //if (cubeTexDesc.MipLevels > 1)
         //{
@@ -63,7 +62,7 @@ namespace crystal
             for (int j = 0; j < cubeTexDesc.MipLevels; ++j)
             {
                 deviceContext->CopySubresourceRegion(
-                    cubeTexture.Get(),
+                    m_pCubemapTexture.Get(),
                     D3D11CalcSubresource(j, D3D11_TEXTURECUBE_FACE_POSITIVE_X, cubeTexDesc.MipLevels),
                     0, 0, 0,
                     texture,
@@ -77,7 +76,7 @@ namespace crystal
             for (int j = 0; j < cubeTexDesc.MipLevels; ++j)
             {
                 deviceContext->CopySubresourceRegion(
-                    cubeTexture.Get(),
+                    m_pCubemapTexture.Get(),
                     D3D11CalcSubresource(j, D3D11_TEXTURECUBE_FACE_NEGATIVE_X, cubeTexDesc.MipLevels),
                     0, 0, 0,
                     texture,
@@ -91,7 +90,7 @@ namespace crystal
             for (int j = 0; j < cubeTexDesc.MipLevels; ++j)
             {
                 deviceContext->CopySubresourceRegion(
-                    cubeTexture.Get(),
+                    m_pCubemapTexture.Get(),
                     D3D11CalcSubresource(j, D3D11_TEXTURECUBE_FACE_POSITIVE_Y, cubeTexDesc.MipLevels),
                     0, 0, 0,
                     texture,
@@ -105,7 +104,7 @@ namespace crystal
             for (int j = 0; j < cubeTexDesc.MipLevels; ++j)
             {
                 deviceContext->CopySubresourceRegion(
-                    cubeTexture.Get(),
+                    m_pCubemapTexture.Get(),
                     D3D11CalcSubresource(j, D3D11_TEXTURECUBE_FACE_NEGATIVE_Y, cubeTexDesc.MipLevels),
                     0, 0, 0,
                     texture,
@@ -119,7 +118,7 @@ namespace crystal
             for (int j = 0; j < cubeTexDesc.MipLevels; ++j)
             {
                 deviceContext->CopySubresourceRegion(
-                    cubeTexture.Get(),
+                    m_pCubemapTexture.Get(),
                     D3D11CalcSubresource(j, D3D11_TEXTURECUBE_FACE_POSITIVE_Z, cubeTexDesc.MipLevels),
                     0, 0, 0,
                     texture,
@@ -133,7 +132,7 @@ namespace crystal
             for (int j = 0; j < cubeTexDesc.MipLevels; ++j)
             {
                 deviceContext->CopySubresourceRegion(
-                    cubeTexture.Get(),
+                    m_pCubemapTexture.Get(),
                     D3D11CalcSubresource(j, D3D11_TEXTURECUBE_FACE_NEGATIVE_Z, cubeTexDesc.MipLevels),
                     0, 0, 0,
                     texture,
@@ -148,13 +147,35 @@ namespace crystal
         SRVDesc.TextureCube.MipLevels = texDesc.MipmapLevels;
         SRVDesc.TextureCube.MostDetailedMip = 0;
 
-        HR(device->CreateShaderResourceView(cubeTexture.Get(), nullptr, m_pSRV.GetAddressOf()));
+        m_mipMapLevels = texDesc.MipmapLevels;
+
+        HR(device->CreateShaderResourceView(m_pCubemapTexture.Get(), nullptr, m_pSRV.GetAddressOf()));
     }
+
     DX11TextureCubemap::~DX11TextureCubemap()
     {}
+
     void DX11TextureCubemap::GetShaderResourceHandle(void* pHandle) const
     {
         ID3D11ShaderResourceView** ptr = (ID3D11ShaderResourceView**)pHandle;
         *ptr = m_pSRV.Get();
+    }
+
+    void DX11TextureCubemap::ReplaceMipmap(std::shared_ptr<ITextureCubemap> mipCubemap, int mipLevel)
+    {
+        auto deviceContext = m_pGraphicsDevice->GetD3DContext()->GetD3DContext();
+        auto dx11TextureCubemap = std::dynamic_pointer_cast<DX11TextureCubemap>(mipCubemap);
+
+        for (size_t face = 0; face < 6; face++)
+        {
+            deviceContext->CopySubresourceRegion(
+                m_pCubemapTexture.Get(),
+                D3D11CalcSubresource(mipLevel, face, m_mipMapLevels),
+                0, 0, 0,
+                dx11TextureCubemap->m_pCubemapTexture.Get(),
+                D3D11CalcSubresource(0, face, 1),
+                nullptr);
+        }
+
     }
 }

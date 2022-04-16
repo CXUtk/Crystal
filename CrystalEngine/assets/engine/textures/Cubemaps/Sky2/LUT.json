@@ -1,0 +1,5 @@
+{
+    "type": "Texture2D",
+    "target": "LUT.jpg",
+    "format": "RGBA8ub"
+}

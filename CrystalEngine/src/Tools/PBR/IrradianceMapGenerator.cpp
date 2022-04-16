@@ -50,7 +50,7 @@ int main(int argc, char** argv)
         {
             throw std::logic_error("Cannot find cubemap images");
         }
-        SkyCubemap[i] = std::make_shared<RawTexture2D>(width, height, data);
+        SkyCubemap[i] = std::make_shared<RawTexture2D>(width, height, data, true);
         stbi_image_free(data);
     }
     GlobalLogger::Log(SeverityLevel::Info, "Loaded Images");
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 
     for (size_t f = 0; f < 6; f++)
     {
-        IrradianceCubemap[f] = std::make_shared<RawTexture2D>(CUBEMAP_SIZE, CUBEMAP_SIZE);
+        IrradianceCubemap[f] = std::make_shared<RawTexture2D>(CUBEMAP_SIZE, CUBEMAP_SIZE, true);
 
         // Sample on origin-centered unit cube
         float unit = 1.f / CUBEMAP_SIZE;
@@ -68,11 +68,11 @@ int main(int argc, char** argv)
             for (size_t j = 0; j < CUBEMAP_SIZE; j++)
             {
                 // Sample the center of each pixel
-                Vector2f pos = Vector2f(i + 0.5f, j + 0.5f) * unit;
+                Vector2f pos = Vector2f(j + 0.5f, i + 0.5f) * unit;
                 
                 auto vector = CubeUVToVector(CubeUV{ (int)f, pos });
                 auto color = SampleOneNormal(vector, samples);
-                IrradianceCubemap[f]->SetPixel(Vector2i(i, j), color);
+                IrradianceCubemap[f]->SetPixel(Vector2i(j, i), color);
             }
         }
 

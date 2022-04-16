@@ -56,13 +56,5 @@ namespace crystal
     }
 
 
-    Vector3f sRGBToHDR(const Vector3f& color)
-    {
-        return glm::pow(color, Vector3f(2.2f));
-    }
 
-    Vector3f HDRTosRGB(const Vector3f& hdr)
-    {
-        return glm::pow(hdr, Vector3f(1 / 2.2f));
-    }
 }

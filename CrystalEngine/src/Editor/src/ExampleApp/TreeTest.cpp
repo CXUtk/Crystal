@@ -9,6 +9,7 @@
 #include <Core/Utils/Misc.h>
 
 #include "Resource/Asset/AssetManager.h"
+#include <random>
 
 namespace crystal
 {
@@ -167,26 +168,47 @@ namespace crystal
         LastForLevel[level] = node;
     }
 
+    TreeNode* GenerateFromText(const char* text)
+    {
+        TreeNode* node = new TreeNode();
+        std::vector<TreeNode*> stack;
+        stack.push_back(node);
+
+        int i = 0;
+        while (text[i])
+        {
+            if (text[i] == '[')
+            {
+                stack.push_back(new TreeNode());
+            }
+            else if (text[i] == ']')
+            {
+                auto snode = stack.back();
+                stack.pop_back();
+                stack.back()->Children.push_back(snode);
+            }
+            i++;
+        }
+
+        return node;
+    }
+
     void TreeTest::InitTree()
     {
-        Root = new TreeNode();
-        Root->Children.push_back(new TreeNode());
 
-        auto center = new TreeNode();
-        center->Children.push_back(new TreeNode());
-        center->Children.push_back(new TreeNode());
-        Root->Children.push_back(center);
+       /* Root = new TreeNode();
+        std::vector<TreeNode*> nodes;
+        nodes.push_back(Root);
+        std::mt19937 mt;
+        for (int i = 0; i < 64; i++)
+        {
+            int id = mt() % nodes.size();
+            auto node = new TreeNode();
+            nodes[id]->Children.push_back(node);
+            nodes.push_back(node);
+        }*/
 
-        Root->Children.push_back(new TreeNode());
-
-        auto right = new TreeNode();
-        for(int i = 0; i < 9; i++)
-        right->Children.push_back(new TreeNode());
-        Root->Children.push_back(right);
-
-        auto test = new TreeNode();
-        test->Children.push_back(new TreeNode());
-        Root->Children.push_back(test);
+        Root = GenerateFromText("X[X[]X[X[X[]X[X[]X[X[]]]X[]X[X[X[]X[X[X[]X[X[]X[]X[]]X[]]X[]]]X[X[]X[]]X[]]]X[X[X[]]]X[]X[]]]");
 
         Dfs1(Root, 0);
         printf("F\n");

@@ -19,6 +19,23 @@ CXX_EXTENSIONS OFF)
 target_link_libraries("IrradianceMapGenerator" PRIVATE "CrystalEngine_Runtime")
 
 
+add_executable ("PrefilterGenerator" "PrefilterGenerator.cpp")
+
+set_target_properties("PrefilterGenerator"
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Tools/PBR"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Tools/PBR")
+
+set_target_properties("PrefilterGenerator" PROPERTIES
+CXX_STANDARD 17
+CXX_STANDARD_REQUIRED ON
+CXX_EXTENSIONS OFF)
+
+target_link_libraries("PrefilterGenerator" PRIVATE "CrystalEngine_Runtime")
+
+
 add_executable ("LUTGenerator" "LUTGenerator.cpp")
 
 set_target_properties("LUTGenerator"

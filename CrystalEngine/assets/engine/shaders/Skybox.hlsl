@@ -31,5 +31,5 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_Target
 {
-	return skyboxTexture.SampleLevel(samplerState, pIn.texCoords, 12);
+	return skyboxTexture.SampleLevel(samplerState, pIn.texCoords, 0);
 }

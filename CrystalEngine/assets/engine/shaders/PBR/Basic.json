@@ -36,6 +36,10 @@
             "type": "float"
         },
         {
+            "name": "uSpecular",
+            "type": "vec3"
+        },
+        {
             "name": "uMetallic",
             "type": "float"
         }

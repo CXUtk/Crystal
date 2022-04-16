@@ -1,7 +1,7 @@
 {
 
-    "WindowWidth": 1350,
-    "WindowHeight": 768,
+    "WindowWidth": 1920,
+    "WindowHeight": 1440,
     "WindowResizable": false,
     "FPSLimit": 60,
     "WindowTitle": "Title",

@@ -13,7 +13,9 @@
     "textures": [
         "White",
         "Cubemaps/Sky2/Skybox",
-        "Cubemaps/Sky2/Skybox_Irradiance"
+        "Cubemaps/Sky2/Skybox_Irradiance",
+        "Cubemaps/Sky2/Skybox_Prefilter",
+        "Cubemaps/Sky2/LUT"
     ],
     "fonts": [
         "arial.ttf",

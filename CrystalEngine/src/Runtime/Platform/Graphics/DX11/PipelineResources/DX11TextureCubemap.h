@@ -15,8 +15,12 @@ namespace crystal
 		~DX11TextureCubemap() override;
 
 		virtual void GetShaderResourceHandle(void* pHandle) const override;
+        virtual void ReplaceMipmap(std::shared_ptr<ITextureCubemap> mipCubemap, int mipLevel) override;
 	private:
 		DX11GraphicsDevice*					m_pGraphicsDevice = nullptr;
 		ComPtr<ID3D11ShaderResourceView>	m_pSRV = nullptr;
+        ComPtr<ID3D11Texture2D>             m_pCubemapTexture = nullptr;
+
+        size_t                              m_mipMapLevels = 0;
 	};
 }

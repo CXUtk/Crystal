@@ -53,7 +53,16 @@ namespace crystal
                     throw std::logic_error(string_format("Asset Name Conflict: Cubemap %s already exist", name.c_str()));
                 }
                 m_textureCubeMap[name] = TextureLoader::LoadCubemap(textureMetaInfo, path.parent_path());
-            }   
+            }
+            else if (type == "Cubemap_mips")
+            {
+                if (m_textureCubeMap.find(name) != m_textureCubeMap.end())
+                {
+                    throw std::logic_error(string_format("Asset Name Conflict: Cubemap %s already exist", name.c_str()));
+                }
+                auto mipLevels = textureMetaInfo["mipmapLevels"].Get<int>();
+                m_textureCubeMap[name] = TextureLoader::LoadCubemapWithMips(textureMetaInfo, path.parent_path(), mipLevels);
+            }
         }
     }
 
