@@ -9,14 +9,14 @@ namespace crystal
     struct TreeNode
     {
         float Left, Right;
-        float Mod;
+        float LazyTag;
 
         std::vector<TreeNode*> Children{};
 
         TreeNode()
         {
             Left = Right = 0;
-            Mod = 0;
+            LazyTag = 0;
         }
 
         float Center() const { return (Left + Right) / 2.f; }
@@ -49,8 +49,8 @@ namespace crystal
 
         void InitTree();
         void DFSDraw(TreeNode* node, int level, SpriteBatch* spriteBatch, GeometryRenderer* gRender);
-        void PushDown(TreeNode* node, float Mod, int level);
-        void PushDownRightOnly(TreeNode* node, float Mod, int level);
+        void PushDown(TreeNode* node);
         void Dfs1(TreeNode* node, int level);
+        void ClearTree(TreeNode* node);
 	};
 }

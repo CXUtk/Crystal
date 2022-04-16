@@ -13,7 +13,7 @@
 
 namespace crystal
 {
-    void ClearTree(TreeNode* node)
+    void TreeTest::ClearTree(TreeNode* node)
     {
         for (auto child : node->Children)
         {
@@ -27,6 +27,8 @@ namespace crystal
     static constexpr int NodeSize = 16;
     static constexpr int NodeMinPadding = 8;
     static constexpr int InitPadding = 32;
+    static TreeNode* Root = nullptr;
+    static TreeNode* LastForLevel[100]{};
 
     void TreeTest::DFSDraw(TreeNode* node, int level, SpriteBatch* spriteBatch, GeometryRenderer* gRender)
     {
@@ -49,32 +51,17 @@ namespace crystal
         }
     }
 
-    void TreeTest::PushDown(TreeNode* node, float Mod, int level)
+    void TreeTest::PushDown(TreeNode* node)
     {
-        float mod = Mod + node->Mod;
         for (auto child : node->Children)
         {
-            PushDown(child, mod, level + 1);
+            child->LazyTag += node->LazyTag;
+            PushDown(child);
         }
-        node->Left += mod;
-        node->Right += mod;
-        node->Mod = 0;
+        node->Left += node->LazyTag;
+        node->Right += node->LazyTag;
+        node->LazyTag = 0;
     }
-
-    void TreeTest::PushDownRightOnly(TreeNode* node, float Mod, int level)
-    {
-        float mod = Mod + node->Mod;
-        if (!node->Children.empty())
-        {
-            PushDown(node->Children.back(), mod, level + 1);
-        }
-        node->Left += mod;
-        node->Right += mod;
-        node->Mod = 0;
-    }
-
-    static TreeNode* Root = nullptr;
-    static TreeNode* LastForLevel[100]{};
 
 	TreeTest::TreeTest()
 	{}
@@ -122,7 +109,9 @@ namespace crystal
 
         spriteBatch->Begin(SpriteSortMode::Deferred, m_PSO);
         gRender->Begin();
-        DFSDraw(Root, 0, spriteBatch, gRender);
+        {
+            DFSDraw(Root, 0, spriteBatch, gRender);
+        }
         gRender->End();
 		spriteBatch->End();
 	}
@@ -155,16 +144,16 @@ namespace crystal
         {
             node->Left = nextPos;
             node->Right = node->Left + NodeSize;
-            LastForLevel[level] = node;
-            return;
         }
-
-        float estimatedLeft = (minLeft + maxRight) * 0.5f - NodeSize / 2;
-        float pos = std::max(estimatedLeft, nextPos);
-        node->Mod = pos - estimatedLeft;
-        node->Left = estimatedLeft;
-        node->Right = node->Left + NodeSize;
-        PushDown(node, 0, level);
+        else
+        {
+            float estimatedLeft = (minLeft + maxRight) * 0.5f - NodeSize / 2.f;
+            float pos = std::max(estimatedLeft, nextPos);
+            node->LazyTag = pos - estimatedLeft;
+            node->Left = estimatedLeft;
+            node->Right = node->Left + NodeSize;
+            PushDown(node);
+        }
         LastForLevel[level] = node;
     }
 
@@ -195,7 +184,7 @@ namespace crystal
 
     void TreeTest::InitTree()
     {
-
+        // 随机生成树节点的流程
        /* Root = new TreeNode();
         std::vector<TreeNode*> nodes;
         nodes.push_back(Root);
@@ -208,10 +197,10 @@ namespace crystal
             nodes.push_back(node);
         }*/
 
-        Root = GenerateFromText("X[X[]X[X[X[]X[X[]X[X[]]]X[]X[X[X[]X[X[X[]X[X[]X[]X[]]X[]]X[]]]X[X[]X[]]X[]]]X[X[X[]]]X[]X[]]]");
+        // 通过括号序列生成树节点
+        Root = GenerateFromText("[[][[[][[][[]]][][[[][[[][[][][]][]][]]][[][]][]]][[[]]][][]]]");
 
         Dfs1(Root, 0);
-        printf("F\n");
     }
 
 }
