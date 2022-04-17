@@ -163,8 +163,8 @@ namespace crystal
 	{
 		std::array<D3D11_CULL_MODE, N> M{};
 		M[(int)CullingMode::None] = D3D11_CULL_MODE::D3D11_CULL_NONE;
-		M[(int)CullingMode::CullCCW] = D3D11_CULL_MODE::D3D11_CULL_BACK;
-		M[(int)CullingMode::CullCW] = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+		M[(int)CullingMode::CullCCW] = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+		M[(int)CullingMode::CullCW] = D3D11_CULL_MODE::D3D11_CULL_BACK;
 		return M;
 	}
 	constexpr auto CullModeMapping = GenerateCullModeMapping<(size_t)CullingMode::__COUNT>();

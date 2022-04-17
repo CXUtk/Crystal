@@ -65,7 +65,7 @@ namespace crystal
         VNum = meshData.size();
 
         m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("PBR/Basic");
-        m_texture2D = assetManager->LoadAsset<ITexture2D>("engine:White");
+        m_texture2D = assetManager->LoadAsset<ITexture2D>("ui:Test/Dots");
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PRO->SetVertexBuffer(vertexBuffer);
@@ -82,7 +82,7 @@ namespace crystal
 
 		m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
 		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
-		m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
+		m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullCCW));
 		//indexBuffer->Bind(0);
 	}
 
@@ -166,19 +166,18 @@ namespace crystal
         m_pShader->SetUniformVec3f("uCameraPos", m_pCamera->GetEyePos());
         m_pShader->SetUniformVec3f("uLightPos", Vector3f(5.f, 5.f, 50.f));
         m_pShader->SetUniformVec3f("uLightIntensity", Vector3f(1.f));
-        m_pShader->SetUniformVec3f("uAlbedo", Vector3f(1.f, 0.f, 0.f));
-        m_pShader->SetUniformVec3f("uSpecular", Vector3f(1.f));
 
         auto identity = glm::identity<Matrix4f>();
         graphicsContext->LoadPipelineState(m_PSO);
 
-        for (int i = 0; i < 10; i++)
+
+        for (int i = 0; i < 6; i++)
         {
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 6; j++)
             {
-                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 5, j - 5, 0) * 3.f));
-                m_pShader->SetUniform1f("uRoughness", i * 0.1 + 0.05);
-                m_pShader->SetUniform1f("uMetallic", j * 0.1 + 0.05);
+                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 3, j - 3, 0) * 3.f));
+                m_pShader->SetUniform1f("uRoughness", i * 0.167 + 0.05);
+                m_pShader->SetUniform1f("uMetallic", j * 0.167 + 0.05);
 
                 graphicsContext->LoadPipelineResources(m_PRO);
                 {

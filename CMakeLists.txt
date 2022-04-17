@@ -19,5 +19,4 @@ set(BINARY_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/")
 
 message(${CMAKE_INSTALL_PREFIX})
 
-add_subdirectory ("CrystalTracer")
 add_subdirectory ("CrystalEngine")

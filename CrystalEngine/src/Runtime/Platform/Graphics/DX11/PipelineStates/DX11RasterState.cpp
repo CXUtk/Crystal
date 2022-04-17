@@ -13,7 +13,7 @@ namespace crystal
 	{
         m_RSDesc.FillMode = DX11Common::FillModeConvert(rasterDesc.FillMode);
         m_RSDesc.CullMode = DX11Common::CullModeConvert(rasterDesc.CullMode);
-        m_RSDesc.FrontCounterClockwise = false;
+        m_RSDesc.FrontCounterClockwise = true;
         m_RSDesc.DepthBias = 0;
         m_RSDesc.DepthBiasClamp = 0.0f;
         m_RSDesc.SlopeScaledDepthBias = 0.0f;

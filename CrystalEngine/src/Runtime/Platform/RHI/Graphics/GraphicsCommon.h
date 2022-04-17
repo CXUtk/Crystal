@@ -258,6 +258,8 @@ namespace crystal
 	enum class RasterStates
 	{
 		CullNone,
+        CullCW,
+        CullCCW,
 
 		__COUNT
 	};

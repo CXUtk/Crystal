@@ -7,6 +7,6 @@ namespace crystal
 	class IFileSystem
 	{
 	public:
-		virtual ~IFileSystem() = 0 {};
+		virtual ~IFileSystem() = 0;
 	};
 }

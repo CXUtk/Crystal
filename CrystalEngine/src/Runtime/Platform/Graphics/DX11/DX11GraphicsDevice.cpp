@@ -49,6 +49,8 @@ namespace crystal
         DepthStencilStateDescription	    DefaultDepthTest{};
         
         RasterStateDescription		        Raster_CullNone{};
+        RasterStateDescription		        Raster_CullCCW{};
+        RasterStateDescription		        Raster_CullCW{};
 
     private:
         DX11GraphicsDevice*		m_pGraphicsDevice;
@@ -321,6 +323,14 @@ namespace crystal
         {
             return CreateRasterState(m_commonStates->Raster_CullNone);
         }
+        case crystal::RasterStates::CullCW:
+        {
+            return CreateRasterState(m_commonStates->Raster_CullCW);
+        }
+        case crystal::RasterStates::CullCCW:
+        {
+            return CreateRasterState(m_commonStates->Raster_CullCCW);
+        }
         default:
             break;
         }
@@ -409,5 +419,11 @@ namespace crystal
         rasterDesc.EnableScissorTest = false;
         rasterDesc.EnableAntialiasedLine = false;
         Raster_CullNone = rasterDesc;
+
+        rasterDesc.CullMode = CullingMode::CullCW;
+        Raster_CullCW = rasterDesc;
+
+        rasterDesc.CullMode = CullingMode::CullCCW;
+        Raster_CullCCW = rasterDesc;
     }
 }

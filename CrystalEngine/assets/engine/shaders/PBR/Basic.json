@@ -28,16 +28,8 @@
             "type": "vec3"
         },
         {
-            "name": "uAlbedo",
-            "type": "vec3"
-        },
-        {
             "name": "uRoughness",
             "type": "float"
-        },
-        {
-            "name": "uSpecular",
-            "type": "vec3"
         },
         {
             "name": "uMetallic",
