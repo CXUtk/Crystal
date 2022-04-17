@@ -1,6 +1,7 @@
 #pragma once
 #include <Crystal.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace crystal
 {
@@ -18,4 +19,10 @@ namespace crystal
     using Vector3f = glm::vec3;
     using Vector4f = glm::vec4;
     using Normal3f = glm::vec3;
+
+    using Matrix2f = glm::mat2;
+    using Matrix3f = glm::mat3;
+    using Matrix4f = glm::mat4;
+
+    using Quaternion = glm::quat;
 }

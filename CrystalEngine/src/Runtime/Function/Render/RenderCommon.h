@@ -1,6 +1,6 @@
 #pragma once
 #include "Platform/RHI/Interfaces.h"
-#include <Core/Utils/Geometry.h>
+#include <Core/Math/Geometry.h>
 
 namespace crystal
 {

@@ -1,7 +1,7 @@
 #pragma once
 #include <Application.h>
 #include "Engine.h"
-#include <Core/Utils/Math.h>
+#include <Core/Math/Math.h>
 #include "Platform/RHI/Interfaces.h"
 
 namespace crystal

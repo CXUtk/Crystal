@@ -2,7 +2,7 @@
 #include <array>
 #include <map>
 #include "Platform/RHI/Graphics/GraphicsCommon.h"
-#include <Core/Utils/Geometry.h>
+#include <Core/Math/Geometry.h>
 
 namespace crystal
 {

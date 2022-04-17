@@ -4,26 +4,24 @@
 #include <sstream>
 #include <fstream>
 
-#include "Geometry.h"
-
 namespace crystal
 {
-	struct ImageInfo
-	{
-		Vector2i	Size;
-		int			Channels;
+	//struct ImageInfo
+	//{
+	//	Vector2i	Size;
+	//	int			Channels;
 
-		std::shared_ptr<Byte[]>		Data;
-	};
+	//	std::shared_ptr<Byte[]>		Data;
+	//};
 
-	struct LoadDescription
-	{
-		bool	FlipVertical;
-	};
+	//struct LoadDescription
+	//{
+	//	bool	FlipVertical;
+	//};
 
-	class IOUtils
-	{
-	public:
-		static bool ReadImage(const char* filename, const LoadDescription& loadDesc, ImageInfo* outputImg);
-	};
+	//class IOUtils
+	//{
+	//public:
+	//	static bool ReadImage(const char* filename, const LoadDescription& loadDesc, ImageInfo* outputImg);
+	//};
 }

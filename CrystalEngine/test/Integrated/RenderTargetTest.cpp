@@ -1,8 +1,8 @@
-﻿#include "RenderTargetTest.h"
+#include "RenderTargetTest.h"
 #include <Engine.h>
 #include "Platform/RHI/Interfaces.h"
 #include <Core/Utils/Logger.h>
-#include <Core/Utils/Geometry.h>
+#include <Core/Math/Geometry.h>
 #include "Function/Input/InputController.h"
 #include <Core/Utils/GameTimer.h>
 

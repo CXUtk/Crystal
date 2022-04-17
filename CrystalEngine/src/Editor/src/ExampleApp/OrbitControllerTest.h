@@ -2,6 +2,7 @@
 #include <Application.h>
 #include "Engine.h"
 #include "Camera.h"
+#include <Function/Framework/Framework.h>
 
 namespace crystal
 {
@@ -23,6 +24,9 @@ namespace crystal
 
 	private:
 		bool m_renderPause = false;
+
+        std::shared_ptr<GameObject>                 m_gameObject = nullptr;
+
 		std::shared_ptr<IShaderProgram>				m_pShader = nullptr;
 		std::shared_ptr<Camera>						m_pCamera = nullptr;
 		std::shared_ptr<IPipelineStateObject>		m_PSO = nullptr;

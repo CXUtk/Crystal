@@ -88,7 +88,6 @@ float3 F(float3 F0, float3 H, float3 V)
 float3 F2(float3 F0, float3 H, float3 V)
 {
 	float HdotV = max(0.0, dot(H, V));
-	
 	float3 roughness = uRoughness;
 	return F0 + (max(1.0 - roughness, F0) - F0) * pow(1.0 - HdotV, 5.0);
 }

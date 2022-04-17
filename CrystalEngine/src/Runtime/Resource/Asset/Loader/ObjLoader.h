@@ -11,7 +11,7 @@
 
 #include <Platform/RHI/FileSystem/FSCommon.h>
 #include <Resource/Asset/Content/Mesh.h>
-#include <Core/Utils/Math.h>
+#include <Core/Math/Math.h>
 
 namespace crystal
 {

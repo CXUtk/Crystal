@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <glm/gtc/type_ptr.hpp>
-#include <Core/Utils/Geometry.h>
+#include <Core/Math/Geometry.h>
 #include <SRefl/SRefl.hpp>
 
 namespace crystal
@@ -37,9 +37,6 @@ namespace crystal
 	using Spectrum = glm::vec3;
 	using Color3f = glm::vec3;
 	using Color4f = glm::vec4;
-	using Matrix2f = glm::mat2;
-	using Matrix3f = glm::mat3;
-	using Matrix4f = glm::mat4;
 	using Viewport = Bound3f;
 
 	template<typename T>

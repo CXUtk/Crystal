@@ -3,7 +3,7 @@
 
 #include <bitset>
 #include <Crystal.h>
-#include <Core/Utils/Geometry.h>
+#include <Core/Math/Geometry.h>
 #include <vector>
 
 

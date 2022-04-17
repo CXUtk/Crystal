@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Utils/Math.h>
+#include <Core/Math/Math.h>
 #include <glm/gtx/transform.hpp>
 #include <random>
 

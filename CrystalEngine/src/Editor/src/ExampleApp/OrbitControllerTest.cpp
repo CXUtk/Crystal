@@ -2,7 +2,7 @@
 #include <Engine.h>
 
 #include <Core/Utils/Logger.h>
-#include <Core/Utils/Geometry.h>
+#include <Core/Math/Geometry.h>
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/GameTimer.h>
 
@@ -10,6 +10,8 @@
 #include "Resource/Asset/Content/Mesh.h"
 #include "Function/Input/InputController.h"
 #include "Platform/RHI/Interfaces.h"
+
+#include <Function/Framework/Components/Transform/TransformComponent.h>
 
 
 namespace crystal
