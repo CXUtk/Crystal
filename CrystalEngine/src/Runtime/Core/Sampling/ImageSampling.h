@@ -33,6 +33,13 @@ namespace crystal
             Data = new Vector3f[Width * Height];
         }
 
+        RawTexture2D(int width, int height, float* data)
+            : Width(width), Height(height)
+        {
+            Data = new Vector3f[Width * Height];
+            memcpy(Data, data, Width * Height * sizeof(Vector3f));
+        }
+
         RawTexture2D(int width, int height, stbi_uc* data, bool isHDR = false)
             : Width(width), Height(height), IsHDR(isHDR)
         {
@@ -96,6 +103,21 @@ namespace crystal
                 data.push_back((unsigned char)floor(v.r * 255));
                 data.push_back((unsigned char)floor(v.g * 255));
                 data.push_back((unsigned char)floor(v.b * 255));
+            }
+            return data;
+        }
+
+        std::vector<float> GetFloatData() const
+        {
+            std::vector<float> data;
+            data.resize(Width * Height * 3);
+
+            for (int i = 0; i < Width * Height; i++)
+            {
+                auto& v = Data[i];
+                data[i * 3] = v.r;
+                data[i * 3 + 1] = v.g;
+                data[i * 3 + 2] = v.b;
             }
             return data;
         }

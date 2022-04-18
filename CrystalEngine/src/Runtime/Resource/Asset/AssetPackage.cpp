@@ -5,6 +5,7 @@
 #include "Loader/ShaderLoader.h"
 #include "Loader/TextureLoader.h"
 #include "Loader/ObjLoader.h"
+#include "AssetMeta/AssetMetaInfo.h"
 
 namespace crystal
 {
@@ -20,7 +21,7 @@ namespace crystal
         for (auto& name : entries)
         {
             auto path = parentPath / (name + ".json");
-            auto shaderMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
+            const auto shaderMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
             if (m_shadersMap.find(name) != m_shadersMap.end())
             {
                 throw std::logic_error(string_format("Asset Name Conflict: Shader %s already exist", name.c_str()));
@@ -35,8 +36,13 @@ namespace crystal
         {
             auto path = parentPath / (name + ".json");
 
-            auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
+            const auto textureMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
             auto type = textureMetaInfo["type"].Get<std::string>();
+
+            if (textureMetaInfo.Contains("version"))
+            {
+                // Version back-compatibility
+            }
 
             if (type == "Texture2D")
             {
@@ -44,7 +50,8 @@ namespace crystal
                 {
                     throw std::logic_error(string_format("Asset Name Conflict: Texture2D %s already exist", name.c_str()));
                 }
-                m_texture2DMap[name] = TextureLoader::LoadTexture2D(textureMetaInfo, path.parent_path());
+                auto meta = SJson::de_serialize<Texture2DMetaInfo>(textureMetaInfo["info"]);
+                m_texture2DMap[name] = TextureLoader::LoadTexture2D(meta, path.parent_path());
             }
             else if (type == "Cubemap")
             {
@@ -52,7 +59,8 @@ namespace crystal
                 {
                     throw std::logic_error(string_format("Asset Name Conflict: Cubemap %s already exist", name.c_str()));
                 }
-                m_textureCubeMap[name] = TextureLoader::LoadCubemap(textureMetaInfo, path.parent_path());
+                auto meta = SJson::de_serialize<TextureCubemapMetaInfo>(textureMetaInfo["info"]);
+                m_textureCubeMap[name] = TextureLoader::LoadCubemap(meta, path.parent_path());
             }
             else if (type == "Cubemap_mips")
             {
@@ -60,8 +68,8 @@ namespace crystal
                 {
                     throw std::logic_error(string_format("Asset Name Conflict: Cubemap %s already exist", name.c_str()));
                 }
-                auto mipLevels = textureMetaInfo["mipmapLevels"].Get<int>();
-                m_textureCubeMap[name] = TextureLoader::LoadCubemapWithMips(textureMetaInfo, path.parent_path(), mipLevels);
+                auto meta = SJson::de_serialize<TextureCubemapMetaWithMipsInfo>(textureMetaInfo["info"]);
+                m_textureCubeMap[name] = TextureLoader::LoadCubemapWithMips(meta, path.parent_path());
             }
         }
     }
@@ -72,7 +80,7 @@ namespace crystal
         for (auto& name : entries)
         {
             auto path = parentPath / (name + ".json");
-            auto meshMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
+            const auto meshMetaInfo = SJson::JsonConvert::Parse(File::ReadAllText(path));
             if (m_meshesMap.find(name) != m_meshesMap.end())
             {
                 throw std::logic_error(string_format("Asset Name Conflict: Mesh %s already exist", name.c_str()));

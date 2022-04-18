@@ -7,7 +7,7 @@ namespace crystal
 	{
 	public:
 		DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const std::string& path, const Texture2DDescription& texDesc);
-		DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const uint8_t* src, size_t size, const Texture2DDescription& texDesc);
+		DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const void* src, size_t size, const Texture2DDescription& texDesc);
 		~DX11Texture2D() override;
 
 		virtual Vector2i GetSize() const override { return m_size; }

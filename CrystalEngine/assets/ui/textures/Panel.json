@@ -1,5 +1,9 @@
 {
     "type": "Texture2D",
-    "target": "Panel.png",
-    "format": "RGBA8ub"
+
+    "info": {
+        "Target": "Panel.png",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
 }

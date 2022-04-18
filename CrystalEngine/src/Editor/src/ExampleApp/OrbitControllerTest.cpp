@@ -224,8 +224,8 @@ namespace crystal
     {
         auto assetManager = m_engine->GetAssetManager();
         m_pSkyboxShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("Skybox");
-        m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox");
-        m_skyBoxIrradiance = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox_Irradiance");
+        m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky/Skybox");
+        m_skyBoxIrradiance = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky/Skybox_Irradiance");
         m_skyBoxPrefilter = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox_Prefilter");
         m_skyBoxLUT = assetManager->LoadAssetBuiltIn<ITexture2D>("Cubemaps/Sky2/LUT");
 
@@ -258,7 +258,6 @@ namespace crystal
         m_pSkyboxPRO->SetVertexBuffer(vertexBuffer);
         m_pSkyboxPRO->SetShaderProgram(m_pSkyboxShader);
         m_pSkyboxPRO->SetShaderResource(m_skyBox, 0);
-        m_pSkyboxPRO->SetShaderResource(m_skyBoxIrradiance, 1);
         m_pSkyboxPRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 0);
 
         m_pSkyboxPSO = graphicsDevice->CreatePipelineStateObject();

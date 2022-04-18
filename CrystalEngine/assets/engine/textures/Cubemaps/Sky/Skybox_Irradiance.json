@@ -1,0 +1,14 @@
+{
+    "type": "Cubemap",
+
+    "info": {
+        "PosX": "posx_irradiance.hdr",
+        "NegX": "negx_irradiance.hdr",
+        "PosY": "posy_irradiance.hdr",
+        "NegY": "negy_irradiance.hdr",
+        "PosZ": "posz_irradiance.hdr",
+        "NegZ": "negz_irradiance.hdr",
+        "Format": "RGB32f",
+        "MipmapLevels": 1
+    }
+}

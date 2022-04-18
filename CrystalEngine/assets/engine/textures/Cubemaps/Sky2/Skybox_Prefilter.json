@@ -1,11 +1,15 @@
 {
     "type": "Cubemap_mips",
-    "mipmapLevels": 5,
-    "format": "RGBA8ub",
-    "posx": "Prefilter/posx_specular_mipmap.jpg",
-    "negx": "Prefilter/negx_specular_mipmap.jpg",
-    "posy": "Prefilter/posy_specular_mipmap.jpg",
-    "negy": "Prefilter/negy_specular_mipmap.jpg",
-    "posz": "Prefilter/posz_specular_mipmap.jpg",
-    "negz": "Prefilter/negz_specular_mipmap.jpg"
+
+    "info": {
+        "PosXPattern": "Prefilter/posx_specular_mipmap.jpg",
+        "NegXPattern": "Prefilter/negx_specular_mipmap.jpg",
+        "PosYPattern": "Prefilter/posy_specular_mipmap.jpg",
+        "NegYPattern": "Prefilter/negy_specular_mipmap.jpg",
+        "PosZPattern": "Prefilter/posz_specular_mipmap.jpg",
+        "NegZPattern": "Prefilter/negz_specular_mipmap.jpg",
+
+        "Format": "RGBA8ub",
+        "MipmapLevels": 5
+    }
 }

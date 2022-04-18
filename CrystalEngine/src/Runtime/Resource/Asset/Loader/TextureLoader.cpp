@@ -1,72 +1,42 @@
 #include "TextureLoader.h"
 #include <Engine.h>
 #include <Core/Utils/Misc.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stbi/stb_image.h>
+
 
 namespace crystal
 {
-    std::shared_ptr<ITexture2D> TextureLoader::LoadTexture2D(const SJson::JsonNode& metaData, const path_type& curPath)
+    std::shared_ptr<ITexture2D> TextureLoader::LoadTexture2D(const Texture2DMetaInfo& metaData,
+        const path_type& curPath)
     {
-        auto target = metaData["target"].Get<std::string>();
-        auto pathToTarget = curPath / target;
+        auto pathToTarget = curPath / metaData.Target;
 
         Texture2DDescription texDesc = {};
-        texDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
+        texDesc.Format = metaData.Format;
         texDesc.MipmapLevels = 1;
-
-        if (metaData.Contains("mipmapLevels"))
-        {
-            texDesc.MipmapLevels = metaData["mipmapLevels"].Get<int>();
-        }
+        texDesc.MipmapLevels = metaData.MipmapLevels;
         texDesc.Usage = BufferUsage::Immutable;
 
         return LoadTexture2DFromFile(pathToTarget, texDesc);
     }
 
-    std::shared_ptr<ITextureCubemap> TextureLoader::LoadCubemap(const SJson::JsonNode& metaData, const path_type& curPath)
+    std::shared_ptr<ITextureCubemap> TextureLoader::LoadCubemap(const TextureCubemapMetaInfo& metaData, const path_type& curPath)
     {
         Texture2DDescription texDesc = {};
-        texDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
-        texDesc.MipmapLevels = 1;
-        if (metaData.Contains("mipmapLevels"))
-        {
-            texDesc.MipmapLevels = metaData["mipmapLevels"].Get<int>();
-        }
+        texDesc.Format = metaData.Format;
+        texDesc.MipmapLevels = metaData.MipmapLevels;
         texDesc.Usage = BufferUsage::Default;
 
         std::vector<path_type> paths;
-        paths.push_back(curPath / metaData["posx"].Get<std::string>());
-        paths.push_back(curPath / metaData["negx"].Get<std::string>());
-        paths.push_back(curPath / metaData["posy"].Get<std::string>());
-        paths.push_back(curPath / metaData["negy"].Get<std::string>());
-        paths.push_back(curPath / metaData["posz"].Get<std::string>());
-        paths.push_back(curPath / metaData["negz"].Get<std::string>());
+        paths.push_back(curPath / metaData.PosX);
+        paths.push_back(curPath / metaData.NegX);
+        paths.push_back(curPath / metaData.PosY);
+        paths.push_back(curPath / metaData.NegY);
+        paths.push_back(curPath / metaData.PosZ);
+        paths.push_back(curPath / metaData.NegZ);
 
         return LoadCubemapFromFile(paths, texDesc);
-        //CubemapTexture6 cubemapTexs;
-
-        //auto target = metaData["posx"].Get<std::string>();
-        //cubemapTexs.posX = LoadTexture2DFromFile(curPath / target, texDesc);
-
-        //texDesc.Size = cubemapTexs.posX->GetSize();
-
-        //target = metaData["negx"].Get<std::string>();
-        //cubemapTexs.negX = LoadTexture2DFromFile(curPath / target, texDesc);
-
-        //target = metaData["posy"].Get<std::string>();
-        //cubemapTexs.posY = LoadTexture2DFromFile(curPath / target, texDesc);
-
-        //target = metaData["negy"].Get<std::string>();
-        //cubemapTexs.negY = LoadTexture2DFromFile(curPath / target, texDesc);
-
-        //target = metaData["posz"].Get<std::string>();
-        //cubemapTexs.posZ = LoadTexture2DFromFile(curPath / target, texDesc);
-
-        //target = metaData["negz"].Get<std::string>();
-        //cubemapTexs.negZ = LoadTexture2DFromFile(curPath / target, texDesc);
-
-        //auto engine = Engine::GetInstance();
-        //auto graphicsDevice = engine->GetGraphicsDevice();
-        //return graphicsDevice->CreateCubemapFromTexture6(cubemapTexs, texDesc);
     }
 
 
@@ -90,23 +60,23 @@ namespace crystal
         return result;
     }
 
-    std::shared_ptr<ITextureCubemap> TextureLoader::LoadCubemapWithMips(const SJson::JsonNode& metaData, const path_type& curPath, int mipLevels)
+    std::shared_ptr<ITextureCubemap> TextureLoader::LoadCubemapWithMips(const TextureCubemapMetaWithMipsInfo& metaData, const path_type& curPath)
     {
         Texture2DDescription mainTexDesc = {};
-        mainTexDesc.Format = SRefl::EnumInfo<RenderFormat>::string_to_enum(metaData["format"].Get<std::string>());
-        mainTexDesc.MipmapLevels = metaData["mipmapLevels"].Get<int>();
+        mainTexDesc.Format = metaData.Format;
+        mainTexDesc.MipmapLevels = metaData.MipmapLevels;
 
         // temp assert
         assert(mainTexDesc.MipmapLevels > 1);
         mainTexDesc.Usage = BufferUsage::Default;
 
         std::vector<path_type> paths;
-        paths.push_back(curPath / metaData["posx"].Get<std::string>());
-        paths.push_back(curPath / metaData["negx"].Get<std::string>());
-        paths.push_back(curPath / metaData["posy"].Get<std::string>());
-        paths.push_back(curPath / metaData["negy"].Get<std::string>());
-        paths.push_back(curPath / metaData["posz"].Get<std::string>());
-        paths.push_back(curPath / metaData["negz"].Get<std::string>());
+        paths.push_back(curPath / metaData.PosXPattern);
+        paths.push_back(curPath / metaData.NegXPattern);
+        paths.push_back(curPath / metaData.PosYPattern);
+        paths.push_back(curPath / metaData.NegYPattern);
+        paths.push_back(curPath / metaData.PosZPattern);
+        paths.push_back(curPath / metaData.NegZPattern);
 
 
         auto mainCubeMap = LoadCubemapFromFile(ConvertToSuffixPathList(paths, 0), mainTexDesc);
@@ -125,10 +95,29 @@ namespace crystal
 
 
     std::shared_ptr<ITexture2D> TextureLoader::LoadTexture2DFromFile(const path_type& path,
-        const Texture2DDescription& desc)
+        Texture2DDescription& desc)
     {
         auto engine = Engine::GetInstance();
         auto graphicsDevice = engine->GetGraphicsDevice();
+        if (!File::Exists(path))
+        {
+            throw std::runtime_error(string_format("Cannot find given file: %s", path.string()));
+        }
+
+        // If is HDR image
+        if (desc.Format >= RenderFormat::R32f && desc.Format <= RenderFormat::RGBA32f)
+        {
+            int width, height, channels;
+            auto data = stbi_loadf(path.string().c_str(), &width, &height, &channels, 0);
+            if (!data)
+            {
+                throw std::runtime_error(string_format("Failed to load file: %s", path.string()));
+            }
+
+            size_t size = (size_t)width * height * channels * sizeof(float);
+            desc.Size = Vector2i(width, height);
+            return graphicsDevice->CreateTexture2DFromMemory(data, size, desc);
+        }
         return graphicsDevice->CreateTexture2DFromFile(path.string(), desc);
     }
 

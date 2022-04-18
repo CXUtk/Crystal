@@ -6,17 +6,8 @@
 using namespace crystal;
 int main(int argc, char** argv)
 {
-    try
-    {
-        Engine* engine = Engine::GetInstance();
-        auto uptr = std::make_unique<OrbitControllerTest>();
-        engine->Start(std::move(uptr));
-    }
-    catch (std::exception& e)
-    {
-        printf("%s\n", e.what());
-        int x;
-        scanf("%d", &x);
-    }
+    Engine* engine = Engine::GetInstance();
+    auto uptr = std::make_unique<OrbitControllerTest>();
+    engine->Start(std::move(uptr));
     return 0;
 }

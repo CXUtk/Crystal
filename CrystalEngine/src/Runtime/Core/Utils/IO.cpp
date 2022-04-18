@@ -1,7 +1,5 @@
 #include "IO.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stbi/stb_image.h>
 #include <Core/Utils/Misc.h>
 
 namespace crystal

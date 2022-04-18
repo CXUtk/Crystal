@@ -1,5 +1,8 @@
 {
     "type": "Texture2D",
-    "target": "Box.png",
-    "format": "RGBA8ub"
+    "info": {
+        "Target": "Box.png",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
 }

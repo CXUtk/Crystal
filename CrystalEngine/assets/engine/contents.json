@@ -15,7 +15,10 @@
         "Cubemaps/Sky2/Skybox",
         "Cubemaps/Sky2/Skybox_Irradiance",
         "Cubemaps/Sky2/Skybox_Prefilter",
-        "Cubemaps/Sky2/LUT"
+        "Cubemaps/Sky2/LUT",
+
+        "Cubemaps/Sky/Skybox",
+        "Cubemaps/Sky/Skybox_Irradiance"
     ],
     "fonts": [
         "arial.ttf",

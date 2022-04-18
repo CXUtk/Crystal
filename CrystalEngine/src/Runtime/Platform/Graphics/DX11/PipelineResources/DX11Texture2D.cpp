@@ -71,7 +71,7 @@ namespace crystal
 		m_size.y = textureDesc.Height;
 	}
 
-	DX11Texture2D::DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
+	DX11Texture2D::DX11Texture2D(DX11GraphicsDevice* graphicsDevice, const void* src, size_t size, const Texture2DDescription& texDesc)
         : m_pGraphicsDevice(graphicsDevice)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc;

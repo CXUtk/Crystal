@@ -1,11 +1,14 @@
 {
     "type": "Cubemap",
-    "format": "RGBA8ub",
-    "posx": "posx.jpg",
-    "negx": "negx.jpg",
-    "posy": "posy.jpg",
-    "negy": "negy.jpg",
-    "posz": "posz.jpg",
-    "negz": "negz.jpg",
-    "mipmapLevels": 11
+
+    "info": {
+        "PosX": "posx.jpg",
+        "NegX": "negx.jpg",
+        "PosY": "posy.jpg",
+        "NegY": "negy.jpg",
+        "PosZ": "posz.jpg",
+        "NegZ": "negz.jpg",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
 }

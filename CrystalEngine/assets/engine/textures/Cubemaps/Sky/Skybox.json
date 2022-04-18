@@ -1,5 +1,13 @@
 {
     "type": "Cubemap",
-    "format": "HDR",
-    "posx": 
+    "info": {
+        "PosX": "posx.hdr",
+        "NegX": "negx.hdr",
+        "PosY": "posy.hdr",
+        "NegY": "negy.hdr",
+        "PosZ": "posz.hdr",
+        "NegZ": "negz.hdr",
+        "Format": "RGB32f",
+        "MipmapLevels": 1
+    }
 }

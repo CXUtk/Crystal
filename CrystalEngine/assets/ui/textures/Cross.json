@@ -1,5 +1,9 @@
 {
     "type": "Texture2D",
-    "target": "Cross.png",
-    "format": "RGBA8ub"
+
+    "info": {
+        "Target": "Cross.png",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
 }

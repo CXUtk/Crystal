@@ -20,6 +20,23 @@ static Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& 
 
 static std::shared_ptr<RawTexture2D> SkyCubemap[6];
 static std::shared_ptr<RawTexture2D> IrradianceCubemap[6];
+static const char* filenames_hdr[6] = {
+    "posx.hdr",
+    "negx.hdr",
+    "posy.hdr",
+    "negy.hdr",
+    "posz.hdr",
+    "negz.hdr",
+};
+
+static const char* filenames_output_hdr[6] = {
+    "posx_irradiance.hdr",
+    "negx_irradiance.hdr",
+    "posy_irradiance.hdr",
+    "negy_irradiance.hdr",
+    "posz_irradiance.hdr",
+    "negz_irradiance.hdr",
+};
 static const char* filenames[6] = {
     "posx.jpg",
     "negx.jpg",
@@ -45,21 +62,22 @@ int main(int argc, char** argv)
     for (int i = 0; i < 6; i++)
     {
         int width, height, channels;
-        stbi_uc* data = stbi_load(filenames[i], &width, &height, &channels, 3);
+        // stbi_uc* data = stbi_load(filenames[i], &width, &height, &channels, 3);
+        float* data = stbi_loadf(filenames_hdr[i], &width, &height, &channels, 0);
         if (!data)
         {
             throw std::logic_error("Cannot find cubemap images");
         }
-        SkyCubemap[i] = std::make_shared<RawTexture2D>(width, height, data, true);
+        SkyCubemap[i] = std::make_shared<RawTexture2D>(width, height, data);
         stbi_image_free(data);
     }
     GlobalLogger::Log(SeverityLevel::Info, "Loaded Images");
 
-    auto samples = GenerateSamples(32);
+    auto samples = GenerateSamples(1024);
 
     for (size_t f = 0; f < 6; f++)
     {
-        IrradianceCubemap[f] = std::make_shared<RawTexture2D>(CUBEMAP_SIZE, CUBEMAP_SIZE, true);
+        IrradianceCubemap[f] = std::make_shared<RawTexture2D>(CUBEMAP_SIZE, CUBEMAP_SIZE, false);
 
         // Sample on origin-centered unit cube
         float unit = 1.f / CUBEMAP_SIZE;
@@ -84,8 +102,9 @@ int main(int argc, char** argv)
     // Save IrradianceCubemap to files
     for (size_t f = 0; f < 6; f++)
     {
-        auto data = IrradianceCubemap[f]->GetByteData();
-        stbi_write_jpg(filenames_output[f], IrradianceCubemap[f]->Width, IrradianceCubemap[f]->Height, 3, data.data(), 100);
+        auto data = IrradianceCubemap[f]->GetFloatData();
+        stbi_write_hdr(filenames_output_hdr[f], CUBEMAP_SIZE, CUBEMAP_SIZE, 3, data.data());
+        // stbi_write_jpg(filenames_output[f], IrradianceCubemap[f]->Width, IrradianceCubemap[f]->Height, 3, data.data(), 100);
     }
 
     GlobalLogger::Log(SeverityLevel::Info, "Finished Writting");
@@ -140,7 +159,7 @@ Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& samples
         Vector3f vector = NextCosineUnitHemiSphere(sample, &pdf);
         auto V = vector.x * T + vector.y * N + vector.z * B;
 
-        sampledValue += SampleSkyCubemap(V) * vector.y / glm::pi<float>() / pdf;
+        sampledValue += glm::clamp(SampleSkyCubemap(V), Vector3f(0.f), Vector3f(1.f)) / glm::pi<float>() * vector.y / pdf;
     }
 
     float invN = 1.f / samples.size();

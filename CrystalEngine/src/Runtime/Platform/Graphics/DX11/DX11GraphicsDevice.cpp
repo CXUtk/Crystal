@@ -132,7 +132,7 @@ namespace crystal
         return std::make_shared<DX11Texture2D>(this, path, texDesc);
     }
 
-    std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromMemory(const uint8_t* src, size_t size, const Texture2DDescription& texDesc)
+    std::shared_ptr<ITexture2D> DX11GraphicsDevice::CreateTexture2DFromMemory(const void* src, size_t size, const Texture2DDescription& texDesc)
     {
         return std::make_shared<DX11Texture2D>(this, src, size, texDesc);
     }

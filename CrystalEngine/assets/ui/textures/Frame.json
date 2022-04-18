@@ -1,5 +1,9 @@
 {
     "type": "Texture2D",
-    "target": "Frame.png",
-    "format": "RGBA8ub"
+
+    "info": {
+        "Target": "Frame.png",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
 }

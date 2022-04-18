@@ -1,5 +1,9 @@
 {
     "type": "Texture2D",
-    "target": "LUT.jpg",
-    "format": "RGBA8ub"
+
+    "info": {
+        "Target": "LUT.jpg",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
 }
