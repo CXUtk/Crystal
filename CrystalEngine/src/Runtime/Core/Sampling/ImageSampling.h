@@ -5,24 +5,20 @@
 #include <string>
 #include <vector>
 #include <stbi/stb_image.h>
+#include <algorithm>
 
 namespace crystal
 {
-    inline Vector3f sRGBToHDR(const Vector3f& color)
-    {
-        return glm::pow(color, Vector3f(2.2f));
-    }
-
-    inline Vector3f HDRTosRGB(const Vector3f& hdr)
-    {
-        return glm::pow(hdr, Vector3f(1 / 2.2f));
-    }
-
     struct CubeUV
     {
         int         Id;
         Vector2f    UV;
     };
+
+    CubeUV XYZToCubeUV(const Vector3f& p);
+    Vector3f CubeUVToVector(const CubeUV& cube);
+    Vector3f sRGBToHDR(const Vector3f& color);
+    Vector3f HDRTosRGB(const Vector3f& hdr);
 
     class RawTexture2D
     {
@@ -31,6 +27,8 @@ namespace crystal
             : Width(width), Height(height), IsHDR(isHDR)
         {
             Data = new Vector3f[Width * Height];
+            memset(Data, 0, Width * Height * sizeof(Vector3f));
+            SetUpSampler();
         }
 
         RawTexture2D(int width, int height, float* data)
@@ -38,6 +36,7 @@ namespace crystal
         {
             Data = new Vector3f[Width * Height];
             memcpy(Data, data, Width * Height * sizeof(Vector3f));
+            SetUpSampler();
         }
 
         RawTexture2D(int width, int height, stbi_uc* data, bool isHDR = false)
@@ -60,17 +59,23 @@ namespace crystal
                     Data[i] = sRGBToHDR(Data[i]);
                 }
             }
+            SetUpSampler();
         }
 
         ~RawTexture2D()
         {
             delete[] Data;
+            Data = nullptr;
+            delete[] WeightForRow;
+            WeightForRow = nullptr;
+            delete[] WeightForCol;
+            WeightForCol = nullptr;
         }
 
         Vector3f Sample(Vector2f coord) const
         {
             size_t row = (size_t)(std::min(1.0 - coord.y, 0.9999) * Height);
-            size_t col = (size_t)(coord.x * Width);
+            size_t col = (size_t)(std::min(coord.x, 0.9999f) * Width);
             return Data[row * Width + col];
         }
 
@@ -86,6 +91,13 @@ namespace crystal
             assert(coord.x >= 0 && coord.x < Width&& coord.y >= 0 && coord.y < Height);
             size_t row = Height - coord.y - 1;
             Data[row * Width + coord.x] = value;
+        }
+
+        void SetPixel(Vector2f coord, Vector3f value)
+        {
+            size_t row = (size_t)(std::min(1.0 - coord.y, 0.9999) * Height);
+            size_t col = (size_t)(std::min(coord.x, 0.9999f) * Width);
+            Data[row * Width + col] = value;
         }
 
         std::vector<stbi_uc> GetByteData() const
@@ -107,17 +119,18 @@ namespace crystal
             return data;
         }
 
-        std::vector<float> GetFloatData() const
+        std::vector<float> GetFloatData(int components = 3) const
         {
             std::vector<float> data;
-            data.resize(Width * Height * 3);
+            data.resize(Width * Height * components);
 
             for (int i = 0; i < Width * Height; i++)
             {
                 auto& v = Data[i];
-                data[i * 3] = v.r;
-                data[i * 3 + 1] = v.g;
-                data[i * 3 + 2] = v.b;
+                for (int j = 0; j < components; j++)
+                {
+                    data[i * components + j] = v[j];
+                }
             }
             return data;
         }
@@ -149,18 +162,61 @@ namespace crystal
                 }
             }
             delete[] Data;
+            delete[] WeightForRow;
+            delete[] WeightForCol;
             Data = newData;
+
             Width = newWidth;
             Height = newHeight;
+            SetUpSampler();
+        }
+
+        void SetUpSampler()
+        {
+            WeightForRow = new float[Height + 1];
+            memset(WeightForRow, 0, sizeof(float) * (Height + 1));
+            WeightForCol = new float[(Width + 1) * Height];
+            memset(WeightForCol, 0, sizeof(float) * ((Width + 1) * Height));
+
+            for (size_t i = 0; i < Height; i++)
+            {
+                for (size_t j = 0; j < Width; j++)
+                {
+                    auto data = Data[i * Width + j];
+                    float w = data.x * 0.3f + data.y * 0.6f + data.z * 0.1f;
+                    TotalWeight += w;
+                    WeightForRow[i + 1] += w;
+                    WeightForCol[i * (Width + 1) + j + 1] = w;
+                }
+                for (size_t j = 1; j <= Width; j++)
+                {
+                    WeightForCol[i * (Width + 1) + j] += WeightForCol[i * (Width + 1) + j - 1];
+                }
+            }
+
+            for (size_t i = 1; i <= Height; i++)
+            {
+                WeightForRow[i] += WeightForRow[i - 1];
+            }
+        }
+
+        Vector2f WeightedSampleUV(const Vector2f& sample)
+        {
+            int row = std::upper_bound(WeightForRow, WeightForRow + Height + 1,
+                sample.x * WeightForRow[Height]) - WeightForRow - 1;
+
+            float* start = WeightForCol + row * (Width + 1);
+            int col = std::upper_bound(start, start + Width + 1,
+                sample.y * start[Width]) - start - 1;
+            return Vector2f((float)col / Width, (float)(Height - row - 1) / Height);
         }
 
         size_t Width = 0, Height = 0;
         bool IsHDR = false;
         Vector3f* Data = nullptr;
-    };
 
-    CubeUV XYZToCubeUV(const Vector3f& p);
-    Vector3f CubeUVToVector(const CubeUV& cube);
-    Vector3f sRGBToHDR(const Vector3f& color);
-    Vector3f HDRTosRGB(const Vector3f& hdr);
+        float TotalWeight{};
+        float* WeightForRow = nullptr;
+        float* WeightForCol = nullptr;
+    };
 }

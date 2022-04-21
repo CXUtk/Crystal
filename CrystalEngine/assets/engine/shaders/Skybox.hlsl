@@ -32,7 +32,7 @@ VertexOut VS(VertexIn vIn)
 float4 PS(VertexOut pIn) : SV_Target
 {
 	float3 color = skyboxTexture.Sample(samplerState, pIn.texCoords).rgb;
-	color = color / (color + 1.0);
-	color = pow(color, 1.0 / 2.2);
+	//color = color / (color + 1.0);
+	//color = pow(color, 1.0 / 2.2);
 	return float4(color, 1.0);
 }

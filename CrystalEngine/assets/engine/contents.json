@@ -7,15 +7,18 @@
 
         "PBR/Mirror",
         "PBR/Microfacet",
+        "PBR/Microfacet_KC",
         "PBR/Irradiance",
         "PBR/Basic"
     ],
     "textures": [
         "White",
+        "LUT",
+        "Eavg",
+        "Emu",
         "Cubemaps/Sky2/Skybox",
         "Cubemaps/Sky2/Skybox_Irradiance",
         "Cubemaps/Sky2/Skybox_Prefilter",
-        "Cubemaps/Sky2/LUT",
 
         "Cubemaps/Sky/Skybox",
         "Cubemaps/Sky/Skybox_Irradiance"

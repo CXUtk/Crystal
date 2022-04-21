@@ -5,8 +5,8 @@
     "WindowResizable": false,
     "FPSLimit": 60,
     "WindowTitle": "Title",
-    "Enable4xMSAA": false,
-    "MSAAQuality": 0,
+    "Enable4xMSAA": true,
+    "MSAAQuality": 1,
 
     "BuiltinPackage": "engine",
     "ExtraPackages": [

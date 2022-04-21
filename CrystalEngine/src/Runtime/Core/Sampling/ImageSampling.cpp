@@ -2,6 +2,16 @@
 
 namespace crystal
 {
+    Vector3f sRGBToHDR(const Vector3f& color)
+    {
+        return glm::pow(color, Vector3f(2.2f));
+    }
+
+    Vector3f HDRTosRGB(const Vector3f& hdr)
+    {
+        return glm::pow(hdr, Vector3f(1 / 2.2f));
+    }
+
     CubeUV crystal::XYZToCubeUV(const Vector3f& p)
     {
         float ax = std::abs(p.x);
@@ -49,8 +59,6 @@ namespace crystal
             float neg = (cube.Id == 4) ? 1.f : -1.f;
             vector = Vector3f(neg * pos.x, pos.y, neg);
         }
-
-        vector = glm::normalize(vector);
         assert(glm::isnan(vector) == glm::bvec3(false));
         return vector;
     }

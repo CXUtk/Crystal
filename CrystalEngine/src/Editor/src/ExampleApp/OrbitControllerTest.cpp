@@ -66,15 +66,15 @@ namespace crystal
 
         VNum = meshData.size();
 
-        m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("PBR/Basic");
-        m_texture2D = assetManager->LoadAsset<ITexture2D>("ui:Test/Dots");
+        m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("PBR/Microfacet_KC");
+        m_texture2D = assetManager->LoadAsset<ITexture2D>("engine:White");
 
 		vertexBuffer->BindVertexLayout(vLayout);
 		m_PRO->SetVertexBuffer(vertexBuffer);
 		m_PRO->SetShaderProgram(m_pShader);
 		m_PRO->SetShaderResource(m_texture2D, 0);
-        m_PRO->SetShaderResource(m_skyBoxIrradiance, 1);
-        m_PRO->SetShaderResource(m_skyBoxPrefilter, 2);
+        m_PRO->SetShaderResource(m_EmuTexture, 1);
+        m_PRO->SetShaderResource(m_EavgTexture, 2);
         m_PRO->SetShaderResource(m_skyBoxLUT, 3);
         
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 0);
@@ -168,18 +168,19 @@ namespace crystal
         m_pShader->SetUniformVec3f("uCameraPos", m_pCamera->GetEyePos());
         m_pShader->SetUniformVec3f("uLightPos", Vector3f(5.f, 5.f, 50.f));
         m_pShader->SetUniformVec3f("uLightIntensity", Vector3f(1.f));
+        m_pShader->SetUniformVec3f("uTint", Vector3f(1.0f, 0.71f, 0.29f));
 
         auto identity = glm::identity<Matrix4f>();
         graphicsContext->LoadPipelineState(m_PSO);
 
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 11; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < 11; j++)
             {
-                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 3, j - 3, 0) * 3.f));
-                m_pShader->SetUniform1f("uRoughness", i * 0.167 + 0.05);
-                m_pShader->SetUniform1f("uMetallic", j * 0.167 + 0.05);
+                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 5, j - 5, 0) * 3.f));
+                m_pShader->SetUniform1f("uRoughness", i * 0.1);
+                m_pShader->SetUniform1f("uMetallic", j * 0.1);
 
                 graphicsContext->LoadPipelineResources(m_PRO);
                 {
@@ -224,10 +225,12 @@ namespace crystal
     {
         auto assetManager = m_engine->GetAssetManager();
         m_pSkyboxShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("Skybox");
-        m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky/Skybox");
-        m_skyBoxIrradiance = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky/Skybox_Irradiance");
+        m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox");
+        m_skyBoxIrradiance = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox_Irradiance");
         m_skyBoxPrefilter = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox_Prefilter");
-        m_skyBoxLUT = assetManager->LoadAssetBuiltIn<ITexture2D>("Cubemaps/Sky2/LUT");
+        m_skyBoxLUT = assetManager->LoadAssetBuiltIn<ITexture2D>("LUT");
+        m_EavgTexture = assetManager->LoadAssetBuiltIn<ITexture2D>("Eavg");
+        m_EmuTexture = assetManager->LoadAssetBuiltIn<ITexture2D>("Emu");
 
         std::vector<ElementDescription> elements = {
             { SemanticType::POSITION, 0, RenderFormat::RGB32f, 0 },

@@ -1,0 +1,9 @@
+{
+    "type": "Texture2D",
+
+    "info": {
+        "Target": "Emu.png",
+        "Format": "RGBA8ub",
+        "MipmapLevels": 1
+    }
+}

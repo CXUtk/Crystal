@@ -21,35 +21,41 @@ static Vector3f SampleBRDF(const std::vector<Vector2f>& samples,
 static Vector3f SampleSkyCubemap(const Vector3f& v);
 static Vector3f GGXImportanceSample(const Vector2f& sample, float roughness);
 
-static std::shared_ptr<RawTexture2D> SkyCubemap[6];
-static std::shared_ptr<RawTexture2D> CubemapMipmap[6];
-
-static constexpr size_t LUT_TEXTURE_SIZE = 256;
+static constexpr size_t KC_TEXTURE_SIZE = 256;
 
 int main(int argc, char** argv)
 {
     auto samples = GenerateSamples(32);
-    std::shared_ptr<RawTexture2D> texture = std::make_shared<RawTexture2D>(LUT_TEXTURE_SIZE, LUT_TEXTURE_SIZE);
-    for (int i = 0; i <= LUT_TEXTURE_SIZE - 1; i++)
+    std::shared_ptr<RawTexture2D> texture = std::make_shared<RawTexture2D>(KC_TEXTURE_SIZE, KC_TEXTURE_SIZE);
+    std::shared_ptr<RawTexture2D> EAvgTexture = std::make_shared<RawTexture2D>(KC_TEXTURE_SIZE, 1);
+    for (int i = 0; i <= KC_TEXTURE_SIZE - 1; i++)
     {
         // N 和 V 的夹角，因为 H 只在积分中出现
-        float cosTheta = (float)(i + 0.5f) / LUT_TEXTURE_SIZE;
-        for (int j = 0; j <= LUT_TEXTURE_SIZE - 1; j++)
+        float cosTheta = (float)(i + 0.5f) / KC_TEXTURE_SIZE;
+        for (int j = 0; j <= KC_TEXTURE_SIZE - 1; j++)
         {
-            float roughness = (float)(j + 0.5f) / LUT_TEXTURE_SIZE;
+            float roughness = (float)(j + 0.5f) / KC_TEXTURE_SIZE;
             texture->SetPixel(Vector2i(i, j), SampleBRDF(samples, roughness, cosTheta));
         }
     }
     auto data = texture->GetByteData();
-    stbi_write_jpg("LUT.jpg", texture->Width, texture->Height, 3, data.data(), 100);
+    stbi_write_png("E.png", texture->Width, texture->Height, 3, data.data(), 3 * texture->Width);
+
+
+    for (int i = 0; i < KC_TEXTURE_SIZE; i++)
+    {
+        Vector3f sampledEavg(0.f);
+        for (int j = 0; j < KC_TEXTURE_SIZE; j++)
+        {
+            sampledEavg += texture->Sample(Vector2i(j, i));
+        }
+        EAvgTexture->SetPixel(Vector2i(i, 0), sampledEavg * (1.f / KC_TEXTURE_SIZE));
+    }
+    stbi_write_png("Eavg.png", EAvgTexture->Width, EAvgTexture->Height, 3, EAvgTexture->GetByteData().data(),
+        3 * texture->Width);
     return 0;
 }
 
-Vector3f SampleSkyCubemap(const Vector3f& v)
-{
-    auto cube = XYZToCubeUV(v);
-    return SkyCubemap[cube.Id]->Sample(cube.UV);
-}
 
 Vector3f GGXImportanceSample(const Vector2f& sample, float roughness)
 {
@@ -102,6 +108,7 @@ float G(const Vector3f& N, const Vector3f& V, const Vector3f& L, float roughness
     return  g1 * g2;
 }
 
+
 float V_SmithGGXCorrelated(const Vector3f& N, const Vector3f& V, const Vector3f& L, float alpha)
 {
     float NdotL = std::max(0.0f, glm::dot(N, L));
@@ -113,7 +120,7 @@ float V_SmithGGXCorrelated(const Vector3f& N, const Vector3f& V, const Vector3f&
     return 0.5f / (GGXV + GGXL);
 }
 
-Vector3f SampleBRDF( const std::vector<Vector2f>& samples,
+Vector3f SampleBRDF(const std::vector<Vector2f>& samples,
     float roughness, float NdotV)
 {
     Vector3f sampledValue(0.f);
@@ -137,13 +144,11 @@ Vector3f SampleBRDF( const std::vector<Vector2f>& samples,
             // Total = DVF * NoL / (D * NoH / (4 * VoH))
             //       = 4VF * VoH / NoH
 
-            float g = G(Vector3f(0, 1, 0), V, L, roughness);
+            float Vis = V_SmithGGXCorrelated(Vector3f(0, 1, 0), V, L, roughness);
 
-            float GWf = (g * VoH) / (NdotV * NoH);
-            float t = std::pow(1.0f - VoH, 5);
+            float GWf = (4 * Vis * VoH * L.y) / NoH;
 
-            sampledValue.x += (1.0f - t) * GWf;
-            sampledValue.y += t * GWf;
+            sampledValue += Vector3f(GWf);
         }
     }
 

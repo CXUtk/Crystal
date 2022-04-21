@@ -1,5 +1,5 @@
 {
-    "dx11Src": "Microfacet.hlsl",
+    "dx11Src": "Microfacet_KC.hlsl",
     "vsEntry": "VS",
     "fsEntry": "PS",
     "uniforms": [
