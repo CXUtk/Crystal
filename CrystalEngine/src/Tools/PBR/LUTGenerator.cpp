@@ -23,11 +23,29 @@ static Vector3f GGXImportanceSample(const Vector2f& sample, float roughness);
 
 static std::shared_ptr<RawTexture2D> SkyCubemap[6];
 static std::shared_ptr<RawTexture2D> CubemapMipmap[6];
+static std::shared_ptr<RawTexture2D> EmuTexture;
+static std::shared_ptr<RawTexture2D> EavgTexture;
 
 static constexpr size_t LUT_TEXTURE_SIZE = 256;
 
+
+std::shared_ptr<RawTexture2D> LoadImg(const std::string& path)
+{
+    int width, height, channels;
+    stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 3);
+    if (!data)
+    {
+        throw std::logic_error("Cannot find given image");
+    }
+    auto ptr = std::make_shared<RawTexture2D>(width, height, data, true);
+    stbi_image_free(data);
+    return ptr;
+}
+
 int main(int argc, char** argv)
 {
+    EmuTexture = LoadImg("E.png");
+    EavgTexture = LoadImg("Eavg.png");
     auto samples = GenerateSamples(32);
     std::shared_ptr<RawTexture2D> texture = std::make_shared<RawTexture2D>(LUT_TEXTURE_SIZE, LUT_TEXTURE_SIZE);
     for (int i = 0; i <= LUT_TEXTURE_SIZE - 1; i++)
@@ -51,10 +69,9 @@ Vector3f SampleSkyCubemap(const Vector3f& v)
     return SkyCubemap[cube.Id]->Sample(cube.UV);
 }
 
-Vector3f GGXImportanceSample(const Vector2f& sample, float roughness)
+Vector3f GGXImportanceSample(const Vector2f& sample, float alpha)
 {
-    float a = roughness * roughness;
-    float a2 = a * a;
+    float a2 = alpha * alpha;
     float cosTheta = std::sqrt((1 - sample.x) / (sample.x * (a2 - 1) + 1));
     float phi = glm::two_pi<float>() * sample.y;
     return GetUnitVectorUsingCos(cosTheta, phi);
@@ -79,11 +96,10 @@ std::vector<Vector2f> GenerateSamples(size_t N)
 }
 
 
-float D(const Vector3f& N, const Vector3f& H, float roughness)
+float D(const Vector3f& N, const Vector3f& H, float alpha)
 {
-    float a = square(roughness);
-    float a2 = square(a);
-    float NdotH = std::max(0.f, glm::dot(N, H));
+    float a2 = square(alpha);
+    float NdotH = std::max(0.0f, glm::dot(N, H));
     return a2 / (glm::pi<float>() * square(square(NdotH) * (a2 - 1.0) + 1.0));
 }
 
@@ -116,34 +132,47 @@ float V_SmithGGXCorrelated(const Vector3f& N, const Vector3f& V, const Vector3f&
 Vector3f SampleBRDF( const std::vector<Vector2f>& samples,
     float roughness, float NdotV)
 {
+    float alpha = roughness * roughness;
     Vector3f sampledValue(0.f);
     Vector3f V(std::sqrt(1.f - NdotV * NdotV), NdotV, 0);
+    Vector3f N = Vector3f(0, 1, 0);
     for (auto& sample : samples)
     {
-        Vector3f H = GGXImportanceSample(sample, roughness);
+        Vector3f H = GGXImportanceSample(sample, alpha);
         Vector3f L = glm::reflect(-V, H);
-
+        
         if (L.y > 0)
         {
             float VoH = std::max(0.f, glm::dot(V, H));
             float NoH = std::max(0.f, H.y);
+            float NoL = std::max(0.f, L.y);
+            float NoV = std::max(0.f, V.y);
             // Incident light = SampleColor * NoL
             // Microfacet specular = D*G*F / (4*NoL*NoV)
             // pdf = D * NoH / (4 * VoH)
             // Total = fr * NoL / pdf
 
-            // Fr = DVF
+            // Fr = DVF + x
             // pdf = D * NoH / (4 * VoH)
-            // Total = DVF * NoL / (D * NoH / (4 * VoH))
-            //       = 4VF * VoH / NoH
+            // Total = (DVF + x) * HoV / (D * NoH / (4 * VoH))
+            //       = (DVF*NoL + x*NoL) / (D * NoH / (4 * VoH))
+            //       = 4VF * NoL * VoH / NoH  +  4 * VoH * x * NoL/ (D * NoH)
 
-            float g = G(Vector3f(0, 1, 0), V, L, roughness);
+            float Vis = V_SmithGGXCorrelated(N, V, L, alpha);
 
-            float GWf = (g * VoH) / (NdotV * NoH);
+            Vector3f EmuL = 1.f - EmuTexture->Sample(Vector2f(NoL, roughness));
+            Vector3f EmuV = 1.f - EmuTexture->Sample(Vector2f(NoV, roughness));
+            Vector3f Eavg = 1.f - EavgTexture->Sample(Vector2f(roughness, 0));
+
+            float GWf = (4 * Vis * VoH * L.y) / NoH;
+            float fms = (EmuL.x * EmuV.x / (glm::pi<float>() * Eavg.x));
+            float ext = 4 * VoH * L.y * fms / (D(N, H, alpha) * NoH);
+            //GWf += ext;
             float t = std::pow(1.0f - VoH, 5);
 
             sampledValue.x += (1.0f - t) * GWf;
             sampledValue.y += t * GWf;
+            sampledValue.z += ext;
         }
     }
 

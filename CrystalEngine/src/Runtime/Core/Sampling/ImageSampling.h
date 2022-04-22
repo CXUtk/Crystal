@@ -107,7 +107,7 @@ namespace crystal
 
             for (int i = 0; i < Width * Height; i++)
             {
-                auto& v = Data[i];
+                Vector3f v = glm::clamp(Data[i], Vector3f(0.f), Vector3f(1.f));
                 if (IsHDR)
                 {
                     Data[i] = HDRTosRGB(Data[i]);

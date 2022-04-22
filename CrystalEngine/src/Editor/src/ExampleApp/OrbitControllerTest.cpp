@@ -75,12 +75,16 @@ namespace crystal
 		m_PRO->SetShaderResource(m_texture2D, 0);
         m_PRO->SetShaderResource(m_EmuTexture, 1);
         m_PRO->SetShaderResource(m_EavgTexture, 2);
-        m_PRO->SetShaderResource(m_skyBoxLUT, 3);
+        m_PRO->SetShaderResource(m_skyBoxIrradiance, 3);
+        m_PRO->SetShaderResource(m_skyBoxPrefilter, 4);
+        m_PRO->SetShaderResource(m_skyBoxLUT, 5);
         
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 0);
         m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 1);
         m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 2);
         m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 3);
+        m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 4);
+        m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::LinearClamp), 5);
 
 		m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
 		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
@@ -166,9 +170,9 @@ namespace crystal
         m_pShader->SetUniformMat3f("MN", glm::identity<Matrix3f>());
         m_pShader->SetUniformMat4f("VP", P * V);
         m_pShader->SetUniformVec3f("uCameraPos", m_pCamera->GetEyePos());
-        m_pShader->SetUniformVec3f("uLightPos", Vector3f(5.f, 5.f, 50.f));
+        m_pShader->SetUniformVec3f("uLightPos", Vector3f(0.f, 0.f, -1000.f));
         m_pShader->SetUniformVec3f("uLightIntensity", Vector3f(1.f));
-        m_pShader->SetUniformVec3f("uTint", Vector3f(1.0f, 0.71f, 0.29f));
+        m_pShader->SetUniformVec3f("uTint", Vector3f(1.f, 0.f, 0.f));
 
         auto identity = glm::identity<Matrix4f>();
         graphicsContext->LoadPipelineState(m_PSO);

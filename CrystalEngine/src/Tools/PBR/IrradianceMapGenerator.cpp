@@ -122,7 +122,8 @@ int main(int argc, char** argv)
                 
                 auto vector = CubeUVToVector(CubeUV{ (int)f, pos });
                 //auto color = SampleSkyCubemap(vector);
-                auto color = SampleOneNormalMIS(glm::normalize(vector), samples, samples2, samples3);
+                auto N = glm::normalize(vector);
+                auto color = SampleOneNormalMIS(N, samples, samples2, samples3);
                 IrradianceCubemap[f]->SetPixel(Vector2i(j, i), color);
             }
         }

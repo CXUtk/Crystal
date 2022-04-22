@@ -7,6 +7,15 @@ SamplerState EmuSampler : register(s1);
 Texture2D EavgTexture : register(t2);
 SamplerState EavgSampler : register(s2);
 
+TextureCube irradianceMap : register(t3);
+SamplerState irradianceSampler : register(s3);
+
+TextureCube spcularMap : register(t4);
+SamplerState spcularSampler : register(s4);
+
+Texture2D LUTTexture : register(t5);
+SamplerState LUTSampler : register(s5);
+
 cbuffer ConstantBuffer : register(b0)
 {
 	float4x4 M;
@@ -90,7 +99,7 @@ float V_SmithGGXCorrelated(float3 N, float3 V, float3 L, float alpha)
 	float a2 = square(alpha);
 	float GGXL = NdotV * sqrt((-NdotL * a2 + NdotL) * NdotL + a2);
 	float GGXV = NdotL * sqrt((-NdotV * a2 + NdotV) * NdotV + a2);
-	return 0.5 / (GGXV + GGXL);
+	return 0.5 / max(EPS, (GGXV + GGXL));
 }
 
 float G(float3 N, float3 V, float3 L)
@@ -107,15 +116,17 @@ float3 F(float3 F0, float3 H, float3 V)
 float3 BRDFDirect(float3 N, float3 V, float3 L, float alpha, float3 albedo, float3 F0)
 {
 	float3 H = normalize(V + L);
+	float NdotL = max(0.0, dot(N, L));
+	float NdotV = max(0.0, dot(N, V));
 	
 	float d = D(N, H, alpha);
 	float v = V_SmithGGXCorrelated(N, V, L, alpha);
 	float3 f = F(F0, H, V);
-
+	
 	float3 cook_torrance = d * v * f;
 	float3 lambertian = albedo / PI * (1.0 - f) * (1.0 - uMetallic);
 	
-	return cook_torrance * uLightIntensity;
+	return (lambertian + cook_torrance) * uLightIntensity;
 }
 
 float4 PS(VertexOut pIn) : SV_Target
@@ -125,17 +136,29 @@ float4 PS(VertexOut pIn) : SV_Target
 	float3 L = normalize(uLightPos - pIn.position);
 	
 	float3 albedo = baseColor.Sample(baseColorSampler, pIn.texCoord).xyz * uTint;
-	float3 F0 = float3(0.04, 0.04, 0.04);
+	float3 F0 = 0.04;
 	F0 = lerp(F0, albedo, uMetallic);
 
-	float roughness = lerp(0.01, 1.0, uRoughness);
+	float roughness = lerp(0.04, 1.0, uRoughness);
 	float alpha = roughness * roughness;
 	
 	float NdotL = max(0.0, dot(N, L));
 	float NdotV = max(0.0, dot(V, N));
 	
-	float3 color = BRDFDirect(N, V, L, alpha, albedo, F0) * NdotL;
 
+	//float3 Fms = (1.0 - EmuL) * (1.0 - EmuV) 
+	/// (PI * OneMinusEavg);
+
+	float3 color = BRDFDirect(N, V, L, alpha, albedo, F0) * NdotL;
+	
+	float4 fSplit = LUTTexture.Sample(LUTSampler, float2(NdotV, 1.0 - alpha));
+	float3 f = (F0 * fSplit.x + fSplit.yyy);
+	float lod = uRoughness * 4.0;
+	
+	color += albedo * pow(irradianceMap.SampleLevel(irradianceSampler, N, 0).xyz, 2.2)
+					* (1.0 - f) * (1.0 - uMetallic);
+	color += pow(spcularMap.SampleLevel(spcularSampler, reflect(-V, N), lod).xyz, 2.2) * f;
+	
 	color = color / (color + 1.0);
 	color = pow(color, 1.0 / 2.2);
 	return float4(color, 1.0);

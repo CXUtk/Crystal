@@ -21,7 +21,7 @@ static Vector3f SampleBRDF(const std::vector<Vector2f>& samples,
 static Vector3f SampleSkyCubemap(const Vector3f& v);
 static Vector3f GGXImportanceSample(const Vector2f& sample, float roughness);
 
-static constexpr size_t KC_TEXTURE_SIZE = 256;
+static constexpr size_t KC_TEXTURE_SIZE = 512;
 
 int main(int argc, char** argv)
 {
@@ -57,10 +57,9 @@ int main(int argc, char** argv)
 }
 
 
-Vector3f GGXImportanceSample(const Vector2f& sample, float roughness)
+Vector3f GGXImportanceSample(const Vector2f& sample, float alpha)
 {
-    float a = roughness * roughness;
-    float a2 = a * a;
+    float a2 = alpha * alpha;
     float cosTheta = std::sqrt((1 - sample.x) / (sample.x * (a2 - 1) + 1));
     float phi = glm::two_pi<float>() * sample.y;
     return GetUnitVectorUsingCos(cosTheta, phi);
@@ -123,11 +122,14 @@ float V_SmithGGXCorrelated(const Vector3f& N, const Vector3f& V, const Vector3f&
 Vector3f SampleBRDF(const std::vector<Vector2f>& samples,
     float roughness, float NdotV)
 {
+    float alpha = roughness * roughness;
     Vector3f sampledValue(0.f);
     Vector3f V(std::sqrt(1.f - NdotV * NdotV), NdotV, 0);
+
+    float count = 0.f;
     for (auto& sample : samples)
     {
-        Vector3f H = GGXImportanceSample(sample, roughness);
+        Vector3f H = GGXImportanceSample(sample, alpha);
         Vector3f L = glm::reflect(-V, H);
 
         if (L.y > 0)
@@ -142,9 +144,9 @@ Vector3f SampleBRDF(const std::vector<Vector2f>& samples,
             // Fr = DVF
             // pdf = D * NoH / (4 * VoH)
             // Total = DVF * NoL / (D * NoH / (4 * VoH))
-            //       = 4VF * VoH / NoH
+            //       = 4VF * VoH * NoL / NoH
 
-            float Vis = V_SmithGGXCorrelated(Vector3f(0, 1, 0), V, L, roughness);
+            float Vis = V_SmithGGXCorrelated(Vector3f(0, 1, 0), V, L, alpha);
 
             float GWf = (4 * Vis * VoH * L.y) / NoH;
 

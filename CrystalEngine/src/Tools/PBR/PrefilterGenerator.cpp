@@ -39,7 +39,7 @@ static const char* filenames_output[6] = {
 };
 
 static const float roughness_level[6] = {
-    0.0,
+    0.02,
     0.25,
     0.5,
     0.75,
@@ -50,7 +50,7 @@ static const float roughness_level[6] = {
 static std::shared_ptr<RawTexture2D> SkyCubemap[6];
 static std::shared_ptr<RawTexture2D> CubemapMipmap[6];
 
-static constexpr size_t CUBEMAP_SIZE = 128;
+static constexpr size_t CUBEMAP_SIZE = 256;
 static constexpr size_t MIPMAP_ROUGHNESS_LEVELS = 5;
 
 int main(int argc, char** argv)
@@ -67,11 +67,11 @@ int main(int argc, char** argv)
         SkyCubemap[i] = std::make_shared<RawTexture2D>(width, height, data, true);
         stbi_image_free(data);
 
-        SkyCubemap[i]->MipmapCompress(4);
+        SkyCubemap[i]->MipmapCompress(3);
     }
     GlobalLogger::Log(SeverityLevel::Info, "Loaded Images");
 
-    auto samples = GenerateSamples(32);
+    auto samples = GenerateSamples(64);
 
     for (size_t level = 0; level < MIPMAP_ROUGHNESS_LEVELS; level++)
     {
@@ -91,7 +91,8 @@ int main(int argc, char** argv)
                     Vector2f pos = Vector2f(j + 0.5f, i + 0.5f) * unit;
 
                     auto vector = CubeUVToVector(CubeUV{ (int)f, pos });
-                    auto color = SampleOneNormal(vector, samples, roughness_level[level]);
+                    auto N = glm::normalize(vector);
+                    auto color = SampleOneNormal(N, samples, roughness_level[level]);
                     CubemapMipmap[f]->SetPixel(Vector2i(j, i), color);
                 }
             }
@@ -117,10 +118,9 @@ Vector3f SampleSkyCubemap(const Vector3f& v)
     return SkyCubemap[cube.Id]->Sample(cube.UV);
 }
 
-Vector3f GGXImportanceSample(const Vector2f& sample, float roughness)
+Vector3f GGXImportanceSample(const Vector2f& sample, float alpha)
 {
-    float a = roughness * roughness;
-    float a2 = a * a;
+    float a2 = square(alpha);
     float cosTheta = std::sqrt((1 - sample.x) / (sample.x * (a2 - 1) + 1));
     float phi = glm::two_pi<float>() * sample.y;
     return GetUnitVectorUsingCos(cosTheta, phi);
@@ -154,6 +154,7 @@ std::vector<Vector2f> GenerateSamples(size_t N)
 
 Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& samples, float roughness)
 {
+    float alpha = roughness * roughness;
     // Calculate TBN vector
     Vector3f T;
     for (int i = 0; i < 3; i++)
@@ -169,15 +170,21 @@ Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& samples
     }
     Vector3f B = glm::normalize(glm::cross(N, T));
     Vector3f sampledValue(0.f);
+    float count = 0;
     for (auto& sample : samples)
     {
-        Vector3f vector = GGXImportanceSample(sample, roughness);
+        Vector3f vector = GGXImportanceSample(sample, alpha);
         auto H = vector.x * T + vector.y * N + vector.z * B;
         auto L = glm::reflect(-N, H);
 
-        sampledValue += SampleSkyCubemap(L);
+        float NoL = std::max(0.f, glm::dot(N, L));
+        // Remember to exclude the samples that are invalid
+        if (NoL > 0)
+        {
+            sampledValue += SampleSkyCubemap(L);
+            count++;
+        }
     }
 
-    float invN = 1.f / samples.size();
-    return sampledValue * invN;
+    return sampledValue * (1.f / count);
 }
