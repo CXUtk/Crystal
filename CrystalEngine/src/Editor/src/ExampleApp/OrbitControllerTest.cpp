@@ -66,7 +66,7 @@ namespace crystal
 
         VNum = meshData.size();
 
-        m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("PBR/Microfacet_KC");
+        m_pShader = assetManager->LoadAssetBuiltIn<IShaderProgram>("PBR/Microfacet");
         m_texture2D = assetManager->LoadAsset<ITexture2D>("engine:White");
 
 		vertexBuffer->BindVertexLayout(vLayout);
@@ -170,21 +170,26 @@ namespace crystal
         m_pShader->SetUniformMat3f("MN", glm::identity<Matrix3f>());
         m_pShader->SetUniformMat4f("VP", P * V);
         m_pShader->SetUniformVec3f("uCameraPos", m_pCamera->GetEyePos());
-        m_pShader->SetUniformVec3f("uLightPos", Vector3f(0.f, 0.f, -1000.f));
+        m_pShader->SetUniformVec3f("uLightPos", Vector3f(-500.f, 500.f, -1000.f));
         m_pShader->SetUniformVec3f("uLightIntensity", Vector3f(1.f));
-        m_pShader->SetUniformVec3f("uTint", Vector3f(1.f, 0.f, 0.f));
+        m_pShader->SetUniformVec3f("uTint", Vector3f(1.f, 1.f, 1.f));
+
+        //Vector3f vx(81 / 255.0f, 35 / 255.0f, 67 / 255.0f);
+        //auto ss = glm::pow(vx, Vector3f(2.2f));
+        //auto res = ss / (1.0f - ss);
+        //printf("%lf %lf %lf\n", res.x, res.y, res.z);
 
         auto identity = glm::identity<Matrix4f>();
         graphicsContext->LoadPipelineState(m_PSO);
 
 
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 7; i++)
         {
-            for (int j = 0; j < 11; j++)
+            for (int j = 0; j < 7; j++)
             {
-                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 5, j - 5, 0) * 3.f));
-                m_pShader->SetUniform1f("uRoughness", i * 0.1);
-                m_pShader->SetUniform1f("uMetallic", j * 0.1);
+                m_pShader->SetUniformMat4f("M", glm::translate(identity, Vector3f(i - 3, j - 3, 0) * 3.f));
+                m_pShader->SetUniform1f("uRoughness", i / 6.f);
+                m_pShader->SetUniform1f("uMetallic", j / 6.f);
 
                 graphicsContext->LoadPipelineResources(m_PRO);
                 {

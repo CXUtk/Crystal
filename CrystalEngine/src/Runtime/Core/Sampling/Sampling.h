@@ -191,3 +191,4 @@ namespace crystal
         return (n0 << 32) | n1;
     }
 }
+

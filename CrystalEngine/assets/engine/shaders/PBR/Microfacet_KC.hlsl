@@ -133,11 +133,11 @@ float3 BRDFDirect(float3 N, float3 V, float3 L, float roughness, float3 albedo, 
 	float3 cook_torrance = d * v * f;
 	float3 lambertian = albedo / PI * (1.0 - f) * (1.0 - uMetallic);
 	
-	float3 Fms = (1.0 - EmuL) * (1.0 - EmuV) * Eavg * Favg
-	/ (EPS + PI * OneMinusEavg * (1.0 - Favg * OneMinusEavg));
+	float3 Fms = (1.0 - EmuL) * (1.0 - EmuV) * OneMinusEavg * Favg / (PI * OneMinusEavg * (1.0 - Favg * Eavg));
 	
 	return (lambertian + cook_torrance + Fms) * uLightIntensity;
 }
+
 
 float4 PS(VertexOut pIn) : SV_Target
 {
@@ -151,13 +151,12 @@ float4 PS(VertexOut pIn) : SV_Target
 
 	float roughness = lerp(0.04, 1.0, uRoughness);
 	
-	float NdotL = max(0.0, dot(N, L));
 	float NdotV = max(0.0, dot(V, N));
 	
 
 	//float3 Fms = (1.0 - EmuL) * (1.0 - EmuV) 
 	/// (PI * OneMinusEavg);
-
+	float NdotL = max(0.0, dot(L, N));
 	float3 color = BRDFDirect(N, V, L, roughness, albedo, F0) * NdotL;
 	
 	float4 fSplit = LUTTexture.Sample(LUTSampler, float2(NdotV, 1.0 - roughness));
@@ -170,8 +169,11 @@ float4 PS(VertexOut pIn) : SV_Target
 	float3 Favg = (1.0 + F0 * 20.0) / 21.0;
 	float Eavg = EavgTexture.Sample(EavgSampler, float2(roughness, 0)).x;
 	float OneMinusEavg = 1.0 - Eavg;
-	color += pow(spcularMap.SampleLevel(spcularSampler, reflect(-V, N), lod).xyz, 2.2) 
-			* (f + Eavg * Favg / (1.0 - Favg * OneMinusEavg) * fSplit.z);
+	float OneMinusEmuV = 1.0 - EmuTexture.Sample(EmuSampler, float2(NdotV, 1.0 - roughness)).x;
+	float3 fms = Favg * OneMinusEavg * OneMinusEmuV / (PI * OneMinusEavg * (1.0 - Eavg * Favg));
+	
+
+	color += pow(spcularMap.SampleLevel(spcularSampler, reflect(-V, N), lod).xyz, 2.2) * (f + fms * PI * OneMinusEavg);
 	
 	color = color / (color + 1.0);
 	color = pow(color, 1.0 / 2.2);

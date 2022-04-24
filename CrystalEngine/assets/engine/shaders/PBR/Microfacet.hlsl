@@ -113,12 +113,13 @@ float3 F(float3 F0, float3 H, float3 V)
 	return F0 + (1.0 - F0) * pow(1.0 - HdotV, 5.0);
 }
 
-float3 BRDFDirect(float3 N, float3 V, float3 L, float alpha, float3 albedo, float3 F0)
+float3 BRDFDirect(float3 N, float3 V, float3 L, float roughness, float3 albedo, float3 F0)
 {
 	float3 H = normalize(V + L);
 	float NdotL = max(0.0, dot(N, L));
 	float NdotV = max(0.0, dot(N, V));
 	
+	float alpha = roughness * roughness;
 	float d = D(N, H, alpha);
 	float v = V_SmithGGXCorrelated(N, V, L, alpha);
 	float3 f = F(F0, H, V);
@@ -140,8 +141,7 @@ float4 PS(VertexOut pIn) : SV_Target
 	F0 = lerp(F0, albedo, uMetallic);
 
 	float roughness = lerp(0.04, 1.0, uRoughness);
-	float alpha = roughness * roughness;
-	
+
 	float NdotL = max(0.0, dot(N, L));
 	float NdotV = max(0.0, dot(V, N));
 	
@@ -149,11 +149,11 @@ float4 PS(VertexOut pIn) : SV_Target
 	//float3 Fms = (1.0 - EmuL) * (1.0 - EmuV) 
 	/// (PI * OneMinusEavg);
 
-	float3 color = BRDFDirect(N, V, L, alpha, albedo, F0) * NdotL;
+	float3 color = BRDFDirect(N, V, L, roughness, albedo, F0) * NdotL;
 	
-	float4 fSplit = LUTTexture.Sample(LUTSampler, float2(NdotV, 1.0 - alpha));
+	float4 fSplit = LUTTexture.Sample(LUTSampler, float2(NdotV, 1.0 - roughness));
 	float3 f = (F0 * fSplit.x + fSplit.yyy);
-	float lod = uRoughness * 4.0;
+	float lod = roughness * 4.0;
 	
 	color += albedo * pow(irradianceMap.SampleLevel(irradianceSampler, N, 0).xyz, 2.2)
 					* (1.0 - f) * (1.0 - uMetallic);

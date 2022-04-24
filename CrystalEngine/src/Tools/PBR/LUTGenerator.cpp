@@ -55,7 +55,12 @@ int main(int argc, char** argv)
         for (int j = 0; j <= LUT_TEXTURE_SIZE - 1; j++)
         {
             float roughness = (float)(j + 0.5f) / LUT_TEXTURE_SIZE;
-            texture->SetPixel(Vector2i(i, j), SampleBRDF(samples, roughness, cosTheta));
+            auto value = SampleBRDF(samples, roughness, cosTheta);
+            //if (value.r + value.g + value.b > 1.f)
+            //{
+            //    printf("%f %f %f\n", value.r,value.g,value.b);
+            //}
+            texture->SetPixel(Vector2i(i, j), value);
         }
     }
     auto data = texture->GetByteData();
@@ -136,6 +141,8 @@ Vector3f SampleBRDF( const std::vector<Vector2f>& samples,
     Vector3f sampledValue(0.f);
     Vector3f V(std::sqrt(1.f - NdotV * NdotV), NdotV, 0);
     Vector3f N = Vector3f(0, 1, 0);
+
+    float count = 0.f;
     for (auto& sample : samples)
     {
         Vector3f H = GGXImportanceSample(sample, alpha);
@@ -145,8 +152,8 @@ Vector3f SampleBRDF( const std::vector<Vector2f>& samples,
         {
             float VoH = std::max(0.f, glm::dot(V, H));
             float NoH = std::max(0.f, H.y);
-            float NoL = std::max(0.f, L.y);
-            float NoV = std::max(0.f, V.y);
+            float NoL = std::max(0.f, glm::dot(L, H));
+            float NoV = std::max(0.f, glm::dot(V, H));
             // Incident light = SampleColor * NoL
             // Microfacet specular = D*G*F / (4*NoL*NoV)
             // pdf = D * NoH / (4 * VoH)
@@ -161,21 +168,20 @@ Vector3f SampleBRDF( const std::vector<Vector2f>& samples,
             float Vis = V_SmithGGXCorrelated(N, V, L, alpha);
 
             Vector3f EmuL = 1.f - EmuTexture->Sample(Vector2f(NoL, roughness));
-            Vector3f EmuV = 1.f - EmuTexture->Sample(Vector2f(NoV, roughness));
-            Vector3f Eavg = 1.f - EavgTexture->Sample(Vector2f(roughness, 0));
 
-            float GWf = (4 * Vis * VoH * L.y) / NoH;
-            float fms = (EmuL.x * EmuV.x / (glm::pi<float>() * Eavg.x));
-            float ext = 4 * VoH * L.y * fms / (D(N, H, alpha) * NoH);
+            float GWf = (Vis * VoH * L.y) / NoH;
+            float fms = 1.0 - EmuL.x;
+            float ext = VoH * L.y * fms / (D(N, H, alpha) * NoH);
             //GWf += ext;
             float t = std::pow(1.0f - VoH, 5);
 
             sampledValue.x += (1.0f - t) * GWf;
             sampledValue.y += t * GWf;
-            sampledValue.z += ext;
+            // sampledValue.z += ext;
         }
+        count++;
     }
 
-    float invN = 1.f / samples.size();
+    float invN = 4.f / count;
     return sampledValue * invN;
 }

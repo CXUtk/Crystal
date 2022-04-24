@@ -90,11 +90,13 @@ namespace crystal
         {
             assert(coord.x >= 0 && coord.x < Width&& coord.y >= 0 && coord.y < Height);
             size_t row = Height - coord.y - 1;
+            assert(value.x <= 1.1 && value.y <= 1.1 && value.z <= 1.1);
             Data[row * Width + coord.x] = value;
         }
 
         void SetPixel(Vector2f coord, Vector3f value)
         {
+            assert(value.x <= 1 && value.y <= 1 && value.z <= 1);
             size_t row = (size_t)(std::min(1.0 - coord.y, 0.9999) * Height);
             size_t col = (size_t)(std::min(coord.x, 0.9999f) * Width);
             Data[row * Width + col] = value;
@@ -107,14 +109,14 @@ namespace crystal
 
             for (int i = 0; i < Width * Height; i++)
             {
-                Vector3f v = glm::clamp(Data[i], Vector3f(0.f), Vector3f(1.f));
                 if (IsHDR)
                 {
                     Data[i] = HDRTosRGB(Data[i]);
                 }
-                data.push_back((unsigned char)floor(v.r * 255));
-                data.push_back((unsigned char)floor(v.g * 255));
-                data.push_back((unsigned char)floor(v.b * 255));
+                Vector3f v = glm::clamp(Data[i], Vector3f(0.f), Vector3f(1.f));
+                data.push_back((unsigned char)round(v.r * 255));
+                data.push_back((unsigned char)round(v.g * 255));
+                data.push_back((unsigned char)round(v.b * 255));
             }
             return data;
         }

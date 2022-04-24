@@ -21,7 +21,11 @@
         "Cubemaps/Sky2/Skybox_Prefilter",
 
         "Cubemaps/Sky/Skybox",
-        "Cubemaps/Sky/Skybox_Irradiance"
+        "Cubemaps/Sky/Skybox_Irradiance",
+
+        "Cubemaps/Furnace/Skybox",
+        "Cubemaps/Furnace/Skybox_Irradiance",
+        "Cubemaps/Furnace/Skybox_Prefilter"
     ],
     "fonts": [
         "arial.ttf",

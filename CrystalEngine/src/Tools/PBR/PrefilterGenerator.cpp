@@ -50,7 +50,7 @@ static const float roughness_level[6] = {
 static std::shared_ptr<RawTexture2D> SkyCubemap[6];
 static std::shared_ptr<RawTexture2D> CubemapMipmap[6];
 
-static constexpr size_t CUBEMAP_SIZE = 256;
+static constexpr size_t CUBEMAP_SIZE = 128;
 static constexpr size_t MIPMAP_ROUGHNESS_LEVELS = 5;
 
 int main(int argc, char** argv)
@@ -145,12 +145,24 @@ std::vector<Vector2f> GenerateSamples(size_t N)
     return samples;
 }
 
-//float D(const Vector3f& N, const Vector3f& H, float roughness)
-//{
-//    float a2 = square(roughness);
-//    float NdotH = std::max(0.f, glm::dot(N, H));
-//    return a2 / (glm::pi<float>() * square(square(NdotH) * (a2 - 1.0) + 1.0));
-//}
+float D(const Vector3f& N, const Vector3f& H, float alpha)
+{
+    float a2 = square(alpha);
+    float NdotH = std::max(0.f, glm::dot(N, H));
+    return a2 / (glm::pi<float>() * square(square(NdotH) * (a2 - 1.0) + 1.0));
+}
+
+
+float V_SmithGGXCorrelated(const Vector3f& N, const Vector3f& V, const Vector3f& L, float alpha)
+{
+    float NdotL = std::max(0.0f, glm::dot(N, L));
+    float NdotV = std::max(0.0f, glm::dot(N, V));
+
+    float a2 = square(alpha);
+    float GGXL = NdotV * std::sqrt((-NdotL * a2 + NdotL) * NdotL + a2);
+    float GGXV = NdotL * std::sqrt((-NdotV * a2 + NdotV) * NdotV + a2);
+    return 0.5f / (GGXV + GGXL);
+}
 
 Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& samples, float roughness)
 {
@@ -175,16 +187,37 @@ Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& samples
     {
         Vector3f vector = GGXImportanceSample(sample, alpha);
         auto H = vector.x * T + vector.y * N + vector.z * B;
+
         auto L = glm::reflect(-N, H);
 
         float NoL = std::max(0.f, glm::dot(N, L));
+        float VoH = std::max(0.f, glm::dot(N, H));
+        float NoH = std::max(0.f, glm::dot(N, H));
         // Remember to exclude the samples that are invalid
-        if (NoL > 0)
-        {
-            sampledValue += SampleSkyCubemap(L);
-            count++;
-        }
+        //if (NoL > 0)
+        //{
+        //    // Incident light = SampleColor * NoL
+        //    // Microfacet specular = D*G*F / (4*NoL*NoV)
+        //    // pdf = D * NoH / (4 * VoH)
+        //    // Total = fr * NoL / pdf
+
+        //    // Fr = DVF + x
+        //    // pdf = D * NoH / (4 * VoH)
+        //    // Total = (DVF + x) * HoV / (D * NoH / (4 * VoH))
+        //    //       = (DVF*NoL + x*NoL) / (D * NoH / (4 * VoH))
+        //    //       = 4VF * NoL * VoH / NoH  +  4 * VoH * x * NoL/ (D * NoH)
+
+        //    // Here NoH = VoH
+
+        //}
+        auto v = V_SmithGGXCorrelated(N, N, L, alpha);
+        sampledValue += v * SampleSkyCubemap(L) * NoL;
+        count += v * NoL;
+
+        //count++;
     }
 
     return sampledValue * (1.f / count);
 }
+
+
