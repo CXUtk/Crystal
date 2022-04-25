@@ -6,20 +6,52 @@
 
 namespace crystal
 {
+    struct TreeNode;
+    struct ContourNode
+    {
+        TreeNode* node = nullptr;
+        ContourNode* next = nullptr;
+    };
     struct TreeNode
     {
         float Left, Right;
-        float Mod;
+        float LazyTag;
 
         std::vector<TreeNode*> Children{};
+
+        TreeNode* LeftContour = nullptr;
+        TreeNode* RightContour = nullptr;
 
         TreeNode()
         {
             Left = Right = 0;
-            Mod = 0;
+            LazyTag = 0;
         }
 
         float Center() const { return (Left + Right) / 2.f; }
+
+        void MoveToLeftBeginAt(float destLeft)
+        {
+            float diff = destLeft - Left;
+            Left += diff;
+            Right += diff;
+            LazyTag += diff;
+
+            PushDown();
+        }
+
+        void PushDown()
+        {
+            for (auto child : Children)
+            {
+                child->Left += LazyTag;
+                child->Right += LazyTag;
+                child->LazyTag += LazyTag;
+
+                child->PushDown();
+            }
+            LazyTag = 0;
+        }
     };
 
 	class TreeTest : public Application
@@ -40,6 +72,7 @@ namespace crystal
 
 	private:
 		bool m_renderPause = false;
+        TreeNode* m_root = nullptr;
 
 		std::shared_ptr<IShaderProgram> m_pShader = nullptr;
 		std::shared_ptr<IPipelineStateObject> m_PSO = nullptr;
@@ -51,6 +84,7 @@ namespace crystal
         void DFSDraw(TreeNode* node, int level, SpriteBatch* spriteBatch, GeometryRenderer* gRender);
         void PushDown(TreeNode* node, float Mod, int level);
         void PushDownRightOnly(TreeNode* node, float Mod, int level);
-        void Dfs1(TreeNode* node, int level);
+        void Dfs1(TreeNode* node);
+        float DfsMinimum(TreeNode* node);
 	};
 }

@@ -32,9 +32,5 @@
         "consola.ttf"
     ],
     "meshes": [
-        "Cube",
-        "Sphere",
-        "Capsule",
-        "Bunny"
     ]
 }
