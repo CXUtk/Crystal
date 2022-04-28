@@ -13,22 +13,14 @@
 
 namespace crystal
 {
-    void ClearTree(TreeNode* node)
-    {
-        for (auto child : node->Children)
-        {
-            ClearTree(child);
-        }
-
-        delete node;
-    }
-
     static SliceInfo SliceNormal = { 1, 1, 1, 1, Slice_Nine };
     static constexpr int NodeSize = 16;
     static constexpr int NodeMinPadding = 8;
     static constexpr int InitPadding = 32;
 
     static float DrawMinimumX = 0.f;
+    static int S = 0;
+    static TreeNode* LastForLevel[100]{};
 
     void TreeTest::DFSDraw(TreeNode* node, int level, SpriteBatch* spriteBatch, GeometryRenderer* gRender)
     {
@@ -110,7 +102,7 @@ namespace crystal
 	}
 
 
-    void TreeTest::Dfs1(TreeNode* node)
+    void TreeTest::Dfs2(TreeNode* node)
     {
         float leftMostEdge = 0, rightMostEdge = 0;
         bool firstChild = true;
@@ -118,7 +110,7 @@ namespace crystal
         node->RightContour = nullptr;
         for (auto child : node->Children)
         {
-            Dfs1(child);
+            Dfs2(child);
 
             float maxLeft = 0.f;
             if (!node->RightContour)
@@ -134,7 +126,7 @@ namespace crystal
                 {
                     float leftNodeLeftToCenterLeft = child->Left - rightSubtreeLeft->Left;
                     maxLeft = std::max(maxLeft, leftSubtreeRight->Right + leftNodeLeftToCenterLeft);
-
+                    S++;
                     if (!leftSubtreeRight->RightContour || !rightSubtreeLeft->LeftContour)
                     {
                         break;
@@ -176,6 +168,11 @@ namespace crystal
         node->Right = node->Left + NodeSize;
     }
 
+    void TreeTest::PositionMethod2(TreeNode* node)
+    {
+        Dfs2(node);
+    }
+
     float TreeTest::DfsMinimum(TreeNode* node)
     {
         float minn = node->Left;
@@ -185,6 +182,7 @@ namespace crystal
         }
         return minn;
     }
+
 
     TreeNode* GenerateFromText(const char* text)
     {
@@ -211,27 +209,65 @@ namespace crystal
         return node;
     }
 
+    void TreeTest::Dfs1(TreeNode* node, int level)
+    {
+        float minLeft = std::numeric_limits<float>::infinity();
+        float maxRight = -std::numeric_limits<float>::infinity();
+        for (auto child : node->Children)
+        {
+            Dfs1(child, level + 1);
+
+            minLeft = std::min(minLeft, child->Left);
+            maxRight = std::max(maxRight, child->Right);
+        }
+
+        auto lastNode = LastForLevel[level];
+        float lastRight = lastNode ? (lastNode->Right) : 0;
+        float nextPos = lastRight + NodeMinPadding;
+        if (node->Children.empty())
+        {
+            node->Left = nextPos;
+            node->Right = node->Left + NodeSize;
+        }
+        else
+        {
+            float estimatedLeft = (minLeft + maxRight) * 0.5f - NodeSize / 2.f;
+            float pos = std::max(estimatedLeft, nextPos);
+            node->LazyTag = pos - estimatedLeft;
+            node->Left = pos;
+            node->Right = node->Left + NodeSize;
+            node->PushDown();
+        }
+        LastForLevel[level] = node;
+    }
+
+    void TreeTest::PositionMethod1(TreeNode* node)
+    {
+        Dfs1(node, 0);
+    }
+
     void TreeTest::InitTree()
     {
 
-       /* Root = new TreeNode();
+        m_root = new TreeNode();
         std::vector<TreeNode*> nodes;
-        nodes.push_back(Root);
+        nodes.push_back(m_root);
         std::mt19937 mt;
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < 100; i++)
         {
             int id = mt() % nodes.size();
             auto node = new TreeNode();
             nodes[id]->Children.push_back(node);
             nodes.push_back(node);
-        }*/
+        }
 
-        m_root = GenerateFromText("X[X[]X[X[X[]X[X[]X[X[]]]X[]X[X[X[]X[X[X[]X[X[]X[]X[]]X[]]X[]]]X[X[]X[]]X[]]]X[X[X[]]]X[]X[]]]");
+        /*m_root = GenerateFromText("[[][[[][[][[]]][][[[][[[][[][][]][]][]]][[][]][]]][[[]]][][]]]");*/
             //GenerateFromText("X[X[]X[X[X[]X[X[]X[X[]]]X[]X[X[X[]X[X[X[]X[X[]X[]X[]]X[]]X[]]]X[X[]X[]]X[]]]X[X[X[]]]X[]X[]]]");
 
-        Dfs1(m_root);
+        S = 0;
+        PositionMethod2(m_root);
         DrawMinimumX = DfsMinimum(m_root);
-        printf("F\n");
+        printf("Count: %d\n", S);
     }
 
 }

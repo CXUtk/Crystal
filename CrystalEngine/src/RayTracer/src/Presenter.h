@@ -3,13 +3,15 @@
 #include <Engine.h>
 #include <Function/UI/UIExports.h>
 
+#include "Tracer/RayTracer.h"
+
 namespace tracer
 {
-    class CrystalTracer : public crystal::Application
+    class Presenter : public crystal::Application
     {
     public:
-        CrystalTracer();
-        virtual ~CrystalTracer() override;
+        Presenter();
+        virtual ~Presenter() override;
 
         virtual void Initialize() override;
 
@@ -22,6 +24,7 @@ namespace tracer
         virtual bool Paused() override;
 
     private:
-        bool    m_renderPause = false;
+        bool                            m_renderPause = false;
+        std::shared_ptr<RayTracer>      m_tracer = nullptr;
     };
 }

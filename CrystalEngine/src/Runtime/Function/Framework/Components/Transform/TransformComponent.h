@@ -11,7 +11,8 @@ namespace crystal
     class TransformComponent : public Component
     {
     public:
-        TransformComponent(GameObject* attachedObject);
+        TransformComponent();
+        TransformComponent(const Transform& transform);
         virtual ~TransformComponent() override;
 
         virtual void Update(const GameTimer& gameTimer);

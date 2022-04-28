@@ -2,8 +2,7 @@
 
 namespace crystal
 {
-    Component::Component(GameObject* attachedObject)
-        : m_attachedObject(attachedObject)
+    Component::Component()
     {}
 
     Component::~Component()
@@ -14,6 +13,6 @@ namespace crystal
     void Component::Update(const GameTimer& gameTimer)
     {}
 
-    void Component::Draw(const GameTimer & gameTimer)
+    void Component::Draw(const GameTimer& gameTimer)
     {}
 }

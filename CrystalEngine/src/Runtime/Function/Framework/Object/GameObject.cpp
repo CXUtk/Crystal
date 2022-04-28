@@ -12,17 +12,22 @@ namespace crystal
 
     void GameObject::Update(const GameTimer& gameTimer)
     {
-        for (auto& component : m_components)
+        for (auto& entry : m_components)
         {
-            component->Update(gameTimer);
+            entry.second->Update(gameTimer);
         }
     }
 
     void GameObject::Draw(const GameTimer& gameTimer)
     {
-        for (auto& component : m_components)
+        for (auto& entry : m_components)
         {
-            component->Draw(gameTimer);
+            entry.second->Draw(gameTimer);
         }
+    }
+    void GameObject::AddComponent(std::shared_ptr<Component> component)
+    {
+        m_components[typeid(*component.get())] = component;
+        component->AttachToObject(this);
     }
 }

@@ -11,11 +11,13 @@ namespace crystal
     class Component
     {
     public:
-        Component(GameObject* attachedObject);
+        Component();
         virtual ~Component();
 
         virtual void Update(const GameTimer& gameTimer);
         virtual void Draw(const GameTimer& gameTimer);
+
+        void AttachToObject(GameObject* gameObject) { m_attachedObject = gameObject; }
 
     protected:
         GameObject* m_attachedObject = nullptr;

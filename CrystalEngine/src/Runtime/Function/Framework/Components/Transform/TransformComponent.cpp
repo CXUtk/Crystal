@@ -2,9 +2,13 @@
 
 namespace crystal
 {
-    TransformComponent::TransformComponent(GameObject* attachedObject)
-        : Component(attachedObject)
+    TransformComponent::TransformComponent()
     {}
+
+    TransformComponent::TransformComponent(const Transform& transform)
+        : m_transform(transform)
+    {
+    }
 
     TransformComponent::~TransformComponent()
     {}

@@ -3,57 +3,10 @@
 #include "Engine.h"
 #include <Core/Math/Math.h>
 #include "Platform/RHI/Interfaces.h"
+#include "Tree/Tree.h"
 
 namespace crystal
 {
-    struct TreeNode;
-    struct ContourNode
-    {
-        TreeNode* node = nullptr;
-        ContourNode* next = nullptr;
-    };
-    struct TreeNode
-    {
-        float Left, Right;
-        float LazyTag;
-
-        std::vector<TreeNode*> Children{};
-
-        TreeNode* LeftContour = nullptr;
-        TreeNode* RightContour = nullptr;
-
-        TreeNode()
-        {
-            Left = Right = 0;
-            LazyTag = 0;
-        }
-
-        float Center() const { return (Left + Right) / 2.f; }
-
-        void MoveToLeftBeginAt(float destLeft)
-        {
-            float diff = destLeft - Left;
-            Left += diff;
-            Right += diff;
-            LazyTag += diff;
-
-            PushDown();
-        }
-
-        void PushDown()
-        {
-            for (auto child : Children)
-            {
-                child->Left += LazyTag;
-                child->Right += LazyTag;
-                child->LazyTag += LazyTag;
-
-                child->PushDown();
-            }
-            LazyTag = 0;
-        }
-    };
-
 	class TreeTest : public Application
 	{
 	public:
@@ -82,9 +35,13 @@ namespace crystal
 
         void InitTree();
         void DFSDraw(TreeNode* node, int level, SpriteBatch* spriteBatch, GeometryRenderer* gRender);
-        void PushDown(TreeNode* node, float Mod, int level);
-        void PushDownRightOnly(TreeNode* node, float Mod, int level);
-        void Dfs1(TreeNode* node);
+
         float DfsMinimum(TreeNode* node);
+
+        void Dfs1(TreeNode* node, int level);
+        void PositionMethod1(TreeNode* node);
+
+        void Dfs2(TreeNode* node);
+        void PositionMethod2(TreeNode* node);
 	};
 }
