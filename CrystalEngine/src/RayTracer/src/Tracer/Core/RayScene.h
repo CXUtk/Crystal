@@ -12,7 +12,8 @@ namespace tracer
     public:
         RayScene(std::shared_ptr<Scene> scene);
 
-
+        bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const;
+        bool IntersectTest(const Ray3f& ray, float tMin, float tMax) const;
     private:
         std::shared_ptr<Scene>          m_scene = nullptr;
         std::shared_ptr<IAccStructure>  m_accelStructure = nullptr;

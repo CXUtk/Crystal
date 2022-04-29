@@ -111,7 +111,7 @@ namespace crystal
         return true;
     }
 
-    inline glm::vec3 NextCosineUnitHemiSphere(glm::vec2 sample, float* pdf)
+    inline Vector3f NextCosineUnitHemiSphere(const Vector2f& sample, float* pdf)
     {
         auto r = std::sqrt(sample.x);
         auto phi = sample.y * glm::two_pi<float>();
@@ -120,7 +120,7 @@ namespace crystal
         auto z = r * std::sin(phi);
         auto y = std::sqrt(1.0f - r * r);
         *pdf = y / glm::pi<float>();
-        return glm::vec3(x, y, z);
+        return Vector3f(x, y, z);
     }
 
     inline glm::vec3 NextUnitHemiSphere(glm::vec2 sample, float* pdf)

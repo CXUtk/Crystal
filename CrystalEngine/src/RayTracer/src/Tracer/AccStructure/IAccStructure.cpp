@@ -1,7 +1,7 @@
 #include "IAccStructure.h"
 #include "Brute.h"
 #include "BVH.h"
-#include "KDTree.h"
+//#include "KDTree.h"
 
 namespace tracer
 {
@@ -15,10 +15,10 @@ namespace tracer
         {
             return std::make_shared<BVH>();
         }
-        else if (name == "KDTree")
-        {
-            return std::make_shared<KDTree>();
-        }
+        //else if (name == "KDTree")
+        //{
+        //    return std::make_shared<KDTree>();
+        //}
         else
         {
             throw std::exception("No such accelerator!");

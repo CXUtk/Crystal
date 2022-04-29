@@ -45,12 +45,11 @@ namespace crystal
     inline std::shared_ptr<TComp> GameObject::GetComponent()
     {
         //auto& id = typeid(TComp);
-        //auto p = m_components.find(id);
-        //if (p == m_components.end())
-        //{
-        //    return nullptr;
-        //    //throw std::runtime_error(string_format("Cannot find given component: %s", id.name()));
-        //}
+        auto p = m_components.find(typeid(TComp));
+        if (p == m_components.end())
+        {
+            throw std::runtime_error(string_format("Cannot find given component: %s", id.name()));
+        }
         return std::dynamic_pointer_cast<TComp>(m_components[typeid(TComp)]);
     }
 

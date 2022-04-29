@@ -14,8 +14,8 @@ namespace crystal
         LightComponent();
         virtual ~LightComponent() override;
 
-        virtual void Update(const GameTimer& gameTimer);
-        virtual void Draw(const GameTimer& gameTimer);
+        virtual void Update(const GameTimer& gameTimer) override;
+        virtual void Draw(const GameTimer& gameTimer) override;
 
     private:
         std::shared_ptr<Light>  m_light = nullptr;

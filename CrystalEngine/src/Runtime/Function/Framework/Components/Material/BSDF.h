@@ -51,9 +51,9 @@ namespace crystal
         /**
          * @brief Each wOut and wIn are normalized to TNB coordinates
         */
-        virtual Spectrum DistributionFunction(glm::vec3 wOut, glm::vec3 wIn) const = 0;
+        virtual Spectrum DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const = 0;
 
-        virtual float Pdf(glm::vec3 wOut, glm::vec3 wIn) const = 0;
+        virtual float Pdf(const Vector3f& wOut, const Vector3f& wIn) const = 0;
 
         /**
          * @brief Each wOut and wIn are normalized to TNB coordinates
@@ -64,7 +64,8 @@ namespace crystal
          * @param sampledType
          * @return
         */
-        virtual Spectrum SampleDirection(glm::vec2 sample, glm::vec3 wOut, glm::vec3* wIn, float* pdf, BxDFType* sampledType) const = 0;
+        virtual Spectrum SampleDirection(const Vector2f& sample, const Vector3f& wOut,
+            Vector3f* wIn, float* pdf, BxDFType* sampledType) const = 0;
 
         bool Matches(BxDFType type) const { return (_bxdfType & type) == _bxdfType; }
         bool Contains(BxDFType type) const { return (_bxdfType & type); }

@@ -8,7 +8,7 @@ namespace tracer
     RayScene::RayScene(std::shared_ptr<Scene> scene)
         : m_scene(scene)
     {
-        m_accelStructure = IAccStructure::CreateAccelerator("");
+        m_accelStructure = IAccStructure::CreateAccelerator("Brute");
 
         for (auto& obj : scene->GetGameObjects())
         {
@@ -20,5 +20,13 @@ namespace tracer
         }
 
         m_accelStructure->Build(m_hiters);
+    }
+    bool RayScene::Intersect(const Ray3f& ray, SurfaceInteraction* info) const
+    {
+        return m_accelStructure->Intersect(ray, info);
+    }
+    bool RayScene::IntersectTest(const Ray3f& ray, float tMin, float tMax) const
+    {
+        return m_accelStructure->IntersectTest(ray, nullptr, tMin, tMax);
     }
 }

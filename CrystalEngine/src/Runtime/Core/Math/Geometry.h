@@ -167,4 +167,27 @@ namespace crystal
     {
         return BoundingBox<L, T1, Q>(BoundingBox<L, T1, Q>::Vec(bbox.GetMinPos()), BoundingBox<L, T1, Q>::Vec(bbox.GetMaxPos()));
     }
+
+    template<typename T, glm::qualifier Q>
+    inline bool RayBoxTest(const Ray<3, T, Q>& ray, bool inv[3], const glm::vec<3, T, Q>& invD,
+        const BoundingBox<3, T, Q>& box, float& tMin, float& tMax)
+    {
+        auto minP = (box.GetMinPos() - ray.start) * invD;
+        auto maxP = (box.GetMaxPos() - ray.start) * invD;
+        if (inv[0]) std::swap(minP[0], maxP[0]);
+        tMin = std::max(tMin, minP[0]);
+        tMax = std::min(tMax, maxP[0]);
+        if (tMax < tMin) return false;
+
+        if (inv[1]) std::swap(minP[1], maxP[1]);
+        tMin = std::max(tMin, minP[1]);
+        tMax = std::min(tMax, maxP[1]);
+        if (tMax < tMin) return false;
+
+        if (inv[2]) std::swap(minP[2], maxP[2]);
+        tMin = std::max(tMin, minP[2]);
+        tMax = std::min(tMax, maxP[2]);
+        if (tMax < tMin) return false;
+        return true;
+    }
 }

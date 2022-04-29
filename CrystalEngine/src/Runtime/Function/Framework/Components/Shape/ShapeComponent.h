@@ -15,8 +15,8 @@ namespace crystal
         ShapeComponent(std::shared_ptr<Shape> shape);
         virtual ~ShapeComponent() override;
 
-        virtual void Update(const GameTimer& gameTimer);
-        virtual void Draw(const GameTimer& gameTimer);
+        virtual void Update(const GameTimer& gameTimer)override;
+        virtual void Draw(const GameTimer& gameTimer)override;
 
         std::shared_ptr<Shape> GetShape() const { return m_shape; }
         std::shared_ptr<IRayHiter> GetRayHiter() const;

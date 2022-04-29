@@ -27,19 +27,19 @@ namespace crystal
         auto transform = m_isec->GetInverseTNB();
         Vector3f wo = transform * wOut;
         Vector3f wi = transform * wIn;
-        fixVector(wo);
-        fixVector(wi);
+        //fixVector(wo);
+        //fixVector(wi);
 
         float pdf = 0.f;
         int matched = 0;
-        bool reflect = wIn.y * wOut.y > 0;
+        bool reflect = wi.y * wo.y > 0;
         for (int i = 0; i < m_numBxDF; i++)
         {
             auto& bxdf = m_bxdfs[i];
             if (bxdf->Matches(flags) && (reflect && bxdf->Contains(BxDFType::BxDF_REFLECTION))
                 || (!reflect && bxdf->Contains(BxDFType::BxDF_TRANSMISSION)))
             {
-                pdf += bxdf->Pdf(wOut, wIn);
+                pdf += bxdf->Pdf(wo, wi);
                 matched++;
             }
         }
@@ -48,19 +48,20 @@ namespace crystal
 
     Spectrum BSDF::DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const
     {
-        auto transform = _isec->GetInverseTNB();
-        wOut = transform * wOut;
-        wIn = transform * wIn;
-        fixVector(wOut);
-        fixVector(wIn);
+        auto transform = m_isec->GetInverseTNB();
+        Vector3f wo = transform * wOut;
+        Vector3f wi = transform * wIn;
+        //fixVector(wOut);
+        //fixVector(wIn);
         Spectrum L(0);
-        bool reflect = wIn.y * wOut.y > 0;
-        for (int i = 0; i < _numBxDF; i++)
+        bool reflect = wi.y * wo.y > 0;
+        for (int i = 0; i < m_numBxDF; i++)
         {
-            auto& bxdf = _bxdfs[i];
-            if ((reflect && bxdf->Contains(BxDFType::BxDF_REFLECTION)) || (!reflect && bxdf->Contains(BxDFType::BxDF_TRANSMISSION)))
+            auto& bxdf = m_bxdfs[i];
+            if ((reflect && bxdf->Contains(BxDFType::BxDF_REFLECTION))
+                || (!reflect && bxdf->Contains(BxDFType::BxDF_TRANSMISSION)))
             {
-                L += bxdf->DistributionFunction(wOut, wIn);
+                L += bxdf->DistributionFunction(wo, wi);
             }
         }
         return L;
@@ -70,14 +71,14 @@ namespace crystal
             float* pdf, BxDFType flags, BxDFType* sampledType) const
     {
         // 最大10个
-        assert(_numBxDF < 10);
+        assert(m_numBxDF < MAX_BxDFs);
         int tot = 0;
         int idMap[10] = { 0 };
 
         // 按照概率分布均匀采样
-        for (int i = 0; i < _numBxDF; i++)
+        for (int i = 0; i < m_numBxDF; i++)
         {
-            auto& bxdf = _bxdfs[i];
+            auto& bxdf = m_bxdfs[i];
             if (bxdf->Matches(flags))
             {
                 idMap[tot] = i;
@@ -89,41 +90,41 @@ namespace crystal
 
         // Select one bxdf to sample wIn
         int v = (int)(std::min(0.9999999404f, sampleBSDF) * tot);
-        std::shared_ptr<BxDF> selectedBxdf = _bxdfs[idMap[v]];
+        std::shared_ptr<BxDF> selectedBxdf = m_bxdfs[idMap[v]];
 
         *sampledType = selectedBxdf->GetType();
 
-        wOut = _isec->GetInverseTNB() * wOut;
-        fixVector(wOut);
+        Vector3f wo = m_isec->GetInverseTNB() * wOut;
+        // fixVector(wOut);
 
-        auto L = selectedBxdf->SampleDirection(sample, wOut, wIn, pdf, sampledType);
+        auto L = selectedBxdf->SampleDirection(sample, wo, wIn, pdf, sampledType);
         if (L == Spectrum(0.f) || *pdf == 0.f) return Spectrum(0.f);
 
         if (!selectedBxdf->Contains(BxDFType::BxDF_SPECULAR))
         {
-            for (int i = 0; i < _numBxDF; i++)
+            for (int i = 0; i < m_numBxDF; i++)
             {
-                auto& bxdf = _bxdfs[i];
+                auto& bxdf = m_bxdfs[i];
                 if (bxdf != selectedBxdf && bxdf->Matches(flags))
                 {
-                    *pdf += bxdf->Pdf(wOut, *wIn);
+                    *pdf += bxdf->Pdf(wo, *wIn);
                 }
             }
 
-            bool reflect = wIn->y * wOut.y > 0;
-            for (int i = 0; i < _numBxDF; i++)
+            bool reflect = wIn->y * wo.y > 0;
+            for (int i = 0; i < m_numBxDF; i++)
             {
-                auto& bxdf = _bxdfs[i];
+                auto& bxdf = m_bxdfs[i];
                 if (bxdf != selectedBxdf && bxdf->Matches(flags) &&
                     ((reflect && bxdf->Contains(BxDFType::BxDF_REFLECTION))
                         || (!reflect && bxdf->Contains(BxDFType::BxDF_TRANSMISSION))))
                 {
-                    L += bxdf->DistributionFunction(wOut, *wIn);
+                    L += bxdf->DistributionFunction(wo, *wIn);
                 }
             }
         }
-        *wIn = _isec->GetTNB() * (*wIn);
-        fixVector(*wIn);
+        *wIn = m_isec->GetTNB() * (*wIn);
+        // fixVector(*wIn);
 
         *pdf /= tot;
         return L;

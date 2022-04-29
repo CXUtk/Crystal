@@ -14,8 +14,8 @@ namespace crystal
         MeshComponent();
         virtual ~MeshComponent() override;
 
-        virtual void Update(const GameTimer& gameTimer);
-        virtual void Draw(const GameTimer& gameTimer);
+        virtual void Update(const GameTimer& gameTimer) override;
+        virtual void Draw(const GameTimer& gameTimer) override;
 
         const MeshData& GetTransform() const { return m_mesh; }
         MeshData& GetTransform() { return m_mesh; }

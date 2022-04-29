@@ -1,8 +1,13 @@
 #pragma once
 #include <memory>
-#include <Core/Math/Geometry.h>
-#include <Function/Framework/Object/GameObject.h>
 #include <Platform/RHI/Graphics/GraphicsCommon.h>
+
+#include <Core/Math/Geometry.h>
+
+#include <Function/Framework/Object/GameObject.h>
+#include <Function/Framework/Components/Material/BSDF.h>
+#include <Function/Framework/Components/Material/Material.h>
+#include <Function/Framework/Components/Material/MaterialComponent.h>
 
 namespace crystal
 {
@@ -70,9 +75,16 @@ namespace crystal
         */
         Spectrum Le(const Vector3f& w) const;
 
-        void SetBSDF(std::shared_ptr<)
+        std::shared_ptr<BSDF> GetBSDF() const { return m_bsdf; }
+
+        std::shared_ptr<Material> GetMaterial() const
+        {
+            return m_hitObject->GetComponent<MaterialComponent>()->GetMaterial();
+        }
 
     private:
+        std::shared_ptr<BSDF> m_bsdf = nullptr;
+
         const GameObject*   m_hitObject = nullptr;
         float               m_distance = std::numeric_limits<float>::infinity();
         bool                m_isFrontFace = false;
