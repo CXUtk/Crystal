@@ -172,8 +172,8 @@ namespace crystal
     inline bool RayBoxTest(const Ray<3, T, Q>& ray, bool inv[3], const glm::vec<3, T, Q>& invD,
         const BoundingBox<3, T, Q>& box, float& tMin, float& tMax)
     {
-        auto minP = (box.GetMinPos() - ray.start) * invD;
-        auto maxP = (box.GetMaxPos() - ray.start) * invD;
+        auto minP = (box.GetMinPos() - ray.Start()) * invD;
+        auto maxP = (box.GetMaxPos() - ray.Start()) * invD;
         if (inv[0]) std::swap(minP[0], maxP[0]);
         tMin = std::max(tMin, minP[0]);
         tMax = std::min(tMax, maxP[0]);

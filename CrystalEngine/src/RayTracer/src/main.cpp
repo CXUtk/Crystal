@@ -8,14 +8,14 @@
 using namespace crystal;
 int main(int argc, char** argv)
 {
-    //Engine* engine = Engine::GetInstance();
-    //auto uptr = std::make_unique<tracer::CrystalTracer>();
-    //engine->Start(std::move(uptr));
-    GameObject gameObject;
-    gameObject.AddComponent(std::make_shared<TransformComponent>(&gameObject));
-    gameObject.AddComponent(std::make_shared<MeshComponent>(&gameObject));
+    Engine* engine = Engine::GetInstance();
+    auto uptr = std::make_unique<tracer::Presenter>();
+    engine->Start(std::move(uptr));
+    //GameObject gameObject;
+    //gameObject.AddComponent(std::make_shared<TransformComponent>(&gameObject));
+    //gameObject.AddComponent(std::make_shared<MeshComponent>(&gameObject));
 
-    auto mesh = gameObject.GetComponent<MeshComponent>();
-    auto transform = gameObject.GetComponent<TransformComponent>();
+    //auto mesh = gameObject.GetComponent<MeshComponent>();
+    //auto transform = gameObject.GetComponent<TransformComponent>();
     return 0;
 }

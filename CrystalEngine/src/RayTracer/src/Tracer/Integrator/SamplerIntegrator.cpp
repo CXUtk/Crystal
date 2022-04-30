@@ -5,10 +5,10 @@
 namespace tracer
 {
     SamplerIntegrator::SamplerIntegrator(const std::shared_ptr<Sampler>& sampler, int threads)
-        : Integrator(), _sampler(sampler), _numThreads(threads)
+        : Integrator(), m_sampler(sampler), m_numThreads(threads)
     {
         assert(threads <= 16);
-        _threadPool = std::make_unique<FixedThreadPool>(threads);
+        m_threadPool = std::make_unique<FixedThreadPool>(threads);
     }
 
     void tracer::SamplerIntegrator::Render(const RayScene* rayScene,
@@ -16,16 +16,16 @@ namespace tracer
     {
         Preprocess(rayScene);
         int w = frameBuffer->GetWidth(), h = frameBuffer->GetHeight();
-        int SPP = _sampler->GetSamplesPerPixel();
+        int SPP = m_sampler->GetSamplesPerPixel();
 
         constexpr int TILE_SIZE = 32;
-        Point2i nTiles((w + TILE_SIZE - 1) / TILE_SIZE, (h + TILE_SIZE - 1) / TILE_SIZE);
+        m_nTiles = Point2i((w + TILE_SIZE - 1) / TILE_SIZE, (h + TILE_SIZE - 1) / TILE_SIZE);
 
-        std::atomic<int> finishedCount = 0;
+        m_completedBlocks = 0;
 
-        for (int x = 0; x < nTiles.x; x++)
+        for (int x = 0; x < m_nTiles.x; x++)
         {
-            for (int y = 0; y < nTiles.y; y++)
+            for (int y = 0; y < m_nTiles.y; y++)
             {
                 auto task = [&, x, y]() {
                     int x0 = TILE_SIZE * x;
@@ -33,7 +33,7 @@ namespace tracer
                     int y0 = TILE_SIZE * y;
                     int y1 = std::min(y0 + TILE_SIZE, h);
 
-                    auto sampler_thread = _sampler->Clone(x * nTiles.y + y);
+                    auto sampler_thread = m_sampler->Clone(x * m_nTiles.y + y);
 
                     for (int xx = x0; xx < x1; xx++)
                     {
@@ -50,7 +50,7 @@ namespace tracer
                                 auto ray = camera->GenerateRay(pos);
                                 auto color = Evaluate(ray, rayScene, ptr(sampler_thread));
 
-                                frameBuffer->AddSample(xx, yy, color);
+                                frameBuffer->AddSample(yy, xx, color);
                                 //printf("%lf, %lf\n", s.x, s.y);
                             } while (sampler_thread->StartNextSample());
 
@@ -58,12 +58,14 @@ namespace tracer
                         }
                     }
 
-                    finishedCount++;
+                    m_completedBlocks++;
+                    printf("Progress: %.2lf%%\n", (double)m_completedBlocks / (m_nTiles.x * m_nTiles.y) * 100);
+
                 };
-                _threadPool->AddTask(crystal::FixedThreadPool::Task{ task });
+                m_threadPool->AddTask(crystal::FixedThreadPool::Task{ task });
             }
         }
         // Wait until finish a frame
-        while (finishedCount < nTiles.x * nTiles.y) {}
+        while (m_completedBlocks < m_nTiles.x * m_nTiles.y) {}
     }
 }

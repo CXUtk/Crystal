@@ -1,5 +1,6 @@
 #include "LambertianMaterial.h"
 #include "../BSDFs/Lambertian.h"
+#include <Core/Interaction/SurfaceInteraction.h>
 
 namespace crystal
 {

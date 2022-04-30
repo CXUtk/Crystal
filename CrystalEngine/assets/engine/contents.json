@@ -32,5 +32,6 @@
         "consola.ttf"
     ],
     "meshes": [
+        "Floor"
     ]
 }

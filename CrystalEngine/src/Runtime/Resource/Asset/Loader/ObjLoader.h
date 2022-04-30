@@ -10,7 +10,7 @@
 #include <glm/glm.hpp>
 
 #include <Platform/RHI/FileSystem/FSCommon.h>
-#include <Resource/Asset/Content/Mesh.h>
+#include <Function/Framework/Components/Mesh/Mesh.h>
 #include <Core/Math/Math.h>
 
 namespace crystal

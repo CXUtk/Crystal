@@ -18,6 +18,7 @@ namespace crystal
         virtual void Draw(const GameTimer& gameTimer);
 
         void AttachToObject(GameObject* gameObject) { m_attachedObject = gameObject; }
+        GameObject* GetAttachedObject() const { return m_attachedObject; }
 
     protected:
         GameObject* m_attachedObject = nullptr;

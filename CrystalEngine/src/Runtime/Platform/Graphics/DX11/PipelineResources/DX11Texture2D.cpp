@@ -25,6 +25,8 @@ namespace crystal
 		textureDesc.CPUAccessFlags = 0;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.SampleDesc.Quality = 0;
+
+        m_mipMapLevels = texDesc.MipmapLevels;
 		if (texDesc.Usage == BufferUsage::CPURead)
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ;
@@ -46,7 +48,6 @@ namespace crystal
         }
 
         auto d3dContext = m_pGraphicsDevice->GetD3DContext()->GetD3DContext();
-
         if (textureDesc.MipLevels > 1)
         {
             DirectX::CreateWICTextureFromFileEx(graphicsDevice->GetD3DDevice(), d3dContext, DX11Common::ConvertFromUtf8ToUtf16(path).c_str(),
@@ -87,6 +88,8 @@ namespace crystal
 		textureDesc.CPUAccessFlags = 0;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.SampleDesc.Quality = 0;
+
+        m_mipMapLevels = texDesc.MipmapLevels;
 		if (texDesc.Usage == BufferUsage::CPURead)
 		{
 			textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_READ;
@@ -108,11 +111,12 @@ namespace crystal
 
         auto device = m_pGraphicsDevice->GetD3DDevice();
 
+
         D3D11_SUBRESOURCE_DATA sData = {};
         sData.pSysMem = src;
         sData.SysMemPitch = texDesc.Size.x * DX11Common::RenderFormatToBytes(texDesc.Format);
 
-        HR(device->CreateTexture2D(&textureDesc, &sData, m_pTexture2D.GetAddressOf()));
+        HR(device->CreateTexture2D(&textureDesc, src ? &sData : nullptr, m_pTexture2D.GetAddressOf()));
 
         HR(device->CreateShaderResourceView(m_pTexture2D.Get(), nullptr, m_pSRV.GetAddressOf()));
 
@@ -134,4 +138,30 @@ namespace crystal
 		ID3D11ShaderResourceView** ptr = (ID3D11ShaderResourceView**)pHandle;
 		*ptr = m_pSRV.Get();
 	}
+    void DX11Texture2D::ReplaceContent(void* data, size_t size, int level)
+    {
+        auto d3dContext = m_pGraphicsDevice->GetD3DContext()->GetD3DContext();
+
+        ComPtr<ID3D11Texture2D> stageTexture;
+        D3D11_TEXTURE2D_DESC desc;
+        m_pTexture2D->GetDesc(&desc);
+        desc.Usage = D3D11_USAGE_STAGING;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        desc.BindFlags = 0;
+
+        D3D11_SUBRESOURCE_DATA sData = {};
+        sData.pSysMem = data;
+        sData.SysMemPitch = m_size.x * 4;
+
+        auto device = m_pGraphicsDevice->GetD3DDevice();
+        HR(device->CreateTexture2D(&desc, &sData, stageTexture.GetAddressOf()));
+
+        D3D11_MAPPED_SUBRESOURCE mappedData;
+        auto subresource = D3D11CalcSubresource(level, 0, m_mipMapLevels);
+        d3dContext->CopyResource(m_pTexture2D.Get(), stageTexture.Get());
+        //HR(d3dContext->Map(m_pTexture2D.Get(), subresource,
+        //    D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        //memcpy_s(mappedData.pData, mappedData.DepthPitch, data, size);
+        //d3dContext->Unmap(m_pTexture2D.Get(), subresource);
+    }
 }

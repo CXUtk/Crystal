@@ -4,8 +4,6 @@ namespace crystal
     Camera::Camera(Float fovY, Float aspect, Float zNear, Float zFar) : m_FovY(fovY),
         m_AspectRatio(aspect), m_zNear(zNear), m_zFar(zFar)
     {
-
-
     }
 
     Camera::~Camera()

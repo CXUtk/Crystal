@@ -18,7 +18,7 @@ namespace tracer
 
         void Clear();
 
-        std::shared_ptr<unsigned char[]> GetImageDataRGB8() const;
+        std::shared_ptr<unsigned char[]> GetImageDataRGBA8() const;
         std::shared_ptr<float[]> GetImageDataRGB32F() const;
 
     private:

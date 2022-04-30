@@ -26,5 +26,7 @@ namespace tracer
     private:
         bool                            m_renderPause = false;
         std::shared_ptr<RayTracer>      m_tracer = nullptr;
+        std::shared_ptr<ITexture2D>     m_rayTraceTexture = nullptr;
+        double                          m_elapsedTime = 0.f;
     };
 }

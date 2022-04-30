@@ -1,5 +1,6 @@
 #include "BSDF.h"
 #include <glm/glm.hpp>
+#include <Core/Interaction/SurfaceInteraction.h>
 
 namespace crystal
 {

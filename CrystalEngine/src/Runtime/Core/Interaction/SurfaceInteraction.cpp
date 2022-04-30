@@ -24,7 +24,7 @@ namespace crystal
     Ray3f SurfaceInteraction::SpawnRayTo(const Point3f& pos) const
     {
         bool back = glm::dot(pos - m_hitPos, m_normal) < 0;
-        Point3f origin = m_hitPos + ((back) ? -m_normal : -m_normal) * EPS;
+        Point3f origin = m_hitPos + ((back) ? -m_normal : m_normal) * EPS;
         return Ray(origin, pos - origin);
     }
 

@@ -21,9 +21,10 @@ namespace tracer
             GlobalLogger::Log(crystal::SeverityLevel::Warning, "FrameBuffer::AddSample INF detected");
             return;
         }
+        r = m_bufferSize.y - 1 - r;
         auto& pixel = m_colorBuffer[r * m_bufferSize.x + c];
         pixel.Color += color * weight;
-        pixel.Color += weight;
+        pixel.Weight += weight;
     }
 
     void FrameBuffer::Clear()
@@ -37,9 +38,9 @@ namespace tracer
         }
     }
 
-    std::shared_ptr<unsigned char[]> FrameBuffer::GetImageDataRGB8() const
+    std::shared_ptr<unsigned char[]> FrameBuffer::GetImageDataRGBA8() const
     {
-        auto data = std::shared_ptr<unsigned char[]>(new unsigned char[m_bufferSize.x * m_bufferSize.y * 3]);
+        auto data = std::shared_ptr<unsigned char[]>(new unsigned char[m_bufferSize.x * m_bufferSize.y * 4]);
         for (int i = 0; i < m_bufferSize.y; i++)
         {
             for (int j = 0; j < m_bufferSize.x; j++)
@@ -47,9 +48,12 @@ namespace tracer
                 int dest = i * m_bufferSize.x + j;
                 auto c = m_colorBuffer[dest].Color / m_colorBuffer[dest].Weight;
 
-                data[dest * 3] = (unsigned char)round(glm::clamp(c.r, 0.f, 1.f) * 255);
-                data[dest * 3 + 1] = (unsigned char)round(glm::clamp(c.g, 0.f, 1.f) * 255);
-                data[dest * 3 + 2] = (unsigned char)round(glm::clamp(c.b, 0.f, 1.f) * 255);
+                c = glm::pow(c, glm::vec3(1 / 2.2));
+
+                data[dest * 4] = (unsigned char)round(glm::clamp(c.r, 0.f, 1.f) * 255);
+                data[dest * 4 + 1] = (unsigned char)round(glm::clamp(c.g, 0.f, 1.f) * 255);
+                data[dest * 4 + 2] = (unsigned char)round(glm::clamp(c.b, 0.f, 1.f) * 255);
+                data[dest * 4 + 3] = 255;
             }
         }
         return data;

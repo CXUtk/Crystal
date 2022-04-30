@@ -1,9 +1,10 @@
 #pragma once
 #include <Core/Math/Geometry.h>
 
-using namespace crystal;
+
 namespace tracer
 {
+    using namespace crystal;
     struct RenderProperties
     {
         Vector2i    FrameBufferSize{800, 600};

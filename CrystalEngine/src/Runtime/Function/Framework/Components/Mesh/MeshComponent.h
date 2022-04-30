@@ -4,23 +4,27 @@
 #include <memory>
 
 #include "../Component.h"
-#include "MeshData.h"
+#include "Mesh.h"
+#include <Function/Framework/Components/Shape/ShapeRayHiter.h>
+#include <Function/Framework/Components/Shape/Shapes/Triangle.h>
 
 namespace crystal
 {
     class MeshComponent : public Component
     {
     public:
-        MeshComponent();
+        MeshComponent(std::shared_ptr<Mesh> mesh);
         virtual ~MeshComponent() override;
 
         virtual void Update(const GameTimer& gameTimer) override;
         virtual void Draw(const GameTimer& gameTimer) override;
 
-        const MeshData& GetTransform() const { return m_mesh; }
-        MeshData& GetTransform() { return m_mesh; }
+        std::shared_ptr<Mesh> GetMesh() const { return m_mesh; }
+        std::vector<std::shared_ptr<IRayHiter>> CreateRayHiters();
 
     private:
-        MeshData   m_mesh{};
+        std::shared_ptr<Mesh>   m_mesh{};
+        std::vector<std::shared_ptr<Triangle>> m_triangles{};
+        std::vector<MeshVertexData> m_vertices{};
     };
 }

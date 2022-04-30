@@ -11,7 +11,7 @@ namespace crystal
     class MaterialComponent : public Component
     {
     public:
-        MaterialComponent();
+        MaterialComponent(std::shared_ptr<Material> material);
         virtual ~MaterialComponent() override;
 
         virtual void Update(const GameTimer& gameTimer)override;

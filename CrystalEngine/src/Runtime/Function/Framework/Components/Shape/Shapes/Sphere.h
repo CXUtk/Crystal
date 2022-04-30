@@ -1,20 +1,15 @@
 #pragma once
 #include "Shape.h"
 #include <memory>
+#include <Core/Math/Transform.h>
 
 namespace crystal
 {
-    struct SphereShapeDesc
-    {
-        Point3f     Position;
-        float       Radius;
-        Quaternion  Rotation;
-    };
     class Sphere : public Shape
     {
     public:
         // static std::shared_ptr<Shape> CreateSphere(SphereShapeDesc pShapeNode);
-        Sphere(const SphereShapeDesc& desc);
+        Sphere(float radius, const Transform& transform);
         ~Sphere() override;
         Bound3f GetBoundingBox() const override;
         bool Intersect(const Ray3f& ray, SurfaceInteraction* isec) const override;
@@ -28,10 +23,9 @@ namespace crystal
             const SurfaceInteraction& ref) const override;
 
     private:
-        Point3f m_position{};
-        float m_radius{};
-        Quaternion m_rotation{};
-        Matrix3f _world2Local{};
-        Matrix3f _local2World{};
+        float       m_radius{};
+        Point3f     m_position{};
+        Matrix3f    m_world2Local{};
+        Matrix3f    m_local2World{};
     };
 }

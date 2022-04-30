@@ -3,10 +3,11 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include <Core/Math/Geometry.h>
-#include <Core/Interaction/SurfaceInteraction.h>
+#include <Platform/RHI/Graphics/GraphicsCommon.h>
 
 namespace crystal
 {
+    class SurfaceInteraction;
     class Material
     {
     public:

@@ -18,8 +18,10 @@ namespace tracer
             Sampler* sampler) = 0;
 
     private:
-        std::shared_ptr<Sampler> _sampler;
-        std::shared_ptr<FixedThreadPool> _threadPool;
-        int _numThreads;
+        std::shared_ptr<Sampler> m_sampler = nullptr;
+        std::shared_ptr<FixedThreadPool> m_threadPool = nullptr;
+        std::atomic<int>    m_completedBlocks{};
+        int                 m_numThreads{};
+        Point2i             m_nTiles{};
     };
 }

@@ -4,7 +4,7 @@
 #include <Core/Utils/Misc.h>
 
 #include "Content/Fonts/FontFamily.h"
-#include "Content/Mesh.h"
+#include "Function/Framework/Components/Mesh/Mesh.h"
 
 namespace crystal
 {

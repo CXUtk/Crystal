@@ -2,7 +2,9 @@
 
 namespace crystal
 {
-    MaterialComponent::MaterialComponent()
+
+    MaterialComponent::MaterialComponent(std::shared_ptr<Material> material)
+        : m_material(material)
     {}
 
     MaterialComponent::~MaterialComponent()

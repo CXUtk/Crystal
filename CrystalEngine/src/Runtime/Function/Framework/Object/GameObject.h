@@ -48,7 +48,7 @@ namespace crystal
         auto p = m_components.find(typeid(TComp));
         if (p == m_components.end())
         {
-            throw std::runtime_error(string_format("Cannot find given component: %s", id.name()));
+            throw std::runtime_error(string_format("Cannot find given component: %s", typeid(TComp).name()));
         }
         return std::dynamic_pointer_cast<TComp>(m_components[typeid(TComp)]);
     }
@@ -56,13 +56,18 @@ namespace crystal
     template<typename TComp>
     inline std::shared_ptr<const TComp> GameObject::GetComponent() const
     {
-        return std::dynamic_pointer_cast<const TComp>(m_components[typeid(TComp)]);
+        auto p = m_components.find(typeid(TComp));
+        if (p == m_components.end())
+        {
+            throw std::runtime_error(string_format("Cannot find given component: %s", typeid(TComp).name()));
+        }
+        return std::dynamic_pointer_cast<const TComp>(p->second);
     }
 
     template<typename TComp>
     inline bool GameObject::HasComponent() const
     {
-        return m_components.find(id) != m_components.end();
+        return m_components.find(typeid(TComp)) != m_components.end();
     }
 
 }

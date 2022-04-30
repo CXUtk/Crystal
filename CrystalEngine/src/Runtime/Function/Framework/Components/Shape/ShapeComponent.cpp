@@ -18,6 +18,6 @@ namespace crystal
 
     std::shared_ptr<IRayHiter> ShapeComponent::GetRayHiter() const
     {
-        return std::make_shared<ShapeRayHiter>(m_attachedObject, m_shape);
+        return std::make_shared<ShapeRayHiter>(m_attachedObject, cptr(m_shape));
     }
 }

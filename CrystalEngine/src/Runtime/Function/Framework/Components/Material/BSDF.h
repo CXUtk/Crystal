@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include <Core/Math/Geometry.h>
-#include <Core/Interaction/SurfaceInteraction.h>
+#include <Platform/RHI/Graphics/GraphicsCommon.h>
 
 namespace crystal
 {
@@ -18,6 +18,9 @@ namespace crystal
         BxDF_ALL = 0x1F,
     };
     BIT_FLAGS_END(BxDFType);
+
+    class SurfaceInteraction;
+    class BxDF;
 
     class BSDF
     {
@@ -37,15 +40,15 @@ namespace crystal
     private:
         static constexpr int MAX_BxDFs = 8;
 
-        const SurfaceInteraction* m_isec = nullptr;
-        std::shared_ptr<BxDF> m_bxdfs[MAX_BxDFs];
-        int m_numBxDF = 0;
+        const SurfaceInteraction*   m_isec = nullptr;
+        std::shared_ptr<BxDF>       m_bxdfs[MAX_BxDFs];
+        int                         m_numBxDF = 0;
     };
 
     class BxDF
     {
     public:
-        BxDF(BxDFType type) : _bxdfType(type) {}
+        BxDF(BxDFType type) : m_bxdfType(type) {}
         virtual ~BxDF() = 0 {}
 
         /**
@@ -67,12 +70,12 @@ namespace crystal
         virtual Spectrum SampleDirection(const Vector2f& sample, const Vector3f& wOut,
             Vector3f* wIn, float* pdf, BxDFType* sampledType) const = 0;
 
-        bool Matches(BxDFType type) const { return (_bxdfType & type) == _bxdfType; }
-        bool Contains(BxDFType type) const { return (_bxdfType & type); }
+        bool Matches(BxDFType type) const { return (m_bxdfType & type) == m_bxdfType; }
+        bool Contains(BxDFType type) const { return (m_bxdfType & type); }
 
-        BxDFType GetType() const { return _bxdfType; }
+        BxDFType GetType() const { return m_bxdfType; }
 
     private:
-        BxDFType _bxdfType;
+        BxDFType m_bxdfType{};
     };
 }

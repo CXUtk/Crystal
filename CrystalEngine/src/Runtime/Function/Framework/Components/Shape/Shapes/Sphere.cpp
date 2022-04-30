@@ -18,12 +18,13 @@ namespace crystal
     //    return std::make_shared<Sphere>(pos, r, rotation);
     //}
 
-    crystal::Sphere::Sphere(const SphereShapeDesc& desc)
-        : m_position(desc.Position), m_radius(desc.Radius), m_rotation(desc.Rotation)
+    Sphere::Sphere(float radius, const Transform& transform)
+        : m_radius(radius)
     {
-        Matrix4f rotMatrix = glm::toMat4(m_rotation);
-        _local2World = glm::mat3(rotMatrix);
-        _world2Local = glm::transpose(_local2World);
+        m_position = transform.GetTranslation();
+        Matrix4f rotMatrix = glm::toMat4(transform.GetRotation());
+        m_local2World = glm::mat3(rotMatrix);
+        m_world2Local = glm::transpose(m_local2World);
     }
 
     Sphere::~Sphere()
@@ -36,8 +37,8 @@ namespace crystal
 
     bool Sphere::Intersect(const Ray3f& ray, SurfaceInteraction* info) const
     {
-        glm::vec3 P = _world2Local * (ray.Start() - m_position);
-        glm::vec3 d = _world2Local * ray.Dir();
+        Point3f P = m_world2Local * (ray.Start() - m_position);
+        Vector3f d = m_world2Local * ray.Dir();
         float a = glm::dot(d, d);
         float b = 2 * glm::dot(d, P);
         float c = glm::dot(P, P) - m_radius * m_radius;
@@ -61,9 +62,9 @@ namespace crystal
         auto front_face = glm::dot(d, N) < 0;
         N = front_face ? N : -N;
 
-        auto realHitPos = _local2World * dummyHitPos + m_position;
-        auto dpdu = glm::normalize(_local2World * glm::vec3(-N.z, 0, N.x));
-        N = _local2World * N;
+        auto realHitPos = m_local2World * dummyHitPos + m_position;
+        auto dpdu = glm::normalize(m_local2World * glm::vec3(-N.z, 0, N.x));
+        N = m_local2World * N;
         // Interaction normal
         info->SetHitInfo(t, realHitPos, ray.Dir(), N, glm::vec2(phi, theta), front_face, dpdu, glm::cross(N, dpdu));
 
@@ -78,8 +79,8 @@ namespace crystal
     bool Sphere::IntersectTest(const Ray3f& ray, float tMin, float tMax) const
     {
         if (tMin > tMax) return false;
-        glm::vec3 P = _world2Local * (ray.Start() - m_position);
-        glm::vec3 d = _world2Local * ray.Dir();
+        glm::vec3 P = m_world2Local * (ray.Start() - m_position);
+        glm::vec3 d = m_world2Local * ray.Dir();
         float a = glm::dot(d, d);
         float b = 2 * glm::dot(d, P);
         float c = glm::dot(P, P) - m_radius * m_radius;

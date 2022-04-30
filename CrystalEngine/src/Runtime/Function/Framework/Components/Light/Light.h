@@ -1,6 +1,11 @@
 #pragma once
 #include <Crystal.h>
 #include <glm/glm.hpp>
+#include <Core/Math/Geometry.h>
+#include <Core/Interaction/SurfaceInteraction.h>
+#include <Core/Math/Transform.h>
+
+#include <Platform/RHI/Graphics/GraphicsCommon.h>
 
 namespace crystal
 {
@@ -23,18 +28,18 @@ namespace crystal
 
         //virtual const crystal::IIntersectable* GetAttachedObject() const { return nullptr; }
 
-        //virtual Spectrum Flux() const = 0;
+        virtual Spectrum Flux() const = 0;
 
         //virtual void Preprocess(const Scene* scene) const { }
 
-        //// Get the radiance value from the light to the object surface hit point
-        //virtual Spectrum Sample_Li(const SurfaceInfo& surface_w, const glm::vec2& sample,
-        //    Point3f* endpoint, float* pdf) const = 0;
+        // Get the radiance value from the light to the object surface hit point
+        virtual Spectrum Sample_Li(const SurfaceInfo& surface_w, const Transform& transform,
+            const Vector2f& sample, Point3f* endpoint, float* pdf) const = 0;
 
-        //virtual float Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const = 0;
+        virtual float Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const = 0;
 
-        //// Infinite area light, get emitted radiance from direction
-        //virtual Spectrum Le(const Vector3f& wi) const { return Spectrum(0.f); }
+        // Infinite area light, get emitted radiance from direction
+        virtual Spectrum Le(const Vector3f& wi) const { return Spectrum(0.f); }
 
         //int GetNumSamples() const { return _numSamples; }
 

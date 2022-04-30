@@ -63,8 +63,8 @@ namespace crystal
         Vector3f GetHitDir() const { return m_hitDir; }
 
 
-        glm::mat3 GetTNB() const;
-        glm::mat3 GetInverseTNB() const;
+        Matrix3f GetTNB() const;
+        Matrix3f GetInverseTNB() const;
 
         SurfaceInfo GetSurfaceInfo(bool modelNormal) const;
 
@@ -76,6 +76,7 @@ namespace crystal
         Spectrum Le(const Vector3f& w) const;
 
         std::shared_ptr<BSDF> GetBSDF() const { return m_bsdf; }
+        void SetBSDF(std::shared_ptr<BSDF> bsdf) { m_bsdf = bsdf; }
 
         std::shared_ptr<Material> GetMaterial() const
         {
@@ -83,8 +84,6 @@ namespace crystal
         }
 
     private:
-        std::shared_ptr<BSDF> m_bsdf = nullptr;
-
         const GameObject*   m_hitObject = nullptr;
         float               m_distance = std::numeric_limits<float>::infinity();
         bool                m_isFrontFace = false;
@@ -94,5 +93,6 @@ namespace crystal
                             m_dpDv{};
         Normal3f            m_normal{};
         Vector2f            m_texCoord{};
+        std::shared_ptr<BSDF> m_bsdf = nullptr;
     };
 }
