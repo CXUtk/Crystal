@@ -33,6 +33,10 @@ namespace crystal
             return mat;
         }
 
+        void SetTranslation(const Vector3f& translation) { m_translation = translation; }
+        void SetScale(const Vector3f& scale) { m_scale = scale; }
+        void GetRotation(const Quaternion& quat) { m_rotation = quat; }
+
         Vector3f GetTranslation() const { return m_translation; }
         Vector3f GetScale() const { return m_scale; }
         Quaternion GetRotation() const { return m_rotation; }

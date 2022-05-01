@@ -1,0 +1,13 @@
+{
+    "type": "Texture2D",
+
+    "info": {
+        "Target": "LUT.jpg",
+        "TargetComponentFormat": "Byte8",
+        "TargetComponents": 3,
+        "InternalComponentFormat": "Float32",
+        "InternalComponents": 3,
+        "IsHDR": false,
+        "MipmapLevels": 1
+    }
+}

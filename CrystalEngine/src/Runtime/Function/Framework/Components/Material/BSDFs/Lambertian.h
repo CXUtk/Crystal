@@ -3,11 +3,11 @@
 
 namespace crystal
 {
-    class Lambertain : public BxDF
+    class Lambertian : public BxDF
     {
     public:
-        Lambertain(const Spectrum& albedo);
-        ~Lambertain() override;
+        Lambertian(const Spectrum& albedo);
+        ~Lambertian() override;
 
         Spectrum DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const override;
 
@@ -16,6 +16,6 @@ namespace crystal
             Vector3f* wIn, float* pdf, BxDFType* sampledType) const override;
 
     private:
-        Spectrum m_albedo;
+        Spectrum m_albedo{};
     };
 }

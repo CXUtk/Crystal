@@ -4,7 +4,7 @@
 
 namespace crystal
 {
-    LambertianMaterial::LambertianMaterial(const Spectrum& albedo)
+    LambertianMaterial::LambertianMaterial(std::shared_ptr<CPUTexture2D> albedo)
         : m_albedo(albedo)
     {
     }
@@ -14,6 +14,7 @@ namespace crystal
 
     void LambertianMaterial::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const
     {
-        isec->GetBSDF()->AddBxDF(std::make_shared<Lambertain>(m_albedo));
+        auto baseColor = m_albedo->Sample(isec->GetTexCoord());
+        isec->GetBSDF()->AddBxDF(std::make_shared<Lambertian>(baseColor));
     }
 }

@@ -6,6 +6,7 @@
 namespace crystal
 {
     using RNG = std::mt19937;
+    constexpr bool SHOW_DEBUG = true;
 
     inline float UniformRandomFloat(RNG& mt)
     {
@@ -88,7 +89,7 @@ namespace crystal
         return glm::vec3(r * std::cos(phi), 1.0f - r * r, -r * std::sin(phi));
     }
 
-    inline bool refract(glm::vec3 wo, float etaA, float etaB, glm::vec3* wt)
+    inline bool refract(Vector3f wo, float etaA, float etaB, Vector3f* wt)
     {
         float eta = etaA / etaB;
         wo *= -eta;
@@ -150,9 +151,6 @@ namespace crystal
         return glm::vec3(x, y, z);
     }
 
-    inline float square(float x) { return x * x; }
-
-
     template<typename T>
     inline void quickPrint(const T& value) {}
 
@@ -190,5 +188,44 @@ namespace crystal
         uint64_t n1 = ReverseBits32((uint32_t)(n >> 32));
         return (n0 << 32) | n1;
     }
+
+    template<glm::length_t L, typename T, enum glm::qualifier Q>
+    inline void reportNaN(const glm::vec<L, T, Q>& v, const char* title, int lineNum, const char* fileName)
+    {
+        if (glm::isnan(v) != glm::vec<L, bool, Q>(false))
+        {
+            printf("NaN detected at file %s (file %s, line %d)\n", title, fileName, lineNum);
+        }
+    }
+
+    inline void reportNaN(float v, const char* title, int lineNum, const char* fileName)
+    {
+        if (std::isnan(v))
+        {
+            printf("NaN detected at file %s (file %s, line %d)\n", title, fileName, lineNum);
+        }
+    }
+
+    template<glm::length_t L, typename T, enum glm::qualifier Q>
+    inline void reportINF(const glm::vec<L, T, Q>& v, const char* title, int lineNum, const char* fileName)
+    {
+        if (glm::isinf(v) != glm::vec<L, bool, Q>(false))
+        {
+            printf("INF detected at %s (file %s, line %d)\n", title, fileName, lineNum);
+        }
+    }
+
+    inline void reportINF(float v, const char* title, int lineNum, const char* fileName)
+    {
+        if (std::isinf(v))
+        {
+            printf("INF detected at %s (file %s, line %d)\n", title, fileName, lineNum);
+        }
+    }
+
 }
+
+// Micro definitions
+#define NAN_DETECT_V(vec, name) if constexpr(crystal::SHOW_DEBUG) {crystal::reportNaN(vec, name, __LINE__, __FILE__);}
+#define INF_DETECT_V(vec, name) if constexpr(crystal::SHOW_DEBUG) {crystal::reportINF(vec, name, __LINE__, __FILE__);}
 

@@ -3,26 +3,27 @@
 
 namespace crystal
 {
-    Lambertain::Lambertain(const Spectrum& albedo)
+    Lambertian::Lambertian(const Spectrum& albedo)
         : BxDF(BxDFType::BxDF_DIFFUSE | BxDFType::BxDF_REFLECTION), m_albedo(albedo)
     {}
 
-    Lambertain::~Lambertain()
+    Lambertian::~Lambertian()
     {}
 
-    Spectrum Lambertain::DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const
+    Spectrum Lambertian::DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const
     {
         return m_albedo / glm::pi<float>();
     }
 
-    float Lambertain::Pdf(const Vector3f& wOut, const Vector3f& wIn) const
+    float Lambertian::Pdf(const Vector3f& wOut, const Vector3f& wIn) const
     {
         return std::max(0.f, wIn.y) / glm::pi<float>();
     }
 
-    Spectrum Lambertain::SampleDirection(const Vector2f& sample, const Vector3f& wOut,
+    Spectrum Lambertian::SampleDirection(const Vector2f& sample, const Vector3f& wOut,
         Vector3f* wIn, float* pdf, BxDFType* sampledType) const
     {
+        *sampledType = BxDFType::BxDF_REFLECTION | BxDFType::BxDF_DIFFUSE;
         *wIn = NextCosineUnitHemiSphere(sample, pdf);
         return DistributionFunction(wOut, *wIn);
     }

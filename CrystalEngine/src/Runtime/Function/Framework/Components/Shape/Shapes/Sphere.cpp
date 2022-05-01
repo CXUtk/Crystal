@@ -56,17 +56,17 @@ namespace crystal
         auto dummyHitPos = P + d * t;
 
         auto N = glm::normalize(dummyHitPos);
-        auto phi = std::atan2(-dummyHitPos.z, dummyHitPos.x) / glm::pi<float>();
-        auto theta = std::acos(dummyHitPos.y / m_radius) / glm::pi<float>() + 1.0f;
+        auto phi = (std::atan2(-dummyHitPos.z, dummyHitPos.x) + glm::pi<float>()) / glm::pi<float>();
+        auto theta = std::acos(dummyHitPos.y / m_radius) / glm::pi<float>() * 0.5f + 0.5f;
 
         auto front_face = glm::dot(d, N) < 0;
         N = front_face ? N : -N;
 
         auto realHitPos = m_local2World * dummyHitPos + m_position;
-        auto dpdu = glm::normalize(m_local2World * glm::vec3(-N.z, 0, N.x));
+        auto dpdu = glm::normalize(m_local2World * Vector3f(-N.z, 0, N.x));
         N = m_local2World * N;
         // Interaction normal
-        info->SetHitInfo(t, realHitPos, ray.Dir(), N, glm::vec2(phi, theta), front_face, dpdu, glm::cross(N, dpdu));
+        info->SetHitInfo(t, realHitPos, ray.Dir(), N, Point2f(phi * 0.5f, theta), front_face, dpdu, glm::cross(N, dpdu));
 
         if (std::isinf(t) || std::isnan(t))
         {

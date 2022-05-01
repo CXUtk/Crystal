@@ -11,17 +11,21 @@ namespace tracer
     class RayScene
     {
     public:
-        RayScene(std::shared_ptr<Scene> scene);
+        RayScene(std::shared_ptr<Scene> scene, std::shared_ptr<CPUTextureCubemap> skybox);
 
         bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const;
         bool IntersectTest(const Ray3f& ray, float tMin, float tMax) const;
         void ForEachLights(std::function<void(const crystal::LightComponent*)> action) const;
 
+        Spectrum GetEnvironmentLight(const Vector3f& dir) const;
+
     private:
-        std::shared_ptr<Scene>          m_scene = nullptr;
-        std::shared_ptr<IAccStructure>  m_accelStructure = nullptr;
+        std::shared_ptr<Scene>              m_scene = nullptr;
+        std::shared_ptr<IAccStructure>      m_accelStructure = nullptr;
+        std::shared_ptr<CPUTextureCubemap>  m_skyBox = nullptr;
 
         std::vector<std::shared_ptr<crystal::IRayHiter>>         m_hiters{};
         std::vector<std::shared_ptr<crystal::LightComponent>>    m_light{};
+
     };
 }

@@ -5,6 +5,8 @@
 #include <Core/Math/Geometry.h>
 #include <Platform/RHI/Graphics/GraphicsCommon.h>
 
+#include <Resource/Asset/Content/CPUTexture/CPUTexture2D.h>
+
 namespace crystal
 {
     class SurfaceInteraction;

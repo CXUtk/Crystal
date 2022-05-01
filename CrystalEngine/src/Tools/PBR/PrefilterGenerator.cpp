@@ -219,5 +219,3 @@ Vector3f SampleOneNormal(const Vector3f& N, const std::vector<Vector2f>& samples
 
     return sampledValue * (1.f / count);
 }
-
-

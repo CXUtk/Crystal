@@ -28,7 +28,7 @@ namespace tracer
         std::shared_ptr<RayScene>       m_rayScene = nullptr;
         std::shared_ptr<FrameBuffer>    m_frameBuffer = nullptr;
         std::shared_ptr<Integrator>     m_integrator = nullptr;
-        std::shared_ptr<std::thread>    m_renderThread = nullptr;
+        // std::shared_ptr<std::thread>    m_renderThread = nullptr;
         Vector2i                        m_bufferOldSize{};
     };
 }

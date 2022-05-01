@@ -6,6 +6,7 @@
 
 namespace tracer
 {
+
     class SamplerIntegrator : public Integrator
     {
     public:
@@ -14,6 +15,7 @@ namespace tracer
         virtual void Preprocess(const RayScene* scene) = 0;
         void Render(const RayScene* rayScene,
             const CameraComponent* camera, FrameBuffer* frameBuffer) override;
+        virtual bool IsFinished() const override { return m_completedBlocks == m_nTiles.x * m_nTiles.y; }
         virtual Spectrum Evaluate(const Ray3f& ray, const RayScene* scene,
             Sampler* sampler) = 0;
 
@@ -23,5 +25,26 @@ namespace tracer
         std::atomic<int>    m_completedBlocks{};
         int                 m_numThreads{};
         Point2i             m_nTiles{};
+        std::vector<bool>   m_visit{};
+
+        struct TileNode
+        {
+            int x, y;
+        };
+        struct IntegratorBlock
+        {
+            size_t                  TargetWidth, TargetHeight;
+            size_t                  SamplesPerPixel;
+            size_t                  TileXBegin, TileXEnd;
+            size_t                  TileYBegin, TileYEnd;
+            size_t                  X, Y;
+
+            const RayScene* RayScene;
+            const CameraComponent* Camera;
+            FrameBuffer* FrameBuffer;
+        };
+
+
+        void PushNewBlock(IntegratorBlock block);
     };
 }

@@ -26,7 +26,7 @@ namespace tracer
 		SurfaceInteraction isec;
 		if (!scene->Intersect(ray, &isec))
 		{
-            return Spectrum(0.0f);
+            return scene->GetEnvironmentLight(ray.Dir());
 		}
 
 		// Get emitted radiance from hit surface to such direction

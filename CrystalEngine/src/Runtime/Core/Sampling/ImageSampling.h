@@ -17,8 +17,16 @@ namespace crystal
 
     CubeUV XYZToCubeUV(const Vector3f& p);
     Vector3f CubeUVToVector(const CubeUV& cube);
-    Vector3f sRGBToHDR(const Vector3f& color);
-    Vector3f HDRTosRGB(const Vector3f& hdr);
+
+    Vector3f sRGBToHDR(const Vector3f& color)
+    {
+        return glm::pow(color, Vector3f(2.2f));
+    }
+
+    Vector3f HDRTosRGB(const Vector3f& hdr)
+    {
+        return glm::pow(hdr, Vector3f(1 / 2.2f));
+    }
 
     class RawTexture2D
     {

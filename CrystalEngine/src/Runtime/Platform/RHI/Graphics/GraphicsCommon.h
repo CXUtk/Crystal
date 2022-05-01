@@ -544,3 +544,28 @@ F(R8ub) F(RG8ub) F(RGBA8ub)
     GENERATE_ENUM_MAPPING(RenderFormat, LISTFUNC)
 #undef LISTFUNC
 };
+
+
+
+template<>
+struct SRefl::EnumInfo<DataFormat>
+{
+    SREFL_TYPEINFO_HEADER(DataFormat);
+    constexpr static auto _ENUMLIST()
+    {
+        return std::make_tuple(
+            SREFL_ENUM_TERM(Float32),
+            SREFL_ENUM_TERM(Int32),
+            SREFL_ENUM_TERM(UInt32),
+            SREFL_ENUM_TERM(Short16),
+
+            SREFL_ENUM_TERM(UShort16),
+            SREFL_ENUM_TERM(Byte8),
+            SREFL_ENUM_TERM(SByte8)
+        );
+    }
+#define LISTFUNC(F) F(Float32) F(Int32) F(UInt32) F(Short16) \
+F(Byte8) F(SByte8)
+    GENERATE_ENUM_MAPPING(DataFormat, LISTFUNC)
+#undef LISTFUNC
+};

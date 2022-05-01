@@ -18,8 +18,6 @@ namespace tracer
         virtual ~Integrator() = 0 {}
         virtual void Render(const RayScene* rayScene,
             const CameraComponent* camera, FrameBuffer* frameBuffer) = 0;
-
-    protected:
-        const RayScene* m_rayScene = nullptr;
+        virtual bool IsFinished() const = 0;
     };
 }

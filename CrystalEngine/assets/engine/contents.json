@@ -33,5 +33,9 @@
     ],
     "meshes": [
         "Floor"
+    ],
+    "cputextures": [
+        "LUT_cpu",
+        "Cubemaps/Sky2/Skybox_cpu"
     ]
 }

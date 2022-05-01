@@ -5,10 +5,10 @@
 
 namespace tracer
 {
-    RayScene::RayScene(std::shared_ptr<Scene> scene)
-        : m_scene(scene)
+    RayScene::RayScene(std::shared_ptr<Scene> scene, std::shared_ptr<CPUTextureCubemap> skybox)
+        : m_scene(scene), m_skyBox(skybox)
     {
-        m_accelStructure = IAccStructure::CreateAccelerator("Brute");
+        m_accelStructure = IAccStructure::CreateAccelerator("BVH");
 
         for (auto& obj : scene->GetGameObjects())
         {
@@ -51,5 +51,11 @@ namespace tracer
         {
             action(cptr(light));
         }
+    }
+
+    Spectrum RayScene::GetEnvironmentLight(const Vector3f& dir) const
+    {
+        if (!m_skyBox) return Spectrum(0.f);
+        return m_skyBox->Sample(dir);
     }
 }

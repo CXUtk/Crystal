@@ -25,4 +25,6 @@ namespace crystal
     using Matrix4f = glm::mat4;
 
     using Quaternion = glm::quat;
+
+    inline Float square(Float x) { return x * x; }
 }

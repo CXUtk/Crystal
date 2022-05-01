@@ -1,6 +1,6 @@
 #pragma once
 #include "AssetCommon.h"
-#include "Platform/RHI/FileSystem/FSCommon.h"/
+#include "Platform/RHI/FileSystem/FSCommon.h"
 #include <Core/Utils/Misc.h>
 
 #include "AssetPackage.h"
@@ -81,6 +81,14 @@ namespace crystal
         else if constexpr (std::is_same<T, Mesh>::value)
         {
             return p->second->GetMesh(resPath);
+        }
+        else if constexpr (std::is_same<T, CPUTexture2D>::value)
+        {
+            return p->second->GetCPUTexture2D(resPath);
+        }
+        else if constexpr (std::is_same<T, CPUTextureCubemap>::value)
+        {
+            return p->second->GetCPUTextureCubemap(resPath);
         }
         else
         {

@@ -14,6 +14,7 @@ namespace crystal
     static std::string ShadersDirectoryName = "shaders";
     static std::string FontsDirectoryName = "fonts";
     static std::string TexturesDirectoryName = "textures";
+    static std::string CPUTexturesCategoryName = "cputextures";
     static std::string MeshesDirectoryName = "meshes";
 
 
@@ -87,6 +88,15 @@ namespace crystal
                 textureEntries.push_back(node.Get<std::string>());
             });
             assetPackage->LoadTextures(parentPath / TexturesDirectoryName, textureEntries);
+        }
+
+        if (contents.Contains(CPUTexturesCategoryName))
+        {
+            std::vector<std::string> cpuTextureEntries;
+            contents[CPUTexturesCategoryName].foreach([&](const SJson::JsonNode& node) {
+                cpuTextureEntries.push_back(node.Get<std::string>());
+            });
+            assetPackage->LoadCPUTextures(parentPath / TexturesDirectoryName, cpuTextureEntries);
         }
 
         if (contents.Contains(FontsDirectoryName))
