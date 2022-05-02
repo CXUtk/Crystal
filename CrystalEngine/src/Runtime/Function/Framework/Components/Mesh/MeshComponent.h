@@ -6,6 +6,7 @@
 #include "../Component.h"
 #include "Mesh.h"
 #include <Function/Framework/Components/Shape/ShapeRayHiter.h>
+#include <Function/Framework/Components/Shape/ShapeAreaSampler.h>
 #include <Function/Framework/Components/Shape/Shapes/Triangle.h>
 
 namespace crystal
@@ -21,11 +22,13 @@ namespace crystal
         virtual void Draw(const GameTimer& gameTimer) override;
 
         std::shared_ptr<Mesh> GetMesh() const { return m_mesh; }
-        std::vector<std::shared_ptr<IRayHiter>> CreateRayHiters();
+        std::vector<std::shared_ptr<IRayHiter>>     CreateRayHiters() const;
+        std::vector<std::shared_ptr<IAreaSampler>>  CreateAreaSampler() const;
 
     private:
-        std::shared_ptr<Mesh>   m_mesh{};
-        std::vector<std::shared_ptr<Triangle>> m_triangles{};
-        std::vector<MeshVertexData> m_vertices{};
+        std::shared_ptr<Mesh>                   m_mesh{};
+        std::vector<std::shared_ptr<Triangle>>  m_triangles{};
+        std::vector<Float>                      m_weightPrefixSum{};
+        std::vector<MeshVertexData>             m_vertices{};
     };
 }

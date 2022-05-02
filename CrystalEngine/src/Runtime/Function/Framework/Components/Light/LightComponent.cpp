@@ -22,11 +22,20 @@ namespace crystal
         auto transComp = m_attachedObject->GetComponent<TransformComponent>();
         auto& transform = transComp->GetTransform();
 
-        const ShapeComponent* shapeComp = nullptr;
+        std::shared_ptr<ShapeComponent> shapeComp = nullptr;
         if (m_attachedObject->HasComponent<ShapeComponent>())
         {
-            shapeComp = m_attachedObject->GetComponent<ShapeComponent>().get();
+            shapeComp = m_attachedObject->GetComponent<ShapeComponent>();
         }
+
+        std::shared_ptr<MeshComponent> meshComp = nullptr;
+        if (m_attachedObject->HasComponent<MeshComponent>())
+        {
+            meshComp = m_attachedObject->GetComponent<MeshComponent>();
+        }
+
+        assert((meshComp == nullptr) ^ (shapeComp == nullptr));
+
 
         LightType type = SRefl::EnumInfo<crystal::LightType>::string_to_enum(m_setting["Type"].Get<std::string>());
         auto& params = m_setting["Data"];
@@ -41,8 +50,20 @@ namespace crystal
         case crystal::LightType::DiffuseAreaLight:
         {
             DiffuseAreaLightSettings setting = SJson::de_serialize<DiffuseAreaLightSettings>(params);
+
+            std::shared_ptr<IAreaSampler> areaSampler = nullptr;
+
+            if (shapeComp)
+            {
+                areaSampler = shapeComp->GetAreaSampler();
+            }
+            else if (meshComp)
+            {
+                areaSampler = meshComp->
+            }
+
             m_light = std::make_shared<DiffusedAreaLight>(transform,
-                shapeComp->GetAreaSampler(), setting);
+                areaSampler, setting);
             break;
         }
         default:

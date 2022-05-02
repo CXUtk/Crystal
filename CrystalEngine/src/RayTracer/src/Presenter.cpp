@@ -97,7 +97,9 @@ namespace tracer
         sphere1->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<PlasticMaterial>(pureRed, checkerBoard, 1.5)));
 
         Transform transform_sphere2;
-        transform_sphere2.SetTranslation(Vector3f(-3, 3, 0));
+        transform_sphere2.SetTranslation(Vector3f(0, 3, 0));
+        transform_sphere2.SetScale(Vector3f(0.5, 1, 0.5));
+
         auto sphere2 = std::make_shared<GameObject>();
         spSetting.Radius = .5f;
         sphereJsonNode["Data"] = SJson::serialize(spSetting);
@@ -109,7 +111,8 @@ namespace tracer
         areaLightJsonNode["Data"] = SJson::serialize(areaLightSetting);
 
         sphere2->AddComponent(std::make_shared<TransformComponent>(transform_sphere2));
-        sphere2->AddComponent(std::make_shared<ShapeComponent>(sphereJsonNode));
+        sphere2->AddComponent(std::make_shared<MeshComponent>(assetManager->LoadAsset<Mesh>("engine:Floor")));
+        //sphere2->AddComponent(std::make_shared<ShapeComponent>(sphereJsonNode));
         sphere2->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<LambertianMaterial>(pureWhite)));
         sphere2->AddComponent(std::make_shared<LightComponent>(areaLightJsonNode));
         //auto areaLight = std::make_shared<DiffusedAreaLight>()

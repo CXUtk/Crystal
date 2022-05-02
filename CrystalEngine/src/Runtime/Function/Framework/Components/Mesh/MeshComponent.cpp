@@ -38,6 +38,13 @@ namespace crystal
             }
         }
 
+        size_t numTriangles = m_triangles.size();
+        Float weight = 0.f;
+        for (int i = 0; i < numTriangles; i++)
+        {
+            weight += m_triangles[i]->SurfaceArea();
+            m_weightPrefixSum.push_back(weight);
+        }
     }
 
     void MeshComponent::Update(const GameTimer & gameTimer)
@@ -46,7 +53,7 @@ namespace crystal
     void MeshComponent::Draw(const GameTimer & gameTimer)
     {}
 
-    std::vector<std::shared_ptr<IRayHiter>> MeshComponent::CreateRayHiters()
+    std::vector<std::shared_ptr<IRayHiter>> MeshComponent::CreateRayHiters() const
     {
         std::vector<std::shared_ptr<IRayHiter>> hiters{};
         for (auto& triangle : m_triangles)
@@ -54,5 +61,11 @@ namespace crystal
             hiters.push_back(std::make_shared<ShapeRayHiter>(m_attachedObject, cptr(triangle)));
         }
         return hiters;
+    }
+
+    std::vector<std::shared_ptr<IAreaSampler>> MeshComponent::CreateAreaSampler() const
+    {
+        std::vector<std::shared_ptr<IAreaSampler>>
+        return 
     }
 }
