@@ -483,7 +483,7 @@ namespace crystal
             m_eventOnCharInput.Invoke(args);
             return 0;
         }
-        case WM_IME_CHAR:	//使用输入法输入字符时，触发 WM_IME_CHAR 消息。输入词组时，词组有多少个字符就触发多少次。
+        case WM_IME_CHAR:
             CharInputArgs args = {};
             std::wstring wstr;
             wstr.push_back((wchar_t)wParam);

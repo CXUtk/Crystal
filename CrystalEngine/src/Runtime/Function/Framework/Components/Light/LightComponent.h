@@ -2,18 +2,20 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <SJson/SJson.hpp>
 
 #include "../Component.h"
-#include "Light.h"
+#include "Lights/Light.h"
 
 namespace crystal
 {
     class LightComponent : public Component
     {
     public:
-        LightComponent(std::shared_ptr<Light> light);
+        LightComponent(const SJson::JsonNode& setting);
         virtual ~LightComponent() override;
 
+        virtual void Initialize() override;
         virtual void Update(const GameTimer& gameTimer) override;
         virtual void Draw(const GameTimer& gameTimer) override;
 
@@ -27,9 +29,13 @@ namespace crystal
         virtual float Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const
         { return m_light->Pdf_Li(surface_w, wi); }
 
-        virtual Spectrum Le(const Vector3f& wi) const { return m_light->Flux(); }
+        virtual Spectrum Le(const Vector3f& wi) const { return m_light->Le(wi); }
+
+        bool IsDeltaLight() const { return m_light->IsDeltaLight(); }
+        bool IsAreaLight() const { return m_light->IsAreaLight(); }
 
     private:
-        std::shared_ptr<Light>  m_light = nullptr;
+        SJson::JsonNode             m_setting{};
+        std::shared_ptr<Light>      m_light = nullptr;
     };
 }

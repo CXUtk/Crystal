@@ -22,8 +22,8 @@ namespace crystal
         Point3f GetPosition() const { return m_position; }
         Normal3f GetNormal() const { return m_normal; }
     private:
-        Point3f m_position;
-        Normal3f m_normal;
+        Point3f m_position{};
+        Normal3f m_normal{};
     };
 
     class SurfaceInteraction

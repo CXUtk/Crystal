@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <algorithm>
 #include <tuple>
 #include <functional>
 #include <variant>
@@ -16,6 +17,7 @@
 
 #include "../SRefl/SRefl.hpp"
 
+#define NOMINMAX
 
 namespace std
 {
@@ -404,6 +406,11 @@ namespace SJson
         {
             assert(m_type == ValueType::Float);
             return static_cast<T>(std::get<double>(m_value));
+        }
+        else if constexpr (std::is_same<std::decay_t<T>, array_type>::value)
+        {
+            assert(m_type == ValueType::Array);
+            return static_cast<T>(std::get<array_type>(m_value));
         }
         else
         {

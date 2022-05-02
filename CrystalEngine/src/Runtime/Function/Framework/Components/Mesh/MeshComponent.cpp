@@ -13,15 +13,11 @@ namespace crystal
     MeshComponent::~MeshComponent()
     {}
 
-    void MeshComponent::Update(const GameTimer & gameTimer)
-    {}
-
-    void MeshComponent::Draw(const GameTimer & gameTimer)
-    {}
-
-    std::vector<std::shared_ptr<IRayHiter>> MeshComponent::CreateRayHiters()
+    void MeshComponent::Initialize()
     {
-        m_vertices = m_mesh->GetTransformedVertices(m_attachedObject->GetComponent<TransformComponent>()->GetTransform());
+        auto& transform = m_attachedObject->GetComponent<TransformComponent>()->GetTransform();
+        m_vertices = m_mesh->GetTransformedVertices(transform);
+
         auto& V = m_vertices;
         if (!m_mesh->HasIndices())
         {
@@ -42,6 +38,16 @@ namespace crystal
             }
         }
 
+    }
+
+    void MeshComponent::Update(const GameTimer & gameTimer)
+    {}
+
+    void MeshComponent::Draw(const GameTimer & gameTimer)
+    {}
+
+    std::vector<std::shared_ptr<IRayHiter>> MeshComponent::CreateRayHiters()
+    {
         std::vector<std::shared_ptr<IRayHiter>> hiters{};
         for (auto& triangle : m_triangles)
         {

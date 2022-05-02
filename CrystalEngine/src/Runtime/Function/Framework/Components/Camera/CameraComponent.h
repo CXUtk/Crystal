@@ -11,9 +11,10 @@ namespace crystal
     class CameraComponent : public Component
     {
     public:
-        CameraComponent(std::shared_ptr<Camera> camera);
+        CameraComponent(const SJson::JsonNode& setting);
         virtual ~CameraComponent() override;
 
+        virtual void Initialize() override;
         virtual void Update(const GameTimer& gameTimer) override;
         virtual void Draw(const GameTimer& gameTimer) override;
 
@@ -21,6 +22,7 @@ namespace crystal
         Ray3f GenerateRay(const Vector2f& coord) const;
 
     private:
-        std::shared_ptr<Camera>  m_camera = nullptr;
+        SJson::JsonNode         m_setting{};
+        std::shared_ptr<Camera> m_camera = nullptr;
     };
 }

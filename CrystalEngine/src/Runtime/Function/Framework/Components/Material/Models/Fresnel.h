@@ -21,6 +21,15 @@ namespace crystal
         Spectrum Eval(float cosThetaI) const override { return glm::vec3(1.f); }
     };
 
+    class FresnelFullTransmission : public Fresnel
+    {
+    public:
+        FresnelFullTransmission() {}
+        ~FresnelFullTransmission() override {}
+        Spectrum Eval(float cosThetaI) const override { return glm::vec3(0.f); }
+    };
+
+
 
     class FresnelDielectric : public Fresnel
     {

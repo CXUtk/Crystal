@@ -13,6 +13,9 @@ namespace crystal
     TransformComponent::~TransformComponent()
     {}
 
+    void TransformComponent::Initialize()
+    {}
+
     void TransformComponent::Update(const GameTimer & gameTimer)
     {}
 

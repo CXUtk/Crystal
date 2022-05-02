@@ -9,7 +9,7 @@ namespace crystal
     {
     public:
         // static std::shared_ptr<Shape> CreateSphere(SphereShapeDesc pShapeNode);
-        Sphere(float radius, const Transform& transform);
+        Sphere(const SphereSettings& settings, const Transform* transform);
         ~Sphere() override;
         Bound3f GetBoundingBox() const override;
         bool Intersect(const Ray3f& ray, SurfaceInteraction* isec) const override;

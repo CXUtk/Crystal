@@ -4,7 +4,7 @@
 #include <vector>
 #include <Core/Math/Geometry.h>
 #include <Core/Interaction/SurfaceInteraction.h>
-#include <Function/Framework/Object/IRayHiter.h>
+#include <Function/Framework/Interfaces/IRayHiter.h>
 
 namespace tracer
 {

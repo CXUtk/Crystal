@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "SamplerIntegrator.h"
-#include <Function/Framework/Components/Light/Light.h>
+#include <Function/Framework/Components/Light/Lights/Light.h>
 
 namespace tracer
 {

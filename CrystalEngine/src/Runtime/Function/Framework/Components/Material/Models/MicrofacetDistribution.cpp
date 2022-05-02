@@ -18,7 +18,9 @@ namespace crystal
 
 
     GGXDistribution::GGXDistribution(Vector2f roughness) : m_alpha(roughness * roughness)
-    {}
+    {
+        m_alpha = glm::clamp(m_alpha, glm::vec2(0.01f), glm::vec2(1.f));
+    }
 
     GGXDistribution::~GGXDistribution()
     {}
@@ -97,6 +99,7 @@ namespace crystal
     BeckmannDistribution::BeckmannDistribution(Vector2f roughness)
         : m_alpha(roughness * roughness)
     {
+        m_alpha = glm::clamp(m_alpha, glm::vec2(0.01f), glm::vec2(1.f));
         //printf("%lf, %lf\n", _alpha.x, _alpha.y);
     }
 

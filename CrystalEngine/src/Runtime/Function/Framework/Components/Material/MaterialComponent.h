@@ -14,6 +14,7 @@ namespace crystal
         MaterialComponent(std::shared_ptr<Material> material);
         virtual ~MaterialComponent() override;
 
+        virtual void Initialize() override;
         virtual void Update(const GameTimer& gameTimer)override;
         virtual void Draw(const GameTimer& gameTimer)override;
 

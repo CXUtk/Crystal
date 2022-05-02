@@ -11,17 +11,23 @@
 #include <Resource/Asset/AssetManager.h>
 
 #include <Function/Framework/Object/GameObject.h>
+
 #include <Function/Framework/Components/Transform/TransformComponent.h>
 #include <Function/Framework/Components/Mesh/MeshComponent.h>
+
 #include <Function/Framework/Components/Shape/ShapeComponent.h>
 #include <Function/Framework/Components/Shape/Shapes/Sphere.h>
+
 #include <Function/Framework/Components/Light/LightComponent.h>
-#include <Function/Framework/Components/Light/PointLight.h>
+#include <Function/Framework/Components/Light/Lights/PointLight.h>
+#include <Function/Framework/Components/Light/Lights/DiffusedAreaLight.h>
+
 #include <Function/Framework/Components/Material/Materials/LambertianMaterial.h>
 #include <Function/Framework/Components/Material/Materials/MirrorMaterial.h>
 #include <Function/Framework/Components/Material/Materials/Glass.h>
 #include <Function/Framework/Components/Material/Materials/MicrofacetMaterial.h>
 #include <Function/Framework/Components/Material/Materials/PlasticMaterial.h>
+
 #include <Core/Sampling/Sampling.h>
 
 using namespace crystal;
@@ -52,15 +58,16 @@ namespace tracer
         auto scene = std::make_shared<Scene>();
 
         auto pureWhite = std::make_shared<CPUTexture2DPure>(Spectrum(1.f));
+        auto pureRed = std::make_shared<CPUTexture2DPure>(Spectrum(1.f, 0.f, 0.f));
         auto image = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(1.f), Spectrum(0.33f));//assetManager->LoadAsset<CPUTexture2D>("engine:LUT_cpu");
-        auto checkerBoard = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(.4f), Spectrum(0.4f, 0.f, 0.f));
+        auto checkerBoard = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(.3f), Spectrum(0.1f, 0.1f, 0.f));
 
         RenderProperties renderprops = {};
         renderprops.FrameBufferSize = window->GetWindowSize();
         renderprops.Gamma = 2.2;
         renderprops.SampleCount = 64;
-        renderprops.NumOfThreads = 8;
-        renderprops.Skybox = assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky2/Skybox_cpu");
+        renderprops.NumOfThreads = 4;
+        renderprops.Skybox = nullptr;//assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky2/Skybox_cpu");
 
         Transform transform(Vector3f(0.f, -1.f, 0.f), Vector3f(5.f, 1.f, 5.f), glm::identity<Quaternion>());
 
@@ -72,26 +79,41 @@ namespace tracer
 
         Transform transform_sphere;
         auto sphere = std::make_shared<GameObject>();
-        auto sphereShape = std::make_shared<Sphere>(1, transform_sphere);
+        SJson::JsonNode sphereJsonNode;
+        SphereSettings spSetting = {};
+        spSetting.Radius = 1.f;
+        sphereJsonNode["Type"] = "Sphere";
+        sphereJsonNode["Data"] = SJson::serialize(spSetting);
+
         sphere->AddComponent(std::make_shared<TransformComponent>(transform_sphere));
-        sphere->AddComponent(std::make_shared<ShapeComponent>(sphereShape));
+        sphere->AddComponent(std::make_shared<ShapeComponent>(sphereJsonNode));
         sphere->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<Glass>(Spectrum(1.f), Spectrum(1.f), 1.5f)));
 
         Transform transform_sphere1;
         transform_sphere1.SetTranslation(Vector3f(2, 0, 1.f));
         auto sphere1 = std::make_shared<GameObject>();
-        auto sphereShape1 = std::make_shared<Sphere>(1, transform_sphere1);
         sphere1->AddComponent(std::make_shared<TransformComponent>(transform_sphere1));
-        sphere1->AddComponent(std::make_shared<ShapeComponent>(sphereShape1));
-        sphere1->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<PlasticMaterial>(pureWhite, checkerBoard, 1.5)));
+        sphere1->AddComponent(std::make_shared<ShapeComponent>(sphereJsonNode));
+        sphere1->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<PlasticMaterial>(pureRed, checkerBoard, 1.5)));
 
-        //Transform transform_sphere2;
-        //transform_sphere2.SetTranslation(Vector3f(-3, 0, 1));
-        //auto sphere2 = std::make_shared<GameObject>();
-        //auto sphereShape2 = std::make_shared<Sphere>(1, transform_sphere2);
-        //sphere2->AddComponent(std::make_shared<TransformComponent>(transform_sphere2));
-        //sphere2->AddComponent(std::make_shared<ShapeComponent>(sphereShape2));
-        //sphere2->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<LambertianMaterial>(Spectrum(1.f, .5f, 0.f))));
+        Transform transform_sphere2;
+        transform_sphere2.SetTranslation(Vector3f(-3, 3, 0));
+        auto sphere2 = std::make_shared<GameObject>();
+        spSetting.Radius = .5f;
+        sphereJsonNode["Data"] = SJson::serialize(spSetting);
+        SJson::JsonNode areaLightJsonNode;
+        DiffuseAreaLightSettings areaLightSetting = {};
+        areaLightSetting.LEmit = Spectrum(5.f);
+        areaLightSetting.NumSamples = 1;
+        areaLightJsonNode["Type"] = "DiffuseAreaLight";
+        areaLightJsonNode["Data"] = SJson::serialize(areaLightSetting);
+
+        sphere2->AddComponent(std::make_shared<TransformComponent>(transform_sphere2));
+        sphere2->AddComponent(std::make_shared<ShapeComponent>(sphereJsonNode));
+        sphere2->AddComponent(std::make_shared<MaterialComponent>(std::make_shared<LambertianMaterial>(pureWhite)));
+        sphere2->AddComponent(std::make_shared<LightComponent>(areaLightJsonNode));
+        //auto areaLight = std::make_shared<DiffusedAreaLight>()
+        //sphere2->AddComponent(std::make_shared<LightComponent>(std::make_shared<LightComponent>()));
 
 
         //std::mt19937 mt;
@@ -118,30 +140,46 @@ namespace tracer
         //    scene->AddObject(light);
         //}
 
+        auto camera = std::make_shared<GameObject>();
+
         auto targetPos = Vector3f(0.f);
         auto viewPos = Vector3f(0, 2, 5);
         Transform transform_camera(viewPos, Vector3f(1.f),
             glm::quatLookAt(glm::normalize(targetPos - viewPos), Vector3f(0, 1, 0)));
+        SJson::JsonNode cameraJsonNode;
+        PerspectiveCameraSetting perspSetting = {};
+        perspSetting.FovY = glm::pi<float>() / 3.f;
+        perspSetting.Aspect = (float)renderprops.FrameBufferSize.x / renderprops.FrameBufferSize.y;
+        perspSetting.ZNear = 0;
+        perspSetting.ZFar = 100;
+        cameraJsonNode["Type"] = "Perspective";
+        cameraJsonNode["Data"] = SJson::serialize(perspSetting);
 
-        auto camera = std::make_shared<GameObject>();
-        auto normalCamera = std::make_shared<Camera>(glm::pi<float>() / 3.f,
-            (float)renderprops.FrameBufferSize.x / renderprops.FrameBufferSize.y, 0, 100);
         camera->AddComponent(std::make_shared<TransformComponent>(transform_camera));
-        camera->AddComponent(std::make_shared<CameraComponent>(normalCamera));
+        camera->AddComponent(std::make_shared<CameraComponent>(cameraJsonNode));
+
+
+        auto light = std::make_shared<GameObject>();
 
         Transform transform_light(Vector3f(0, 3, 0), Vector3f(1.f),
             glm::identity<Quaternion>());
-        auto pointLight = std::make_shared<PointLight>(Spectrum(10.f));
-        auto light = std::make_shared<GameObject>();
+        SJson::JsonNode lightJsonNode;
+        PointLightSettings ptlSetting = {};
+        ptlSetting.Intensity = Spectrum(0.f);
+        lightJsonNode["Type"] = "PointLight";
+        lightJsonNode["Data"] = SJson::serialize(ptlSetting);
+
         light->AddComponent(std::make_shared<TransformComponent>(transform_light));
-        light->AddComponent(std::make_shared<LightComponent>(pointLight));
+        light->AddComponent(std::make_shared<LightComponent>(lightJsonNode));
 
         scene->AddObject(plane);
         scene->AddObject(sphere);
         scene->AddObject(sphere1);
-        // scene->AddObject(sphere2);
+        scene->AddObject(sphere2);
         scene->AddObject(camera);
         scene->AddObject(light);
+
+        scene->Initialize();
 
         m_tracer = std::make_shared<RayTracer>();
         m_tracer->RenderAsync(scene, renderprops, cptr(camera->GetComponent<CameraComponent>()));

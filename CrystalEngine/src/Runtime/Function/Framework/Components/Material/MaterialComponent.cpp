@@ -10,6 +10,9 @@ namespace crystal
     MaterialComponent::~MaterialComponent()
     {}
 
+    void MaterialComponent::Initialize()
+    {}
+
     void MaterialComponent::Update(const GameTimer & gameTimer)
     {}
 

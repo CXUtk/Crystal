@@ -1,5 +1,6 @@
 #include "SurfaceInteraction.h"
 #include <Function/Framework/Components/Light/LightComponent.h>
+#include <Function/Framework/Components/Light/Lights/AreaLight.h>
 
 
 namespace crystal
@@ -62,7 +63,11 @@ namespace crystal
         if (m_hitObject->HasComponent<LightComponent>())
         {
             auto lightComp = m_hitObject->GetComponent<LightComponent>();
-            return Spectrum(0.f);
+            if (lightComp->IsAreaLight())
+            {
+                auto surface = GetSurfaceInfo(true);
+                return std::dynamic_pointer_cast<AreaLight>(lightComp->GetLight())->Eval_Le(surface, w);
+            }
         }
         return Spectrum(0.f);
     }

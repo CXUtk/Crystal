@@ -17,10 +17,11 @@ namespace crystal
     {
     public:
         GameObject();
-        virtual ~GameObject();
+        ~GameObject();
 
-        virtual void Update(const GameTimer& gameTimer);
-        virtual void Draw(const GameTimer& gameTimer);
+        void Initialize();
+        void Update(const GameTimer& gameTimer);
+        void Draw(const GameTimer& gameTimer);
 
         std::string GetName() const { return m_name; }
 
@@ -36,9 +37,11 @@ namespace crystal
         bool HasComponent() const;
 
     private:
-        std::string     m_name;
+        std::string     m_name{};
+        std::map<std::type_index, std::shared_ptr<Component>> m_components{};
+        std::vector<std::shared_ptr<Component>> m_components_topological_order{};
 
-        std::unordered_map<std::type_index, std::shared_ptr<Component>> m_components;
+        void topologicalSort();
     };
 
     template<typename TComp>

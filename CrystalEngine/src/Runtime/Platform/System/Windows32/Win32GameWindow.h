@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 #include <Crystal.h>
 #include <wrl/client.h>
 #include <string>

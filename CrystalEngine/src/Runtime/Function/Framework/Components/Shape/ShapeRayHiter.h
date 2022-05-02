@@ -1,5 +1,5 @@
 #pragma once
-#include <Function/Framework/Object/IRayHiter.h>
+#include <Function/Framework/Interfaces/IRayHiter.h>
 
 #include <Core/Math/Geometry.h>
 
@@ -22,8 +22,8 @@ namespace crystal
             float tMax = std::numeric_limits<float>::infinity()) const;
 
     private:
-        const GameObject* m_pObject = nullptr;
-        const Shape* m_pShape = nullptr;
-        Bound3f m_boundingBox{};
+        const GameObject*   m_pObject = nullptr;
+        const Shape*        m_pShape = nullptr;
+        Bound3f             m_boundingBox{};
     };
 }

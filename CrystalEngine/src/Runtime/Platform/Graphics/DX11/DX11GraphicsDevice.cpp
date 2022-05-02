@@ -24,7 +24,6 @@
 
 #include <Core/Utils/Misc.h>
 #include <Core/Utils/IO.h>
-#include <SJson/SJson.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 namespace crystal

@@ -3,27 +3,26 @@
 #include <Platform/RHI/Interfaces.h>
 #include <Core/Math/Transform.h>
 
+#include "ComponentSettings.h"
+
 namespace crystal
 {
     class Camera
     {
     public:
-        Camera(Float fovY, Float aspect, Float zNear, Float zFar);
+        Camera(const Transform* transform, const PerspectiveCameraSetting& setting);
         ~Camera();
 
-        void SetEyePos(Point3f eye);
-        void SetLookAt(Point3f pos);
-        void SetAspectRatio(Float aspect);
-
         Point3f GetEyePos() const;
-        Point3f GetLookAt() const;
+        Point3f GetForwardDir() const;
 
         Matrix4f GetProjectionMatrix() const;
         Matrix4f GetViewMatrix() const;
 
-        Vector3f GetDirection(const Vector2f& coord, const Transform& transform) const;
+        Vector3f GetDirection(const Vector2f& coord) const;
 
     private:
-        Float       m_FovY{}, m_AspectRatio{}, m_zNear{}, m_zFar{};
+        const Transform*    m_tranform = nullptr;
+        Float               m_FovY{}, m_AspectRatio{}, m_zNear{}, m_zFar{};
     };
 }

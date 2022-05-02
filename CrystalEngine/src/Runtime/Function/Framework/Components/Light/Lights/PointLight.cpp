@@ -2,17 +2,17 @@
 
 namespace crystal
 {
-    PointLight::PointLight(const Spectrum& intensity)
-        : Light(LightFlags::DeltaPosition, 1), m_intensity(intensity)
+    PointLight::PointLight(const Transform& transform, const Spectrum& intensity)
+        : Light(transform, LightFlags::DeltaPosition, 1), m_intensity(intensity)
     {}
 
     PointLight::~PointLight()
     {}
 
-    Spectrum PointLight::Sample_Li(const SurfaceInfo& surface, const Transform& transform,
+    Spectrum PointLight::Sample_Li(const SurfaceInfo& surface,
         const Vector2f& sample, Point3f* endpoint, float* pdf) const
     {
-        auto pos = transform.GetTranslation();
+        auto pos = m_transform.GetTranslation();
         *endpoint = pos;
         *pdf = 1.0f;
         return m_intensity / glm::length2(pos - surface.GetPosition());

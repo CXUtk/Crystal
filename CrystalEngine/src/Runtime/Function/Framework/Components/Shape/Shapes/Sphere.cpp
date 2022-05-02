@@ -18,11 +18,11 @@ namespace crystal
     //    return std::make_shared<Sphere>(pos, r, rotation);
     //}
 
-    Sphere::Sphere(float radius, const Transform& transform)
-        : m_radius(radius)
+    Sphere::Sphere(const SphereSettings& settings, const Transform* transform)
+        : m_radius(settings.Radius)
     {
-        m_position = transform.GetTranslation();
-        Matrix4f rotMatrix = glm::toMat4(transform.GetRotation());
+        m_position = transform->GetTranslation();
+        Matrix4f rotMatrix = glm::toMat4(transform->GetRotation());
         m_local2World = glm::mat3(rotMatrix);
         m_world2Local = glm::transpose(m_local2World);
     }

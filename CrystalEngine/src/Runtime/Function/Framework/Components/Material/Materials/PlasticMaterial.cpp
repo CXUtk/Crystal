@@ -19,9 +19,9 @@ namespace crystal
     void PlasticMaterial::ComputeScatteringFunctions(SurfaceInteraction * isec, bool fromCamera) const
     {
         auto baseColor = m_Kd->Sample(isec->GetTexCoord());
-        auto roughness = m_roughness->Sample(isec->GetTexCoord()).x;
-        auto distribution = std::make_shared<GGXDistribution>(Vector2f(roughness, roughness));
-        isec->GetBSDF()->AddBxDF(std::make_shared<FresnelBlend>(Spectrum(0.7f, 0.f, 0.f),
+        auto roughness = m_roughness->Sample(isec->GetTexCoord());
+        auto distribution = std::make_shared<GGXDistribution>(Vector2f(roughness.x, roughness.y));
+        isec->GetBSDF()->AddBxDF(std::make_shared<FresnelBlend>(baseColor,
             Spectrum(1.f), distribution, m_F));
     }
 }

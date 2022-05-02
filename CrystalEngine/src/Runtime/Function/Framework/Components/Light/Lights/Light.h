@@ -22,7 +22,8 @@ namespace crystal
     class Light
     {
     public:
-        Light(LightFlags flags, int numSamples) : m_flags(flags), m_numSamples(numSamples) { }
+        Light(const Transform& transform, LightFlags flags, int numSamples)
+            : m_transform(transform), m_flags(flags), m_numSamples(numSamples) { }
 
         virtual ~Light() = 0 {}
 
@@ -33,8 +34,8 @@ namespace crystal
         //virtual void Preprocess(const Scene* scene) const { }
 
         // Get the radiance value from the light to the object surface hit point
-        virtual Spectrum Sample_Li(const SurfaceInfo& surface_w, const Transform& transform,
-            const Vector2f& sample, Point3f* endpoint, float* pdf) const = 0;
+        virtual Spectrum Sample_Li(const SurfaceInfo& surface_w, const Vector2f& sample,
+            Point3f* endpoint, float* pdf) const = 0;
 
         virtual float Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const = 0;
 
@@ -50,8 +51,11 @@ namespace crystal
             return (m_flags & (LightFlags::DeltaPosition | LightFlags::DeltaDirection));
         }
 
-    private:
+        bool IsAreaLight() const { return (m_flags & LightFlags::Area); }
+
+    protected:
         int         m_numSamples{};
         LightFlags  m_flags{};
+        Transform   m_transform{};
     };
 }

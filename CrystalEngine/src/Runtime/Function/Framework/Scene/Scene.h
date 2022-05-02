@@ -18,6 +18,7 @@ namespace crystal
         ~Scene();
 
         void AddObject(std::shared_ptr<GameObject> gameObject);
+        void Initialize();
         const std::vector<std::shared_ptr<GameObject>>& GetGameObjects() const { return m_gameObjects; }
 
     private:
