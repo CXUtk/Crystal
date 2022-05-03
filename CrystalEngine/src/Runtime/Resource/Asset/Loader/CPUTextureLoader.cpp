@@ -2,6 +2,11 @@
 
 namespace crystal
 {
+    std::shared_ptr<CPUTexture2D> CPUTextureLoader::LoadTexture2DPure(const CPUTexture2DPureMetaInfo& metaData, const path_type& curPath)
+    {
+        return std::make_shared<CPUTexture2DPure>(metaData.Value);
+    }
+
     std::shared_ptr<CPUTexture2D> crystal::CPUTextureLoader::LoadTexture2D(const CPUTexture2DMetaInfo& metaData,
         const path_type& curPath)
     {

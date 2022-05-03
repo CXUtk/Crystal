@@ -26,6 +26,7 @@ namespace tracer
         int                 m_numThreads{};
         Point2i             m_nTiles{};
         std::vector<bool>   m_visit{};
+        double              m_startRenderingTime{};
 
         struct TileNode
         {

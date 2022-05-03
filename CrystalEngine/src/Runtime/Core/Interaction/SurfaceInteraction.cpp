@@ -60,15 +60,7 @@ namespace crystal
 
     Spectrum SurfaceInteraction::Le(const Vector3f& w) const
     {
-        if (m_hitObject->HasComponent<LightComponent>())
-        {
-            auto lightComp = m_hitObject->GetComponent<LightComponent>();
-            if (lightComp->IsAreaLight())
-            {
-                auto surface = GetSurfaceInfo(true);
-                return std::dynamic_pointer_cast<AreaLight>(lightComp->GetLight())->Eval_Le(surface, w);
-            }
-        }
-        return Spectrum(0.f);
+        auto light = m_primitive->GetAreaLight();
+        return light ? light->Eval_Le(GetSurfaceInfo(true), w) : Spectrum(0.f);
     }
 }

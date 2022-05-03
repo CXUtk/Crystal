@@ -2,6 +2,8 @@
 #include <thread>
 #include <mutex>
 
+#include <Engine.h>
+
 namespace tracer
 {
     static int dx[4] = { 1, -1, 0, 0 };
@@ -70,6 +72,8 @@ namespace tracer
         }
         //// Wait until finish a frame
         //while (m_completedBlocks < m_nTiles.x * m_nTiles.y) {}
+
+        m_startRenderingTime = Engine::GetInstance()->GetCurrentTime();
     }
     void SamplerIntegrator::PushNewBlock(IntegratorBlock block)
     {
@@ -101,6 +105,11 @@ namespace tracer
 
             m_completedBlocks++;
             printf("Progress: %.2lf%%\n", (double)m_completedBlocks / (m_nTiles.x * m_nTiles.y) * 100);
+
+            if (m_completedBlocks == m_nTiles.x * m_nTiles.y)
+            {
+                printf("Finished! Time Elapsed = %lf Secs\n", Engine::GetInstance()->GetCurrentTime() - m_startRenderingTime);
+            }
 
         };
         m_threadPool->AddTask(crystal::FixedThreadPool::Task{ task });

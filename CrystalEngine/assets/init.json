@@ -10,6 +10,7 @@
 
     "BuiltinPackage": "engine",
     "ExtraPackages": [
-        "ui"
+        "ui",
+        "constants"
     ]
 }

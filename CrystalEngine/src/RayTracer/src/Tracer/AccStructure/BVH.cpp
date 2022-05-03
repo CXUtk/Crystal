@@ -31,44 +31,46 @@ namespace tracer
     };
     constexpr int SizeBVHNode = sizeof(BVHNode);
 
-    BVH::BVH() : _nodes(nullptr), _tot(0), _root(0)
+    BVH::BVH() : m_nodes(nullptr), m_tot(0), m_root(0)
     {}
 
     BVH::~BVH()
     {
-        if (_nodes)
-            delete[] _nodes;
+        if (m_nodes)
+            delete[] m_nodes;
     }
 
-    void BVH::Build(const std::vector<std::shared_ptr<IRayHiter>>& objects)
+    void BVH::Build(const std::vector<std::shared_ptr<IRayPrimitive>>& objects)
     {
         for (auto& obj : objects)
         {
-            _objects.push_back(cptr(obj));
+            m_primitives.push_back(cptr(obj));
         }
-        _nodes = new BVHNode[objects.size() * 2 + 1];
-        _tot = 0;
-        _build(_root, 0, objects.size() - 1);
+        m_nodes = new BVHNode[objects.size() * 2 + 1];
+        m_tot = 0;
+        _build(m_root, 0, objects.size() - 1);
     }
 
     bool BVH::Intersect(const Ray3f& ray, SurfaceInteraction* info, float tMin, float tMax) const
     {
+        constexpr int MAX_STACK_SIZE = 64;
+
         bool hit = false;
         Vector3f invDir(1.f / ray.Dir().x, 1.f / ray.Dir().y, 1.f / ray.Dir().z);
         bool dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
         SurfaceInteraction isec;
-        int nodesStack[64]{}, top = 0;
-        int currentNode = _root;
+        int nodesStack[MAX_STACK_SIZE]{}, top = 0;
+        int currentNode = m_root;
         while (true)
         {
-            auto& current = _nodes[currentNode];
+            auto& current = m_nodes[currentNode];
             float t1 = tMin, t2 = std::min(tMax, info->GetDistance());
             if (RayBoxTest(ray, dirIsNeg, invDir, current.bound, t1, t2))
             {
                 // 如果是叶子节点就是暴力判定一下
                 if (current.splitAxis == -1)
                 {
-                    const IRayHiter* const* startP = &_objects[current.entitiesStartOffset];
+                    const IRayPrimitive* const* startP = &m_primitives[current.entitiesStartOffset];
                     int objCnt = current.count;
                     for (int i = 0; i < objCnt; i++)
                     {
@@ -82,8 +84,8 @@ namespace tracer
                         }
                         if (dis < info->GetDistance())
                         {
-                            isec.SetHitObject(startP[i]->GetObject());
-                            *info = std::move(isec);
+                            isec.SetHitPrimitive(startP[i]);
+                            *info = isec;
                         }
                     }
                     if (!top) break;
@@ -94,6 +96,7 @@ namespace tracer
                     int initDir = dirIsNeg[current.splitAxis] ? 1 : 0;
                     nodesStack[top++] = current.ch[!initDir];
                     currentNode = current.ch[initDir];
+                    assert(top < MAX_STACK_SIZE && top >= 0);
                 }
             }
             else
@@ -105,24 +108,26 @@ namespace tracer
         return hit;
     }
 
-    bool BVH::IntersectTest(const Ray3f& ray, const IRayHiter* ignoreShape,
+    bool BVH::IntersectTest(const Ray3f& ray, const IRayPrimitive* ignoreShape,
         float tMin, float tMax) const
     {
+        constexpr int MAX_STACK_SIZE = 64;
+
         Vector3f invDir(1.f / ray.Dir().x, 1.f / ray.Dir().y, 1.f / ray.Dir().z);
         bool dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
 
-        int nodesStack[64]{}, top = 0;
-        int currentNode = _root;
+        int nodesStack[MAX_STACK_SIZE]{}, top = 0;
+        int currentNode = m_root;
         while (true)
         {
-            auto& current = _nodes[currentNode];
+            auto& current = m_nodes[currentNode];
             float t1 = tMin, t2 = tMax;
             if (RayBoxTest(ray, dirIsNeg, invDir, current.bound, t1, t2))
             {
                 // 如果是叶子节点就是暴力判定一下
                 if (current.splitAxis == -1)
                 {
-                    const IRayHiter* const* startP = &_objects[current.entitiesStartOffset];
+                    const IRayPrimitive* const* startP = &m_primitives[current.entitiesStartOffset];
                     int objCnt = current.count;
                     for (int i = 0; i < objCnt; i++)
                     {
@@ -139,6 +144,7 @@ namespace tracer
                 {
                     int initDir = dirIsNeg[current.splitAxis] ? 1 : 0;
                     nodesStack[top++] = current.ch[!initDir];
+                    assert(top < MAX_STACK_SIZE && top >= 0);
                     currentNode = current.ch[initDir];
                 }
             }
@@ -146,6 +152,7 @@ namespace tracer
             {
                 if (!top) break;
                 currentNode = nodesStack[--top];
+                assert(top < MAX_STACK_SIZE && top >= 0);
             }
         }
         return false;
@@ -153,16 +160,17 @@ namespace tracer
 
     void BVH::_build(int& p, int l, int r)
     {
+        if (r < l) return;
         if (r - l + 1 <= MAX_OBJ_IN_NODE)
         {
             createLeaf(p, l, r);
             return;
         }
         // 获取[l, r]的碰撞箱
-        BoundingBox box = _objects[l]->GetBoundingBox();
+        BoundingBox box = m_primitives[l]->GetBoundingBox();
         for (int i = l + 1; i <= r; i++)
         {
-            box = box.Union(_objects[i]->GetBoundingBox());
+            box = box.Union(m_primitives[i]->GetBoundingBox());
         }
 
         int splitAxis, splitPos;
@@ -181,19 +189,19 @@ namespace tracer
 
         // 按照排序结果从中间分割物体们
         p = createInternal(splitAxis, box);
-        _build(_nodes[p].ch[0], l, splitPos);
-        _build(_nodes[p].ch[1], splitPos + 1, r);
+        _build(m_nodes[p].ch[0], l, splitPos);
+        _build(m_nodes[p].ch[1], splitPos + 1, r);
     }
 
     int BVH::splitByEqualCount(int l, int r, const Bound3f& box, int& splitPos)
     {
         int splitAxis = box.MaxExtent();
         // 按照某种方式分割物体，并且排序
-        auto cmp = [splitAxis](const IRayHiter* a, const IRayHiter* b) {
+        auto cmp = [splitAxis](const IRayPrimitive* a, const IRayPrimitive* b) {
             return a->GetBoundingBox().GetCenter()[splitAxis] < b->GetBoundingBox().GetCenter()[splitAxis];
         };
         splitPos = l + (r - l) / 2;
-        std::nth_element(_objects.begin() + l, _objects.begin() + splitPos, _objects.begin() + r + 1, cmp);
+        std::nth_element(m_primitives.begin() + l, m_primitives.begin() + splitPos, m_primitives.begin() + r + 1, cmp);
         return splitAxis;
     }
 
@@ -201,16 +209,16 @@ namespace tracer
     {
         splitAxis = 0, splitPos = l;
         float minCost = std::numeric_limits<float>::infinity();
-        const IRayHiter* const* startP = &_objects[l];
+        const crystal::IRayPrimitive* const* startP = &m_primitives[l];
         float totArea = box.SurfaceArea();
         float* sufArea = new float[r - l + 2];
         for (int i = 0; i < 3; i++)
         {
             // 按照中点坐标排序
-            auto cmp = [i](const IRayHiter* a, const IRayHiter* b) {
+            auto cmp = [i](const crystal::IRayPrimitive* a, const crystal::IRayPrimitive* b) {
                 return a->GetBoundingBox().GetCenter()[i] < b->GetBoundingBox().GetCenter()[i];
             };
-            std::sort(_objects.begin() + l, _objects.begin() + r + 1, cmp);
+            std::sort(m_primitives.begin() + l, m_primitives.begin() + r + 1, cmp);
 
             Bound3f currentBox;
             // 求后缀包围盒表面积和
@@ -245,31 +253,31 @@ namespace tracer
 
     int BVH::createLeaf(int& p, int l, int r)
     {
-        BoundingBox box = _objects[l]->GetBoundingBox();
+        BoundingBox box = m_primitives[l]->GetBoundingBox();
         // 获取[l, r]的碰撞箱，并且把纯指针放进shapes里
         for (int i = l + 1; i <= r; i++)
         {
-            box = box.Union(_objects[i]->GetBoundingBox());
+            box = box.Union(m_primitives[i]->GetBoundingBox());
         }
-        p = ++_tot;
+        p = ++m_tot;
 
         // Leaf Part
-        _nodes[_tot].entitiesStartOffset = l;
-        _nodes[_tot].count = r - l + 1;
+        m_nodes[m_tot].entitiesStartOffset = l;
+        m_nodes[m_tot].count = r - l + 1;
 
-        _nodes[_tot].bound = box;
-        _nodes[_tot].splitAxis = -1;
-        return _tot;
+        m_nodes[m_tot].bound = box;
+        m_nodes[m_tot].splitAxis = -1;
+        return m_tot;
     }
 
     int BVH::createInternal(int splitAxis, const Bound3f& box)
     {
-        _tot++;
+        m_tot++;
         // Internal Part
-        _nodes[_tot].ch[0] = _nodes[_tot].ch[1] = 0;
+        m_nodes[m_tot].ch[0] = m_nodes[m_tot].ch[1] = 0;
 
-        _nodes[_tot].bound = box;
-        _nodes[_tot].splitAxis = splitAxis;
-        return _tot;
+        m_nodes[m_tot].bound = box;
+        m_nodes[m_tot].splitAxis = splitAxis;
+        return m_tot;
     }
 }

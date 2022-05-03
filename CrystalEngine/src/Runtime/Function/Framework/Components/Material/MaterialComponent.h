@@ -3,8 +3,9 @@
 #include <vector>
 #include <memory>
 
+#include "ComponentSettings.h"
 #include "../Component.h"
-#include "Material.h"
+#include "Material.h" 
 
 namespace crystal
 {
@@ -12,6 +13,7 @@ namespace crystal
     {
     public:
         MaterialComponent(std::shared_ptr<Material> material);
+        MaterialComponent(const SJson::JsonNode& setting);
         virtual ~MaterialComponent() override;
 
         virtual void Initialize() override;
@@ -19,8 +21,9 @@ namespace crystal
         virtual void Draw(const GameTimer& gameTimer)override;
 
         
-        std::shared_ptr<Material> GetMaterial() const { return m_material; }
+        const Material* GetMaterial() const { return cptr(m_material); }
     private:
-        std::shared_ptr<Material>  m_material = nullptr;
+        SJson::JsonNode             m_setting{};
+        std::shared_ptr<Material>   m_material = nullptr;
     };
 }

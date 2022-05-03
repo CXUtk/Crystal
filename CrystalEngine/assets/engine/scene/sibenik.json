@@ -1,0 +1,95 @@
+{
+    "Objects": [
+        {
+            "Name": "Camera",
+            "Components": [
+                {
+                    "Type": "CameraComponent",
+                    "Setting": {
+                        "Type": "Perspective",
+                        "Data": {
+                            "FovY": 1.04719753,
+                            "Aspect": 1.33333,
+                            "ZNear": 0,
+                            "ZFar": 100
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 12, -12, 0 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0.707106769, 0, 0.707106769 ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Building",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:sibenik"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "constants:pure/White"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Light",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Floor"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ -10, -2, 0 ],
+                        "Scale": [ 1, -1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "constants:pure/White"
+                        }
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 20, 20, 20 ],
+                            "NumSamples": 1
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

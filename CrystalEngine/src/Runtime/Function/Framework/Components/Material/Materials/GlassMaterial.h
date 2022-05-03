@@ -4,16 +4,16 @@
 
 namespace crystal
 {
-    class Glass : public Material
+    class GlassMaterial : public Material
     {
     public:
-        Glass(const Spectrum& R, const Spectrum& T, Float IOR);
-        ~Glass() override;
+        GlassMaterial(std::shared_ptr<CPUTexture2D> Ks, std::shared_ptr<CPUTexture2D> Tf, Float IOR);
+        ~GlassMaterial() override;
 
         void ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera = true) const override;
 
     private:
-        Spectrum m_R{}, m_T{};
+        std::shared_ptr<CPUTexture2D> m_Ks{}, m_Tf{};
         Float m_ior{};
     };
 }

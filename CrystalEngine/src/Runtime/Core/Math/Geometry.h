@@ -169,6 +169,23 @@ namespace crystal
     }
 
     template<typename T, glm::qualifier Q>
+    inline bool RayBoxTest(const Ray<3, T, Q>& ray, const BoundingBox<3, T, Q>& box, float& tMin, float& tMax)
+    {
+        glm::vec3 invD = { 1.0f / ray.Dir().x, 1.0f / ray.Dir().y, 1.0f / ray.Dir().z };
+        bool inv[3] = { invD.x < 0, invD.y < 0 , invD.z < 0};
+        auto minP = (box.GetMinPos() - ray.Start()) * invD;
+        auto maxP = (box.GetMaxPos() - ray.Start()) * invD;
+        for (int i = 0; i < 3; i++)
+        {
+            if (inv[i]) std::swap(minP[i], maxP[i]);
+            tMin = std::max(tMin, minP[i]);
+            tMax = std::min(tMax, maxP[i]);
+            if (tMax < tMin) return false;
+        }
+        return true;
+    }
+
+    template<typename T, glm::qualifier Q>
     inline bool RayBoxTest(const Ray<3, T, Q>& ray, bool inv[3], const glm::vec<3, T, Q>& invD,
         const BoundingBox<3, T, Q>& box, float& tMin, float& tMax)
     {

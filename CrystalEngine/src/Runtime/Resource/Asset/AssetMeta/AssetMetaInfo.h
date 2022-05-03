@@ -2,6 +2,7 @@
 #include <string>
 #include <SRefl/SRefl.hpp>
 #include <Platform/RHI/Graphics/GraphicsCommon.h>
+#include <Core/Utils/SJsonHelper.h>
 
 namespace crystal
 {
@@ -24,6 +25,11 @@ namespace crystal
 
         bool            IsHDR;
         size_t          MipmapLevels;
+    };
+
+    struct CPUTexture2DPureMetaInfo
+    {
+        Spectrum        Value;
     };
 
 
@@ -165,6 +171,18 @@ struct SRefl::TypeInfo<CPUTextureCubemapMetaInfo>
             SREFL_FIELD(InternalComponents),
             SREFL_FIELD(IsHDR),
             SREFL_FIELD(MipmapLevels)
+        );
+    }
+};
+
+template<>
+struct SRefl::TypeInfo<CPUTexture2DPureMetaInfo>
+{
+    SREFL_TYPEINFO_HEADER(CPUTexture2DPureMetaInfo);
+    constexpr static auto _FIELDLIST()
+    {
+        return std::make_tuple(
+            SREFL_FIELD(Value)
         );
     }
 };

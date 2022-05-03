@@ -21,6 +21,6 @@ namespace tracer
         Spectrum UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene, Sampler* sampler);
         Spectrum EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
             const Vector2f& sampleLight, const Vector2f& sampleBSDF,
-            const crystal::LightComponent* light, Sampler* sampler);
+            const crystal::Light* light, Sampler* sampler);
     };
 }

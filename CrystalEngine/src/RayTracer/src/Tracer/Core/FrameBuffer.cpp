@@ -1,5 +1,6 @@
 #include "FrameBuffer.h"
 #include <Core/Utils/Logger.h>
+#include <Core/Sampling/Sampling.h>
 
 namespace tracer
 {
@@ -11,14 +12,14 @@ namespace tracer
 
     void FrameBuffer::AddSample(int r, int c, const Vector3f& color, float weight)
     {
+        NAN_DETECT_V(color, "FrameBuffer::AddSample");
+        INF_DETECT_V(color, "FrameBuffer::AddSample");
         if (glm::isnan(color) != glm::bvec3(false))
         {
-            GlobalLogger::Log(crystal::SeverityLevel::Warning, "FrameBuffer::AddSample NAN detected");
             return;
         }
         if (glm::isinf(color) != glm::bvec3(false))
         {
-            GlobalLogger::Log(crystal::SeverityLevel::Warning, "FrameBuffer::AddSample INF detected");
             return;
         }
         r = m_bufferSize.y - 1 - r;

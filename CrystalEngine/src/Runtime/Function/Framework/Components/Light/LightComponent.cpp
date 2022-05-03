@@ -34,7 +34,7 @@ namespace crystal
             meshComp = m_attachedObject->GetComponent<MeshComponent>();
         }
 
-        assert((meshComp == nullptr) ^ (shapeComp == nullptr));
+        assert((meshComp == nullptr) || (shapeComp == nullptr));
 
 
         LightType type = SRefl::EnumInfo<crystal::LightType>::string_to_enum(m_setting["Type"].Get<std::string>());
@@ -44,26 +44,27 @@ namespace crystal
         case crystal::LightType::PointLight:
         {
             PointLightSettings setting = SJson::de_serialize<PointLightSettings>(params);
-            m_light = std::make_shared<PointLight>(transform, setting.Intensity);
+            m_lights.push_back(std::make_shared<PointLight>(transform, setting.Intensity));
             break;
         }
         case crystal::LightType::DiffuseAreaLight:
         {
             DiffuseAreaLightSettings setting = SJson::de_serialize<DiffuseAreaLightSettings>(params);
 
-            std::shared_ptr<IAreaSampler> areaSampler = nullptr;
-
             if (shapeComp)
             {
-                areaSampler = shapeComp->GetAreaSampler();
+                std::shared_ptr<IAreaSampler> areaSampler = shapeComp->GetAreaSampler();
+                m_lights.push_back(std::make_shared<DiffusedAreaLight>(transform,
+                    areaSampler, setting));
             }
             else if (meshComp)
             {
-                areaSampler = meshComp->
+                meshComp->ForeachTriangle([&](std::shared_ptr<const Triangle> triangle) {
+                    std::shared_ptr<IAreaSampler> areaSampler = std::make_shared<ShapeAreaSampler>(cptr(triangle));
+                    m_lights.push_back(std::make_shared<DiffusedAreaLight>(transform,
+                        areaSampler, setting));
+                });
             }
-
-            m_light = std::make_shared<DiffusedAreaLight>(transform,
-                areaSampler, setting);
             break;
         }
         default:
@@ -77,9 +78,4 @@ namespace crystal
 
     void LightComponent::Draw(const GameTimer & gameTimer)
     {}
-
-    Spectrum LightComponent::Sample_Li(const SurfaceInfo & surface_w, const Vector2f & sample, Point3f * endpoint, float* pdf) const
-    {
-        return m_light->Sample_Li(surface_w, sample, endpoint, pdf);
-    }
 }

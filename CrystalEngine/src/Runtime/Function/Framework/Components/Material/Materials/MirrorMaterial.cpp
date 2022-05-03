@@ -4,8 +4,8 @@
 
 namespace crystal
 {
-    MirrorMaterial::MirrorMaterial(const Spectrum& albedo)
-        : m_albedo(albedo)
+    MirrorMaterial::MirrorMaterial(std::shared_ptr<CPUTexture2D> Ks)
+        : m_Ks(Ks)
     {
     }
 
@@ -15,6 +15,7 @@ namespace crystal
     void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction* isec, bool fromCamera) const
     {
         auto F = std::make_shared<FresnelNoOp>();
-        isec->GetBSDF()->AddBxDF(std::make_shared<SpecularReflection>(m_albedo, F));
+        auto R = m_Ks->Sample(isec->GetTexCoord());
+        isec->GetBSDF()->AddBxDF(std::make_shared<SpecularReflection>(R, F));
     }
 }

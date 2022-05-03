@@ -10,16 +10,16 @@ namespace tracer
     public:
         BVH();
         ~BVH() override;
-        void Build(const std::vector<std::shared_ptr<IRayHiter>>& objects) override;
+        void Build(const std::vector<std::shared_ptr<IRayPrimitive>>& objects) override;
         bool Intersect(const Ray3f& ray, SurfaceInteraction* info,
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
-        bool IntersectTest(const Ray3f& ray, const IRayHiter* ignoreShape,
+        bool IntersectTest(const Ray3f& ray, const IRayPrimitive* ignoreShape,
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
 
     private:
-        BVHNode* _nodes;
-        int _tot, _root;
-        std::vector<const IRayHiter*> _objects;
+        BVHNode* m_nodes;
+        int m_tot, m_root;
+        std::vector<const IRayPrimitive*> m_primitives{};
 
         void _build(int& p, int l, int r);
         //int newNode(int startOffset, int cnt, int splitAxis, const BoundingBox& box);

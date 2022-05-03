@@ -1,10 +1,12 @@
 #include "ShapeComponent.h"
-#include "ShapeRayHiter.h"
 #include "ShapeAreaSampler.h"
 
 #include "Shapes/Sphere.h"
 #include "Shapes/Triangle.h"
+
 #include <Function/Framework/Components/Transform/TransformComponent.h>
+#include <Function/Framework/Components/Light/LightComponent.h>
+#include <Function/Framework/Components/Light/Lights/AreaLight.h>
 
 namespace crystal
 {
@@ -48,9 +50,21 @@ namespace crystal
     void ShapeComponent::Draw(const GameTimer & gameTimer)
     {}
 
-    std::shared_ptr<IRayHiter> ShapeComponent::GetRayHiter() const
+    std::shared_ptr<IRayPrimitive> ShapeComponent::GetRayPrimitive() const
     {
-        return std::make_shared<ShapeRayHiter>(m_attachedObject, cptr(m_shape));
+        const AreaLight* light = nullptr;
+        const Material* material = nullptr;
+        if (m_attachedObject->HasComponent<LightComponent>())
+        {
+            auto&& lightComp = m_attachedObject->GetComponent<LightComponent>();
+            light = dynamic_cast<const AreaLight *>(lightComp->GetLights()[0].get());
+        }
+        if (m_attachedObject->HasComponent<MaterialComponent>())
+        {
+            auto&& materialComp = m_attachedObject->GetComponent<MaterialComponent>();
+            material = materialComp->GetMaterial();
+        }
+        return std::make_shared<ShapeRayPrimitive>(cptr(m_shape), light, material);
     }
 
     std::shared_ptr<IAreaSampler> ShapeComponent::GetAreaSampler() const

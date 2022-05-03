@@ -15,24 +15,25 @@ namespace tracer
             if (obj->HasComponent<ShapeComponent>())
             {
                 auto shapeComp = obj->GetComponent<ShapeComponent>();
-                m_hiters.push_back(shapeComp->GetRayHiter());
+                m_primitives.push_back(shapeComp->GetRayPrimitive());
             }
             else if (obj->HasComponent<MeshComponent>())
             {
                 auto meshComp = obj->GetComponent<MeshComponent>();
-                for (auto& triangle : meshComp->CreateRayHiters())
+                for (auto& triangle : meshComp->GetRayPrimitives())
                 {
-                    m_hiters.push_back(triangle);
+                    m_primitives.push_back(triangle);
                 }
             }
 
             if (obj->HasComponent<LightComponent>())
             {
-                m_light.push_back(obj->GetComponent<LightComponent>());
+                auto& lightComp = obj->GetComponent<LightComponent>();
+                auto& lights = lightComp->GetLights();
+                m_lights.insert(m_lights.end(), lights.begin(), lights.end());
             }
         }
-
-        m_accelStructure->Build(m_hiters);
+        m_accelStructure->Build(m_primitives);
     }
 
     bool RayScene::Intersect(const Ray3f& ray, SurfaceInteraction* info) const
@@ -45,13 +46,13 @@ namespace tracer
         return m_accelStructure->IntersectTest(ray, nullptr, tMin, tMax);
     }
 
-    void RayScene::ForEachLights(std::function<void(const crystal::LightComponent*)> action) const
+    void RayScene::ForEachLights(std::function<void(const crystal::Light*)> action) const
     {
-        for (auto& light : m_light)
+        for (auto& light : m_lights)
         {
             action(cptr(light));
         }
-    }
+    } 
 
     Spectrum RayScene::GetEnvironmentLight(const Vector3f& dir) const
     {

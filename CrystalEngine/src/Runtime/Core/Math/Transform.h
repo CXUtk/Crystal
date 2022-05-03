@@ -3,11 +3,13 @@
 #include "Math.h"
 #include "Geometry.h"
 #include <glm/gtx/transform.hpp>
+#include <SRefl/SRefl.hpp>
 
 namespace crystal
 {
     class Transform
     {
+        SREFL_TYPE_HEADER(Transform);
     public:
         Transform() {}
         Transform(const Vector3f& translate, const Vector3f& scale, const Quaternion& rotation)
@@ -35,7 +37,7 @@ namespace crystal
 
         void SetTranslation(const Vector3f& translation) { m_translation = translation; }
         void SetScale(const Vector3f& scale) { m_scale = scale; }
-        void GetRotation(const Quaternion& quat) { m_rotation = quat; }
+        void SetRotation(const Quaternion& quat) { m_rotation = quat; }
 
         Vector3f GetTranslation() const { return m_translation; }
         Vector3f GetScale() const { return m_scale; }
@@ -47,3 +49,17 @@ namespace crystal
         Quaternion m_rotation = glm::identity<Quaternion>();
     };
 }
+
+template<>
+struct SRefl::TypeInfo<crystal::Transform>
+{
+    SREFL_TYPEINFO_HEADER(crystal::Transform);
+    constexpr static auto _FIELDLIST()
+    {
+        return std::make_tuple(
+            SRefl::_field(&_Type::m_translation, "Translation"),
+            SRefl::_field(&_Type::m_scale, "Scale"),
+            SRefl::_field(&_Type::m_rotation, "Rotation")
+        );
+    }
+};

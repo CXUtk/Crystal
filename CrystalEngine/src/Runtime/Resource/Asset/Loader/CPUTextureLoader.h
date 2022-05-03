@@ -13,6 +13,8 @@ namespace crystal
     class CPUTextureLoader
     {
     public:
+        static std::shared_ptr<CPUTexture2D> LoadTexture2DPure(const CPUTexture2DPureMetaInfo& metaData,
+            const path_type& curPath);
 
         static std::shared_ptr<CPUTexture2D> LoadTexture2D(const CPUTexture2DMetaInfo& metaData,
             const path_type& curPath);

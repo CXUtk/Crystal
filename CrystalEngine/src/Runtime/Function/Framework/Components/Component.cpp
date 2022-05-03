@@ -9,6 +9,45 @@
 
 namespace crystal
 {
+    std::shared_ptr<Component> Component::LoadComponent(const SJson::JsonNode& node)
+    {
+        ComponentType type = SRefl::EnumInfo<crystal::ComponentType>::string_to_enum(
+            node["Type"].Get<std::string>()
+        );
+        auto& setting = node["Setting"];
+        switch (type)
+        {
+        case crystal::ComponentType::CameraComponent:
+        {
+            return std::make_shared<CameraComponent>(setting);
+        }
+        case crystal::ComponentType::LightComponent:
+        {
+            return std::make_shared<LightComponent>(setting);
+        }
+        case crystal::ComponentType::MaterialComponent:
+        {
+            return std::make_shared<MaterialComponent>(setting);
+        }
+        case crystal::ComponentType::MeshComponent:
+        {
+            return std::make_shared<MeshComponent>(setting);
+        }
+        case crystal::ComponentType::ShapeComponent:
+        {
+            return std::make_shared<ShapeComponent>(setting);
+        }
+        case crystal::ComponentType::TransformComponent:
+        {
+            auto transform = SJson::de_serialize<Transform>(setting);
+            return std::make_shared<TransformComponent>(transform);
+        }
+        default:
+            break;
+        }
+        return nullptr;
+    }
+
     const ComponentDependencyGraph* Component::GetDependencyGraph()
     {
         static ComponentDependencyGraph g_dependencyGraph{};

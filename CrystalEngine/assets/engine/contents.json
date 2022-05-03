@@ -32,10 +32,12 @@
         "consola.ttf"
     ],
     "meshes": [
-        "Floor"
+        "Floor",
+        "Knob",
+        "sibenik"
     ],
     "cputextures": [
         "LUT_cpu",
-        "Cubemaps/Sky2/Skybox_cpu"
+        "Cubemaps/Sky/Skybox_cpu"
     ]
 }

@@ -20,5 +20,7 @@ namespace crystal
 
         // Pdf of a given surface patch in solid angle of shading point hemisphere
         virtual Float PdfLight(const SurfaceInfo& surface_w, const Vector3f& wi) const = 0;
+
+        virtual bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const = 0;
     };
 }

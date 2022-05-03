@@ -11,10 +11,6 @@ namespace SJson
         array_type vec = node.Get<array_type>();
         assert(vec.size() == 3);
 
-        assert(vec[0].GetType() == ValueType::Float);
-        assert(vec[1].GetType() == ValueType::Float);
-        assert(vec[2].GetType() == ValueType::Float);
-
         crystal::Vector3f result{};
         result[0] = vec[0].Get<crystal::Float>();
         result[1] = vec[1].Get<crystal::Float>();
@@ -33,11 +29,6 @@ namespace SJson
         assert(node.GetType() == ValueType::Array);
         array_type vec = node.Get<array_type>();
         assert(vec.size() == 4);
-
-        assert(vec[0].GetType() == ValueType::Float);
-        assert(vec[1].GetType() == ValueType::Float);
-        assert(vec[2].GetType() == ValueType::Float);
-        assert(vec[3].GetType() == ValueType::Float);
 
         crystal::Quaternion result{};
         result[0] = vec[0].Get<crystal::Float>();

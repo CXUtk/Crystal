@@ -3,6 +3,7 @@
 #include <Function/Framework/Components/Material/BSDF.h>
 
 #include <Core/Sampling/Sampling.h>
+#include <Function/Framework/Components/Light/Lights/AreaLight.h>
 
 namespace tracer
 {
@@ -51,7 +52,7 @@ namespace tracer
 		// One sample for each light
 		Vector2f sampleLight = sampler->Get2D();
         Vector2f sampleBSDF = sampler->Get2D();
-		scene->ForEachLights([&](const crystal::LightComponent* light) {
+		scene->ForEachLights([&](const crystal::Light* light) {
 			if (light->Flux() == Spectrum(0.f)) return;
 			L += EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler);
 		});
@@ -59,7 +60,8 @@ namespace tracer
 	}
 
 	Spectrum DirectLightingIntegrator::EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
-            const Vector2f& sampleLight, const Vector2f& sampleBSDF, const crystal::LightComponent* light, Sampler* sampler)
+        const Vector2f& sampleLight, const Vector2f& sampleBSDF,
+        const crystal::Light* light, Sampler* sampler)
 	{
 		Spectrum L(0.f);
 
@@ -89,7 +91,7 @@ namespace tracer
 
 				if (Li_light != Spectrum(0.f))
 				{
-					if (light->GetLight()->IsDeltaLight())
+					if (light->IsDeltaLight())
 					{
 						L += f * Li_light * NdotL / pdf_light;
 					}
@@ -102,7 +104,7 @@ namespace tracer
 		}
 
 		// Sample BSDF (Delta light should not have any value in BSDF sample)
-		if (!light->GetLight()->IsDeltaLight())
+		if (!light->IsDeltaLight())
 		{
 			float pdf_bsdf;
 			BxDFType sampledType;
@@ -119,19 +121,18 @@ namespace tracer
 				weight = PowerHeuristic(1, pdf_bsdf, 1, pdf_light);
 			}
 
-			SurfaceInteraction lightIsec;
-			Spectrum Li(0.f);
-			if (scene->Intersect(isec.SpawnRay(wi), &lightIsec))
-			{
-				if (lightIsec.GetHitObject() == light->GetAttachedObject())
-				{
-					Li = lightIsec.Le(-wi);
-				}
-			}
-			else
-			{
-				Li = light->Le(wi);
-			}
+            Spectrum Li(0.f);
+            Ray lightTestRay = isec.SpawnRay(wi);
+            SurfaceInteraction lightIsec;
+            if (scene->Intersect(lightTestRay, &lightIsec)
+                && lightIsec.GetHitPrimitive()->GetAreaLight() == light)
+            {
+                Li = lightIsec.Le(-wi);
+            }
+            else
+            {
+                Li = light->Le(wi);
+            }
 			if (Li != Spectrum(0.f))
 			{
 				L += f * Li * weight / pdf_bsdf;

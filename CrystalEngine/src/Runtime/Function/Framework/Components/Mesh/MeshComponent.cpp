@@ -1,5 +1,11 @@
 #include "MeshComponent.h"
 #include <Function/Framework/Components/Transform/TransformComponent.h>
+#include <Function/Framework/Components/Light/ComponentSettings.h>
+#include <Function/Framework/Components/Light/LightComponent.h>
+#include <Function/Framework/Components/Light/Lights/AreaLight.h>
+
+#include <Engine.h>
+#include <Resource/Asset/AssetManager.h>
 
 namespace crystal
 {
@@ -10,11 +16,22 @@ namespace crystal
         
     }
 
+    MeshComponent::MeshComponent(const SJson::JsonNode& node)
+        : m_setting(node)
+    {}
+
     MeshComponent::~MeshComponent()
     {}
 
     void MeshComponent::Initialize()
     {
+        if (m_setting.GetType() != SJson::ValueType::Null)
+        {
+            auto assetManager = Engine::GetInstance()->GetAssetManager();
+            auto modelURI = m_setting["Model"].Get<std::string>();
+            m_mesh = assetManager->LoadAsset<Mesh>(modelURI);
+        }
+
         auto& transform = m_attachedObject->GetComponent<TransformComponent>()->GetTransform();
         m_vertices = m_mesh->GetTransformedVertices(transform);
 
@@ -37,14 +54,6 @@ namespace crystal
                 m_triangles.push_back(std::make_shared<Triangle>(&V[triangle.x], &V[triangle.y], &V[triangle.z]));
             }
         }
-
-        size_t numTriangles = m_triangles.size();
-        Float weight = 0.f;
-        for (int i = 0; i < numTriangles; i++)
-        {
-            weight += m_triangles[i]->SurfaceArea();
-            m_weightPrefixSum.push_back(weight);
-        }
     }
 
     void MeshComponent::Update(const GameTimer & gameTimer)
@@ -53,19 +62,54 @@ namespace crystal
     void MeshComponent::Draw(const GameTimer & gameTimer)
     {}
 
-    std::vector<std::shared_ptr<IRayHiter>> MeshComponent::CreateRayHiters() const
+    std::vector<std::shared_ptr<IRayPrimitive>> MeshComponent::GetRayPrimitives() const
     {
-        std::vector<std::shared_ptr<IRayHiter>> hiters{};
-        for (auto& triangle : m_triangles)
+        std::vector<std::shared_ptr<IRayPrimitive>> primitives{};
+        std::vector<const AreaLight*> areaLights;
+        const Material* material = nullptr;
+
+        if (m_attachedObject->HasComponent<LightComponent>())
         {
-            hiters.push_back(std::make_shared<ShapeRayHiter>(m_attachedObject, cptr(triangle)));
+            auto&& lightComp = m_attachedObject->GetComponent<LightComponent>();
+
+            for (auto& light : lightComp->GetLights())
+            {
+                if (light->IsAreaLight())
+                {
+                    areaLights.push_back(dynamic_cast<const AreaLight*>(light.get()));
+                }
+                else
+                {
+                    areaLights.push_back(nullptr);
+                }
+            }
         }
-        return hiters;
+        if (m_attachedObject->HasComponent<MaterialComponent>())
+        {
+            auto&& materialComp = m_attachedObject->GetComponent<MaterialComponent>();
+            material = materialComp->GetMaterial();
+        }
+        size_t count = m_triangles.size();
+        size_t lightCount = areaLights.size();
+        for (size_t i = 0; i < count; i++)
+        {
+            auto& triangle = m_triangles[i];
+            const AreaLight* light = nullptr;
+            if (i < lightCount)
+            {
+                light = areaLights[i];
+            }
+
+            primitives.push_back(std::make_shared<ShapeRayPrimitive>(cptr(triangle), light, material));
+        }
+        return primitives;
     }
 
-    std::vector<std::shared_ptr<IAreaSampler>> MeshComponent::CreateAreaSampler() const
+    void MeshComponent::ForeachTriangle(std::function<void(std::shared_ptr<const Triangle>)> action) const
     {
-        std::vector<std::shared_ptr<IAreaSampler>>
-        return 
+        for (auto& triangle : m_triangles)
+        {
+            action(triangle);
+        }
     }
 }

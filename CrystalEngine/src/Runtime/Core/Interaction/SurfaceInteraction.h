@@ -8,6 +8,7 @@
 #include <Function/Framework/Components/Material/BSDF.h>
 #include <Function/Framework/Components/Material/Material.h>
 #include <Function/Framework/Components/Material/MaterialComponent.h>
+#include <Function/Framework/Interfaces/IRayPrimitive.h>
 
 namespace crystal
 {
@@ -41,8 +42,8 @@ namespace crystal
         bool IsFrontFace() const { return m_isFrontFace; }
         float GetDistance() const { return m_distance; }
 
-        void SetHitObject(const GameObject* object) { m_hitObject = object; }
-        const GameObject* GetHitObject() const { return m_hitObject; }
+        void SetHitPrimitive(const IRayPrimitive* primitive) { m_primitive = primitive; }
+        const IRayPrimitive* GetHitPrimitive() const { return m_primitive; }
 
         void SetHitPos(const Point3f& pos) { m_hitPos = pos; }
         Point3f GetHitPos() const { return m_hitPos; }
@@ -78,13 +79,12 @@ namespace crystal
         std::shared_ptr<BSDF> GetBSDF() const { return m_bsdf; }
         void SetBSDF(std::shared_ptr<BSDF> bsdf) { m_bsdf = bsdf; }
 
-        std::shared_ptr<Material> GetMaterial() const
+        const Material* GetMaterial() const
         {
-            return m_hitObject->GetComponent<MaterialComponent>()->GetMaterial();
+            return m_primitive->GetMaterial();
         }
 
     private:
-        const GameObject*   m_hitObject = nullptr;
         float               m_distance = std::numeric_limits<float>::infinity();
         bool                m_isFrontFace = false;
         Point3f             m_hitPos{};
@@ -93,6 +93,8 @@ namespace crystal
                             m_dpDv{};
         Normal3f            m_normal{};
         Vector2f            m_texCoord{};
-        std::shared_ptr<BSDF> m_bsdf = nullptr;
+
+        std::shared_ptr<BSDF>   m_bsdf = nullptr;
+        const IRayPrimitive*    m_primitive = nullptr;
     };
 }

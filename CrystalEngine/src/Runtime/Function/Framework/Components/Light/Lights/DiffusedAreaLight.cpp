@@ -23,10 +23,10 @@ namespace crystal
         auto surface_light = m_areaSampler->SampleSurface(sample);
         *endpoint = surface_light.GetPosition();
 
-        auto dir = *endpoint - surface_w.GetPosition();
-        *pdf = m_areaSampler->PdfLight(surface_w, dir);
+        auto diff = *endpoint - surface_w.GetPosition();
+        *pdf = m_areaSampler->PdfLight(surface_w, diff);
 
-        return Eval_Le(surface_light, -dir);
+        return Eval_Le(surface_light, -diff);
     }
 
     float DiffusedAreaLight::Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const

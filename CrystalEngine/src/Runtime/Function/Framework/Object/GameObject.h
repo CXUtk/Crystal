@@ -10,11 +10,16 @@
 #include <Core/Utils/GameTimer.h>
 #include <Core/Utils/Misc.h>
 
+#include <SJson/SJson.hpp>
+
 
 namespace crystal
 {
     class GameObject
     {
+    public:
+        static std::shared_ptr<GameObject> LoadGameObject(const SJson::JsonNode& node);
+
     public:
         GameObject();
         ~GameObject();
@@ -24,6 +29,7 @@ namespace crystal
         void Draw(const GameTimer& gameTimer);
 
         std::string GetName() const { return m_name; }
+        void SetName(const std::string& name) { m_name = name; }
 
         void AddComponent(std::shared_ptr<Component> component);
 

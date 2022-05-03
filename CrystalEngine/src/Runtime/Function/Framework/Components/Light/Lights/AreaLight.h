@@ -13,7 +13,7 @@ namespace crystal
         {}
 
         virtual Spectrum Eval_Le(const SurfaceInfo& surface, const Vector3f& wi) const = 0;
-
+        std::shared_ptr<const IAreaSampler> GetAreaSampler() const { return m_areaSampler; }
     protected:
         std::shared_ptr<IAreaSampler> m_areaSampler = nullptr;
     };

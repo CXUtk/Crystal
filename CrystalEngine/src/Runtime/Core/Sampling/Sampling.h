@@ -6,7 +6,7 @@
 namespace crystal
 {
     using RNG = std::mt19937;
-    constexpr bool SHOW_DEBUG = true;
+    constexpr bool SHOW_DEBUG = false;
 
     inline float UniformRandomFloat(RNG& mt)
     {

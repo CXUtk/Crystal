@@ -5,7 +5,7 @@
 
 #include "../Component.h"
 #include "Mesh.h"
-#include <Function/Framework/Components/Shape/ShapeRayHiter.h>
+#include <Function/Framework/Components/Shape/ShapeRayPrimitive.h>
 #include <Function/Framework/Components/Shape/ShapeAreaSampler.h>
 #include <Function/Framework/Components/Shape/Shapes/Triangle.h>
 
@@ -15,6 +15,9 @@ namespace crystal
     {
     public:
         MeshComponent(std::shared_ptr<Mesh> mesh);
+
+        // ["Model"] = URI to model mesh
+        MeshComponent(const SJson::JsonNode& node);
         virtual ~MeshComponent() override;
 
         virtual void Initialize() override;
@@ -22,13 +25,14 @@ namespace crystal
         virtual void Draw(const GameTimer& gameTimer) override;
 
         std::shared_ptr<Mesh> GetMesh() const { return m_mesh; }
-        std::vector<std::shared_ptr<IRayHiter>>     CreateRayHiters() const;
-        std::vector<std::shared_ptr<IAreaSampler>>  CreateAreaSampler() const;
+        std::vector<std::shared_ptr<IRayPrimitive>> GetRayPrimitives() const;
+
+        void ForeachTriangle(std::function<void(std::shared_ptr<const Triangle>)> action) const;
 
     private:
+        SJson::JsonNode                         m_setting{};
         std::shared_ptr<Mesh>                   m_mesh{};
         std::vector<std::shared_ptr<Triangle>>  m_triangles{};
-        std::vector<Float>                      m_weightPrefixSum{};
         std::vector<MeshVertexData>             m_vertices{};
     };
 }

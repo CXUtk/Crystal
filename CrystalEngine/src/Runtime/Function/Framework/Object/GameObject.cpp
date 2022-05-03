@@ -6,6 +6,20 @@
 
 namespace crystal
 {
+    std::shared_ptr<GameObject> GameObject::LoadGameObject(const SJson::JsonNode& node)
+    {
+        auto name = node["Name"].Get<std::string>();
+        auto& components = node["Components"];
+
+        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>();
+        gameObject->SetName(name);
+
+        components.foreach([&gameObject](const SJson::JsonNode& node) {
+            gameObject->AddComponent(Component::LoadComponent(node));
+        });
+        return gameObject;
+    }
+
     GameObject::GameObject()
     {}
 

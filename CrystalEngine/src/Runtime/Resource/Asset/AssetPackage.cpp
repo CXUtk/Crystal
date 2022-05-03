@@ -107,6 +107,15 @@ namespace crystal
                 auto meta = SJson::de_serialize<CPUTextureCubemapMetaInfo>(cputextureMetaInfo["info"]);
                 m_cpu_textureCubemap[name] = CPUTextureLoader::LoadCubemap(meta, path.parent_path());
             }
+            else if (type == "Pure")
+            {
+                if (m_cpu_texture2DMap.find(name) != m_cpu_texture2DMap.end())
+                {
+                    throw std::logic_error(string_format("Asset Name Conflict: CPU Texture2D %s already exist", name.c_str()));
+                }
+                auto meta = SJson::de_serialize<CPUTexture2DPureMetaInfo>(cputextureMetaInfo["info"]);
+                m_cpu_texture2DMap[name] = CPUTextureLoader::LoadTexture2DPure(meta, path.parent_path());
+            }
             else if (type == "Cubemap_mips")
             {
                /* if (m_textureCubeMap.find(name) != m_textureCubeMap.end())

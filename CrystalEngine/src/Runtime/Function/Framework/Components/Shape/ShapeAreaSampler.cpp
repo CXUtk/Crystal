@@ -26,4 +26,9 @@ namespace crystal
     {
         return m_pShape->PdfLight(surface_w, wi);
     }
+
+    bool ShapeAreaSampler::Intersect(const Ray3f& ray, SurfaceInteraction* info) const
+    {
+        return m_pShape->Intersect(ray, info);
+    }
 }

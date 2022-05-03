@@ -1,15 +1,24 @@
 #pragma once
 #include <Function/Framework/Object/GameObject.h>
-#include <Core/Interaction/SurfaceInteraction.h>
+#include <Core/Math/Geometry.h>
 
 namespace crystal
 {
-    class IRayHiter
+    class AreaLight;
+    class Shape;
+    class SurfaceInteraction;
+    class Material;
+
+    class IRayPrimitive
     {
     public:
-        virtual ~IRayHiter() = 0 {};
+        virtual ~IRayPrimitive() = 0 {};
 
-        virtual const GameObject* GetObject() const = 0;
+        virtual const Shape* GetShape() const = 0;
+
+        virtual const AreaLight* GetAreaLight() const = 0;
+
+        virtual const Material* GetMaterial() const = 0;
 
         // Get bounding box of transformed model
         virtual Bound3f GetBoundingBox() const = 0;

@@ -1,0 +1,19 @@
+{
+    "type": "Cubemap",
+
+    "info": {
+        "PosX": "posx.hdr",
+        "NegX": "negx.hdr",
+        "PosY": "posy.hdr",
+        "NegY": "negy.hdr",
+        "PosZ": "posz.hdr",
+        "NegZ": "negz.hdr",
+
+        "TargetComponentFormat": "Float32",
+        "TargetComponents": 3,
+        "InternalComponentFormat": "Float32",
+        "InternalComponents": 3,
+        "IsHDR": true,
+        "MipmapLevels": 1
+    }
+}

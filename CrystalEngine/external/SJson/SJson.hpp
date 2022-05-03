@@ -328,8 +328,8 @@ namespace SJson
         JsonNode& operator[](size_t index);
         const JsonNode& operator[](size_t index) const;
     private:
-        ValueType m_type;
-        JsonValue m_value;
+        ValueType m_type{};
+        JsonValue m_value{};
 
         std::string internal_tostring(const JsonFormatOption& format, int level) const;
     };
@@ -404,7 +404,11 @@ namespace SJson
         }
         else if constexpr (std::is_floating_point<std::decay_t<T>>::value)
         {
-            assert(m_type == ValueType::Float);
+            assert(m_type == ValueType::Float || m_type == ValueType::Integer);
+            if (m_type == ValueType::Integer)
+            {
+                return static_cast<T>(std::get<int64_t>(m_value));
+            }
             return static_cast<T>(std::get<double>(m_value));
         }
         else if constexpr (std::is_same<std::decay_t<T>, array_type>::value)

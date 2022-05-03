@@ -12,6 +12,15 @@
 
 namespace crystal
 {
+    enum class ComponentType
+    {
+        CameraComponent,
+        LightComponent,
+        MaterialComponent,
+        MeshComponent,
+        ShapeComponent,
+        TransformComponent
+    };
 
     class ComponentDependencyGraph
     {
@@ -37,6 +46,7 @@ namespace crystal
     class Component
     {
     public:
+        static std::shared_ptr<Component> LoadComponent(const SJson::JsonNode& node);
         static const ComponentDependencyGraph* GetDependencyGraph();
 
         Component();
@@ -55,6 +65,26 @@ namespace crystal
 
     private:
     };
-
-
 }
+
+
+template<>
+struct SRefl::EnumInfo<crystal::ComponentType>
+{
+    SREFL_TYPEINFO_HEADER(crystal::ComponentType);
+    constexpr static auto _ENUMLIST()
+    {
+        return std::make_tuple(
+            SREFL_ENUM_TERM(CameraComponent),
+            SREFL_ENUM_TERM(LightComponent),
+            SREFL_ENUM_TERM(MaterialComponent),
+            SREFL_ENUM_TERM(MeshComponent),
+            SREFL_ENUM_TERM(ShapeComponent),
+            SREFL_ENUM_TERM(TransformComponent)
+        );
+    }
+#define LISTFUNC(F) F(CameraComponent) F(LightComponent) F(MaterialComponent) \
+F(MeshComponent) F(ShapeComponent) F(TransformComponent)
+    GENERATE_ENUM_MAPPING(crystal::ComponentType, LISTFUNC)
+#undef LISTFUNC
+};

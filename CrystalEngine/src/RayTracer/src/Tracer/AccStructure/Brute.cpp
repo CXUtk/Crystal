@@ -8,11 +8,11 @@ namespace tracer
     Brute::~Brute()
     {}
 
-    void Brute::Build(const std::vector<std::shared_ptr<IRayHiter>>& objects)
+    void Brute::Build(const std::vector<std::shared_ptr<IRayPrimitive>>& primitive)
     {
-        for (auto& ptr : objects)
+        for (auto& ptr : primitive)
         {
-            m_objects.push_back(cptr(ptr));
+            m_primitives.push_back(cptr(ptr));
         }
     }
 
@@ -21,7 +21,7 @@ namespace tracer
     {
         bool hit = false;
         int cnt = 0;
-        for (auto& obj : m_objects)
+        for (auto& obj : m_primitives)
         {
             SurfaceInteraction tmp;
             if (obj->Intersect(ray, &tmp))
@@ -29,7 +29,7 @@ namespace tracer
                 auto dist = tmp.GetDistance();
                 if (dist < isec->GetDistance())
                 {
-                    tmp.SetHitObject(obj->GetObject());
+                    tmp.SetHitPrimitive(obj);
                     *isec = std::move(tmp);
                 }
                 hit = true;
@@ -39,12 +39,12 @@ namespace tracer
     }
 
 
-    bool Brute::IntersectTest(const crystal::Ray3f& ray, const IRayHiter* ignoreShape,
+    bool Brute::IntersectTest(const crystal::Ray3f& ray, const IRayPrimitive* ignoreItem,
         float tMin, float tMax) const
     {
-        for (auto& obj : m_objects)
+        for (auto& obj : m_primitives)
         {
-            if (obj == ignoreShape) continue;
+            if (obj == ignoreItem) continue;
             if (obj->IntersectTest(ray, tMin, tMax))
             {
                 return true;

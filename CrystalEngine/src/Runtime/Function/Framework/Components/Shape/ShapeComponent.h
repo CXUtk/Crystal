@@ -6,8 +6,8 @@
 
 #include "../Component.h"
 #include "Shapes/Shape.h"
+#include "ShapeRayPrimitive.h"
 
-#include <Function/Framework/Interfaces/IRayHiter.h>
 #include <Function/Framework/Interfaces/IAreaSampler.h>
 
 
@@ -24,7 +24,7 @@ namespace crystal
         virtual void Draw(const GameTimer& gameTimer)override;
 
         std::shared_ptr<Shape> GetShape() const { return m_shape; }
-        std::shared_ptr<IRayHiter> GetRayHiter() const;
+        std::shared_ptr<IRayPrimitive> GetRayPrimitive() const;
         std::shared_ptr<IAreaSampler> GetAreaSampler() const;
 
     private:

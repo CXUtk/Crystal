@@ -19,11 +19,9 @@ namespace crystal
         virtual void Update(const GameTimer& gameTimer) override;
         virtual void Draw(const GameTimer& gameTimer) override;
 
-        std::shared_ptr<Light> GetLight() const { return m_light; }
-
-
+        const std::vector<std::shared_ptr<Light>>& GetLights() const { return m_lights; }
     private:
         SJson::JsonNode                     m_setting{};
-        std::vector<std::shared_ptr<Light>> m_light{};
+        std::vector<std::shared_ptr<Light>> m_lights{};
     };
 }
