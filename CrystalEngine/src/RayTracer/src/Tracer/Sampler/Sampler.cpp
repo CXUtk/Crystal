@@ -82,12 +82,19 @@ namespace crystal
     bool Sampler::StartNextSample()
     {
         m_array1DOffset = m_array2DOffset = 0;
-        return ++m_currentSampleIndex < m_samplesPerPixel;
+        return ++m_currentSampleIndex < m_endSampleIndex;
     }
 
-    void Sampler::StartPixel(const Point2i& pt)
+    void Sampler::StartPixel(const Point2i& pt, int startSample, int endSample)
     {
-        m_currentPixel = pt, m_currentSampleIndex = 0;
+        m_currentPixel = pt; 
+        m_startSampleIndex = startSample;
+        m_endSampleIndex = endSample;
+        m_currentSampleIndex = m_startSampleIndex;
+        if (m_endSampleIndex < 0)
+        {
+            m_endSampleIndex = m_samplesPerPixel;
+        }
         m_array1DOffset = m_array2DOffset = 0;
     }
 

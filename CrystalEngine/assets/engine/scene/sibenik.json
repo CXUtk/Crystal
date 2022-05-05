@@ -81,6 +81,44 @@
                     }
                 }
             ]
+        },
+        {
+            "Name": "Light2",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Floor"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 1, -1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "constants:pure/White"
+                        }
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 20, 20, 20 ],
+                            "NumSamples": 1
+                        }
+                    }
+                }
+            ]
         }
     ]
 }

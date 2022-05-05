@@ -23,13 +23,14 @@ namespace crystal
 		virtual void Request1DArray(int N);
 		virtual void Request2DArray(int N);
 		virtual bool StartNextSample();
-		virtual void StartPixel(const Point2i& pt);
+		virtual void StartPixel(const Point2i& pt, int startSample, int endSample = -1);
 
 		float* Get1DArray(int N);
 		Point2f* Get2DArray(int N);
 
 	protected:
-		size_t m_samplesPerPixel, m_currentSampleIndex = 0;
+        size_t m_samplesPerPixel = 0, m_currentSampleIndex = 0;
+        size_t m_startSampleIndex = 0, m_endSampleIndex = 0;
 		Point2i m_currentPixel{};
 
 		int m_array1DOffset = 0, m_array2DOffset = 0;

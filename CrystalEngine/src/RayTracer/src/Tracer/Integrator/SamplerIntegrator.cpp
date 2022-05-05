@@ -25,7 +25,6 @@ namespace tracer
         IntegratorBlock block = {};
         block.TargetWidth = frameBuffer->GetWidth();
         block.TargetHeight = frameBuffer->GetHeight();
-        block.SamplesPerPixel = m_sampler->GetSamplesPerPixel();
 
         block.Camera = camera;
         block.FrameBuffer = frameBuffer;
@@ -34,40 +33,57 @@ namespace tracer
         constexpr int TILE_SIZE = 32;
         m_nTiles = Point2i((block.TargetWidth + TILE_SIZE - 1) / TILE_SIZE,
             (block.TargetHeight + TILE_SIZE - 1) / TILE_SIZE);
+        constexpr int MAX_SAMPLES_PER_TASK = 8;
         m_completedBlocks = 0;
 
         int centerBlockX = block.TargetWidth / 2 / TILE_SIZE;
         int centerBlockY = block.TargetHeight / 2 / TILE_SIZE;
+        int totalSPP = m_sampler->GetSamplesPerPixel();
 
-        std::queue<TileNode> Q;
-        Q.push({ centerBlockX, centerBlockY });
+        m_totalBlocks = (totalSPP + MAX_SAMPLES_PER_TASK - 1) / MAX_SAMPLES_PER_TASK;
+        m_totalBlocks = m_totalBlocks * m_nTiles.x * m_nTiles.y;
 
         m_visit.resize(m_nTiles.x * m_nTiles.y, false);
 
-        while (!Q.empty())
+
+        int seed = 0;
+
+        for (int sp = 0; sp < totalSPP; sp += MAX_SAMPLES_PER_TASK)
         {
-            TileNode node = Q.front();
-            Q.pop();
+            block.SampleNumBegin = sp;
+            block.SampleNumEnd = std::min(totalSPP, sp + MAX_SAMPLES_PER_TASK);
 
-            if (m_visit[node.y * m_nTiles.x + node.x]) continue;
-            m_visit[node.y * m_nTiles.x + node.x] = true;
+            std::queue<TileNode> Q;
+            Q.push({ centerBlockX, centerBlockY });
 
-            block.TileXBegin = TILE_SIZE * node.x;
-            block.TileXEnd = std::min(block.TileXBegin + TILE_SIZE, block.TargetWidth);
-            block.TileYBegin = TILE_SIZE * node.y;
-            block.TileYEnd = std::min(block.TileYBegin + TILE_SIZE, block.TargetHeight);
-            block.X = node.x;
-            block.Y = node.y;
+            m_visit.assign(m_nTiles.x * m_nTiles.y, false);
 
-            PushNewBlock(block);
-
-            for (int i = 0; i < 4; i++)
+            while (!Q.empty())
             {
-                int nx = node.x + dx[i];
-                int ny = node.y + dy[i];
+                TileNode node = Q.front();
+                Q.pop();
 
-                if (nx < 0 || ny < 0 || nx >= m_nTiles.x || ny >= m_nTiles.y) continue;
-                Q.push({ nx, ny });
+                if (m_visit[node.y * m_nTiles.x + node.x]) continue;
+                m_visit[node.y * m_nTiles.x + node.x] = true;
+
+                block.TileXBegin = TILE_SIZE * node.x;
+                block.TileXEnd = std::min(block.TileXBegin + TILE_SIZE, block.TargetWidth);
+                block.TileYBegin = TILE_SIZE * node.y;
+                block.TileYEnd = std::min(block.TileYBegin + TILE_SIZE, block.TargetHeight);
+                block.X = node.x;
+                block.Y = node.y;
+                block.Seed = seed++;
+
+                PushNewBlock(block);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    int nx = node.x + dx[i];
+                    int ny = node.y + dy[i];
+
+                    if (nx < 0 || ny < 0 || nx >= m_nTiles.x || ny >= m_nTiles.y) continue;
+                    Q.push({ nx, ny });
+                }
             }
         }
         //// Wait until finish a frame
@@ -78,13 +94,13 @@ namespace tracer
     void SamplerIntegrator::PushNewBlock(IntegratorBlock block)
     {
         auto task = [this, block]() {
-            auto sampler_thread = m_sampler->Clone(block.X * m_nTiles.y + block.Y);
+            auto sampler_thread = m_sampler->Clone(block.Seed);
 
             for (int xx = block.TileXBegin; xx < block.TileXEnd; xx++)
             {
                 for (int yy = block.TileYBegin; yy < block.TileYEnd; yy++)
                 {
-                    sampler_thread->StartPixel(Point2i(xx, yy));
+                    sampler_thread->StartPixel(Point2i(xx, yy), block.SampleNumBegin, block.SampleNumEnd);
                     do
                     {
                         auto s = sampler_thread->Get2D();
@@ -98,15 +114,13 @@ namespace tracer
                         block.FrameBuffer->AddSample(yy, xx, color);
                         //printf("%lf, %lf\n", s.x, s.y);
                     } while (sampler_thread->StartNextSample());
-
-                    //printf("================\n");
                 }
             }
 
             m_completedBlocks++;
-            printf("Progress: %.2lf%%\n", (double)m_completedBlocks / (m_nTiles.x * m_nTiles.y) * 100);
+            printf("Progress: %.2lf%%\n", (double)m_completedBlocks / m_totalBlocks * 100);
 
-            if (m_completedBlocks == m_nTiles.x * m_nTiles.y)
+            if (m_completedBlocks == m_totalBlocks)
             {
                 printf("Finished! Time Elapsed = %lf Secs\n", Engine::GetInstance()->GetCurrentTime() - m_startRenderingTime);
             }

@@ -17,6 +17,9 @@ namespace crystal
         virtual ~CPUTexture2D() = 0 {};
         virtual Vector3f Sample(const Vector2f& uv) const = 0;
         virtual Vector3f SampleMipmap(const Vector2f& uv, float lod) const = 0;
+
+    private:
+
     };
 
     class CPUTexture2DPure : public CPUTexture2D
