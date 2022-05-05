@@ -63,6 +63,8 @@ namespace crystal
             g_dependencyGraph.AddEdge<ShapeComponent, LightComponent>();
             g_dependencyGraph.AddEdge<MeshComponent, LightComponent>();
 
+            g_dependencyGraph.AddEdge<MaterialComponent, MeshComponent>();
+
             g_isDependencyGraphInitialized = true;
         }
         return &g_dependencyGraph;

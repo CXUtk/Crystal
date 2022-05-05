@@ -4,7 +4,8 @@
 
 #include "Loader/ShaderLoader.h"
 #include "Loader/TextureLoader.h"
-#include "Loader/ObjLoader.h"
+#include "Loader/MeshLoader.h"
+//#include "Loader/ObjLoader.h"
 #include "Loader/CPUTextureLoader.h"
 #include "AssetMeta/AssetMetaInfo.h"
 
@@ -130,7 +131,6 @@ namespace crystal
 
     void AssetPackage::LoadMeshes(const path_type& parentPath, const std::vector<std::string>& entries)
     {
-        ObjLoader loader;
         for (auto& name : entries)
         {
             auto path = parentPath / (name + ".json");
@@ -140,11 +140,7 @@ namespace crystal
                 throw std::logic_error(string_format("Asset Name Conflict: Mesh %s already exist", name.c_str()));
             }
 
-            auto target = meshMetaInfo["target"].Get<std::string>();
-            auto pathToTarget = path.parent_path() / target;
-            loader.load(pathToTarget);
-
-            m_meshesMap[name] = loader.GetMesh();
+            m_meshesMap[name] = MeshLoader::LoadOneMeshFromObj(meshMetaInfo, parentPath);
         }
     }
 

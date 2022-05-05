@@ -1,5 +1,9 @@
 {
     "cputextures": [
-        "pure/White"
+        "pure/White",
+        "pure/Cyan",
+        "pure/OneTenth",
+        "pure/TwoTenth",
+        "pure/ThreeTenth"
     ]
 }

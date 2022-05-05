@@ -1,13 +1,30 @@
 #include "Mesh.h"
+#include <SJson/SJson.hpp>
 
 namespace crystal
 {
-    Mesh::Mesh(const std::vector<MeshVertexData>& V, const std::vector<glm::ivec3>& I)
-        : m_vertices(V)
+    Mesh::Mesh(const std::vector<MeshVertexData>& V, const std::vector<MeshFaceData>& F,
+        const std::vector<std::string> materials)
+        : m_vertices(V), m_faces(F), m_materials(materials)
+    {}
+
+    Mesh::Mesh(const std::vector<MeshVertexData>& V, const std::vector<MeshFaceData>& F,
+        const std::vector<std::string> materials, const std::map<std::string, SJson::JsonNode>& inits)
+        : m_vertices(V), m_faces(F), m_materials(materials), m_materialInits(inits)
     {}
 
     Mesh::~Mesh()
     {}
+
+    const std::vector<MeshVertexData>& Mesh::GetVertices() const
+    {
+        return m_vertices;
+    }
+
+    const std::vector<MeshFaceData>& Mesh::GetFaces() const
+    {
+        return m_faces;
+    }
 
     std::vector<MeshVertexData> Mesh::GetTransformedVertices(const Transform& transform) const
     {

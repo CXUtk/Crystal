@@ -4,8 +4,9 @@
 #include <glm/glm.hpp>
 #include <Core/Math/Geometry.h>
 #include <Platform/RHI/Graphics/GraphicsCommon.h>
-
 #include <Resource/Asset/Content/CPUTexture/CPUTexture2D.h>
+
+#include "ComponentSettings.h"
 
 namespace crystal
 {
@@ -13,7 +14,7 @@ namespace crystal
     class Material
     {
     public:
-        // static std::shared_ptr<Material> CreateMaterial(JsonNode_CPTR pNode, const Scene* scene);
+        static std::shared_ptr<Material> CreateMaterial(const SJson::JsonNode& setting);
 
         Material() {}
         virtual ~Material() = 0 {};

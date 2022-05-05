@@ -56,8 +56,8 @@ namespace crystal
     {
         // Clamp
         //if (uv.x < 0 || uv.y < 0 || uv.x >= 1.0 || uv.y >= 1.0) return Vector3f(0.f);
-        float U = std::fmod(uv.x, 1.0);
-        float V = std::fmod(uv.y, 1.0);
+        float U = std::fmod(std::fmod(uv.x, 1.0f) + 1.0f, 1.0f);
+        float V = std::fmod(std::fmod(uv.y, 1.0f) + 1.0f, 1.0f);
         size_t row = (size_t)(std::min(1.0f - V, 0.9999f) * m_height);
         size_t col = (size_t)(std::min(U, 0.9999f) * m_width);
         return m_data[row * m_width + col];

@@ -1,0 +1,106 @@
+{
+    "kamen_zid": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen"
+        }
+    },
+    "kamen_zid_parapet": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen_stup"
+        }
+    },
+    "kamen_zid_prozor": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen"
+        }
+    },
+    "pod": {
+        "Type": "Plastic",
+        "Data": {
+            "Kd": "engine:Sibenik/Mramor",
+            "Roughness": "constants:pure/TwoTenth",
+            "IOR": 1.5
+        }
+    },
+    "pod_rub": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen"
+        }
+    },
+    "pod_tepih": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "constants:pure/White"
+        }
+    },
+    "rozeta": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen_stup"
+        }
+    },
+    "sprljci": {
+        "Type": "Glass",
+        "Data": {
+            "Ks": "constants:pure/White",
+            "Tf": "constants:pure/White",
+            "IOR": 1.0
+        }
+    },
+    "staklo": {
+        "Type": "Glass",
+        "Data": {
+            "Ks": "constants:pure/White",
+            "Tf": "constants:pure/White",
+            "IOR": 1.5
+        }
+    },
+    "staklo_crveno": {
+        "Type": "Plastic",
+        "Data": {
+            "Kd": "constants:pure/White",
+            "Roughness": "constants:pure/OneTenth",
+            "IOR": 1.5
+        }
+    },
+    "staklo_plavo": {
+        "Type": "Glass",
+        "Data": {
+            "Ks": "constants:pure/White",
+            "Tf": "constants:pure/White",
+            "IOR": 1.5
+        }
+    },
+    "staklo_zeleno": {
+        "Type": "Glass",
+        "Data": {
+            "Ks": "constants:pure/White",
+            "Tf": "constants:pure/White",
+            "IOR": 1.5
+        }
+    },
+    "staklo_zuto": {
+        "Type": "Glass",
+        "Data": {
+            "Ks": "constants:pure/White",
+            "Tf": "constants:pure/White",
+            "IOR": 1.5
+        }
+    },
+    "stupovi": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen_stup"
+        }
+    },
+    "zid_vani": {
+        "Type": "Lambertian",
+        "Data": {
+            "Kd": "engine:Sibenik/Kamen"
+        }
+    }
+}

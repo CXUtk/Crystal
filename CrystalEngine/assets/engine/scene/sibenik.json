@@ -41,15 +41,6 @@
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
-                },
-                {
-                    "Type": "MaterialComponent",
-                    "Setting": {
-                        "Type": "Lambertian",
-                        "Data": {
-                            "Kd": "constants:pure/White"
-                        }
-                    }
                 }
             ]
         },
@@ -65,7 +56,7 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ -10, -2, 0 ],
+                        "Translation": [ -10, 0, 0 ],
                         "Scale": [ 1, -1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }

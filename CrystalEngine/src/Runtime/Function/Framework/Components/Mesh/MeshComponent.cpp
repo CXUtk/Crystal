@@ -35,25 +35,39 @@ namespace crystal
         auto& transform = m_attachedObject->GetComponent<TransformComponent>()->GetTransform();
         m_vertices = m_mesh->GetTransformedVertices(transform);
 
-        auto& V = m_vertices;
-        if (!m_mesh->HasIndices())
+        auto& Faces = m_mesh->GetFaces();
+
+        for (auto& face : Faces)
         {
-            size_t size = V.size();
-            for (int i = 0; i < size; i += 3)
-            {
-                m_triangles.push_back(std::make_shared<Triangle>(&V[i], &V[i + 1], &V[i + 2]));
-            }
+            m_triangles[face.Material].push_back(std::make_shared<Triangle>(
+                &m_vertices[face.V[0]],
+                &m_vertices[face.V[1]],
+                &m_vertices[face.V[2]]));
         }
-        else
+
+        for (auto& pair : m_mesh->GetMaterialInits())
         {
-            auto& I = m_mesh->GetIndices();
-            size_t size = I.size();
-            for (int i = 0; i < size; i++)
-            {
-                auto& triangle = I[i];
-                m_triangles.push_back(std::make_shared<Triangle>(&V[triangle.x], &V[triangle.y], &V[triangle.z]));
-            }
+            m_materials[pair.first] = Material::CreateMaterial(pair.second);
         }
+
+        //if (!m_mesh->HasIndices())
+        //{
+        //    size_t size = V.size();
+        //    for (int i = 0; i < size; i += 3)
+        //    {
+        //        m_triangles.push_back(std::make_shared<Triangle>(&V[i], &V[i + 1], &V[i + 2]));
+        //    }
+        //}
+        //else
+        //{
+        //    //auto& I = m_mesh->GetIndices();
+        //    //size_t size = I.size();
+        //    //for (int i = 0; i < size; i++)
+        //    //{
+        //    //    auto& triangle = I[i];
+        //    //    m_triangles.push_back(std::make_shared<Triangle>(&V[triangle.x], &V[triangle.y], &V[triangle.z]));
+        //    //}
+        //}
     }
 
     void MeshComponent::Update(const GameTimer & gameTimer)
@@ -84,32 +98,60 @@ namespace crystal
                 }
             }
         }
+
+        bool useModelMaterial = true;
+        // If there is a material component, then use the information in the component
         if (m_attachedObject->HasComponent<MaterialComponent>())
         {
             auto&& materialComp = m_attachedObject->GetComponent<MaterialComponent>();
             material = materialComp->GetMaterial();
+            useModelMaterial = false;
         }
-        size_t count = m_triangles.size();
-        size_t lightCount = areaLights.size();
-        for (size_t i = 0; i < count; i++)
+
+        int index = 0;
+        const auto& matNames = m_mesh->GetMaterialNames();
+        // Otherwise, use the material information from model file
+        for (auto& pair : m_triangles)
         {
-            auto& triangle = m_triangles[i];
-            const AreaLight* light = nullptr;
-            if (i < lightCount)
+            if (pair.first != -1 && useModelMaterial)
             {
-                light = areaLights[i];
+                // Find material according to this matID
+                auto& name = matNames[pair.first];
+                material = FindMaterial(name);
             }
 
-            primitives.push_back(std::make_shared<ShapeRayPrimitive>(cptr(triangle), light, material));
+            for (auto& triangle : pair.second)
+            {
+                const AreaLight* light = nullptr;
+                if (index < areaLights.size())
+                {
+                    light = areaLights[index];
+                }
+                primitives.push_back(std::make_shared<ShapeRayPrimitive>(cptr(triangle), light, material));
+
+                ++index;
+            }
         }
         return primitives;
     }
 
     void MeshComponent::ForeachTriangle(std::function<void(std::shared_ptr<const Triangle>)> action) const
     {
-        for (auto& triangle : m_triangles)
+        for (auto& pair : m_triangles)
         {
-            action(triangle);
+            for (auto& triangle : pair.second)
+            {
+                action(triangle);
+            }
         }
+    }
+    const Material* MeshComponent::FindMaterial(const std::string& name) const
+    {
+        auto p = m_materials.find(name);
+        if (p == m_materials.end())
+        {
+            throw std::runtime_error("Cannot find such material");
+        }
+        return cptr(p->second);
     }
 }

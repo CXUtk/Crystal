@@ -32,7 +32,11 @@ namespace crystal
     private:
         SJson::JsonNode                         m_setting{};
         std::shared_ptr<Mesh>                   m_mesh{};
-        std::vector<std::shared_ptr<Triangle>>  m_triangles{};
         std::vector<MeshVertexData>             m_vertices{};
+
+        std::map<std::string, std::shared_ptr<Material>>        m_materials{};
+        std::map<int, std::vector<std::shared_ptr<Triangle>>>   m_triangles{};
+
+        const Material* FindMaterial(const std::string& name) const;
     };
 }

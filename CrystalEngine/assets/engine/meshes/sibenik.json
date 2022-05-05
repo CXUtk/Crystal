@@ -1,4 +1,5 @@
 {
     "type": "Model",
-    "target": "sibenik_2.obj"
+    "target": "Sibenik/sibenik_2.obj",
+    "material": "Sibenik/sibenik_2_mtl.json"
 }
