@@ -1,5 +1,7 @@
 #include "DefaultSampler.h"
-namespace crystal
+using namespace crystal;
+
+namespace tracer
 {
 	DefaultSampler::DefaultSampler(int samplesPerPixel, int seed) : Sampler(samplesPerPixel), _rng(seed)
 	{}

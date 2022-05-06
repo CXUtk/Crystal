@@ -1,7 +1,8 @@
 #include "Sampler.h"
 #include <Core/Sampling/Sampling.h>
+using namespace crystal;
 
-namespace crystal
+namespace tracer
 {
 
     //std::shared_ptr<Sampler> Sampler::LoadSampler(JsonNode_CPTR pSamplerNode, const config::ConfigInfo& configInfo)

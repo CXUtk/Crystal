@@ -30,56 +30,62 @@ namespace crystal
             return nullptr;
         }
 
-        auto& shape = shapes[0];
 
         std::vector<MeshFaceData> Triangles{};
         std::vector<MeshVertexData> Vertices{};
         std::vector<std::string> Materials{};
 
-        size_t index_offset = 0;
-        for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++)
+
+        size_t v_offset = 0;
+        for (auto& shape : shapes)
         {
-            size_t fnum = shape.mesh.num_face_vertices[f];
-            assert(fnum == 3);
-
-            MeshFaceData faceData = {};
-
-            // For each vertex in the face
-            for (size_t v = 0; v < fnum; v++)
+            size_t index_offset = 0;
+            size_t faces = shape.mesh.num_face_vertices.size();
+            for (size_t f = 0; f < faces; f++)
             {
-                tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
+                size_t fnum = shape.mesh.num_face_vertices[f];
+                assert(fnum == 3);
 
-                faceData.V[v] = index_offset + v;
+                MeshFaceData faceData = {};
 
-                MeshVertexData vertexData = {};
-                vertexData.Position = Vector3f(attrib.vertices[idx.vertex_index * 3],
-                    attrib.vertices[idx.vertex_index * 3 + 1],
-                    attrib.vertices[idx.vertex_index * 3 + 2]);
+                // For each vertex in the face
+                for (size_t v = 0; v < fnum; v++)
+                {
+                    tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
 
-                vertexData.Normal = Vector3f(attrib.normals[idx.normal_index * 3],
-                    attrib.normals[idx.normal_index * 3 + 1],
-                    attrib.normals[idx.normal_index * 3 + 2]);
+                    faceData.V[v] = v_offset + index_offset + v;
 
-                vertexData.TexCoord = Vector2f(attrib.texcoords[idx.texcoord_index * 2],
-                    attrib.texcoords[idx.texcoord_index * 2 + 1]);
+                    MeshVertexData vertexData = {};
+                    vertexData.Position = Vector3f(attrib.vertices[idx.vertex_index * 3],
+                        attrib.vertices[idx.vertex_index * 3 + 1],
+                        attrib.vertices[idx.vertex_index * 3 + 2]);
 
-                Vertices.push_back(vertexData);
+                    vertexData.Normal = Vector3f(attrib.normals[idx.normal_index * 3],
+                        attrib.normals[idx.normal_index * 3 + 1],
+                        attrib.normals[idx.normal_index * 3 + 2]);
 
-                //printf("    face[%ld].v[%ld].idx = %d/%d/%d\n", static_cast<long>(f),
-                //       static_cast<long>(v), idx.vertex_index, idx.normal_index,
-                //       idx.texcoord_index);
+                    vertexData.TexCoord = Vector2f(attrib.texcoords[idx.texcoord_index * 2],
+                        attrib.texcoords[idx.texcoord_index * 2 + 1]);
+
+                    Vertices.push_back(vertexData);
+
+                    //printf("    face[%ld].v[%ld].idx = %d/%d/%d\n", static_cast<long>(f),
+                    //       static_cast<long>(v), idx.vertex_index, idx.normal_index,
+                    //       idx.texcoord_index);
+                }
+
+                faceData.Material = shape.mesh.material_ids[f];
+                //printf("  face[%ld].material_id = %d\n", static_cast<long>(f),
+                //       shapes[i].mesh.material_ids[f]);
+                //printf("  face[%ld].smoothing_group_id = %d\n", static_cast<long>(f),
+                //       shapes[i].mesh.smoothing_group_ids[f]);
+
+                index_offset += fnum;
+                Triangles.push_back(faceData);
             }
 
-            faceData.Material = shape.mesh.material_ids[f];
-            //printf("  face[%ld].material_id = %d\n", static_cast<long>(f),
-            //       shapes[i].mesh.material_ids[f]);
-            //printf("  face[%ld].smoothing_group_id = %d\n", static_cast<long>(f),
-            //       shapes[i].mesh.smoothing_group_ids[f]);
-
-            index_offset += fnum;
-            Triangles.push_back(faceData);
+            v_offset += index_offset;
         }
-
 
         for (auto& material : materials)
         {

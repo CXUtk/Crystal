@@ -31,9 +31,12 @@ namespace tracer
         block.RayScene = rayScene;
 
         constexpr int TILE_SIZE = 32;
+        constexpr int MAX_SAMPLES_PER_TASK = 99999;
+
+
         m_nTiles = Point2i((block.TargetWidth + TILE_SIZE - 1) / TILE_SIZE,
             (block.TargetHeight + TILE_SIZE - 1) / TILE_SIZE);
-        constexpr int MAX_SAMPLES_PER_TASK = 8;
+
         m_completedBlocks = 0;
 
         int centerBlockX = block.TargetWidth / 2 / TILE_SIZE;
@@ -88,9 +91,9 @@ namespace tracer
         }
         //// Wait until finish a frame
         //while (m_completedBlocks < m_nTiles.x * m_nTiles.y) {}
-
         m_startRenderingTime = Engine::GetInstance()->GetCurrentTime();
     }
+
     void SamplerIntegrator::PushNewBlock(IntegratorBlock block)
     {
         auto task = [this, block]() {
@@ -117,12 +120,17 @@ namespace tracer
                 }
             }
 
-            m_completedBlocks++;
-            printf("Progress: %.2lf%%\n", (double)m_completedBlocks / m_totalBlocks * 100);
-
-            if (m_completedBlocks == m_totalBlocks)
+            double currentTime = Engine::GetInstance()->GetCurrentTime();
             {
-                printf("Finished! Time Elapsed = %lf Secs\n", Engine::GetInstance()->GetCurrentTime() - m_startRenderingTime);
+                std::lock_guard<std::mutex> lock(m_countLock);
+
+                m_completedBlocks++;
+                printf("Progress: %.2lf%%\n", (double)m_completedBlocks / m_totalBlocks * 100);
+
+                if (m_completedBlocks == m_totalBlocks)
+                {
+                    printf("Finished! Time Elapsed = %lf Secs\n", currentTime - m_startRenderingTime);
+                }
             }
 
         };

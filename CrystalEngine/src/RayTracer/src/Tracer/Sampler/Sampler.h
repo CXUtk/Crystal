@@ -4,8 +4,9 @@
 #include <random>
 #include <algorithm>
 
-namespace crystal
+namespace tracer
 {
+    using namespace crystal;
 	class Sampler
 	{
 	public:

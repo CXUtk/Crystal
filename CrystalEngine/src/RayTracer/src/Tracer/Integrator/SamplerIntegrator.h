@@ -22,12 +22,14 @@ namespace tracer
     private:
         std::shared_ptr<Sampler> m_sampler = nullptr;
         std::shared_ptr<FixedThreadPool> m_threadPool = nullptr;
-        std::atomic<size_t>    m_completedBlocks{};
-        int                 m_numThreads{};
-        size_t              m_totalBlocks{};
-        Point2i             m_nTiles{};
-        std::vector<bool>   m_visit{};
-        double              m_startRenderingTime{};
+
+        volatile size_t         m_completedBlocks{};
+        int                     m_numThreads{};
+        size_t                  m_totalBlocks{};
+        Point2i                 m_nTiles{};
+        std::vector<bool>       m_visit{};
+        double                  m_startRenderingTime{};
+        std::mutex              m_countLock{};
 
         struct TileNode
         {
@@ -42,9 +44,9 @@ namespace tracer
             size_t                  X, Y;
             size_t                  Seed;
 
-            const RayScene* RayScene;
-            const CameraComponent* Camera;
-            FrameBuffer* FrameBuffer;
+            const RayScene*         RayScene;
+            const CameraComponent*  Camera;
+            FrameBuffer*            FrameBuffer;
         };
 
 

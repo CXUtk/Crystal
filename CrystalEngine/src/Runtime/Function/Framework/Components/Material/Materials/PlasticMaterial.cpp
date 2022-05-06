@@ -2,6 +2,7 @@
 #include "../BSDFs/FresnelBlend.h"
 #include "../BSDFs/MicrofacetReflection.h"
 #include "../BSDFs/Lambertian.h"
+#include "../BSDFs/AshikhminShirley.h"
 #include <Core/Interaction/SurfaceInteraction.h>
 
 namespace crystal
@@ -21,7 +22,7 @@ namespace crystal
         auto baseColor = m_Kd->Sample(isec->GetTexCoord());
         auto roughness = m_roughness->Sample(isec->GetTexCoord());
         auto distribution = std::make_shared<GGXDistribution>(Vector2f(roughness.x, roughness.y));
-        isec->GetBSDF()->AddBxDF(std::make_shared<FresnelBlend>(baseColor,
+        isec->GetBSDF()->AddBxDF(std::make_shared<AshikhminShirley>(baseColor,
             Spectrum(1.f), distribution, m_F));
     }
 }

@@ -10,7 +10,8 @@ namespace crystal
         Lambertian,
         Glass,
         Mirror,
-        Plastic
+        Plastic,
+
     };
 
     struct LambertianMaterialSettings

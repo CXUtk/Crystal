@@ -56,7 +56,7 @@ namespace tracer
         m_rayTraceTexture = graphicsDevice->CreateTexture2DFromMemory(nullptr, 0, texDesc);
 
         auto assetManager = m_engine->GetAssetManager();
-        auto scene = Scene::LoadScene(File::ReadAllText("assets/engine/scene/sibenik.json"));
+        auto scene = Scene::LoadScene(File::ReadAllText("assets/engine/scene/Knob.json"));
 
         auto pureWhite = std::make_shared<CPUTexture2DPure>(Spectrum(1.f));
         auto pureRed = std::make_shared<CPUTexture2DPure>(Spectrum(1.f, 0.f, 0.f));
@@ -68,7 +68,7 @@ namespace tracer
         RenderProperties renderprops = {};
         renderprops.FrameBufferSize = window->GetWindowSize();
         renderprops.Gamma = 2.2;
-        renderprops.SampleCount = 32;
+        renderprops.SampleCount = 64;
         renderprops.NumOfThreads = 8;
         renderprops.Skybox = assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky2/Skybox_cpu");
 

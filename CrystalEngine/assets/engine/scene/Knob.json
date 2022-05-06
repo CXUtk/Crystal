@@ -1,0 +1,125 @@
+{
+    "Objects": [
+        {
+            "Name": "Camera",
+            "Components": [
+                {
+                    "Type": "CameraComponent",
+                    "Setting": {
+                        "Type": "Perspective",
+                        "Data": {
+                            "FovY": 1.04719753,
+                            "Aspect": 1.33333,
+                            "ZNear": 0,
+                            "ZFar": 100
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 5, -15 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0.995133340, 0.0985376164, 0 ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "KnobObject",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:hero"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 10, 10, 10 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Plastic",
+                        "Data": {
+                            "Kd": "constants:pure/Cyan",
+                            "Roughness": "constants:pure/ThreeTenth",
+                            "IOR": 1.5
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Floor",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Floor"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 10, 1, 10 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "engine:Sibenik/Mramor"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Light",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Floor"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 10, 0 ],
+                        "Scale": [ 1, -1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "constants:pure/White"
+                        }
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 20, 20, 20 ],
+                            "NumSamples": 1
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
