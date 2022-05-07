@@ -196,7 +196,10 @@ namespace tracer
             {
                 f *= std::max(0.f, glm::dot(N, wi));
                 pdf_light = light->Pdf_Li(isec.GetSurfaceInfo(false), wi);
-                if (pdf_light == 0.f || f == Spectrum(0.f)) return L;
+                if (pdf_light == 0.f || f == Spectrum(0.f))
+                {
+                    return L;
+                }
                 weight = PowerHeuristic(1, pdf_bsdf, 1, pdf_light);
             }
 
@@ -204,15 +207,27 @@ namespace tracer
             Spectrum Li(0.f);
             Ray lightTestRay = isec.SpawnRay(wi);
             SurfaceInteraction lightIsec;
-            if (scene->Intersect(lightTestRay, &lightIsec)
-                && lightIsec.GetHitPrimitive()->GetAreaLight() == light)
+
+            if (light->GetFlags() & LightFlags::Area)
             {
-                Li = lightIsec.Le(-wi);
+                if (scene->Intersect(lightTestRay, &lightIsec)
+                    && lightIsec.GetHitPrimitive()->GetAreaLight() == light)
+                {
+                    Li = lightIsec.Le(-wi);
+                }
+                else
+                {
+                    Li = light->Le(wi);
+                }
             }
-            else
+            else if (light->GetFlags() & LightFlags::Infinite)
             {
-                Li = light->Le(wi);
+                if (!scene->IntersectTest(lightTestRay, 0, std::numeric_limits<float>::infinity()))
+                {
+                    Li = light->Le(wi);
+                }
             }
+
             if (Li != Spectrum(0.f))
             {
                 L += f * Li * weight / pdf_bsdf;

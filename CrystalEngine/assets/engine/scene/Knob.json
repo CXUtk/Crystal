@@ -114,7 +114,7 @@
                     "Setting": {
                         "Type": "DiffuseAreaLight",
                         "Data": {
-                            "LEmit": [ 20, 20, 20 ],
+                            "LEmit": [ 0, 0, 0 ],
                             "NumSamples": 1
                         }
                     }

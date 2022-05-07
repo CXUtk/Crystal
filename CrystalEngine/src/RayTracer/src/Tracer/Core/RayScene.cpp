@@ -1,6 +1,7 @@
 #include "RayScene.h"
 #include <Function/Framework/Components/Shape/ShapeComponent.h>
 #include <Function/Framework/Components/Light/LightComponent.h>
+#include <Function/Framework/Components/Light/Lights/CubemapEnvironmentLight.h>
 #include <Function/Framework/Components/Mesh/MeshComponent.h>
 
 namespace tracer
@@ -33,6 +34,13 @@ namespace tracer
                 m_lights.insert(m_lights.end(), lights.begin(), lights.end());
             }
         }
+
+        //if (m_skyBox != nullptr)
+        //{
+        //    Transform transform;
+        //    m_lights.push_back(std::make_shared<CubemapEnvironmentLight>(transform, m_skyBox));
+        //}
+
         m_accelStructure->Build(m_primitives);
     }
 

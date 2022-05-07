@@ -60,12 +60,18 @@ namespace crystal
                         attrib.vertices[idx.vertex_index * 3 + 1],
                         attrib.vertices[idx.vertex_index * 3 + 2]);
 
-                    vertexData.Normal = Vector3f(attrib.normals[idx.normal_index * 3],
-                        attrib.normals[idx.normal_index * 3 + 1],
-                        attrib.normals[idx.normal_index * 3 + 2]);
+                    if (idx.normal_index >= 0)
+                    {
+                        vertexData.Normal = Vector3f(attrib.normals[idx.normal_index * 3],
+                            attrib.normals[idx.normal_index * 3 + 1],
+                            attrib.normals[idx.normal_index * 3 + 2]);
+                    }
 
-                    vertexData.TexCoord = Vector2f(attrib.texcoords[idx.texcoord_index * 2],
-                        attrib.texcoords[idx.texcoord_index * 2 + 1]);
+                    if (idx.texcoord_index >= 0)
+                    {
+                        vertexData.TexCoord = Vector2f(attrib.texcoords[idx.texcoord_index * 2],
+                            attrib.texcoords[idx.texcoord_index * 2 + 1]);
+                    }
 
                     Vertices.push_back(vertexData);
 

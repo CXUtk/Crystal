@@ -88,7 +88,7 @@ namespace crystal
 
             for (auto& light : lightComp->GetLights())
             {
-                if (light->IsAreaLight())
+                if (light->GetFlags() & LightFlags::Area)
                 {
                     areaLights.push_back(dynamic_cast<const AreaLight*>(light.get()));
                 }

@@ -22,7 +22,14 @@ namespace crystal
         Vector3f Sample(const Vector3f& dir) const;
         Vector3f SampleMipmap(const Vector3f& dir, float lod) const;
 
+        Vector3f WeightedSampleUV(const Vector2f& sample) const;
+        Float AverageWeights() const;
+
+        virtual Float Pdf(const Vector3f& dir) const;
+
     private:
-        std::shared_ptr<CPUTexture2D> m_textures[6];
+        std::shared_ptr<CPUTexture2D> m_textures[6]{};
+        Float  m_weights[7]{};
+        Float  m_avgWeights{};
     };
 }

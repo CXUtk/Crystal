@@ -17,7 +17,9 @@ namespace crystal
         virtual ~CPUTexture2D() = 0 {};
         virtual Vector3f Sample(const Vector2f& uv) const = 0;
         virtual Vector3f SampleMipmap(const Vector2f& uv, float lod) const = 0;
-
+        virtual Vector2f WeightedSampleUV(const Vector2f& sample) const = 0;
+        virtual Float AverageWeights() const = 0;
+        virtual Float Pdf(const Vector2f& u) const = 0;
     private:
 
     };
@@ -30,9 +32,12 @@ namespace crystal
 
         virtual Vector3f Sample(const Vector2f& uv) const override { return m_color; }
         virtual Vector3f SampleMipmap(const Vector2f& uv, float lod) const override { return m_color; }
+        virtual Float AverageWeights() const override { return (m_color.r + m_color.g + m_color.b) / 3.f; }
+        virtual Vector2f WeightedSampleUV(const Vector2f& sample) const { return sample; }
+        virtual Float Pdf(const Vector2f& u) const override { return 1.f; }
 
     private:
-        Spectrum m_color;
+        Spectrum m_color{};
     };
 
     class CPUTexture2DCheckerBoard : public CPUTexture2D
@@ -43,7 +48,13 @@ namespace crystal
 
         virtual Vector3f Sample(const Vector2f& uv) const override;
         virtual Vector3f SampleMipmap(const Vector2f& uv, float lod) const override { return Sample(uv); }
-
+        virtual Vector2f WeightedSampleUV(const Vector2f& sample) const override;
+        virtual Float AverageWeights() const override
+        {
+            Spectrum combine = m_W + m_B;
+            return (combine.r + combine.g + combine.b) / 3.f;
+        }
+        virtual Float Pdf(const Vector2f& u) const override;
     private:
         Spectrum m_W{}, m_B{};
     };
@@ -69,6 +80,11 @@ namespace crystal
         std::vector<stbi_uc> GetByteData() const;
         std::vector<float> GetFloatData(int components = 3) const;
 
+        Vector2f WeightedSampleUV(const Vector2f& sample) const override;
+        virtual Float AverageWeights() const override;
+
+        virtual Float Pdf(const Vector2f& u) const override;
+
     private:
         size_t      m_width = 0, m_height = 0;
         bool        m_isHDR = false;
@@ -77,5 +93,8 @@ namespace crystal
         float       TotalWeight{};
         float*      WeightForRow = nullptr;
         float*      WeightForCol = nullptr;
+
+
+        void SetUpSampler();
     };
 }

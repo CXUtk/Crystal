@@ -39,19 +39,17 @@ namespace crystal
 
         virtual float Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const = 0;
 
-        // Infinite area light, get emitted radiance from direction
+        // Infinite area light, get emitted radiance from given direction
         virtual Spectrum Le(const Vector3f& wi) const { return Spectrum(0.f); }
 
         //int GetNumSamples() const { return _numSamples; }
 
-        //LightFlags GetFlags() const { return _flags; }
+        LightFlags GetFlags() const { return m_flags; }
 
         bool IsDeltaLight() const
         {
             return (m_flags & (LightFlags::DeltaPosition | LightFlags::DeltaDirection));
         }
-
-        bool IsAreaLight() const { return (m_flags & LightFlags::Area); }
 
     protected:
         int         m_numSamples{};
