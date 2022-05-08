@@ -11,7 +11,7 @@ namespace crystal
         Glass,
         Mirror,
         Plastic,
-
+        Metal
     };
 
     struct LambertianMaterialSettings
@@ -42,7 +42,18 @@ namespace crystal
         URI Roughness;
         // Index of refraction
         Float IOR;
+    };
 
+
+    struct MetalMaterialSettings
+    {
+        URI Kd;
+        // Roughness texture of surface
+        URI Roughness;
+        // Index of refraction
+        Spectrum IOR;
+        // Index of refraction (Complex)
+        Spectrum K;
     };
 }
 
@@ -94,6 +105,21 @@ struct SRefl::TypeInfo<crystal::PlasticMaterialSettings>
             SREFL_FIELD(Kd),
             SREFL_FIELD(Roughness),
             SREFL_FIELD(IOR)
+        );
+    }
+};
+
+template<>
+struct SRefl::TypeInfo<crystal::MetalMaterialSettings>
+{
+    SREFL_TYPEINFO_HEADER(crystal::MetalMaterialSettings);
+    constexpr static auto _FIELDLIST()
+    {
+        return std::make_tuple(
+            SREFL_FIELD(Kd),
+            SREFL_FIELD(Roughness),
+            SREFL_FIELD(IOR),
+            SREFL_FIELD(K)
         );
     }
 };

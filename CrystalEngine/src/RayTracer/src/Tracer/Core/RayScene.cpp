@@ -35,11 +35,11 @@ namespace tracer
             }
         }
 
-        //if (m_skyBox != nullptr)
-        //{
-        //    Transform transform;
-        //    m_lights.push_back(std::make_shared<CubemapEnvironmentLight>(transform, m_skyBox));
-        //}
+        if (m_skyBox != nullptr)
+        {
+            Transform transform;
+            m_lights.push_back(std::make_shared<CubemapEnvironmentLight>(transform, m_skyBox));
+        }
 
         m_accelStructure->Build(m_primitives);
     }

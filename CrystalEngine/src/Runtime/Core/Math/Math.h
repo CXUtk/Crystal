@@ -27,4 +27,7 @@ namespace crystal
     using Quaternion = glm::quat;
 
     inline Float square(Float x) { return x * x; }
+
+    template<glm::length_t L, typename T, glm::qualifier Q>
+    inline glm::vec<L, T, Q> square(const glm::vec<L, T, Q>& x) { return x * x; }
 }

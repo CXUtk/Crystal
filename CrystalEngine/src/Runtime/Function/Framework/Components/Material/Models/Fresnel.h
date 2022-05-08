@@ -3,6 +3,7 @@
 #include <Crystal.h>
 #include <Core/Math/Geometry.h>
 #include <Platform/RHI/Graphics/GraphicsCommon.h>
+#include <complex>
 
 namespace crystal
 {
@@ -42,6 +43,18 @@ namespace crystal
         Float m_etaA{}, m_etaB{};
     };
 
+    class FresnelConductor : public Fresnel
+    {
+    public:
+        FresnelConductor(const Spectrum& etaI, const Spectrum& etaT, const Spectrum& k)
+            : m_etaI(etaI), m_etaT(etaT), m_K(k) {}
+        ~FresnelConductor() override {}
+        Spectrum Eval(float cosThetaI) const override;
+
+    private:
+        Spectrum m_etaI{}, m_etaT{};
+        Spectrum m_K{};
+    };
 
     class FresnelSchlick : public Fresnel
     {

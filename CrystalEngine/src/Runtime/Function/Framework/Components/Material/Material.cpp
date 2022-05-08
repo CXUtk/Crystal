@@ -4,6 +4,7 @@
 #include "Materials/GlassMaterial.h"
 #include "Materials/MirrorMaterial.h"
 #include "Materials/PlasticMaterial.h"
+#include "Materials/MetalMaterial.h"
 
 #include <Engine.h>
 #include <Resource/Asset/AssetManager.h>
@@ -46,6 +47,14 @@ namespace crystal
             auto Kd = assetManager->LoadAsset<CPUTexture2D>(settings.Kd);
             auto Roughness = assetManager->LoadAsset<CPUTexture2D>(settings.Roughness);
             return std::make_shared<PlasticMaterial>(Kd, Roughness, settings.IOR);
+        }
+        case crystal::MaterialType::Metal:
+        {
+            auto settings = SJson::de_serialize<MetalMaterialSettings>(params);
+            auto Kd = assetManager->LoadAsset<CPUTexture2D>(settings.Kd);
+            auto Roughness = assetManager->LoadAsset<CPUTexture2D>(settings.Roughness);
+            // Gold: Spectrum(0.181f, 0.608f, 1.562f), Spectrum(3.068f, 2.54f, 1.904f);
+            return std::make_shared<MetalMaterial>(Kd, Roughness, settings.IOR, settings.K);
         }
         default:
             throw std::runtime_error("Not implemented");

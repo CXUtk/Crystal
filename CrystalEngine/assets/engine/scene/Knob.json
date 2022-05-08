@@ -26,7 +26,7 @@
             ]
         },
         {
-            "Name": "KnobObject",
+            "Name": "Hero",
             "Components": [
                 {
                     "Type": "MeshComponent",
@@ -37,8 +37,8 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 0, 0, 0 ],
-                        "Scale": [ 10, 10, 10 ],
+                        "Translation": [ 0, 0, -3 ],
+                        "Scale": [ 10, 10, -10 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
                 },
@@ -47,7 +47,70 @@
                     "Setting": {
                         "Type": "Plastic",
                         "Data": {
-                            "Kd": "constants:pure/Cyan",
+                            "Kd": "constants:pure/White",
+                            "Roughness": "constants:pure/OneTenth",
+                            "IOR": 1.5
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "KnobObject",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Knob"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ -4, 0, -5 ],
+                        "Scale": [ 1, 1, -1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Plastic",
+                        "Data": {
+                            "Kd": "constants:pure/White",
+                            "Roughness": "constants:pure/ThreeTenth",
+                            "IOR": 1.5
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Sphere1",
+            "Components": [
+                {
+                    "Type": "ShapeComponent",
+                    "Setting": {
+                        "Type": "Sphere",
+                        "Data": {
+                            "Radius": 1
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 3, 1, -5 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Plastic",
+                        "Data": {
+                            "Kd": "constants:pure/White",
                             "Roughness": "constants:pure/ThreeTenth",
                             "IOR": 1.5
                         }

@@ -68,9 +68,9 @@ namespace tracer
         RenderProperties renderprops = {};
         renderprops.FrameBufferSize = window->GetWindowSize();
         renderprops.Gamma = 2.2;
-        renderprops.SampleCount = 1024;
+        renderprops.SampleCount = 36;
         renderprops.NumOfThreads = 8;
-        renderprops.Skybox = assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky2/Skybox_cpu");
+        renderprops.Skybox = assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky/Skybox_cpu");
 
 
         //SJson::JsonNode areaLightJsonNode;
