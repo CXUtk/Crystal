@@ -78,7 +78,7 @@
                         "Type": "Plastic",
                         "Data": {
                             "Kd": "constants:pure/White",
-                            "Roughness": "constants:pure/ThreeTenth",
+                            "Roughness": "constants:pure/Half",
                             "IOR": 1.5
                         }
                     }
@@ -93,14 +93,14 @@
                     "Setting": {
                         "Type": "Sphere",
                         "Data": {
-                            "Radius": 1
+                            "Radius": 2
                         }
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 3, 1, -5 ],
+                        "Translation": [ 3, 3, -6 ],
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
@@ -108,11 +108,14 @@
                 {
                     "Type": "MaterialComponent",
                     "Setting": {
-                        "Type": "Glass",
+                        "Type": "Mirror",
                         "Data": {
                             "Ks": "constants:pure/White",
                             "Tf": "constants:pure/White",
-                            "IOR": 1.5
+                            "Roughness": "constants:pure/OneTenth",
+                            "IOR": 1.5,
+                            "Kd": "constants:pure/White",
+                            "K": [ 3.068, 2.54, 1.904 ]
                         }
                     }
                 }
@@ -177,7 +180,7 @@
                     "Setting": {
                         "Type": "DiffuseAreaLight",
                         "Data": {
-                            "LEmit": [ 20, 20, 20 ],
+                            "LEmit": [ 0, 0, 0 ],
                             "NumSamples": 1
                         }
                     }

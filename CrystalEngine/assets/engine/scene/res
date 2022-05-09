@@ -1,0 +1,12 @@
+        
+
+"Type": "MaterialComponent",
+"Setting": {
+    "Type": "Metal",
+    "Data": {
+        "Kd": "constants:pure/White",
+        "Roughness": "constants:pure/OneTenth",
+        "IOR": [ 0.181, 0.608, 1.562 ],
+        "K": [ 3.068, 2.54, 1.904 ]
+    }
+}

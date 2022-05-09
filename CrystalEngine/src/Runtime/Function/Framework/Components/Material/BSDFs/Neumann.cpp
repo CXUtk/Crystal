@@ -10,10 +10,11 @@ namespace crystal
     Neumann::~Neumann()
     {}
 
-    Spectrum Neumann::DistributionFunction(const Vector3f & wOut, const Vector3f & wIn) const
+    Spectrum Neumann::DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const
     {
+        if (wIn.y <= 0) return Spectrum(0.f);
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
-        float LdotR = glm::dot(R, wIn);
+        float LdotR = std::max(0.f, glm::dot(R, wIn));
         float NdotV = std::max(0.f, wOut.y);
         float NdotL = std::max(0.f, wIn.y);
         return m_R * (float)((m_N + 2) / glm::two_pi<float>() * std::pow(LdotR, m_N) / std::max(NdotV, NdotL));
@@ -21,6 +22,7 @@ namespace crystal
 
     float Neumann::Pdf(const Vector3f& wOut, const Vector3f& wIn) const
     {
+        if (wIn.y <= 0) return 0.f;
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
         float LdotR = std::max(0.f, glm::dot(R, wIn));
         return (m_N + 1) / glm::two_pi<float>() * std::pow(LdotR, m_N);
@@ -28,6 +30,7 @@ namespace crystal
 
     Spectrum Neumann::SampleDirection(const Vector2f& sample, const Vector3f& wOut, Vector3f* wIn, float* pdf, BxDFType* sampledType) const
     {
+        *sampledType = BxDFType::BxDF_REFLECTION | BxDFType::BxDF_GLOSSY;
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
         Vector3f B = Vector3f(0, 0, 1);
         Vector3f T = glm::cross(R, B);

@@ -2,6 +2,24 @@
 
 namespace crystal
 {
+    std::shared_ptr<Distribution2D> CPUTexture2DPure::GetDistributionSampler(DistributionMapType type) const
+    {
+        switch (type)
+        {
+        case DistributionMapType::Regular:
+        {
+            return nullptr;
+        }
+        case DistributionMapType::ThetaPhi:
+        {
+            
+            return std::make_shared<Distribution2DPureSineTheta>();
+        }
+        default:
+            return nullptr;
+        }
+    }
+
     Vector3f CPUTexture2DCheckerBoard::Sample(const Vector2f& uv) const
     {
         Point2f uv2 = glm::modf(uv * 10.f, glm::vec2(1.f));
@@ -10,15 +28,9 @@ namespace crystal
         return m_B;
     }
 
-    Vector2f CPUTexture2DCheckerBoard::WeightedSampleUV(const Vector2f& sample) const
+    std::shared_ptr<Distribution2D> CPUTexture2DCheckerBoard::GetDistributionSampler(DistributionMapType type) const
     {
-        return Vector2f();
-    }
-
-    Float CPUTexture2DCheckerBoard::Pdf(const Vector2f& u) const
-    {
-        auto& v = Sample(u);
-        return ((v.r + v.g + v.b) / 3) / AverageWeights();
+        return nullptr;
     }
 
     CPUImageTexture2D::CPUImageTexture2D(int width, int height, bool isHDR)
@@ -33,7 +45,6 @@ namespace crystal
     {
         m_data = new Vector3f[m_width * m_height];
         memcpy(m_data, data, m_width * m_height * sizeof(Vector3f));
-        SetUpSampler();
     }
 
     CPUImageTexture2D::CPUImageTexture2D(int width, int height, stbi_uc* data, bool isHDR)
@@ -56,7 +67,6 @@ namespace crystal
                 m_data[i] = sRGBToHDR(m_data[i]);
             }
         }
-        SetUpSampler();
     }
 
     CPUImageTexture2D::~CPUImageTexture2D()
@@ -92,7 +102,7 @@ namespace crystal
     {
         assert(coord.x >= 0 && coord.x < m_width&& coord.y >= 0 && coord.y < m_height);
         size_t row = m_height - coord.y - 1;
-        assert(value.x <= 1.1 && value.y <= 1.1 && value.z <= 1.1);
+        //assert(value.x <= 1.001 && value.y <= 1.1 && value.z <= 1.1);
         m_data[row * m_width + coord.x] = value;
     }
 
@@ -138,64 +148,86 @@ namespace crystal
         return data;
     }
 
-    Float CPUImageTexture2D::AverageWeights() const
-    {
-        return TotalWeight / (m_width * m_height);
-    }
+    //void CPUImageTexture2D::SetUpSampler()
+    //{
+    //    WeightForRow = new float[m_height + 1];
+    //    memset(WeightForRow, 0, sizeof(float) * (m_height + 1));
+    //    WeightForCol = new float[(m_width + 1) * m_height];
+    //    memset(WeightForCol, 0, sizeof(float) * ((m_width + 1) * m_height));
 
-    void CPUImageTexture2D::SetUpSampler()
-    {
-        WeightForRow = new float[m_height + 1];
-        memset(WeightForRow, 0, sizeof(float) * (m_height + 1));
-        WeightForCol = new float[(m_width + 1) * m_height];
-        memset(WeightForCol, 0, sizeof(float) * ((m_width + 1) * m_height));
+    //    for (size_t i = 0; i < m_height; i++)
+    //    {
+    //        for (size_t j = 0; j < m_width; j++)
+    //        {
+    //            auto& data = m_data[i * m_width + j];
+    //            float w = (data.r + data.g + data.b) / 3.f;
+    //            TotalWeight += w;
+    //            WeightForRow[i + 1] += w;
+    //            WeightForCol[i * (m_width + 1) + j + 1] = w;
+    //        }
+    //        for (size_t j = 1; j <= m_width; j++)
+    //        {
+    //            WeightForCol[i * (m_width + 1) + j] += WeightForCol[i * (m_width + 1) + j - 1];
+    //        }
+    //    }
 
-        for (size_t i = 0; i < m_height; i++)
+    //    for (size_t i = 1; i <= m_height; i++)
+    //    {
+    //        WeightForRow[i] += WeightForRow[i - 1];
+    //    }
+    //}
+
+    //Vector2f CPUImageTexture2D::WeightedSampleUV(const Vector2f& sample) const
+    //{
+    //    float X = sample.x * WeightForRow[m_height];
+    //    int row = std::upper_bound(WeightForRow, WeightForRow + m_height + 1,
+    //        X) - WeightForRow - 1;
+
+    //    X = (X - WeightForRow[row]) / (WeightForRow[row + 1] - WeightForRow[row]);
+
+    //    float* start = WeightForCol + row * (m_width + 1);
+    //    int col = std::upper_bound(start, start + m_width + 1,
+    //        X * start[m_width]) - start - 1;
+
+    //    //int Y = (int)(sample.y * 10000);
+    //    //float dx = (Y / 100) / 100.f;
+    //    //float dy = (Y % 100) / 100.f;
+
+    //    return Vector2f((col + 0.5f) / m_width, (m_height - row - 1 + 0.5f) / m_height);
+    //}
+
+    std::shared_ptr<Distribution2D> CPUImageTexture2D::GetDistributionSampler(DistributionMapType type) const
+    {
+        switch (type)
         {
-            float sinTheta = std::sin((float)(i + 0.5f) / m_height * glm::pi<float>());
-            for (size_t j = 0; j < m_width; j++)
-            {
-                auto& data = m_data[i * m_width + j];
-                float w = (data.r + data.g + data.b) / 3.f * sinTheta;
-                TotalWeight += w;
-                WeightForRow[i + 1] += w;
-                WeightForCol[i * (m_width + 1) + j + 1] = w;
-            }
-            for (size_t j = 1; j <= m_width; j++)
-            {
-                WeightForCol[i * (m_width + 1) + j] += WeightForCol[i * (m_width + 1) + j - 1];
-            }
-        }
-
-        for (size_t i = 1; i <= m_height; i++)
+        case DistributionMapType::Regular:
         {
-            WeightForRow[i] += WeightForRow[i - 1];
+            std::vector<Float> luminMap;
+            luminMap.reserve(m_width * m_height);
+
+            for (int i = 0; i < m_width * m_height; i++)
+            {
+                auto& data = m_data[i];
+                luminMap.push_back((data.r + data.g + data.b) / 3.f);
+            }
+            return std::make_shared<Distribution2DDiscrete>(luminMap.data(), m_height, m_width);
+        }
+        case DistributionMapType::ThetaPhi:
+        {
+            std::vector<Float> luminMap;
+            luminMap.reserve(m_width * m_height);
+
+            for (int i = 0; i < m_width * m_height; i++)
+            {
+                auto& data = m_data[i];
+                Float theta = (i / m_width + 0.5f) / m_height;
+                luminMap.push_back((data.r + data.g + data.b) / 3.f * std::sin(theta));
+            }
+            return std::make_shared<Distribution2DDiscrete>(luminMap.data(), m_height, m_width);
+        }
+        default:
+            return nullptr;
         }
     }
 
-    Vector2f CPUImageTexture2D::WeightedSampleUV(const Vector2f& sample) const
-    {
-        float X = sample.x * WeightForRow[m_height];
-        int row = std::upper_bound(WeightForRow, WeightForRow + m_height + 1,
-            X) - WeightForRow - 1;
-
-        X = (X - WeightForRow[row]) / (WeightForRow[row + 1] - WeightForRow[row]);
-
-        float* start = WeightForCol + row * (m_width + 1);
-        int col = std::upper_bound(start, start + m_width + 1,
-            X * start[m_width]) - start - 1;
-
-        //int Y = (int)(sample.y * 10000);
-        //float dx = (Y / 100) / 100.f;
-        //float dy = (Y % 100) / 100.f;
-
-        return Vector2f((col + 0.5f) / m_width, (m_height - row - 1 + 0.5f) / m_height);
-    }
-
-    Float CPUImageTexture2D::Pdf(const Vector2f& u) const
-    {
-        auto& v = Sample(u);
-        Float sinTheta = std::sin(u.y * glm::pi<float>());
-        return ((v.r + v.g + v.b) / 3) * sinTheta / AverageWeights();
-    }
 }

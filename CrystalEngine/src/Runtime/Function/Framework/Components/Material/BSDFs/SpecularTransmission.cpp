@@ -19,7 +19,7 @@ namespace crystal
     }
     Spectrum SpecularTransmission::SampleDirection(const Vector2f& sample, const Vector3f& wOut, Vector3f* wIn, float* pdf, BxDFType* sampledType) const
     {
-        *sampledType = BxDFType::BxDF_REFLECTION | BxDFType::BxDF_SPECULAR;
+        *sampledType = BxDFType::BxDF_TRANSMISSION | BxDFType::BxDF_SPECULAR;
         *wIn = Vector3f(-wOut.x, wOut.y, -wOut.z);
         *pdf = 1.0f;
 

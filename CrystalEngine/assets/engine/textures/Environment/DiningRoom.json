@@ -1,0 +1,13 @@
+{
+    "type": "Texture2D",
+
+    "info": {
+        "Target": "DiningRoom.hdr",
+        "TargetComponentFormat": "Float32",
+        "TargetComponents": 3,
+        "InternalComponentFormat": "Float32",
+        "InternalComponents": 3,
+        "IsHDR": true,
+        "MipmapLevels": 1
+    }
+}

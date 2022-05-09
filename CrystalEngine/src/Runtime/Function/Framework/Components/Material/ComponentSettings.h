@@ -134,10 +134,11 @@ struct SRefl::EnumInfo<crystal::MaterialType>
             SREFL_ENUM_TERM(Lambertian),
             SREFL_ENUM_TERM(Glass),
             SREFL_ENUM_TERM(Mirror),
-            SREFL_ENUM_TERM(Plastic)
+            SREFL_ENUM_TERM(Plastic),
+            SREFL_ENUM_TERM(Metal)
         );
     }
-#define LISTFUNC(F) F(Lambertian) F(Glass) F(Mirror) F(Plastic)
+#define LISTFUNC(F) F(Lambertian) F(Glass) F(Mirror) F(Plastic) F(Metal)
     GENERATE_ENUM_MAPPING(crystal::MaterialType, LISTFUNC)
 #undef LISTFUNC
 };

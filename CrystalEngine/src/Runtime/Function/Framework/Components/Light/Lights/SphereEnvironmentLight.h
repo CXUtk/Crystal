@@ -2,7 +2,6 @@
 #include "Light.h"
 #include <Core/Math/Transform.h>
 #include <Resource/Asset/Content/CPUTexture/CPUTexture2D.h>
-#include <Resource/Asset/Content/CPUTexture/CPUTextureCubemap.h>
 
 namespace crystal
 {
@@ -20,6 +19,7 @@ namespace crystal
         Spectrum Flux() const override;
 
     private:
-        std::shared_ptr<CPUTexture2D>  m_sphereTexture{};
+        std::shared_ptr<CPUTexture2D>   m_sphereTexture{};
+        std::shared_ptr<Distribution2D> m_distribution{};
     };
 }

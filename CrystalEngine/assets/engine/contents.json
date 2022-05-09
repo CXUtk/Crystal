@@ -44,6 +44,7 @@
         "Sibenik/Kamen_stup",
         "Sibenik/Mramor",
         "Cubemaps/Furnace/Skybox_cpu",
-        "Cubemaps/Furnace/Skybox_cpu_sphere"
+        "Environment/DiningRoom",
+        "Environment/TestWB"
     ]
 }

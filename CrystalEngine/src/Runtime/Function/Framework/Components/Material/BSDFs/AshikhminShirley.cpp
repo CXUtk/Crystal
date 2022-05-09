@@ -4,10 +4,9 @@
 namespace crystal
 {
     AshikhminShirley::AshikhminShirley(const Spectrum& Rd, const Spectrum& Rs,
-        std::shared_ptr<MicrofacetDistribution> microfacet,
-        std::shared_ptr<Fresnel> fresnel)
+        std::shared_ptr<MicrofacetDistribution> microfacet)
         : BxDF(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_GLOSSY),
-        m_Rd(Rd), m_Rs(Rs), m_microfacet(microfacet), m_fresnel(fresnel)
+        m_Rd(Rd), m_Rs(Rs), m_microfacet(microfacet)
     {}
 
     AshikhminShirley::~AshikhminShirley()

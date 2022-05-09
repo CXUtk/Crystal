@@ -8,8 +8,7 @@ namespace crystal
     class AshikhminShirley : public BxDF
     {
     public:
-        AshikhminShirley(const Spectrum& Rd, const Spectrum& Rs, std::shared_ptr<MicrofacetDistribution> microfacet,
-            std::shared_ptr<Fresnel> fresnel);
+        AshikhminShirley(const Spectrum& Rd, const Spectrum& Rs, std::shared_ptr<MicrofacetDistribution> microfacet);
         ~AshikhminShirley() override;
 
         Spectrum DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const override;
@@ -21,7 +20,6 @@ namespace crystal
     private:
         Spectrum                    m_Rd{}, m_Rs{};
         Float                       m_roughness{};
-        std::shared_ptr<Fresnel>    m_fresnel{};
 
         std::shared_ptr<MicrofacetDistribution> m_microfacet{};
     };

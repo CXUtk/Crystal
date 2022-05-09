@@ -113,7 +113,7 @@ namespace crystal
                 }
             }
 
-            bool reflect = wIn->y * wo.y > 0;
+            bool reflect = wIn->y * wo.y >= 0;
             for (int i = 0; i < m_numBxDF; i++)
             {
                 auto& bxdf = m_bxdfs[i];

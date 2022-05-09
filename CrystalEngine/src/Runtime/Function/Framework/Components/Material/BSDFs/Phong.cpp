@@ -12,17 +12,19 @@ namespace crystal
 
     Spectrum Phong::DistributionFunction(const Vector3f & wOut, const Vector3f& wIn) const
     {
-        if (wIn.y < 0) return Spectrum(0.f);
+        if (wIn.y <= 0) return Spectrum(0.f);
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
-        float LdotR = glm::dot(R, wIn);
+        float LdotR = std::max(0.f, glm::dot(R, wIn));
+        if (LdotR == 0.f) return Spectrum(0.f);
         return m_R * (float)((m_N + 2) / glm::two_pi<float>() * std::pow(LdotR, m_N));
     }
 
     float Phong::Pdf(const Vector3f& wOut, const Vector3f& wIn) const
     {
-        if (wIn.y < 0) return 0.f;
+        if (wIn.y <= 0) return 0.f;
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
         float LdotR = std::max(0.f, glm::dot(R, wIn));
+        if (LdotR == 0.f) return 0.f;
         return (m_N + 1) / glm::two_pi<float>() * std::pow(LdotR, m_N);
     }
 
