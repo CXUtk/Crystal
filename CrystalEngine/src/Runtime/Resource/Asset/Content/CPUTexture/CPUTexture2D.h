@@ -32,9 +32,20 @@ namespace crystal
 
         virtual Vector3f Sample(const Vector2f& uv) const override { return m_color; }
         virtual Vector3f SampleMipmap(const Vector2f& uv, float lod) const override { return m_color; }
-        virtual Float AverageWeights() const override { return (m_color.r + m_color.g + m_color.b) / 3.f; }
-        virtual Vector2f WeightedSampleUV(const Vector2f& sample) const { return sample; }
-        virtual Float Pdf(const Vector2f& u) const override { return 1.f; }
+        // Int_{0}^{\pi} sin(x) dx
+        virtual Float AverageWeights() const override
+        {
+            return (m_color.r + m_color.g + m_color.b) * 2 / (3.f * glm::pi<float>());
+        }
+        virtual Vector2f WeightedSampleUV(const Vector2f& sample) const
+        {
+            float v = std::acos(-2 * sample.y + 1) / glm::pi<float>();
+            return Vector2f(sample.x, v);
+        }
+        virtual Float Pdf(const Vector2f& u) const override
+        {
+            return  std::sin(u.y * glm::pi<float>()) * glm::pi<float>() / 2.f;
+        }
 
     private:
         Spectrum m_color{};

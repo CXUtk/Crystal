@@ -3,6 +3,7 @@
 
 #include "Tracer/Integrator/DirectLightingIntegrator.h"
 #include "Tracer/Integrator/PathTracingIntegrator.h"
+#include "Tracer/Integrator/WhiteFurnaceIntegrator.h"
 #include "Tracer/Sampler/DefaultSampler.h"
 #include "Tracer/Sampler/StratifiedSampler.h"
 
@@ -30,12 +31,13 @@ namespace tracer
             m_frameBuffer = std::make_shared<FrameBuffer>(width, height);
         }
 
-        m_rayScene = std::make_shared<RayScene>(scene, renderProps.Skybox);
+        m_rayScene = std::make_shared<RayScene>(scene, renderProps.EnvironmentLight);
 
         int sqrtSPP = (int)std::sqrt(renderProps.SampleCount);
         /*auto sampler = std::make_shared<DefaultSampler>(renderProps.SampleCount);*/
         auto sampler = std::make_shared<StratifiedSampler>(Point2i(sqrtSPP, sqrtSPP), 10);
         m_integrator = std::make_shared<PathTracingIntegrator>(sampler, renderProps.NumOfThreads, 10);
+        //m_integrator = std::make_shared<WhiteFurnaceIntegrator>(sampler, renderProps.NumOfThreads);
 
         m_integrator->Render(cptr(m_rayScene), camera, ptr(m_frameBuffer));
     }

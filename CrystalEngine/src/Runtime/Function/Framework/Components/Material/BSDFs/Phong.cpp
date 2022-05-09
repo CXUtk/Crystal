@@ -28,6 +28,7 @@ namespace crystal
 
     Spectrum Phong::SampleDirection(const Vector2f& sample, const Vector3f& wOut, Vector3f* wIn, float* pdf, BxDFType* sampledType) const
     {
+        *sampledType = BxDFType::BxDF_REFLECTION | BxDFType::BxDF_GLOSSY;
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
         Vector3f B = Vector3f(0, 0, 1);
         Vector3f T = glm::cross(R, B);

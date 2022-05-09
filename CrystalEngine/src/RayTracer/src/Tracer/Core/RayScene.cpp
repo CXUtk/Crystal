@@ -6,8 +6,8 @@
 
 namespace tracer
 {
-    RayScene::RayScene(std::shared_ptr<Scene> scene, std::shared_ptr<CPUTextureCubemap> skybox)
-        : m_scene(scene), m_skyBox(skybox)
+    RayScene::RayScene(std::shared_ptr<Scene> scene, std::shared_ptr<Light> environmentLight)
+        : m_scene(scene), m_environmentLight(environmentLight)
     {
         m_accelStructure = IAccStructure::CreateAccelerator("BVH");
 
@@ -35,10 +35,9 @@ namespace tracer
             }
         }
 
-        if (m_skyBox != nullptr)
+        if (m_environmentLight != nullptr)
         {
-            Transform transform;
-            m_lights.push_back(std::make_shared<CubemapEnvironmentLight>(transform, m_skyBox));
+            m_lights.push_back(m_environmentLight);
         }
 
         m_accelStructure->Build(m_primitives);
@@ -64,7 +63,7 @@ namespace tracer
 
     Spectrum RayScene::GetEnvironmentLight(const Vector3f& dir) const
     {
-        if (!m_skyBox) return Spectrum(0.f);
-        return m_skyBox->Sample(dir);
+        if (!m_environmentLight) return Spectrum(0.f);
+        return m_environmentLight->Le(dir);
     }
 }

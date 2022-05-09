@@ -1,6 +1,7 @@
 #include "BSDF.h"
 #include <glm/glm.hpp>
 #include <Core/Interaction/SurfaceInteraction.h>
+#include <Core/Sampling/Sampling.h>
 
 namespace crystal
 {
@@ -28,8 +29,8 @@ namespace crystal
         auto transform = m_isec->GetInverseTNB();
         Vector3f wo = transform * wOut;
         Vector3f wi = transform * wIn;
-        //fixVector(wo);
-        //fixVector(wi);
+        FixVector(wo);
+        FixVector(wi);
 
         float pdf = 0.f;
         int matched = 0;
@@ -52,8 +53,8 @@ namespace crystal
         auto transform = m_isec->GetInverseTNB();
         Vector3f wo = transform * wOut;
         Vector3f wi = transform * wIn;
-        //fixVector(wOut);
-        //fixVector(wIn);
+        FixVector(wo);
+        FixVector(wi);
         Spectrum L(0);
         bool reflect = wi.y * wo.y > 0;
         for (int i = 0; i < m_numBxDF; i++)
@@ -96,7 +97,7 @@ namespace crystal
         *sampledType = selectedBxdf->GetType();
 
         Vector3f wo = m_isec->GetInverseTNB() * wOut;
-        // fixVector(wOut);
+        FixVector(wo);
 
         auto L = selectedBxdf->SampleDirection(sample, wo, wIn, pdf, sampledType);
         if (L == Spectrum(0.f) || *pdf == 0.f) return Spectrum(0.f);
@@ -124,8 +125,8 @@ namespace crystal
                 }
             }
         }
-        *wIn = m_isec->GetTNB() * (*wIn);
-        // fixVector(*wIn);
+        *wIn = glm::normalize(m_isec->GetTNB() * (*wIn));
+        FixVector(*wIn);
 
         *pdf /= tot;
         return L;

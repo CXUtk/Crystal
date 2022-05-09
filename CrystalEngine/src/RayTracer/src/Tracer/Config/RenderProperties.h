@@ -1,10 +1,11 @@
 #pragma once
 #include <Core/Math/Geometry.h>
-#include <Resource/Asset/Content/CPUTexture/CPUTextureCubemap.h>
+#include <Function/Framework/Components/Light/Lights/Light.h>
 
 namespace tracer
 {
     using namespace crystal;
+
     struct RenderProperties
     {
         Vector2i    FrameBufferSize{ 800, 600 };
@@ -13,6 +14,6 @@ namespace tracer
 
         float       Gamma{ 2.2 };
 
-        std::shared_ptr<CPUTextureCubemap> Skybox = nullptr;
+        std::shared_ptr<Light> EnvironmentLight = nullptr;
     };
 }

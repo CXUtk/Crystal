@@ -19,8 +19,8 @@
 #include <Function/Framework/Components/Shape/Shapes/Sphere.h>
 
 #include <Function/Framework/Components/Light/LightComponent.h>
-#include <Function/Framework/Components/Light/Lights/PointLight.h>
-#include <Function/Framework/Components/Light/Lights/DiffusedAreaLight.h>
+#include <Function/Framework/Components/Light/Lights/SphereEnvironmentLight.h>
+#include <Function/Framework/Components/Light/Lights/CubemapEnvironmentLight.h>
 
 #include <Function/Framework/Components/Material/Materials/LambertianMaterial.h>
 #include <Function/Framework/Components/Material/Materials/MirrorMaterial.h>
@@ -58,19 +58,26 @@ namespace tracer
         auto assetManager = m_engine->GetAssetManager();
         auto scene = Scene::LoadScene(File::ReadAllText("assets/engine/scene/Knob.json"));
 
-        auto pureWhite = std::make_shared<CPUTexture2DPure>(Spectrum(1.f));
-        auto pureRed = std::make_shared<CPUTexture2DPure>(Spectrum(1.f, 0.f, 0.f));
-        auto pureCyan = std::make_shared<CPUTexture2DPure>(Spectrum(0.f, 0.5f, 1.f));
-        auto image = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(1.f), Spectrum(0.33f));//assetManager->LoadAsset<CPUTexture2D>("engine:LUT_cpu");
-        auto checkerBoard = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(.3f), Spectrum(0.1f, 0.1f, 0.f));
-        auto pureSmooth = std::make_shared<CPUTexture2DPure>(Spectrum(0.1f));
+        //auto pureWhite = std::make_shared<CPUTexture2DPure>(Spectrum(1.f));
+        //auto pureRed = std::make_shared<CPUTexture2DPure>(Spectrum(1.f, 0.f, 0.f));
+        //auto pureCyan = std::make_shared<CPUTexture2DPure>(Spectrum(0.f, 0.5f, 1.f));
+        //auto image = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(1.f), Spectrum(0.33f));//assetManager->LoadAsset<CPUTexture2D>("engine:LUT_cpu");
+        //auto checkerBoard = std::make_shared<CPUTexture2DCheckerBoard>(Spectrum(.3f), Spectrum(0.1f, 0.1f, 0.f));
+        //auto pureSmooth = std::make_shared<CPUTexture2DPure>(Spectrum(0.1f));
 
         RenderProperties renderprops = {};
         renderprops.FrameBufferSize = window->GetWindowSize();
         renderprops.Gamma = 2.2;
         renderprops.SampleCount = 36;
         renderprops.NumOfThreads = 8;
-        renderprops.Skybox = assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky/Skybox_cpu");
+
+        Transform transform;
+        //renderprops.EnvironmentLight = std::make_shared<SphereEnvironmentLight>(transform,
+        //    std::make_shared<CPUTexture2DPure>(Spectrum(std::pow(0.5f, 2.2f))));
+
+        auto t = assetManager->LoadAsset<CPUTextureCubemap>("engine:Cubemaps/Sky/Skybox_cpu");
+        renderprops.EnvironmentLight = std::make_shared<CubemapEnvironmentLight>(transform,
+            t);
 
 
         //SJson::JsonNode areaLightJsonNode;

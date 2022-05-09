@@ -42,6 +42,8 @@
         "Cubemaps/Sky/Skybox_cpu",
         "Sibenik/Kamen",
         "Sibenik/Kamen_stup",
-        "Sibenik/Mramor"
+        "Sibenik/Mramor",
+        "Cubemaps/Furnace/Skybox_cpu",
+        "Cubemaps/Furnace/Skybox_cpu_sphere"
     ]
 }

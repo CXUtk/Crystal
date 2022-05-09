@@ -6,7 +6,7 @@
 namespace crystal
 {
     using RNG = std::mt19937;
-    constexpr bool SHOW_DEBUG = false;
+    constexpr bool SHOW_DEBUG = true;
 
     inline float UniformRandomFloat(RNG& mt)
     {
@@ -86,7 +86,15 @@ namespace crystal
     inline glm::vec3 GetUnitVector(float theta, float phi)
     {
         float r = sin(theta);
-        return glm::vec3(r * std::cos(phi), 1.0f - r * r, -r * std::sin(phi));
+        return glm::vec3(r * std::cos(phi), std::cos(theta), -r * std::sin(phi));
+    }
+
+    inline Vector2f GetThetaPhi(const Vector3f& dir)
+    {
+        float phi = std::atan2(-dir.z, dir.x);
+        phi = (phi < 0) ? (phi + glm::two_pi<float>()) : phi;
+        float theta = std::acos(dir.y);
+        return Vector2f(theta, phi);
     }
 
     inline bool refract(Vector3f wo, float etaA, float etaB, Vector3f* wt)
@@ -160,9 +168,9 @@ namespace crystal
         printf("%lf, %lf, %lf", value.x, value.y, value.z);
     }
 
-    inline void fixVector(glm::vec3& vector)
+    inline void FixVector(Vector3f& vector)
     {
-        vector = glm::clamp(vector, glm::vec3(-1.0), glm::vec3(1.0));
+        vector = glm::clamp(vector, Vector3f(-1.0), Vector3f(1.0));
     }
 
     inline float PowerHeuristic(int nf, float fPdf, int ng, float gPdf)

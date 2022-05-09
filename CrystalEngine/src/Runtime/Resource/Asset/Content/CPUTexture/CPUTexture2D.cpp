@@ -152,10 +152,11 @@ namespace crystal
 
         for (size_t i = 0; i < m_height; i++)
         {
+            float sinTheta = std::sin((float)(i + 0.5f) / m_height * glm::pi<float>());
             for (size_t j = 0; j < m_width; j++)
             {
                 auto& data = m_data[i * m_width + j];
-                float w = (data.x + data.y + data.z) / 3.f;
+                float w = (data.r + data.g + data.b) / 3.f * sinTheta;
                 TotalWeight += w;
                 WeightForRow[i + 1] += w;
                 WeightForCol[i * (m_width + 1) + j + 1] = w;
@@ -184,16 +185,17 @@ namespace crystal
         int col = std::upper_bound(start, start + m_width + 1,
             X * start[m_width]) - start - 1;
 
-        int Y = (int)(sample.y * 10000);
-        float dx = (Y / 100) / 100.f;
-        float dy = (Y % 100) / 100.f;
+        //int Y = (int)(sample.y * 10000);
+        //float dx = (Y / 100) / 100.f;
+        //float dy = (Y % 100) / 100.f;
 
-        return Vector2f((col + dx) / m_width, (m_height - row - 1 + dy) / m_height);
+        return Vector2f((col + 0.5f) / m_width, (m_height - row - 1 + 0.5f) / m_height);
     }
 
     Float CPUImageTexture2D::Pdf(const Vector2f& u) const
     {
         auto& v = Sample(u);
-        return ((v.r + v.g + v.b) / 3) / AverageWeights();
+        Float sinTheta = std::sin(u.y * glm::pi<float>());
+        return ((v.r + v.g + v.b) / 3) * sinTheta / AverageWeights();
     }
 }

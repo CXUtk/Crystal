@@ -26,19 +26,19 @@
             ]
         },
         {
-            "Name": "Hero",
+            "Name": "KnobObject1",
             "Components": [
                 {
                     "Type": "MeshComponent",
                     "Setting": {
-                        "Model": "engine:hero"
+                        "Model": "engine:Knob"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 0, 0, -3 ],
-                        "Scale": [ 10, 10, -10 ],
+                        "Translation": [ -4, 0, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
                 },
@@ -56,7 +56,7 @@
             ]
         },
         {
-            "Name": "KnobObject",
+            "Name": "KnobObject2",
             "Components": [
                 {
                     "Type": "MeshComponent",
@@ -67,8 +67,38 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ -4, 0, -5 ],
-                        "Scale": [ 1, 1, -1 ],
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Plastic",
+                        "Data": {
+                            "Kd": "constants:pure/White",
+                            "Roughness": "constants:pure/TwoTenth",
+                            "IOR": 1.5
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "KnobObject3",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Knob"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 4, 0, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
                 },
@@ -86,80 +116,47 @@
             ]
         },
         {
-            "Name": "Sphere1",
+            "Name": "KnobObjectRef1",
             "Components": [
                 {
-                    "Type": "ShapeComponent",
+                    "Type": "MeshComponent",
                     "Setting": {
-                        "Type": "Sphere",
-                        "Data": {
-                            "Radius": 1
-                        }
+                        "Model": "engine:Knob"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 3, 1, -5 ],
-                        "Scale": [ 1, 1, 1 ],
+                        "Translation": [ 4, -4, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
                 },
                 {
                     "Type": "MaterialComponent",
                     "Setting": {
-                        "Type": "Glass",
+                        "Type": "Mirror",
                         "Data": {
-                            "Ks": "constants:pure/White",
-                            "Tf": "constants:pure/White",
-                            "IOR": 1.5
+                            "Ks": "constants:pure/White"
                         }
                     }
                 }
             ]
         },
         {
-            "Name": "Floor",
+            "Name": "KnobObjectRef2",
             "Components": [
                 {
                     "Type": "MeshComponent",
                     "Setting": {
-                        "Model": "engine:Floor"
+                        "Model": "engine:Knob"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 0, 0, 0 ],
-                        "Scale": [ 10, 1, 10 ],
-                        "Rotation": [ 0, 0, 0, 1 ]
-                    }
-                },
-                {
-                    "Type": "MaterialComponent",
-                    "Setting": {
-                        "Type": "Lambertian",
-                        "Data": {
-                            "Kd": "engine:Sibenik/Mramor"
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "Name": "Light",
-            "Components": [
-                {
-                    "Type": "MeshComponent",
-                    "Setting": {
-                        "Model": "engine:Floor"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Setting": {
-                        "Translation": [ 0, 12, 0 ],
-                        "Scale": [ 1, -1, 1 ],
+                        "Translation": [ 0, -4, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
                 },
@@ -171,14 +168,32 @@
                             "Kd": "constants:pure/White"
                         }
                     }
+                }
+            ]
+        },
+        {
+            "Name": "KnobObjectRef3",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Knob"
+                    }
                 },
                 {
-                    "Type": "LightComponent",
+                    "Type": "TransformComponent",
                     "Setting": {
-                        "Type": "DiffuseAreaLight",
+                        "Translation": [ -4, -4, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
                         "Data": {
-                            "LEmit": [ 20, 20, 20 ],
-                            "NumSamples": 1
+                            "Kd": "constants:pure/White"
                         }
                     }
                 }

@@ -13,15 +13,14 @@ namespace crystal
     Spectrum CubemapEnvironmentLight::Sample_Li(const SurfaceInfo & surface, const Vector2f & sample, Point3f * endpoint, float* pdf) const
     {
         auto& dir = m_cubeMap->WeightedSampleUV(sample);
-        *pdf = m_cubeMap->Pdf(dir) / 6.f;
+        *pdf = m_cubeMap->Pdf(dir) / (4 * glm::pi<float>());
         *endpoint = surface.GetPosition() + dir * 10000.f;
-        auto l =  m_cubeMap->Sample(dir);
-        return l;
+        return m_cubeMap->Sample(dir);
     }
 
     float CubemapEnvironmentLight::Pdf_Li(const SurfaceInfo& surface, const Vector3f& wi) const
     {
-        return m_cubeMap->Pdf(wi);
+        return m_cubeMap->Pdf(wi) / (4 * glm::pi<float>());
     }
 
     Spectrum CubemapEnvironmentLight::Le(const Vector3f& wi) const

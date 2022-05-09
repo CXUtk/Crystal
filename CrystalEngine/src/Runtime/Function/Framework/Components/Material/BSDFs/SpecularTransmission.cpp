@@ -24,6 +24,6 @@ namespace crystal
         *pdf = 1.0f;
 
         Float cosTheta = std::max(0.f, -wOut.y);
-        return m_T / cosTheta * (1.0f - m_fresnel->Eval(cosTheta));
+        return m_T * (1.0f - m_fresnel->Eval(cosTheta));
     }
 }

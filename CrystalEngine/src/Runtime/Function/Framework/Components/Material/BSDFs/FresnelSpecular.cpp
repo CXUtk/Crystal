@@ -33,14 +33,14 @@ namespace crystal
             *sampledType = BxDFType(BxDFType::BxDF_REFLECTION | BxDFType::BxDF_SPECULAR);
             *wIn = Vector3f(-wOut.x, wOut.y, -wOut.z);
             *pdf = fr.r;
-            return fr.r * m_R / cosTheta;
+            return fr.r * m_R;
         }
         else
         {
             *sampledType = BxDFType(BxDFType::BxDF_TRANSMISSION | BxDFType::BxDF_SPECULAR);
             refract(wOut, m_etaA, m_etaB, wIn);
             *pdf = 1.f - fr.r;
-            return (1.f - fr.r) * m_T / std::max(0.f, -wIn->y);
+            return (1.f - fr.r) * m_T;
         }
     }
 }
