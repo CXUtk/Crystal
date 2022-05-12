@@ -17,8 +17,8 @@ namespace crystal
 
         virtual Bound3f GetBoundingBox() const = 0;
         virtual bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const = 0;
-        virtual bool IntersectTest(const Ray3f& ray, float tMin = 0,
-            float tMax = std::numeric_limits<float>::infinity()) const = 0;
+        virtual bool IntersectTest(const Ray3f& ray, Float* t,
+            float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const = 0;
 
         virtual float SurfaceArea() const = 0;
         virtual SurfaceInfo SampleSurface(const Vector2f& sample) const = 0;

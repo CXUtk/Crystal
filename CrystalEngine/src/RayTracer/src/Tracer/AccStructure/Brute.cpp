@@ -19,33 +19,37 @@ namespace tracer
     bool Brute::Intersect(const crystal::Ray3f& ray, SurfaceInteraction* isec,
         float tMin, float tMax) const
     {
-        bool hit = false;
         int cnt = 0;
+        RayHitPayload payload;
         for (auto& obj : m_primitives)
         {
-            SurfaceInteraction tmp;
-            if (obj->Intersect(ray, &tmp))
+            Float tCurrent = std::numeric_limits<Float>::infinity();
+            if (obj->IntersectTest(ray, &tCurrent, 0, payload.Distance))
             {
-                auto dist = tmp.GetDistance();
-                if (dist < isec->GetDistance())
+                if (tCurrent < payload.Distance)
                 {
-                    tmp.SetHitPrimitive(obj);
-                    *isec = std::move(tmp);
+                    payload.Distance = tCurrent;
+                    payload.HitPrimitive = obj;
                 }
-                hit = true;
             }
         }
-        return hit;
+
+        if (payload.HitPrimitive)
+        {
+            payload.HitPrimitive->Intersect(ray, isec);
+        }
+        return payload.HitPrimitive;
     }
 
 
     bool Brute::IntersectTest(const crystal::Ray3f& ray, const IRayPrimitive* ignoreItem,
         float tMin, float tMax) const
     {
+        Float t;
         for (auto& obj : m_primitives)
         {
             if (obj == ignoreItem) continue;
-            if (obj->IntersectTest(ray, tMin, tMax))
+            if (obj->IntersectTest(ray, &t, tMin, tMax))
             {
                 return true;
             }

@@ -37,6 +37,8 @@ namespace crystal
         Spectrum SampleDirection(float sampleBSDF, const Vector2f& sample, const Vector3f& wOut, Vector3f* wIn,
             float* pdf, BxDFType flags, BxDFType* sampledType) const;
 
+        Spectrum CalculateBSDFNoLDivideByPdf(const Vector3f& wOut, const Vector3f& wIn, BxDFType flags) const;
+
     private:
         static constexpr int MAX_BxDFs = 8;
 
@@ -70,7 +72,9 @@ namespace crystal
         virtual Spectrum SampleDirection(const Vector2f& sample, const Vector3f& wOut,
             Vector3f* wIn, float* pdf, BxDFType* sampledType) const = 0;
 
-        bool Matches(BxDFType type) const { return (m_bxdfType & type) == m_bxdfType; }
+        virtual Spectrum CalculateBSDFNoLDivideByPdf(const Vector3f& wOut, const Vector3f& wIn, BxDFType scatterType) const;
+
+        bool Matches(BxDFType type) const { return !((~type) & m_bxdfType); }
         bool Contains(BxDFType type) const { return (m_bxdfType & type); }
 
         BxDFType GetType() const { return m_bxdfType; }

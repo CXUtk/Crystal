@@ -113,6 +113,14 @@ namespace crystal
     {\
         return static_cast<Flags>(static_cast<int>(a) ^ static_cast<int>(b));\
     }\
+    inline constexpr Flags operator>>(Flags a, unsigned int b)\
+    {\
+        return static_cast<Flags>(static_cast<int>(a) >> static_cast<int>(b));\
+    }\
+    inline constexpr Flags operator<<(Flags a, unsigned int b)\
+    {\
+        return static_cast<Flags>(static_cast<int>(a) << static_cast<int>(b));\
+    }\
 };\
     using name = Crystal_##name::Flags
 

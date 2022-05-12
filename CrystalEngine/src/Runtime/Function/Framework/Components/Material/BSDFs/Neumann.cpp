@@ -12,6 +12,7 @@ namespace crystal
 
     Spectrum Neumann::DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const
     {
+        // Phong模型在power很高的情况下容易出现数值精度炸裂
         if (wIn.y <= 0) return Spectrum(0.f);
         Vector3f R = glm::reflect(-wOut, Vector3f(0, 1, 0));
         float LdotR = std::max(0.f, glm::dot(R, wIn));
@@ -42,5 +43,21 @@ namespace crystal
         *wIn = glm::normalize(v.x * T + v.y * R + v.z * B);
         *pdf = Pdf(wOut, *wIn);
         return DistributionFunction(wOut, *wIn);
+    }
+
+    Spectrum Neumann::CalculateBSDFNoLDivideByPdf(const Vector3f& wOut,
+        const Vector3f& wIn, BxDFType scatterType) const
+    {
+        Float NdotL = std::max(0.f, wIn.y);
+        Float NdotV = std::max(0.f, wOut.y);
+
+        if (NdotL > NdotV)
+        {
+            return m_R * ((m_N + 2) / static_cast<Float>(m_N + 1));
+        }
+        else
+        {
+            return m_R * ((m_N + 2) / static_cast<Float>(m_N + 1)) * NdotL / NdotV;
+        }
     }
 }

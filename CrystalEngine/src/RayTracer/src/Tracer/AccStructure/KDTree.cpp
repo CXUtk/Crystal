@@ -230,6 +230,7 @@ namespace tracer
     bool KDTree::ray_test_p(int p, const Ray3f& ray, const crystal::IRayPrimitive* ignoreShape, float tMin, float tMax) const
     {
         if (!p || tMin > tMax) return false;
+        Float t;
         //if (!outerBox.rayIntersect(ray, tMin, tMax)) return false;
         if (m_nodes[p].splitAxis == -1)
         {
@@ -237,7 +238,7 @@ namespace tracer
             {
                 float t1 = tMin, t2 = tMax;
                 // if (!RayBoxTest(ray, obj->GetBoundingBox(), t1, t2)) continue;
-                if (obj->IntersectTest(ray, tMin, tMax))
+                if (obj->IntersectTest(ray, &t, tMin, tMax))
                 {
                     return true;
                 }

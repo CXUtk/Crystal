@@ -4,7 +4,7 @@
 namespace crystal
 {
     FresnelSpecular::FresnelSpecular(const Spectrum& R, const Spectrum& T, Float etaA, Float etaB)
-        : BxDF(BxDFType::BxDF_TRANSMISSION | BxDFType::BxDF_REFLECTION | BxDFType::BxDF_SPECULAR),
+        : BxDF(BxDFType::BxDF_SPECULAR),
         m_R(R), m_T(T), m_etaA(etaA), m_etaB(etaB)
     {
         m_F = std::make_shared<FresnelDielectric>(etaA, etaB);
@@ -41,6 +41,18 @@ namespace crystal
             refract(wOut, m_etaA, m_etaB, wIn);
             *pdf = 1.f - fr.r;
             return (1.f - fr.r) * m_T;
+        }
+    }
+    Spectrum FresnelSpecular::CalculateBSDFNoLDivideByPdf(const Vector3f& wOut,
+        const Vector3f& wIn, BxDFType scatterType) const
+    {
+        if (scatterType & BxDFType::BxDF_REFLECTION)
+        {
+            return m_R;
+        }
+        else
+        {
+            return m_T;
         }
     }
 }

@@ -7,6 +7,11 @@
 
 namespace tracer
 {
+    struct RayHitPayload
+    {
+        const IRayPrimitive*    HitPrimitive = nullptr;
+        Float                   Distance = std::numeric_limits<Float>::infinity();
+    };
     class IAccStructure
     {
     public:

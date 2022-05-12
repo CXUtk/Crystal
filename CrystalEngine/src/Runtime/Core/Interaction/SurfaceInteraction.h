@@ -67,6 +67,9 @@ namespace crystal
         Matrix3f GetTNB() const;
         Matrix3f GetInverseTNB() const;
 
+        Vector3f ToLocalCoordinate(const Vector3f& v) const;
+        Vector3f ToWorldCoordinate(const Vector3f& v) const;
+
         SurfaceInfo GetSurfaceInfo(bool modelNormal) const;
 
         /**
@@ -93,8 +96,13 @@ namespace crystal
                             m_dpDv{};
         Normal3f            m_normal{};
         Vector2f            m_texCoord{};
+        Matrix3f            m_TNB{};
+        Matrix3f            m_invTNB{};
 
         std::shared_ptr<BSDF>   m_bsdf = nullptr;
         const IRayPrimitive*    m_primitive = nullptr;
     };
+
+
+
 }

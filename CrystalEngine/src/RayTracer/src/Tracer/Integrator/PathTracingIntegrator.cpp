@@ -72,30 +72,36 @@ namespace tracer
             Vector3f wIn;
             float pdf;
             BxDFType type;
-            auto brdf = bsdf->SampleDirection(sampler->Get1D(), sampler->Get2D(), wo, &wIn,
+
+            Vector3f wOut = isec.ToLocalCoordinate(wo);
+            auto brdf = bsdf->SampleDirection(sampler->Get1D(), sampler->Get2D(), wOut, &wIn,
                 &pdf, BxDFType::BxDF_ALL, &type);
+
             NAN_DETECT_V(brdf, "PathTracingIntegrator::BSDF");
             INF_DETECT_V(brdf, "PathTracingIntegrator::BSDF");
-            if (pdf == 0.f || brdf == glm::vec3(0))
+            if (pdf == 0.f || brdf == Spectrum(0.f))
             {
                 break;
             }
 
+            beta *= bsdf->CalculateBSDFNoLDivideByPdf(wOut, wIn, type);
+            Vector3f wi = isec.ToWorldCoordinate(wIn);
+
             bool specular = (type & BxDFType::BxDF_SPECULAR);
-            bool transmission = (type & BxDFType::BxDF_TRANSMISSION);
-            Float cosine = specular ? 1.0f : std::max(0.f, transmission ? glm::dot(-N, wIn) : glm::dot(N, wIn));
-
             lightPath = specular;
-            currentRay = isec.SpawnRay(wIn);
+            currentRay = isec.SpawnRay(wi);
 
-            if (cosine == 0.f)
-            {
-                beta *= 0.f;
-            }
-            else
-            {
-                beta *= brdf * cosine / pdf;
-            }
+            //bool transmission = (type & BxDFType::BxDF_TRANSMISSION);
+            //Float cosine = std::max(0.f, transmission ? glm::dot(-N, wIn) : glm::dot(N, wIn));
+
+            //if (cosine == 0.f)
+            //{
+            //    beta *= 0.f;
+            //}
+            //else
+            //{
+            //    beta *= brdf * cosine / pdf;
+            //}
 
             if (bounces > 3)
             {
@@ -134,13 +140,12 @@ namespace tracer
     {
         Spectrum L(0.f);
 
-        BxDFType sampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
+        BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
         Point3f P = isec.GetHitPos();
         Normal3f N = isec.GetNormal();
-        Vector3f wo = -isec.GetHitDir();
+        Vector3f wOut = isec.ToLocalCoordinate(-isec.GetHitDir());
 
         auto bsdf = isec.GetBSDF();
-
 
         // Sample light source with MIS (Specular BSDF will not have value)
         {
@@ -148,12 +153,13 @@ namespace tracer
             float pdf_light;
             auto Li_light = light->Sample_Li(isec.GetSurfaceInfo(false), sampleLight, &lightPos, &pdf_light);
 
-            Vector3f wi = glm::normalize(lightPos - P);
-            float NdotL = std::max(0.f, glm::dot(N, wi));
-            if (pdf_light != 0.f && !std::isinf(pdf_light) && Li_light != Spectrum(0.f) && NdotL != 0.f)
+            Vector3f wIn = isec.ToLocalCoordinate(glm::normalize(lightPos - P));
+            float NdotL = std::max(0.f, wIn.y);
+            if (pdf_light != 0.f && !std::isinf(pdf_light)
+                && Li_light != Spectrum(0.f) && NdotL != 0.f)
             {
-                Spectrum f = bsdf->DistributionFunction(wo, wi);
-                float pdf_bsdf = bsdf->Pdf(wo, wi, sampleType);
+                Spectrum f = bsdf->DistributionFunction(wOut, wIn);
+                float pdf_bsdf = bsdf->Pdf(wOut, wIn, bsdfSampleType);
                 if (f != Spectrum(0.f))
                 {
                     if (scene->IntersectTest(isec.SpawnRayTo(lightPos), 0, 1.f - EPS))
@@ -184,10 +190,12 @@ namespace tracer
         {
             float pdf_bsdf = 0.f;
             BxDFType sampledType;
-            Vector3f wi;
-            Spectrum f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wo, &wi,
-                &pdf_bsdf, sampleType, &sampledType);
-            float NdotL = std::max(0.f, glm::dot(N, wi));
+            Vector3f wIn;
+            Spectrum f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wOut, &wIn,
+                &pdf_bsdf, bsdfSampleType, &sampledType);
+            float NdotL = std::max(0.f, wIn.y);
+
+            Vector3f wi = isec.ToWorldCoordinate(wIn);
 
             if (f == Spectrum(0.f) || pdf_bsdf == 0.f || NdotL == 0.f)
             {
@@ -198,7 +206,6 @@ namespace tracer
             float weight = 1.0f;
             if (!specularBSDF)
             {
-                f *= NdotL;
                 Float pdf_light = light->Pdf_Li(isec.GetSurfaceInfo(false), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
@@ -233,7 +240,7 @@ namespace tracer
 
             if (Li != Spectrum(0.f))
             {
-                L += f * Li * weight / pdf_bsdf;
+                L += Li * bsdf->CalculateBSDFNoLDivideByPdf(wOut, wIn, sampledType) * weight;
             }
         }
 

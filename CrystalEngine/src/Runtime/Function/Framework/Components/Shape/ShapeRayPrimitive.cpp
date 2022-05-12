@@ -20,8 +20,8 @@ namespace crystal
         return m_pShape->Intersect(ray, info);
     }
 
-    bool ShapeRayPrimitive::IntersectTest(const Ray3f& ray, float tMin, float tMax) const
+    bool ShapeRayPrimitive::IntersectTest(const Ray3f& ray, Float* t, float tMin, float tMax) const
     {
-        return m_pShape->IntersectTest(ray, tMin, tMax);
+        return m_pShape->IntersectTest(ray, t, tMin, tMax);
     }
 }

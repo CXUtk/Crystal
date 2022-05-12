@@ -43,4 +43,10 @@ namespace crystal
         *pdf = Pdf(wOut, *wIn);
         return DistributionFunction(wOut, *wIn);
     }
+    Spectrum Phong::CalculateBSDFNoLDivideByPdf(const Vector3f& wOut,
+        const Vector3f& wIn, BxDFType scatterType) const
+    {
+        Float NdotL = std::max(0.f, wIn.y);
+        return m_R * ((m_N + 2) / static_cast<Float>(m_N + 1)) * NdotL;
+    }
 }

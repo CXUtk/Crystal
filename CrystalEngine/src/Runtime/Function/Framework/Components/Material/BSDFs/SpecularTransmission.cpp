@@ -26,4 +26,10 @@ namespace crystal
         Float cosTheta = std::max(0.f, -wOut.y);
         return m_T * (1.0f - m_fresnel->Eval(cosTheta));
     }
+    Spectrum SpecularTransmission::CalculateBSDFNoLDivideByPdf(const Vector3f& wOut, const Vector3f& wIn, BxDFType scatterType) const
+    {
+        // Specular formula optimization
+        Float cosTheta = std::max(0.f, -wOut.y);
+        return m_T * (1.0f - m_fresnel->Eval(cosTheta));
+    }
 }

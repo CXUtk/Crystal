@@ -15,6 +15,9 @@ namespace crystal
         Spectrum SampleDirection(const Vector2f& sample, const Vector3f& wOut,
             Vector3f* wIn, float* pdf, BxDFType* sampledType) const override;
 
+        Spectrum CalculateBSDFNoLDivideByPdf(const Vector3f& wOut,
+            const Vector3f& wIn, BxDFType scatterType) const override;
+
     private:
         Spectrum m_albedo{};
     };

@@ -20,7 +20,7 @@ namespace crystal
 
         virtual Bound3f GetBoundingBox() const;
         virtual bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const;
-        virtual bool IntersectTest(const Ray3f& ray, float tMin = 0,
+        virtual bool IntersectTest(const Ray3f& ray, Float* t, float tMin = 0,
             float tMax = std::numeric_limits<float>::infinity()) const;
 
     private:

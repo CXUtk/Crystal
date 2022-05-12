@@ -76,7 +76,7 @@ namespace crystal
         return true;
     }
 
-    bool Sphere::IntersectTest(const Ray3f& ray, float tMin, float tMax) const
+    bool Sphere::IntersectTest(const Ray3f& ray, Float* t, float tMin, float tMax) const
     {
         if (tMin > tMax) return false;
         glm::vec3 P = m_world2Local * (ray.Start() - m_position);
@@ -89,7 +89,15 @@ namespace crystal
         discrim = sqrt(discrim);
         float t1 = (-b + discrim) / (2 * a);
         float t2 = (-b - discrim) / (2 * a);
-        return (t1 >= tMin && t1 <= tMax) || (t2 >= tMin && t2 <= tMax);
+
+        if (t1 > t2) std::swap(t1, t2);
+        *t = t1;
+        if ((t1 < tMin || t1 > tMax))
+        {
+            *t = t2;
+            return (t2 >= tMin && t2 <= tMax);
+        }
+        return (t1 >= tMin && t1 <= tMax);
     }
 
     float Sphere::SurfaceArea() const

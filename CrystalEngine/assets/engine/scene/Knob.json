@@ -108,7 +108,7 @@
                 {
                     "Type": "MaterialComponent",
                     "Setting": {
-                        "Type": "Mirror",
+                        "Type": "Glass",
                         "Data": {
                             "Ks": "constants:pure/White",
                             "Tf": "constants:pure/White",

@@ -27,7 +27,7 @@ namespace crystal
         virtual bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const = 0;
 
         // Do ray-model intersection test, but only test if there is an intersection
-        virtual bool IntersectTest(const Ray3f& ray, float tMin = 0,
+        virtual bool IntersectTest(const Ray3f& ray, Float* t, float tMin = 0,
             float tMax = std::numeric_limits<float>::infinity()) const = 0;
     };
 }

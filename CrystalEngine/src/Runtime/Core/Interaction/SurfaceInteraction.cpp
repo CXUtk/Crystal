@@ -40,18 +40,36 @@ namespace crystal
         m_isFrontFace = frontFace;
         m_dpDu = dpdu;
         m_dpDv = dpdv;
+
+        m_TNB = Matrix3f(m_dpDu, m_normal, m_dpDv);
+        m_invTNB = glm::transpose(m_TNB);
     }
 
 
     Matrix3f SurfaceInteraction::GetTNB() const
     {
-        return glm::mat3(m_dpDu, m_normal, m_dpDv);
+        return m_TNB;
     }
 
     Matrix3f SurfaceInteraction::GetInverseTNB() const
     {
-        return glm::transpose(GetTNB());
+        return m_invTNB;
     }
+
+    Vector3f SurfaceInteraction::ToLocalCoordinate(const Vector3f& v) const
+    {
+        Vector3f newV = m_invTNB * v;
+        FixVector(newV);
+        return newV;
+    }
+
+    Vector3f SurfaceInteraction::ToWorldCoordinate(const Vector3f& v) const
+    {
+        Vector3f newV = m_TNB * v;
+        FixVector(newV);
+        return newV;
+    }
+
 
     SurfaceInfo SurfaceInteraction::GetSurfaceInfo(bool modelNormal) const
     {

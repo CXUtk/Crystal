@@ -37,6 +37,11 @@ namespace crystal
 
         auto LdotH = std::max(0.f, glm::dot(wIn, H));
 
+        if (LdotH == 0.f)
+        {
+            return diffuse;
+        }
+
         float D = m_microfacet->D(H);
         Spectrum specular = D * SchlickFresnel(Ks, LdotH)
             / (4 * LdotH * std::max(NdotI, NdotO));

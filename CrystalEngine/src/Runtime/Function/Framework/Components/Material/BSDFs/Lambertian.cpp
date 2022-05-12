@@ -27,4 +27,9 @@ namespace crystal
         *wIn = NextCosineUnitHemiSphere(sample, pdf);
         return DistributionFunction(wOut, *wIn);
     }
+
+    Spectrum Lambertian::CalculateBSDFNoLDivideByPdf(const Vector3f& wOut, const Vector3f& wIn, BxDFType scatterType) const
+    {
+        return m_albedo;
+    }
 }

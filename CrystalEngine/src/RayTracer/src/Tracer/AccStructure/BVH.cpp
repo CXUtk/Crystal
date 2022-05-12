@@ -8,7 +8,7 @@ namespace tracer
         EQUAL_COUNTS,
         SAH
     };
-    constexpr int MAX_OBJ_IN_NODE = 2;
+    constexpr int MAX_OBJ_IN_NODE = 4;
     constexpr SplitMethod SLILT_METHOD = SplitMethod::EQUAL_COUNTS;
     constexpr float TRAV_COST = 0.5f;
     constexpr float INTERSECT_COST = 1.0f;
@@ -55,16 +55,16 @@ namespace tracer
     {
         constexpr int MAX_STACK_SIZE = 64;
 
-        bool hit = false;
         Vector3f invDir(1.f / ray.Dir().x, 1.f / ray.Dir().y, 1.f / ray.Dir().z);
         bool dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
-        SurfaceInteraction isec;
         int nodesStack[MAX_STACK_SIZE]{}, top = 0;
         int currentNode = m_root;
+
+        RayHitPayload payload = {};
         while (true)
         {
             auto& current = m_nodes[currentNode];
-            float t1 = tMin, t2 = std::min(tMax, info->GetDistance());
+            float t1 = tMin, t2 = std::min(tMax, payload.Distance);
             if (RayBoxTest(ray, dirIsNeg, invDir, current.bound, t1, t2))
             {
                 // 如果是叶子节点就是暴力判定一下
@@ -74,18 +74,14 @@ namespace tracer
                     int objCnt = current.count;
                     for (int i = 0; i < objCnt; i++)
                     {
-                        t1 = tMin, t2 = std::min(tMax, info->GetDistance());
+                        t1 = tMin, t2 = std::min(tMax, payload.Distance);
                         if (!RayBoxTest(ray, dirIsNeg, invDir, startP[i]->GetBoundingBox(), t1, t2)) continue;
-                        if (!startP[i]->Intersect(ray, &isec)) continue;
-                        auto dis = isec.GetDistance();
-                        if (dis < std::numeric_limits<float>::infinity())
+                        Float tCurrent = std::numeric_limits<Float>::infinity();
+                        if (!startP[i]->IntersectTest(ray, &tCurrent)) continue;
+                        if (tCurrent < payload.Distance)
                         {
-                            hit = true;
-                        }
-                        if (dis < info->GetDistance())
-                        {
-                            isec.SetHitPrimitive(startP[i]);
-                            *info = isec;
+                            payload.Distance = tCurrent;
+                            payload.HitPrimitive = startP[i];
                         }
                     }
                     if (!top) break;
@@ -105,7 +101,14 @@ namespace tracer
                 currentNode = nodesStack[--top];
             }
         }
-        return hit;
+
+        if (payload.HitPrimitive)
+        {
+            payload.HitPrimitive->Intersect(ray, info);
+            info->SetHitPrimitive(payload.HitPrimitive);
+            return true;
+        }
+        return false;
     }
 
     bool BVH::IntersectTest(const Ray3f& ray, const IRayPrimitive* ignoreShape,
@@ -118,6 +121,9 @@ namespace tracer
 
         int nodesStack[MAX_STACK_SIZE]{}, top = 0;
         int currentNode = m_root;
+
+        // Unused
+        Float t;
         while (true)
         {
             auto& current = m_nodes[currentNode];
@@ -134,7 +140,7 @@ namespace tracer
                         if (startP[i] == ignoreShape) continue;
                         t1 = tMin, t2 = tMax;
                         if (!RayBoxTest(ray, dirIsNeg, invDir, startP[i]->GetBoundingBox(), t1, t2)) continue;
-                        if (!startP[i]->IntersectTest(ray, t1, t2)) continue;
+                        if (!startP[i]->IntersectTest(ray, &t, t1, t2)) continue;
                         return true;
                     }
                     if (!top) break;

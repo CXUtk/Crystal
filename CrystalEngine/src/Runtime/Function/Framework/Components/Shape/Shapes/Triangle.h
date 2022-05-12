@@ -13,8 +13,8 @@ namespace crystal
 
         Bound3f GetBoundingBox() const override;
         bool Intersect(const Ray3f& ray, SurfaceInteraction* isec) const override;
-        bool IntersectTest(const Ray3f& ray, float tMin = 0,
-            float tMax = std::numeric_limits<float>::infinity()) const override;
+        bool IntersectTest(const Ray3f& ray, Float* t,
+            float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
         float SurfaceArea() const override;
 
         SurfaceInfo SampleSurface(const Vector2f& sample) const override;

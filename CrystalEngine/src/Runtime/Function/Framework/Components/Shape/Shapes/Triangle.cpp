@@ -81,7 +81,7 @@ namespace crystal
         return true;
     }
 
-    bool Triangle::IntersectTest(const Ray3f& ray, float tMin, float tMax) const
+    bool Triangle::IntersectTest(const Ray3f& ray, Float* t, float tMin, float tMax) const
     {
         if (tMin > tMax) return false;
         glm::mat3 A(m_vertices[1]->Position - m_vertices[0]->Position,
@@ -91,6 +91,7 @@ namespace crystal
         auto res = glm::inverse(A) * P;
         if (glm::isnan(res) != glm::bvec3(false)) return false;
         if (res.x < 0 || res.x > 1 || res.y < 0 || res.y > 1 || res.x + res.y > 1 || res.z < 0) return false;
+        *t = res.z;
         return res.z >= tMin && res.z <= tMax;
     }
 
