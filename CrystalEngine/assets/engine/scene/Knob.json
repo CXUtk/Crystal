@@ -122,6 +122,37 @@
             ]
         },
         {
+            "Name": "Sphere2",
+            "Components": [
+                {
+                    "Type": "ShapeComponent",
+                    "Setting": {
+                        "Type": "Sphere",
+                        "Data": {
+                            "Radius": 0.5
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 3, 3, -6 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "constants:pure/White"
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "Name": "Floor",
             "Components": [
                 {
@@ -180,7 +211,7 @@
                     "Setting": {
                         "Type": "DiffuseAreaLight",
                         "Data": {
-                            "LEmit": [ 0, 0, 0 ],
+                            "LEmit": [ 10, 10, 10 ],
                             "NumSamples": 1
                         }
                     }

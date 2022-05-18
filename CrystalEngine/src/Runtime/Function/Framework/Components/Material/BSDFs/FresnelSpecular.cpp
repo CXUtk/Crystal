@@ -40,7 +40,7 @@ namespace crystal
             *sampledType = BxDFType(BxDFType::BxDF_TRANSMISSION | BxDFType::BxDF_SPECULAR);
             refract(wOut, m_etaA, m_etaB, wIn);
             *pdf = 1.f - fr.r;
-            return (1.f - fr.r) * m_T;
+            return (1.f - fr.r) * m_T * (m_etaA * m_etaA) / (m_etaB * m_etaB);
         }
     }
     Spectrum FresnelSpecular::CalculateBSDFNoLDivideByPdf(const Vector3f& wOut,
@@ -52,7 +52,7 @@ namespace crystal
         }
         else
         {
-            return m_T;
+            return m_T * (m_etaA * m_etaA) / (m_etaB * m_etaB);
         }
     }
 }

@@ -2,8 +2,9 @@
 
 namespace crystal
 {
-    SpecularTransmission::SpecularTransmission(const Spectrum& T, std::shared_ptr<Fresnel> fresnel)
-        : BxDF(BxDFType::BxDF_TRANSMISSION | BxDFType::BxDF_SPECULAR), m_T(T), m_fresnel(fresnel)
+    SpecularTransmission::SpecularTransmission(const Spectrum& T, std::shared_ptr<Fresnel> fresnel, Float etaO, Float etaI)
+        : BxDF(BxDFType::BxDF_TRANSMISSION | BxDFType::BxDF_SPECULAR),
+        m_T(T), m_fresnel(fresnel), m_etaO(etaO), m_etaI(etaI)
     {}
 
     SpecularTransmission::~SpecularTransmission()
@@ -30,6 +31,6 @@ namespace crystal
     {
         // Specular formula optimization
         Float cosTheta = std::max(0.f, -wOut.y);
-        return m_T * (1.0f - m_fresnel->Eval(cosTheta));
+        return m_T * (1.0f - m_fresnel->Eval(cosTheta)) * (m_etaO * m_etaO) / (m_etaI * m_etaI);
     }
 }

@@ -7,7 +7,7 @@ namespace crystal
     class SpecularTransmission : public BxDF
     {
     public:
-        SpecularTransmission(const Spectrum& T, std::shared_ptr<Fresnel> fresnel);
+        SpecularTransmission(const Spectrum& T, std::shared_ptr<Fresnel> fresnel, Float etaO, Float etaI);
         ~SpecularTransmission() override;
 
         Spectrum DistributionFunction(const Vector3f& wOut, const Vector3f& wIn) const override;
@@ -21,6 +21,7 @@ namespace crystal
 
     private:
         Spectrum                    m_T{};
+        Float                       m_etaO, m_etaI;
         std::shared_ptr<Fresnel>    m_fresnel{};
     };
 }
