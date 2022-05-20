@@ -105,15 +105,54 @@ namespace crystal
         return 4 * glm::pi<float>() * m_radius * m_radius;
     }
 
-    SurfaceInfo Sphere::SampleSurface(const Vector2f& sample) const
+    SurfaceInfo Sphere::SampleSurfaceArea(const Vector2f& sample) const
     {
         float p;
         auto dir = NextUnitSphere(sample, &p);
         return SurfaceInfo(m_position + dir * m_radius, dir);
     }
 
-    SurfaceInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const SurfaceInteraction& ref) const
+    SurfaceInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const SurfaceInfo& ref) const
     {
-        return SampleSurface(sample);
+        return SampleSurfaceArea(sample);
+        auto dirToP = ref.GetPosition() - m_position;
+        Float d2 = glm::length2(dirToP);
+        if (d2 < m_radius * m_radius)
+        {
+            return SampleSurfaceArea(sample);
+        }
+
+        auto N = glm::normalize(dirToP);
+        auto TNBOnLight = BuildTNB(N);
+
+        Float sinThetaMax2 = m_radius * m_radius / d2;
+        Float cosThetaMax = std::sqrt(1 - sinThetaMax2);
+
+        // Sample a ray from shading point
+        Float cosTheta = std::min(1.0f, 1.0f + sample.x * (cosThetaMax - 1));
+        Float sinTheta = std::sqrt(1.0f - cosTheta * cosTheta);
+        Float phi = sample.y * glm::two_pi<float>();
+
+        Float dc = std::sqrt(d2);
+        Float ds = dc * cosTheta - std::sqrt(std::max(0.f, m_radius * m_radius - d2 * sinTheta * sinTheta));
+        Float cosAlpha = (dc * dc + m_radius * m_radius - ds * ds) / (2 * dc * m_radius);
+
+        auto v = GetUnitVectorUsingCos(cosAlpha, phi);
+        v = TNBOnLight * v;
+        return SurfaceInfo(m_position + v * m_radius, glm::normalize(v));
+    }
+
+    float Sphere::PdfLight(const SurfaceInfo& ref, const Vector3f& wi) const
+    {
+        return Shape::PdfLight(ref, wi);
+        Float d2 = glm::length2(wi);
+        if (d2 < m_radius * m_radius)
+        {
+            return Shape::PdfLight(ref, wi);
+        }
+
+        Float sinThetaMax2 = m_radius * m_radius / d2;
+        Float cosThetaMax = std::sqrt(1 - sinThetaMax2);
+        return 1.f / (glm::two_pi<float>() * (1 - cosThetaMax));
     }
 }

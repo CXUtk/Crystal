@@ -56,23 +56,31 @@ namespace crystal
         N = front_face ? N : -N;
 
         auto dpdu = m_dpDu;
+        Vector3f dpdv;
         // 如果没有切线向量（通常是因为没有纹理坐标绑定），那么就手动计算一个
         if (glm::isnan(dpdu) != glm::bvec3(false))
         {
-            for (int i = 0; i < 3; i++)
-            {
-                Vector3f v(0);
-                v[i] = 1;
-                auto tmp = glm::cross(v, N);
-                if (tmp != Vector3f(0))
-                {
-                    dpdu = glm::normalize(tmp);
-                    break;
-                }
-            }
+            auto tnb = BuildTNB(N);
+            dpdu = tnb[0];
+            dpdv = tnb[2];
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    Vector3f v(0);
+            //    v[i] = 1;
+            //    auto tmp = glm::cross(v, N);
+            //    if (tmp != Vector3f(0))
+            //    {
+            //        dpdu = glm::normalize(tmp);
+            //        break;
+            //    }
+            //}
+        }
+        else
+        {
+            dpdv = glm::normalize(glm::cross(N, dpdu));
         }
 
-        isec->SetHitInfo(res.z, ray.Start() + ray.Dir() * res.z, ray.Dir(), N, UV, front_face, dpdu, glm::cross(N, dpdu));
+        isec->SetHitInfo(res.z, ray.Start() + ray.Dir() * res.z, ray.Dir(), N, UV, front_face, dpdu, dpdv);
         if (std::isinf(res.z) || std::isnan(res.z))
         {
             printf("Invalid distance on triangle intersection: %lf\n", res.z);
@@ -101,7 +109,7 @@ namespace crystal
             m_vertices[2]->Position - m_vertices[0]->Position)) / 2.f;
     }
 
-    SurfaceInfo Triangle::SampleSurface(const Vector2f& sample) const
+    SurfaceInfo Triangle::SampleSurfaceArea(const Vector2f& sample) const
     {
         Vector3f baryCoord = sampleTriangle(sample);
         Point3f pos = baryCoord.x * m_vertices[0]->Position
@@ -119,6 +127,11 @@ namespace crystal
                 m_vertices[1]->Normal, m_vertices[2]->Normal));
         }
         return SurfaceInfo(pos, N);
+    }
+
+    SurfaceInfo Triangle::SampleSurfaceLight(const Vector2f& sample, const SurfaceInfo& ref) const
+    {
+        return SampleSurfaceArea(sample);
     }
 
     Vector3f Triangle::sampleTriangle(const Vector2f& sample) const

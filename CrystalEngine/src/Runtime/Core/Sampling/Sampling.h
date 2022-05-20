@@ -159,6 +159,23 @@ namespace crystal
         return glm::vec3(x, y, z);
     }
 
+    inline Vector3f UniformSampleCone(const Vector3f& sample, Float cosThetaMax, float* pdf)
+    {
+        Float cosTheta = 1.0f + sample.x * (1 - cosThetaMax);
+        Float sinTheta = std::sqrt(1.0f - cosTheta * cosTheta);
+        Float phi = sample.y * glm::two_pi<float>();
+        *pdf = 1.f / (glm::two_pi<float>() * (1 - cosThetaMax));
+        return Vector3f(std::cos(phi) * sinTheta, cosTheta, -std::sin(phi) * sinTheta);
+    }
+
+    inline Matrix3f BuildTNB(const Vector3f& N)
+    {
+        Vector3f v = glm::dot(N, Vector3f(0, 0, 1)) == 0.f ? Vector3f(1, 0, 0) : Vector3f(0, 0, 1);
+        Vector3f T = glm::normalize(glm::cross(v, N));
+        Vector3f B = glm::normalize(glm::cross(N, T));
+        return Matrix3f(T, N, B);
+    }
+
     template<typename T>
     inline void quickPrint(const T& value) {}
 

@@ -20,7 +20,7 @@ namespace crystal
     Spectrum DiffusedAreaLight::Sample_Li(const SurfaceInfo& surface_w,
         const Vector2f& sample, Point3f* endpoint, float* pdf) const
     {
-        auto surface_light = m_areaSampler->SampleSurface(sample);
+        auto surface_light = m_areaSampler->SampleSurfaceLight(surface_w, sample);
         *endpoint = surface_light.GetPosition();
 
         auto diff = *endpoint - surface_w.GetPosition();

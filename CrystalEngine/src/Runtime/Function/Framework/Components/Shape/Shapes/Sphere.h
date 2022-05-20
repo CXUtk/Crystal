@@ -17,10 +17,12 @@ namespace crystal
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
         float SurfaceArea() const override;
 
-        SurfaceInfo SampleSurface(const Vector2f& sample) const override;
+        SurfaceInfo SampleSurfaceArea(const Vector2f& sample) const override;
         // 采样目标点为半球的立体角
         SurfaceInfo SampleSurfaceLight(const Vector2f& sample,
-            const SurfaceInteraction& ref) const override;
+            const SurfaceInfo& ref) const override;
+
+        virtual float PdfLight(const SurfaceInfo& surface_w, const Vector3f& wi) const override;
 
     private:
         float       m_radius{};

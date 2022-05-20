@@ -136,7 +136,7 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 3, 3, -6 ],
+                        "Translation": [ 0, 3, -10 ],
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
@@ -147,6 +147,16 @@
                         "Type": "Lambertian",
                         "Data": {
                             "Kd": "constants:pure/White"
+                        }
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 10, 10, 10 ],
+                            "NumSamples": 1
                         }
                     }
                 }
@@ -211,7 +221,7 @@
                     "Setting": {
                         "Type": "DiffuseAreaLight",
                         "Data": {
-                            "LEmit": [ 10, 10, 10 ],
+                            "LEmit": [ 0, 0, 0 ],
                             "NumSamples": 1
                         }
                     }

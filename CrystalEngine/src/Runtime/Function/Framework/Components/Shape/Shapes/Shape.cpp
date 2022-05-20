@@ -1,9 +1,9 @@
 #include "Shape.h"
 
 
-float Shape::PdfLight(const SurfaceInfo& surface_w, const Vector3f& wi) const
+float Shape::PdfLight(const SurfaceInfo& ref, const Vector3f& wi) const
 {
-	Ray ray = surface_w.SpawnRay(wi);
+	Ray ray = ref.SpawnRay(wi);
 	SurfaceInteraction isec_l;
 	if (!Intersect(ray, &isec_l)) return 0.f;
 
