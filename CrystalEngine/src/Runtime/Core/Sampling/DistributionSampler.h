@@ -16,6 +16,7 @@ namespace crystal
         virtual ~Distribution1D() = 0 {};
         virtual Float SampleContinuous(Float sample, Float* pdf) = 0;
         virtual Float ContinuousPdf(Float x) = 0;
+        virtual Float FuncInt() const = 0;
     };
 
     class Distribution2D
@@ -24,6 +25,7 @@ namespace crystal
         virtual ~Distribution2D() = 0 {};
         virtual Vector2f SampleContinuous(const Vector2f& sample, Float* pdf) = 0;
         virtual Float ContinuousPdf(Vector2f uv) = 0;
+        virtual Float FuncInt() const = 0;
     };
 
     class Distribution1DDiscrete : public Distribution1D
@@ -33,12 +35,13 @@ namespace crystal
         ~Distribution1DDiscrete() override;
 
         Float DiscretePdf(size_t index) const;
-        //size_t SampleDiscrete(Float sample, Float* pdf, Float* remapped) const;
+        size_t SampleDiscrete(Float sample, Float* pdf, Float* remapped) const;
         Float SampleContinuous(Float sample, Float* pdf) override;
         Float AvgWeright() const { return m_funcInt; }
         size_t GetColIndex(Float x) { return std::clamp((size_t)std::floor(m_N * x),
             (size_t)0, (size_t)(m_N - 1)); }
         Float ContinuousPdf(Float x) override;
+        Float FuncInt() const override { return m_funcInt; }
 
     private:
         std::vector<Float>  m_cdf{};
@@ -53,6 +56,7 @@ namespace crystal
         ~Distribution2DDiscrete() override;
         Vector2f SampleContinuous(const Vector2f& sample, Float* pdf) override;
         Float ContinuousPdf(Vector2f uv) override;
+        Float FuncInt() const override { return m_single->AvgWeright(); }
 
     private:
         std::vector<Distribution1DDiscrete>     m_rows{};
@@ -66,6 +70,7 @@ namespace crystal
         ~Distribution2DPureSineTheta() override;
         Vector2f SampleContinuous(const Vector2f& sample, Float* pdf) override;
         Float ContinuousPdf(Vector2f uv) override;
+        Float FuncInt() const override { return 2.f / glm::pi<float>(); }
 
     private:
     };

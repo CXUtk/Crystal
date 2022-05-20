@@ -40,6 +40,20 @@ namespace tracer
             m_lights.push_back(m_environmentLight);
         }
 
+        for (auto& primitive : m_primitives)
+        {
+            m_worldBound = m_worldBound.Union(primitive->GetBoundingBox());
+        }
+
+        std::vector<Float> weights;
+        for (auto& light : m_lights)
+        {
+            light->Preprocess(m_worldBound);
+            auto flux = light->Flux();
+            weights.push_back((flux.r + flux.g + flux.b) / 3.f);
+        }
+        m_lightFluxDistribution = std::make_shared<Distribution1DDiscrete>(weights.data(), weights.size());
+
         m_accelStructure->Build(m_primitives);
     }
 
@@ -59,7 +73,13 @@ namespace tracer
         {
             action(cptr(light));
         }
-    } 
+    }
+    crystal::Light* RayScene::SampleOneLight(Float sample, Float* pdf, Float* remapped) const
+    {
+        size_t index = m_lightFluxDistribution->SampleDiscrete(sample, pdf, remapped);
+        return m_lights[index].get();
+    }
+
 
     Spectrum RayScene::GetEnvironmentLight(const Vector3f& dir) const
     {

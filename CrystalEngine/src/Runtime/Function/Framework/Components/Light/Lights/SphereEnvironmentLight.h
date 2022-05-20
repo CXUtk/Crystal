@@ -12,6 +12,8 @@ namespace crystal
             std::shared_ptr<CPUTexture2D> sphereTexture);
         ~SphereEnvironmentLight() override;
 
+        virtual void Preprocess(const Bound3f& worldBound) override;
+
         Spectrum Sample_Li(const SurfaceInfo& surface, const Vector2f& sample,
             Point3f* endpoint, float* pdf) const override;
         float Pdf_Li(const SurfaceInfo& surface, const Vector3f& wi) const override;
@@ -21,5 +23,6 @@ namespace crystal
     private:
         std::shared_ptr<CPUTexture2D>   m_sphereTexture{};
         std::shared_ptr<Distribution2D> m_distribution{};
+        Spectrum m_flux{};
     };
 }

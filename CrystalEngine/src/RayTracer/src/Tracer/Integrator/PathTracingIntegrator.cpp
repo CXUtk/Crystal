@@ -134,11 +134,28 @@ namespace tracer
         return L;
 	}
 
+    Spectrum PathTracingIntegrator::UniformSampleOneLight(const SurfaceInteraction& isec,
+        const RayScene* scene, Sampler* sampler)
+    {
+        Float u = sampler->Get1D();
+        Vector2f sampleLight = sampler->Get2D();
+        Vector2f sampleBSDF = sampler->Get2D();
+
+        Float pdf, remapped;
+        auto light = scene->SampleOneLight(u, &pdf, &remapped);
+        return EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler) / pdf;
+    }
+
     Spectrum PathTracingIntegrator::EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
         const Vector2f& sampleLight, const Vector2f& sampleBSDF,
         const crystal::Light* light, Sampler* sampler)
     {
         Spectrum L(0.f);
+
+        if (light->Flux() == Spectrum(0.f))
+        {
+            return L;
+        }
 
         BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
         Point3f P = isec.GetHitPos();

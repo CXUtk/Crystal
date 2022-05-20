@@ -13,6 +13,12 @@ namespace crystal
     SphereEnvironmentLight::~SphereEnvironmentLight()
     {}
 
+    void SphereEnvironmentLight::Preprocess(const Bound3f& worldBound)
+    {
+        Float worldR = glm::length(worldBound.GetMaxPos() - worldBound.GetMinPos()) / 2;
+        m_flux = Spectrum(m_distribution->FuncInt() * 2 * glm::pi<float>() * worldR * worldR);
+    }
+
     Spectrum SphereEnvironmentLight::Sample_Li(const SurfaceInfo& surface, const Vector2f& sample, Point3f* endpoint, float* pdf) const
     {
         Float mapPdf;
@@ -49,6 +55,6 @@ namespace crystal
 
     Spectrum SphereEnvironmentLight::Flux() const
     {
-        return Spectrum(10000.f);
+        return m_flux;
     }
 }

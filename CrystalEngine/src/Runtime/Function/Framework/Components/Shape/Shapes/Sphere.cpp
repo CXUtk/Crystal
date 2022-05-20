@@ -114,7 +114,6 @@ namespace crystal
 
     SurfaceInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const SurfaceInfo& ref) const
     {
-        return SampleSurfaceArea(sample);
         auto dirToP = ref.GetPosition() - m_position;
         Float d2 = glm::length2(dirToP);
         if (d2 < m_radius * m_radius)
@@ -144,7 +143,6 @@ namespace crystal
 
     float Sphere::PdfLight(const SurfaceInfo& ref, const Vector3f& wi) const
     {
-        return Shape::PdfLight(ref, wi);
         Float d2 = glm::length2(wi);
         if (d2 < m_radius * m_radius)
         {

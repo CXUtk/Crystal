@@ -31,7 +31,7 @@ namespace crystal
 
         virtual Spectrum Flux() const = 0;
 
-        //virtual void Preprocess(const Scene* scene) const { }
+        virtual void Preprocess(const Bound3f& worldBound) { }
 
         // Get the radiance value from the light to the object surface hit point
         virtual Spectrum Sample_Li(const SurfaceInfo& surface_w, const Vector2f& sample,

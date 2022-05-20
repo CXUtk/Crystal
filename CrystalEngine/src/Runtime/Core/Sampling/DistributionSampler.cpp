@@ -39,6 +39,15 @@ namespace crystal
         return m_cdf[index + 1] - m_cdf[index];
     }
 
+    size_t Distribution1DDiscrete::SampleDiscrete(Float sample, Float* pdf, Float* remapped) const
+    {
+        size_t index = std::upper_bound(m_cdf.begin(), m_cdf.end(), sample) - m_cdf.begin() - 1;
+        index = std::max(0ull, std::min(index, m_N - 1ull));
+        *pdf = DiscretePdf(index);
+        *remapped = (sample - m_cdf[index]) / (m_cdf[index + 1] - m_cdf[index]);
+        return index;
+    }
+
     Float Distribution1DDiscrete::SampleContinuous(Float sample, Float* pdf)
     {
         size_t index = std::upper_bound(m_cdf.begin(), m_cdf.end(), sample) - m_cdf.begin() - 1;
