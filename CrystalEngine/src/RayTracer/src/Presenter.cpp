@@ -68,8 +68,8 @@ namespace tracer
         RenderProperties renderprops = {};
         renderprops.FrameBufferSize = window->GetWindowSize();
         renderprops.Gamma = 2.2;
-        renderprops.SampleCount = 64;
-        renderprops.NumOfThreads = 8;
+        renderprops.SampleCount = 17 * 17;
+        renderprops.NumOfThreads = 12;
 
         Transform transform;
         //renderprops.EnvironmentLight = std::make_shared<SphereEnvironmentLight>(transform,

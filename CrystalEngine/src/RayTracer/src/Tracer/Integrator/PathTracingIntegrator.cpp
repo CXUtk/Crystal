@@ -16,22 +16,22 @@ namespace tracer
 	}
 
 
-    glm::vec3 PathTracingIntegrator::Evaluate(const Ray3f& ray, const RayScene* scene,
+    Spectrum PathTracingIntegrator::Evaluate(const RayTr& ray, const RayScene* scene,
             Sampler* sampler)
     {
         int bounces = 0;
         bool lightPath = true;
         Spectrum beta(1.f), L(0.f);
-        Ray3f currentRay(ray);
+        RayTr currentRay(ray);
 
         for (; bounces < m_maxDepth; bounces++)
         {
             SurfaceInteraction isec;
 
-            bool foundIntersection = scene->Intersect(currentRay, &isec);
+            bool foundIntersection = scene->Intersect(currentRay.Ray, &isec);
 
-            Vector3f wo = -currentRay.Dir();
-            Normal3f N = isec.GetNormal();
+            Vector3f wo = -currentRay.Ray.Dir();
+            Normal3f N = isec.GetInteractionNormal();
             Point3f P = isec.GetHitPos();
 
             // 如果是自发光物体就把发光项加上
@@ -39,11 +39,11 @@ namespace tracer
             {
                 if (!foundIntersection)
                 {
-                    L += beta * scene->GetEnvironmentLight(currentRay.Dir());
+                    L += beta * scene->GetEnvironmentLight(currentRay.Ray.Dir());
                 }
                 else
                 {
-                    L += beta * isec.Le(-currentRay.Dir());
+                    L += beta * isec.Le(-currentRay.Ray.Dir());
                 }
             }
 
@@ -59,7 +59,7 @@ namespace tracer
             auto bsdf = isec.GetBSDF();
             if (bsdf->IsEmpty())
             {
-                currentRay = isec.SpawnRay(currentRay.Dir());
+                currentRay = isec.SpawnRay(currentRay.Ray.Dir());
                 continue;
             }
 
@@ -159,7 +159,7 @@ namespace tracer
 
         BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
         Point3f P = isec.GetHitPos();
-        Normal3f N = isec.GetNormal();
+        Normal3f N = isec.GetInteractionNormal();
         Vector3f wOut = isec.ToLocalCoordinate(-isec.GetHitDir());
 
         auto bsdf = isec.GetBSDF();
@@ -168,7 +168,7 @@ namespace tracer
         {
             Point3f lightPos;
             float pdf_light;
-            auto Li_light = light->Sample_Li(isec.GetSurfaceInfo(false), sampleLight, &lightPos, &pdf_light);
+            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(false), sampleLight, &lightPos, &pdf_light);
 
             Vector3f wIn = isec.ToLocalCoordinate(glm::normalize(lightPos - P));
             float NdotL = std::max(0.f, wIn.y);
@@ -179,7 +179,7 @@ namespace tracer
                 float pdf_bsdf = bsdf->Pdf(wOut, wIn, bsdfSampleType);
                 if (f != Spectrum(0.f))
                 {
-                    if (scene->IntersectTest(isec.SpawnRayTo(lightPos), 0, 1.f - EPS))
+                    if (scene->IntersectTest(isec.SpawnRayTo(lightPos).Ray, 0, 1.f - EPS))
                     {
                         Li_light = Spectrum(0.f);
                     }
@@ -223,7 +223,7 @@ namespace tracer
             float weight = 1.0f;
             if (!specularBSDF)
             {
-                Float pdf_light = light->Pdf_Li(isec.GetSurfaceInfo(false), wi);
+                Float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(false), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
                     return L;
@@ -232,7 +232,7 @@ namespace tracer
             }
 
             Spectrum Li(0.f);
-            Ray lightTestRay = isec.SpawnRay(wi);
+            Ray3f lightTestRay = isec.SpawnRay(wi).Ray;
             SurfaceInteraction lightIsec;
 
             if (light->GetFlags() & LightFlags::Area)

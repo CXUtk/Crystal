@@ -17,6 +17,7 @@ namespace crystal
         CameraComponent,
         LightComponent,
         MaterialComponent,
+        MediumComponent,
         MeshComponent,
         ShapeComponent,
         TransformComponent
@@ -78,13 +79,14 @@ struct SRefl::EnumInfo<crystal::ComponentType>
             SREFL_ENUM_TERM(CameraComponent),
             SREFL_ENUM_TERM(LightComponent),
             SREFL_ENUM_TERM(MaterialComponent),
+            SREFL_ENUM_TERM(MediumComponent),
             SREFL_ENUM_TERM(MeshComponent),
             SREFL_ENUM_TERM(ShapeComponent),
             SREFL_ENUM_TERM(TransformComponent)
         );
     }
 #define LISTFUNC(F) F(CameraComponent) F(LightComponent) F(MaterialComponent) \
-F(MeshComponent) F(ShapeComponent) F(TransformComponent)
+F(MediumComponent) F(MeshComponent) F(ShapeComponent) F(TransformComponent)
     GENERATE_ENUM_MAPPING(crystal::ComponentType, LISTFUNC)
 #undef LISTFUNC
 };

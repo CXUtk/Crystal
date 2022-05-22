@@ -60,13 +60,14 @@ namespace crystal
         auto theta = std::acos(dummyHitPos.y / m_radius) / glm::pi<float>() * 0.5f + 0.5f;
 
         auto front_face = glm::dot(d, N) < 0;
-        N = front_face ? N : -N;
 
         auto realHitPos = m_local2World * dummyHitPos + m_position;
         auto dpdu = glm::normalize(m_local2World * Vector3f(-N.z, 0, N.x));
+        auto dpdv = glm::normalize(glm::cross(N, dpdu));
         N = m_local2World * N;
         // Interaction normal
-        info->SetHitInfo(t, realHitPos, ray.Dir(), N, Point2f(phi * 0.5f, theta), front_face, dpdu, glm::cross(N, dpdu));
+        info->SetHitInfo(t, realHitPos, ray.Dir(), N, Point2f(phi * 0.5f, theta),
+            front_face, dpdu, dpdv);
 
         if (std::isinf(t) || std::isnan(t))
         {
@@ -105,14 +106,14 @@ namespace crystal
         return 4 * glm::pi<float>() * m_radius * m_radius;
     }
 
-    SurfaceInfo Sphere::SampleSurfaceArea(const Vector2f& sample) const
+    InteractionGeometryInfo Sphere::SampleSurfaceArea(const Vector2f& sample) const
     {
         float p;
         auto dir = NextUnitSphere(sample, &p);
-        return SurfaceInfo(m_position + dir * m_radius, dir);
+        return InteractionGeometryInfo(m_position + dir * m_radius, dir);
     }
 
-    SurfaceInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const SurfaceInfo& ref) const
+    InteractionGeometryInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const InteractionGeometryInfo& ref) const
     {
         auto dirToP = ref.GetPosition() - m_position;
         Float d2 = glm::length2(dirToP);
@@ -138,17 +139,16 @@ namespace crystal
 
         auto v = GetUnitVectorUsingCos(cosAlpha, phi);
         v = TNBOnLight * v;
-        return SurfaceInfo(m_position + v * m_radius, glm::normalize(v));
+        return InteractionGeometryInfo(m_position + v * m_radius, glm::normalize(v));
     }
 
-    float Sphere::PdfLight(const SurfaceInfo& ref, const Vector3f& wi) const
+    float Sphere::PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const
     {
         Float d2 = glm::length2(wi);
         if (d2 < m_radius * m_radius)
         {
             return Shape::PdfLight(ref, wi);
         }
-
         Float sinThetaMax2 = m_radius * m_radius / d2;
         Float cosThetaMax = std::sqrt(1 - sinThetaMax2);
         return 1.f / (glm::two_pi<float>() * (1 - cosThetaMax));

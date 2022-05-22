@@ -14,9 +14,9 @@ namespace crystal
 
         virtual void Preprocess(const Bound3f& worldBound) override;
 
-        Spectrum Sample_Li(const SurfaceInfo& surface, const Vector2f& sample,
+        Spectrum Sample_Li(const InteractionGeometryInfo& surface, const Vector2f& sample,
             Point3f* endpoint, float* pdf) const override;
-        float Pdf_Li(const SurfaceInfo& surface, const Vector3f& wi) const override;
+        float Pdf_Li(const InteractionGeometryInfo& surface, const Vector3f& wi) const override;
         virtual Spectrum Le(const Vector3f& wi) const override;
         Spectrum Flux() const override;
 

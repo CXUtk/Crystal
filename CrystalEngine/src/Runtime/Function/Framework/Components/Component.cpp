@@ -6,6 +6,7 @@
 #include <Function/Framework/Components/Light/LightComponent.h>
 #include <Function/Framework/Components/Camera/CameraComponent.h>
 #include <Function/Framework/Components/Material/MaterialComponent.h>
+#include <Function/Framework/Components/Medium/MediumComponent.h>
 
 namespace crystal
 {
@@ -28,6 +29,10 @@ namespace crystal
         case crystal::ComponentType::MaterialComponent:
         {
             return std::make_shared<MaterialComponent>(setting);
+        }
+        case crystal::ComponentType::MediumComponent:
+        {
+            return std::make_shared<MediumComponent>(setting);
         }
         case crystal::ComponentType::MeshComponent:
         {

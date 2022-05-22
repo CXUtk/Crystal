@@ -1,6 +1,6 @@
 #include "PixelSampler.h"
 
-namespace tracer
+namespace crystal
 {
     PixelSampler::PixelSampler(int samplesPerPixel, int dimensions)
         : Sampler(samplesPerPixel), m_dimensions(dimensions)

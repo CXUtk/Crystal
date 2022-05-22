@@ -10,7 +10,7 @@ namespace tracer
         PathTracingIntegrator(const std::shared_ptr<Sampler>& sampler, int threads, int maxDepth);
 
         void Preprocess(const RayScene* scene) override {};
-        Spectrum Evaluate(const Ray3f& ray, const RayScene* scene,
+        Spectrum Evaluate(const RayTr& ray, const RayScene* scene,
             Sampler* sampler) override;
 
     private:

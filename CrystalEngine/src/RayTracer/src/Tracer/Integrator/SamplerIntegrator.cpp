@@ -111,7 +111,10 @@ namespace tracer
                         pos.x = pos.x / block.TargetWidth;
                         pos.y = pos.y / block.TargetHeight;
 
-                        auto ray = block.Camera->GenerateRay(pos);
+                        //auto ray = block.Camera->GenerateRay(pos);
+                        RayTr ray = {};
+                        ray.Ray = block.Camera->GenerateRay(pos);
+                        ray.Medium = nullptr;
                         auto color = Evaluate(ray, block.RayScene, ptr(sampler_thread));
 
                         block.FrameBuffer->AddSample(yy, xx, color);

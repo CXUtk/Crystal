@@ -24,7 +24,7 @@ namespace tracer
         for (auto& obj : m_primitives)
         {
             Float tCurrent = std::numeric_limits<Float>::infinity();
-            if (obj->IntersectTest(ray, &tCurrent, 0, payload.Distance))
+            if (obj->IntersectTest(ray, &tCurrent, tMin, tMax))
             {
                 if (tCurrent < payload.Distance)
                 {

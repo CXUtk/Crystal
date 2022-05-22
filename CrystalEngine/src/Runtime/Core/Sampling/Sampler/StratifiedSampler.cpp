@@ -1,6 +1,6 @@
 #include "StratifiedSampler.h"
 
-namespace tracer
+namespace crystal
 {
     StratifiedSampler::StratifiedSampler(Point2i pixelSamples, int sampledDimensions)
         : PixelSampler(pixelSamples.x * pixelSamples.y, sampledDimensions), m_pixelSamples(pixelSamples)

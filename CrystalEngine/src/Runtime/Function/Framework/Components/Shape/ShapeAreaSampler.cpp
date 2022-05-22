@@ -12,22 +12,22 @@ namespace crystal
         return m_pShape->SurfaceArea();
     }
 
-    SurfaceInfo ShapeAreaSampler::SampleSurfaceArea(const Vector2f& sample) const
+    InteractionGeometryInfo ShapeAreaSampler::SampleSurfaceArea(const Vector2f& sample) const
     {
         return m_pShape->SampleSurfaceArea(sample);
     }
 
-    SurfaceInfo ShapeAreaSampler::SampleSurfaceLight(const SurfaceInfo& ref, const Vector2f& sample) const
+    InteractionGeometryInfo ShapeAreaSampler::SampleSurfaceLight(const InteractionGeometryInfo& ref, const Vector2f& sample) const
     {
         return m_pShape->SampleSurfaceLight(sample, ref);
     }
 
-    Float ShapeAreaSampler::PdfArea(const SurfaceInfo& surface_w) const
+    Float ShapeAreaSampler::PdfArea(const InteractionGeometryInfo& surface_w) const
     {
         return m_pShape->PdfArea(surface_w);
     }
 
-    Float ShapeAreaSampler::PdfLight(const SurfaceInfo& ref, const Vector3f& wi) const
+    Float ShapeAreaSampler::PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const
     {
         return m_pShape->PdfLight(ref, wi);
     }

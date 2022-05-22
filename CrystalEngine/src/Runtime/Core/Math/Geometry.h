@@ -29,6 +29,7 @@ namespace crystal
 
         Vec Start() const { return _start; }
         Vec Dir() const { return _dir; }
+        Vec Eval(Float t) const { return _start + _dir * t; }
 
     private:
         Vec _start, _dir;

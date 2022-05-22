@@ -6,6 +6,7 @@
 
 #include <Engine.h>
 #include <Resource/Asset/AssetManager.h>
+#include <Function/Framework/Components/Medium/MediumComponent.h>
 
 namespace crystal
 {
@@ -81,6 +82,7 @@ namespace crystal
         std::vector<std::shared_ptr<IRayPrimitive>> primitives{};
         std::vector<const AreaLight*> areaLights;
         const Material* material = nullptr;
+        MediumInterface mediumInterface{};
 
         if (m_attachedObject->HasComponent<LightComponent>())
         {
@@ -108,6 +110,12 @@ namespace crystal
             useModelMaterial = false;
         }
 
+        if (m_attachedObject->HasComponent<MediumComponent>())
+        {
+            auto&& medium = m_attachedObject->GetComponent<MediumComponent>();
+            mediumInterface = medium->GetMediumInterface();
+        }
+
         int index = 0;
         const auto& matNames = m_mesh->GetMaterialNames();
         // Otherwise, use the material information from model file
@@ -127,7 +135,7 @@ namespace crystal
                 {
                     light = areaLights[index];
                 }
-                primitives.push_back(std::make_shared<ShapeRayPrimitive>(cptr(triangle), light, material));
+                primitives.push_back(std::make_shared<ShapeRayPrimitive>(cptr(triangle), light, material, mediumInterface));
 
                 ++index;
             }

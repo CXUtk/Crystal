@@ -100,7 +100,7 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 3, 3, -6 ],
+                        "Translation": [ 3, 2, -6 ],
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
@@ -116,6 +116,16 @@
                             "IOR": 1.5,
                             "Kd": "constants:pure/White",
                             "K": [ 3.068, 2.54, 1.904 ]
+                        }
+                    }
+                },
+                {
+                    "Type": "MediumComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 10, 10, 10 ],
+                            "NumSamples": 1
                         }
                     }
                 }

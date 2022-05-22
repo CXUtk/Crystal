@@ -8,6 +8,7 @@ namespace crystal
     class Shape;
     class SurfaceInteraction;
     class Material;
+    class MediumInterface;
 
     class IRayPrimitive
     {
@@ -19,6 +20,8 @@ namespace crystal
         virtual const AreaLight* GetAreaLight() const = 0;
 
         virtual const Material* GetMaterial() const = 0;
+
+        virtual const MediumInterface& GetMediumInterface() const = 0;
 
         // Get bounding box of transformed model
         virtual Bound3f GetBoundingBox() const = 0;

@@ -11,12 +11,12 @@ namespace tracer
         WhiteFurnaceIntegrator(const std::shared_ptr<Sampler>& sampler, int threads);
 
         void Preprocess(const RayScene* scene) override {};
-        Spectrum Evaluate(const Ray3f& ray, const RayScene* scene,
+        Spectrum Evaluate(const RayTr& ray, const RayScene* scene,
             Sampler* sampler) override;
 
     private:
 
-        Spectrum eval_rec(const Ray3f& ray, const RayScene* scene, Sampler* sampler, int level, bool specular);
+        Spectrum eval_rec(const RayTr& ray, const RayScene* scene, Sampler* sampler, int level, bool specular);
         Spectrum UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene, Sampler* sampler);
         Spectrum EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
             const Vector2f& sampleLight, const Vector2f& sampleBSDF,

@@ -2,9 +2,8 @@
 #include "Sampler.h"
 #include <Core/Sampling/Sampling.h>
 
-namespace tracer
+namespace crystal
 {
-    using namespace crystal;
     class PixelSampler : public Sampler
     {
     public:

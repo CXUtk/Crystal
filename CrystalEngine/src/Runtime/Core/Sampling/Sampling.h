@@ -79,7 +79,7 @@ namespace crystal
 
     inline glm::vec3 GetUnitVectorUsingCos(float cosTheta, float phi)
     {
-        float r = std::sqrt(1 - cosTheta * cosTheta);
+        float r = std::sqrt(std::max(0.f, 1 - cosTheta * cosTheta));
         return glm::vec3(r * std::cos(phi), cosTheta, -r * std::sin(phi));
     }
 
@@ -170,10 +170,11 @@ namespace crystal
 
     inline Matrix3f BuildTNB(const Vector3f& N)
     {
-        Vector3f v = glm::dot(N, Vector3f(0, 0, 1)) == 0.f ? Vector3f(1, 0, 0) : Vector3f(0, 0, 1);
-        Vector3f T = glm::normalize(glm::cross(v, N));
-        Vector3f B = glm::normalize(glm::cross(N, T));
-        return Matrix3f(T, N, B);
+        Vector3f n = glm::normalize(N);
+        Vector3f v = std::fabs(glm::dot(n, Vector3f(0, 0, 1))) < 1e-3 ? Vector3f(1, 0, 0) : Vector3f(0, 0, 1);
+        Vector3f T = glm::normalize(glm::cross(v, n));
+        Vector3f B = glm::normalize(glm::cross(n, T));
+        return Matrix3f(T, n, B);
     }
 
     template<typename T>

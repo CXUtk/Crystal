@@ -3,9 +3,10 @@
 
 #include "Tracer/Integrator/DirectLightingIntegrator.h"
 #include "Tracer/Integrator/PathTracingIntegrator.h"
+#include "Tracer/Integrator/VolumePTIntegrator.h"
 #include "Tracer/Integrator/WhiteFurnaceIntegrator.h"
-#include "Tracer/Sampler/DefaultSampler.h"
-#include "Tracer/Sampler/StratifiedSampler.h"
+#include <Core/Sampling/Sampler/DefaultSampler.h>
+#include <Core/Sampling/Sampler/StratifiedSampler.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stbi/stb_image_write.h>
@@ -36,7 +37,7 @@ namespace tracer
         int sqrtSPP = (int)std::sqrt(renderProps.SampleCount);
         /*auto sampler = std::make_shared<DefaultSampler>(renderProps.SampleCount);*/
         auto sampler = std::make_shared<StratifiedSampler>(Point2i(sqrtSPP, sqrtSPP), 10);
-        m_integrator = std::make_shared<PathTracingIntegrator>(sampler, renderProps.NumOfThreads, 10);
+        m_integrator = std::make_shared<VolumePTIntegrator>(sampler, renderProps.NumOfThreads, 10);
         //m_integrator = std::make_shared<WhiteFurnaceIntegrator>(sampler, renderProps.NumOfThreads);
 
         m_integrator->Render(cptr(m_rayScene), camera, ptr(m_frameBuffer));

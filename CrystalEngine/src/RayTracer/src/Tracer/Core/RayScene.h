@@ -5,6 +5,10 @@
 #include <Function/Render/RenderExports.h>
 #include <Function/Framework/Scene/Scene.h>
 #include <Function/Framework/Components/Light/LightComponent.h>
+#include <Function/Framework/Components/Medium/Medium.h>
+
+#include <Core/Sampling/Sampler/Sampler.h>
+#include <Core/Interaction/RayTr.h>
 
 namespace tracer
 {
@@ -13,7 +17,12 @@ namespace tracer
     public:
         RayScene(std::shared_ptr<Scene> scene, std::shared_ptr<Light> environmentLight);
 
-        bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const;
+        bool IntersectTr(const crystal::RayTr& ray, Sampler* sampler,
+            SurfaceInteraction* info, Spectrum* Tr) const;
+
+        bool Intersect(const Ray3f& ray, SurfaceInteraction* info,
+            float tMin = 0, float tMax = std::numeric_limits<Float>::infinity()) const;
+
         bool IntersectTest(const Ray3f& ray, float tMin, float tMax) const;
         void ForEachLights(std::function<void(const crystal::Light*)> action) const;
         const std::vector<std::shared_ptr<crystal::Light>>& GetLights() const { return m_lights; }

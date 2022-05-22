@@ -13,16 +13,16 @@ namespace crystal
         virtual Float SurfaceArea() const = 0;
 
         // Use specific sampling method to sample a patch on the surface
-        virtual SurfaceInfo SampleSurfaceArea(const Vector2f& sample) const = 0;
+        virtual InteractionGeometryInfo SampleSurfaceArea(const Vector2f& sample) const = 0;
 
         // Sample a patch on the surface by target solid angle
-        virtual SurfaceInfo SampleSurfaceLight(const SurfaceInfo& ref, const Vector2f& sample) const = 0;
+        virtual InteractionGeometryInfo SampleSurfaceLight(const InteractionGeometryInfo& ref, const Vector2f& sample) const = 0;
 
         // Pdf of a given surface patch in current surface sampling method
-        virtual Float PdfArea(const SurfaceInfo& surface_w) const { return 1.f / SurfaceArea(); }
+        virtual Float PdfArea(const InteractionGeometryInfo& surface_w) const { return 1.f / SurfaceArea(); }
 
         // Pdf of a given surface patch in solid angle of shading point hemisphere
-        virtual Float PdfLight(const SurfaceInfo& ref, const Vector3f& wi) const = 0;
+        virtual Float PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const = 0;
 
         virtual bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const = 0;
     };

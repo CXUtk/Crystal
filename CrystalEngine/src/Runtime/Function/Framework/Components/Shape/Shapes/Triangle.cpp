@@ -53,7 +53,6 @@ namespace crystal
                 m_vertices[1]->Normal, m_vertices[2]->Normal));
         }
         auto front_face = glm::dot(ray.Dir(), N) < 0;
-        N = front_face ? N : -N;
 
         auto dpdu = m_dpDu;
         Vector3f dpdv;
@@ -63,17 +62,6 @@ namespace crystal
             auto tnb = BuildTNB(N);
             dpdu = tnb[0];
             dpdv = tnb[2];
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    Vector3f v(0);
-            //    v[i] = 1;
-            //    auto tmp = glm::cross(v, N);
-            //    if (tmp != Vector3f(0))
-            //    {
-            //        dpdu = glm::normalize(tmp);
-            //        break;
-            //    }
-            //}
         }
         else
         {
@@ -109,7 +97,7 @@ namespace crystal
             m_vertices[2]->Position - m_vertices[0]->Position)) / 2.f;
     }
 
-    SurfaceInfo Triangle::SampleSurfaceArea(const Vector2f& sample) const
+    InteractionGeometryInfo Triangle::SampleSurfaceArea(const Vector2f& sample) const
     {
         Vector3f baryCoord = sampleTriangle(sample);
         Point3f pos = baryCoord.x * m_vertices[0]->Position
@@ -126,10 +114,10 @@ namespace crystal
             N = glm::normalize(bary_interp(baryCoord, m_vertices[0]->Normal,
                 m_vertices[1]->Normal, m_vertices[2]->Normal));
         }
-        return SurfaceInfo(pos, N);
+        return InteractionGeometryInfo(pos, N);
     }
 
-    SurfaceInfo Triangle::SampleSurfaceLight(const Vector2f& sample, const SurfaceInfo& ref) const
+    InteractionGeometryInfo Triangle::SampleSurfaceLight(const Vector2f& sample, const InteractionGeometryInfo& ref) const
     {
         return SampleSurfaceArea(sample);
     }

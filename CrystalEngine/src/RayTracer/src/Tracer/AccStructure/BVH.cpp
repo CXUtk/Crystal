@@ -77,7 +77,7 @@ namespace tracer
                         t1 = tMin, t2 = std::min(tMax, payload.Distance);
                         if (!RayBoxTest(ray, dirIsNeg, invDir, startP[i]->GetBoundingBox(), t1, t2)) continue;
                         Float tCurrent = std::numeric_limits<Float>::infinity();
-                        if (!startP[i]->IntersectTest(ray, &tCurrent)) continue;
+                        if (!startP[i]->IntersectTest(ray, &tCurrent, tMin, tMax)) continue;
                         if (tCurrent < payload.Distance)
                         {
                             payload.Distance = tCurrent;

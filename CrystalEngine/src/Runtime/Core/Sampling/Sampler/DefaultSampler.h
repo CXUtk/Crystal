@@ -3,7 +3,7 @@
 #include <random>
 #include <Core/Sampling/Sampling.h>
 
-namespace tracer
+namespace crystal
 {
 	class DefaultSampler : public Sampler
 	{

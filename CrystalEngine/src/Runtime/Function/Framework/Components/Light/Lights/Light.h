@@ -34,10 +34,10 @@ namespace crystal
         virtual void Preprocess(const Bound3f& worldBound) { }
 
         // Get the radiance value from the light to the object surface hit point
-        virtual Spectrum Sample_Li(const SurfaceInfo& surface_w, const Vector2f& sample,
+        virtual Spectrum Sample_Li(const InteractionGeometryInfo& surface_w, const Vector2f& sample,
             Point3f* endpoint, float* pdf) const = 0;
 
-        virtual float Pdf_Li(const SurfaceInfo& surface_w, const Vector3f& wi) const = 0;
+        virtual float Pdf_Li(const InteractionGeometryInfo& surface_w, const Vector3f& wi) const = 0;
 
         // Infinite area light, get emitted radiance from given direction
         virtual Spectrum Le(const Vector3f& wi) const { return Spectrum(0.f); }

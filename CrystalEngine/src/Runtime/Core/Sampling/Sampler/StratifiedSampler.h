@@ -1,7 +1,7 @@
 #pragma once
 #include "PixelSampler.h"
 
-namespace tracer
+namespace crystal
 {
     class StratifiedSampler : public PixelSampler
     {

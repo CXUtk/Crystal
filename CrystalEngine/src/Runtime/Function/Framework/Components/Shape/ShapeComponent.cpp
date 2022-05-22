@@ -7,6 +7,7 @@
 #include <Function/Framework/Components/Transform/TransformComponent.h>
 #include <Function/Framework/Components/Light/LightComponent.h>
 #include <Function/Framework/Components/Light/Lights/AreaLight.h>
+#include <Function/Framework/Components/Medium/MediumComponent.h>
 
 namespace crystal
 {
@@ -54,6 +55,7 @@ namespace crystal
     {
         const AreaLight* light = nullptr;
         const Material* material = nullptr;
+        MediumInterface mediumInterface{};
         if (m_attachedObject->HasComponent<LightComponent>())
         {
             auto&& lightComp = m_attachedObject->GetComponent<LightComponent>();
@@ -64,7 +66,12 @@ namespace crystal
             auto&& materialComp = m_attachedObject->GetComponent<MaterialComponent>();
             material = materialComp->GetMaterial();
         }
-        return std::make_shared<ShapeRayPrimitive>(cptr(m_shape), light, material);
+        if (m_attachedObject->HasComponent<MediumComponent>())
+        {
+            auto&& medium = m_attachedObject->GetComponent<MediumComponent>();
+            mediumInterface = medium->GetMediumInterface();
+        }
+        return std::make_shared<ShapeRayPrimitive>(cptr(m_shape), light, material, mediumInterface);
     }
 
     std::shared_ptr<IAreaSampler> ShapeComponent::GetAreaSampler() const

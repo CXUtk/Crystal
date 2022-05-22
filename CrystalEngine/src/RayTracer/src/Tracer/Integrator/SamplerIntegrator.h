@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "Integrator.h"
-#include <Tracer/Sampler/Sampler.h>
+#include <Core/Sampling/Sampler/Sampler.h>
 #include <Core/Utils/FixedThreadPool.h>
 
 namespace tracer
@@ -16,7 +16,7 @@ namespace tracer
         void Render(const RayScene* rayScene,
             const CameraComponent* camera, FrameBuffer* frameBuffer) override;
         virtual bool IsFinished() const override { return m_completedBlocks == m_totalBlocks; }
-        virtual Spectrum Evaluate(const Ray3f& ray, const RayScene* scene,
+        virtual Spectrum Evaluate(const RayTr& ray, const RayScene* scene,
             Sampler* sampler) = 0;
 
     private:

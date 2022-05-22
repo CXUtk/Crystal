@@ -57,9 +57,35 @@ namespace tracer
         m_accelStructure->Build(m_primitives);
     }
 
-    bool RayScene::Intersect(const Ray3f& ray, SurfaceInteraction* info) const
+    bool RayScene::IntersectTr(const crystal::RayTr& ray, Sampler* sampler,
+        SurfaceInteraction* info, Spectrum* Tr) const
     {
-        return m_accelStructure->Intersect(ray, info);
+        *Tr = Spectrum(1.f);
+        crystal::RayTr currentRay(ray);
+        while (true)
+        {
+            bool hit = Intersect(currentRay.Ray, info);
+            if (currentRay.Medium)
+            {
+                *Tr *= currentRay.Medium->Tr(currentRay.Ray, info->GetDistance(), sampler);
+            }
+            if (!hit)
+            {
+                return false;
+            }
+            if (info->GetMaterial() != nullptr)
+            {
+                return true;
+            }
+            
+            currentRay = info->SpawnRay(currentRay.Ray.Dir());
+        }
+        return false;
+    }
+
+    bool RayScene::Intersect(const Ray3f& ray, SurfaceInteraction* info, float tMin, float tMax) const
+    {
+        return m_accelStructure->Intersect(ray, info, tMin, tMax);
     }
 
     bool RayScene::IntersectTest(const Ray3f& ray, float tMin, float tMax) const

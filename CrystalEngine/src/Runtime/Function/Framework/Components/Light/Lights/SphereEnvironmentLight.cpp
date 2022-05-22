@@ -19,7 +19,7 @@ namespace crystal
         m_flux = Spectrum(m_distribution->FuncInt() * 2 * glm::pi<float>() * worldR * worldR);
     }
 
-    Spectrum SphereEnvironmentLight::Sample_Li(const SurfaceInfo& surface, const Vector2f& sample, Point3f* endpoint, float* pdf) const
+    Spectrum SphereEnvironmentLight::Sample_Li(const InteractionGeometryInfo& surface, const Vector2f& sample, Point3f* endpoint, float* pdf) const
     {
         Float mapPdf;
         auto uv = m_distribution->SampleContinuous(sample, &mapPdf);
@@ -36,7 +36,7 @@ namespace crystal
         return m_sphereTexture->Sample(uv);
     }
 
-    float SphereEnvironmentLight::Pdf_Li(const SurfaceInfo& surface, const Vector3f& wi) const
+    float SphereEnvironmentLight::Pdf_Li(const InteractionGeometryInfo& surface, const Vector3f& wi) const
     {
         auto thetaPhi = GetThetaPhi(wi);
         float v = thetaPhi.x / glm::pi<float>();

@@ -13,24 +13,24 @@ namespace tracer
 		int threads) : SamplerIntegrator(sampler, threads)
 	{}
 
-    Spectrum WhiteFurnaceIntegrator::Evaluate(const Ray3f & ray, const RayScene * scene, Sampler * sampler)
+    Spectrum WhiteFurnaceIntegrator::Evaluate(const RayTr& ray, const RayScene * scene, Sampler * sampler)
     {
         return eval_rec(ray, scene, sampler, 0, true);
     }
 
-	Spectrum WhiteFurnaceIntegrator::eval_rec(const Ray3f& ray, const RayScene* scene, Sampler* sampler,
+	Spectrum WhiteFurnaceIntegrator::eval_rec(const RayTr& ray, const RayScene* scene, Sampler* sampler,
 		int level, bool specular)
 	{
 		Spectrum L(0.f);
 
 		SurfaceInteraction isec;
-		if (!scene->Intersect(ray, &isec))
+		if (!scene->Intersect(ray.Ray, &isec))
 		{
-            return scene->GetEnvironmentLight(ray.Dir());
+            return scene->GetEnvironmentLight(ray.Ray.Dir());
 		}
 
 		// Get emitted radiance from hit surface to such direction
-		L += isec.Le(-ray.Dir());
+		L += isec.Le(-ray.Ray.Dir());
 
 		isec.SetBSDF(std::make_shared<BSDF>(&isec));
 		isec.GetMaterial()->ComputeScatteringFunctions(&isec, true);
@@ -38,8 +38,8 @@ namespace tracer
 		L += UniformSampleAllLights(isec, scene, sampler);
 
         // Do one bsdf test
-        Vector3f wo = -ray.Dir();
-        Normal3f N = isec.GetNormal();
+        Vector3f wo = -ray.Ray.Dir();
+        Normal3f N = isec.GetInteractionNormal();
         Point3f P = isec.GetHitPos();
         Vector3f wIn;
         float pdf;
@@ -57,7 +57,7 @@ namespace tracer
         bool transmission = (bxdfType & BxDFType::BxDF_TRANSMISSION);
         auto cosine = std::max(0.f, transmission ? glm::dot(-N, wIn) : glm::dot(N, wIn));
 
-        Ray nextRay = isec.SpawnRay(wIn);
+        Ray3f nextRay = isec.SpawnRay(wIn).Ray;
 
         Spectrum beta = Spectrum(1.f);
 
@@ -90,7 +90,7 @@ namespace tracer
 
         BxDFType sampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
         Point3f P = isec.GetHitPos();
-        Normal3f N = isec.GetNormal();
+        Normal3f N = isec.GetInteractionNormal();
         Vector3f wo = -isec.GetHitDir();
 
         auto bsdf = isec.GetBSDF();
@@ -99,7 +99,7 @@ namespace tracer
         {
             Point3f lightPos;
             float pdf_light;
-            auto Li_light = light->Sample_Li(isec.GetSurfaceInfo(false), sampleLight, &lightPos, &pdf_light);
+            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(false), sampleLight, &lightPos, &pdf_light);
 
             Vector3f wi = glm::normalize(lightPos - P);
             float NdotL = std::max(0.f, glm::dot(N, wi));
@@ -147,7 +147,7 @@ namespace tracer
             if (!specularBSDF)
             {
                 f *= NdotL;
-                float pdf_light = light->Pdf_Li(isec.GetSurfaceInfo(false), wi);
+                float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(false), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
                     return L;
@@ -156,7 +156,7 @@ namespace tracer
             }
 
             Spectrum Li(0.f);
-            Ray lightTestRay = isec.SpawnRay(wi);
+            Ray3f lightTestRay = isec.SpawnRay(wi).Ray;
             SurfaceInteraction lightIsec;
 
             if (light->GetFlags() & LightFlags::Infinite)
