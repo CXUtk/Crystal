@@ -100,7 +100,7 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 3, 2, -6 ],
+                        "Translation": [ 3, 3, -6 ],
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
@@ -113,7 +113,7 @@
                             "Ks": "constants:pure/White",
                             "Tf": "constants:pure/White",
                             "Roughness": "constants:pure/OneTenth",
-                            "IOR": 1.5,
+                            "IOR": 1.33,
                             "Kd": "constants:pure/White",
                             "K": [ 3.068, 2.54, 1.904 ]
                         }
@@ -146,7 +146,7 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 0, 3, -10 ],
+                        "Translation": [ 2, 10, -6 ],
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
@@ -165,7 +165,7 @@
                     "Setting": {
                         "Type": "DiffuseAreaLight",
                         "Data": {
-                            "LEmit": [ 10, 10, 10 ],
+                            "LEmit": [ 100, 100, 100 ],
                             "NumSamples": 1
                         }
                     }

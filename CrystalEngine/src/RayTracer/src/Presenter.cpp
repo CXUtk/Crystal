@@ -68,7 +68,7 @@ namespace tracer
         RenderProperties renderprops = {};
         renderprops.FrameBufferSize = window->GetWindowSize();
         renderprops.Gamma = 2.2;
-        renderprops.SampleCount = 17 * 17;
+        renderprops.SampleCount = 64;
         renderprops.NumOfThreads = 12;
 
         Transform transform;
