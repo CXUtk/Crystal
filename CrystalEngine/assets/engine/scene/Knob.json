@@ -75,11 +75,23 @@
                 {
                     "Type": "MaterialComponent",
                     "Setting": {
-                        "Type": "Plastic",
+                        "Type": "Glass",
                         "Data": {
+                            "Ks": "constants:pure/White",
+                            "Tf": "constants:pure/White",
                             "Kd": "constants:pure/White",
                             "Roughness": "constants:pure/Half",
                             "IOR": 1.5
+                        }
+                    }
+                },
+                {
+                    "Type": "MediumComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 10, 10, 10 ],
+                            "NumSamples": 1
                         }
                     }
                 }
@@ -146,7 +158,7 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 2, 10, -6 ],
+                        "Translation": [ 0, 3, -10 ],
                         "Scale": [ 1, 1, 1 ],
                         "Rotation": [ 0, 0, 0, 1 ]
                     }
@@ -165,7 +177,7 @@
                     "Setting": {
                         "Type": "DiffuseAreaLight",
                         "Data": {
-                            "LEmit": [ 100, 100, 100 ],
+                            "LEmit": [ 5, 5, 5 ],
                             "NumSamples": 1
                         }
                     }

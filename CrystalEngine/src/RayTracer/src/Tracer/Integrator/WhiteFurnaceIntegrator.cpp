@@ -10,80 +10,15 @@ namespace tracer
     static constexpr float EPS = 1e-4;
 
     WhiteFurnaceIntegrator::WhiteFurnaceIntegrator(const std::shared_ptr<Sampler>& sampler,
-		int threads) : SamplerIntegrator(sampler, threads)
-	{}
+        int threads) : SamplerIntegrator(sampler, threads)
+    {}
 
-    Spectrum WhiteFurnaceIntegrator::Evaluate(const RayTr& ray, const RayScene * scene, Sampler * sampler)
+    Spectrum WhiteFurnaceIntegrator::Evaluate(const RayTr& ray, const RayScene* scene, Sampler* sampler)
     {
         return eval_rec(ray, scene, sampler, 0, true);
     }
 
-	Spectrum WhiteFurnaceIntegrator::eval_rec(const RayTr& ray, const RayScene* scene, Sampler* sampler,
-		int level, bool specular)
-	{
-		Spectrum L(0.f);
-
-		SurfaceInteraction isec;
-		if (!scene->Intersect(ray.Ray, &isec))
-		{
-            return scene->GetEnvironmentLight(ray.Ray.Dir());
-		}
-
-		// Get emitted radiance from hit surface to such direction
-		L += isec.Le(-ray.Ray.Dir());
-
-		isec.SetBSDF(std::make_shared<BSDF>(&isec));
-		isec.GetMaterial()->ComputeScatteringFunctions(&isec, true);
-
-		L += UniformSampleAllLights(isec, scene, sampler);
-
-        // Do one bsdf test
-        Vector3f wo = -ray.Ray.Dir();
-        Normal3f N = isec.GetInteractionNormal();
-        Vector3f wIn;
-        float pdf;
-        BxDFType bxdfType;
-        auto brdf = isec.GetBSDF()->SampleDirection(sampler->Get1D(), sampler->Get2D(), wo, &wIn,
-            &pdf, BxDFType::BxDF_ALL, &bxdfType);
-        NAN_DETECT_V(brdf, "WhiteFurnaceIntegrator::BSDF");
-        INF_DETECT_V(brdf, "WhiteFurnaceIntegrator::BSDF");
-        if (std::abs(pdf) == 0.f || brdf == glm::vec3(0))
-        {
-            return L;
-        }
-
-        bool specularPath = (bxdfType & BxDFType::BxDF_SPECULAR);
-        bool transmission = (bxdfType & BxDFType::BxDF_TRANSMISSION);
-        auto cosine = std::max(0.f, transmission ? glm::dot(-N, wIn) : glm::dot(N, wIn));
-
-        Ray3f nextRay = isec.SpawnRay(wIn).Ray;
-
-        Spectrum beta = Spectrum(1.f);
-
-        if (specularPath)
-        {
-            L += brdf * scene->GetEnvironmentLight(nextRay.Dir());
-        }
-		return L;
-	}
-
-    Spectrum WhiteFurnaceIntegrator::UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene,
-        Sampler* sampler)
-    {
-        Spectrum L(0.f);
-        // One sample for each light
-        Vector2f sampleLight = sampler->Get2D();
-        Vector2f sampleBSDF = sampler->Get2D();
-        scene->ForEachLights([&](const crystal::Light* light) {
-            if (light->Flux() == Spectrum(0.f)) return;
-            L += EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler);
-        });
-        return L;
-    }
-
-    Spectrum WhiteFurnaceIntegrator::EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
-        const Vector2f& sampleLight, const Vector2f& sampleBSDF,
-        const crystal::Light* light, Sampler* sampler)
+    Spectrum WhiteFurnaceIntegrator::EsimateDirect_NoTest(const SurfaceInteraction& isec, const RayScene* scene, const Vector2f& sampleLight, const Vector2f& sampleBSDF, const crystal::Light* light, Sampler* sampler)
     {
         Spectrum L(0.f);
 
@@ -171,6 +106,55 @@ namespace tracer
 
             NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
             INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
+        }
+        return L;
+    }
+
+    Spectrum WhiteFurnaceIntegrator::eval_rec(const RayTr& ray, const RayScene* scene, Sampler* sampler,
+        int level, bool specular)
+    {
+        Spectrum L(0.f);
+
+        SurfaceInteraction isec;
+        if (!scene->Intersect(ray.Ray, &isec))
+        {
+            return scene->GetEnvironmentLight(ray.Ray.Dir());
+        }
+
+        // Get emitted radiance from hit surface to such direction
+        L += isec.Le(-ray.Ray.Dir());
+
+        isec.SetBSDF(std::make_shared<BSDF>(&isec));
+        isec.GetMaterial()->ComputeScatteringFunctions(&isec, true);
+
+        L += UniformSampleAllLights(isec, scene, sampler, false);
+
+        // Do one bsdf test
+        Vector3f wo = -ray.Ray.Dir();
+        Normal3f N = isec.GetInteractionNormal();
+        Vector3f wIn;
+        float pdf;
+        BxDFType bxdfType;
+        auto brdf = isec.GetBSDF()->SampleDirection(sampler->Get1D(), sampler->Get2D(), wo, &wIn,
+            &pdf, BxDFType::BxDF_ALL, &bxdfType);
+        NAN_DETECT_V(brdf, "WhiteFurnaceIntegrator::BSDF");
+        INF_DETECT_V(brdf, "WhiteFurnaceIntegrator::BSDF");
+        if (std::abs(pdf) == 0.f || brdf == glm::vec3(0))
+        {
+            return L;
+        }
+
+        bool specularPath = (bxdfType & BxDFType::BxDF_SPECULAR);
+        bool transmission = (bxdfType & BxDFType::BxDF_TRANSMISSION);
+        auto cosine = std::max(0.f, transmission ? glm::dot(-N, wIn) : glm::dot(N, wIn));
+
+        Ray3f nextRay = isec.SpawnRay(wIn).Ray;
+
+        Spectrum beta = Spectrum(1.f);
+
+        if (specularPath)
+        {
+            L += brdf * scene->GetEnvironmentLight(nextRay.Dir());
         }
         return L;
     }

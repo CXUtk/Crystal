@@ -72,12 +72,12 @@ namespace tracer
         renderprops.NumOfThreads = 8;
 
         Transform transform;
-        //renderprops.EnvironmentLight = std::make_shared<SphereEnvironmentLight>(transform,
-        //    std::make_shared<CPUTexture2DPure>(Spectrum(std::pow(0.5f, 2.2f))));
-
-        auto t = assetManager->LoadAsset<CPUTexture2D>("engine:Environment/DiningRoom");
         renderprops.EnvironmentLight = std::make_shared<SphereEnvironmentLight>(transform,
-            t);
+            std::make_shared<CPUTexture2DPure>(Spectrum(std::pow(0.8f, 2.2f))));
+
+        //auto t = assetManager->LoadAsset<CPUTexture2D>("engine:Environment/DiningRoom");
+        //renderprops.EnvironmentLight = std::make_shared<SphereEnvironmentLight>(transform,
+        //    t);
 
 
         scene->Initialize();

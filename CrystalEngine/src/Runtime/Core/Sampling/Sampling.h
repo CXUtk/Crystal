@@ -188,7 +188,9 @@ namespace crystal
 
     inline void FixVector(Vector3f& vector)
     {
-        vector = glm::clamp(vector, Vector3f(-1.0), Vector3f(1.0));
+        vector.x = std::clamp(vector.x, -1.0f, 1.0f);
+        vector.y = std::clamp(vector.y, -1.0f, 1.0f);
+        vector.z = std::clamp(vector.z, -1.0f, 1.0f);
     }
 
     inline float PowerHeuristic(int nf, float fPdf, int ng, float gPdf)

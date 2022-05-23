@@ -19,6 +19,15 @@ namespace tracer
         virtual Spectrum Evaluate(const RayTr& ray, const RayScene* scene,
             Sampler* sampler) = 0;
 
+    protected:
+        Spectrum UniformSampleAllLights(const InteractionInfo& it, const RayScene* scene, Sampler* sampler, bool handleMedium);
+        Spectrum UniformSampleOneLight(const InteractionInfo& it, const RayScene* scene, Sampler* sampler, bool handleMedium);
+        Spectrum EsimateDirect(const InteractionInfo& it, const RayScene* scene,
+            const Vector2f& sampleLight, const Vector2f& sampleBSDF,
+            const crystal::Light* light, Sampler* sampler, bool handleMedium);
+
+        Spectrum TraceLi(const RayScene* scene, const InteractionInfo& it, const Point3f& lightPos);
+
     private:
         std::shared_ptr<Sampler> m_sampler = nullptr;
         std::shared_ptr<FixedThreadPool> m_threadPool = nullptr;

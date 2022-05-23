@@ -37,7 +37,7 @@ namespace crystal
             dist = distance;
         }
 
-        Spectrum tr = glm::exp(-(std::min(dist, std::numeric_limits<Float>::max()) * sigmaT));
+        Spectrum tr = glm::exp(-sigmaT * glm::min(dist, std::numeric_limits<Float>::max()));
 
         if (sampledMedium)
         {

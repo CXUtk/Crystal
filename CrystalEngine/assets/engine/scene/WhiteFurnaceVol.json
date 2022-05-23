@@ -1,0 +1,72 @@
+{
+    "Objects": [
+        {
+            "Name": "Camera",
+            "Components": [
+                {
+                    "Type": "CameraComponent",
+                    "Setting": {
+                        "Type": "Perspective",
+                        "Data": {
+                            "FovY": 1.04719753,
+                            "Aspect": 1.33333,
+                            "ZNear": 0,
+                            "ZFar": 100
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 5, -15 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0.995133340, 0.0985376164, 0 ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "KnobObject1",
+            "Components": [
+                {
+                    "Type": "ShapeComponent",
+                    "Setting": {
+                        "Type": "Sphere",
+                        "Data": {
+                            "Radius": 2
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 0.5, 0.5, -0.5 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Null",
+                        "Data": {
+                            "Kd": "constants:pure/White",
+                            "Roughness": "constants:pure/OneTenth",
+                            "IOR": 1.5
+                        }
+                    }
+                },
+                {
+                    "Type": "MediumComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 10, 10, 10 ],
+                            "NumSamples": 1
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

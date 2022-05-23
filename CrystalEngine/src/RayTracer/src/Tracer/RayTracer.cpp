@@ -36,8 +36,8 @@ namespace tracer
 
         int sqrtSPP = (int)std::sqrt(renderProps.SampleCount);
         /*auto sampler = std::make_shared<DefaultSampler>(renderProps.SampleCount);*/
-        auto sampler = std::make_shared<StratifiedSampler>(Point2i(sqrtSPP, sqrtSPP), 10);
-        m_integrator = std::make_shared<VolumePTIntegrator>(sampler, renderProps.NumOfThreads, 10);
+        auto sampler = std::make_shared<StratifiedSampler>(Point2i(sqrtSPP, sqrtSPP), 12);
+        m_integrator = std::make_shared<VolumePTIntegrator>(sampler, renderProps.NumOfThreads, 12);
         //m_integrator = std::make_shared<WhiteFurnaceIntegrator>(sampler, renderProps.NumOfThreads);
 
         m_integrator->Render(cptr(m_rayScene), camera, ptr(m_frameBuffer));

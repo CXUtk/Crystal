@@ -7,6 +7,7 @@ namespace crystal
 {
     enum class MaterialType
     {
+        Null,
         Lambertian,
         Glass,
         Mirror,
@@ -131,6 +132,7 @@ struct SRefl::EnumInfo<crystal::MaterialType>
     constexpr static auto _ENUMLIST()
     {
         return std::make_tuple(
+            SREFL_ENUM_TERM(Null),
             SREFL_ENUM_TERM(Lambertian),
             SREFL_ENUM_TERM(Glass),
             SREFL_ENUM_TERM(Mirror),
@@ -138,7 +140,7 @@ struct SRefl::EnumInfo<crystal::MaterialType>
             SREFL_ENUM_TERM(Metal)
         );
     }
-#define LISTFUNC(F) F(Lambertian) F(Glass) F(Mirror) F(Plastic) F(Metal)
+#define LISTFUNC(F) F(Null) F(Lambertian) F(Glass) F(Mirror) F(Plastic) F(Metal)
     GENERATE_ENUM_MAPPING(crystal::MaterialType, LISTFUNC)
 #undef LISTFUNC
 };

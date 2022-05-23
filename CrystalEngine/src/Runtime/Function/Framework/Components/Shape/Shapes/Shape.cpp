@@ -8,5 +8,6 @@ float Shape::PdfLight(const SurfaceGeometryInfo& ref, const Vector3f& wi) const
 
     Float cosTheta = std::max(0.f, glm::dot(-glm::normalize(wi),
         isec_l.GetInteractionNormal()));
-	return glm::length2(wi) / (cosTheta * SurfaceArea());
+    Float d = isec_l.GetDistance() * glm::length(wi);
+	return  d * d / (cosTheta * SurfaceArea());
 }

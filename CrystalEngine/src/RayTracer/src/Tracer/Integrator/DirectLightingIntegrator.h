@@ -18,9 +18,5 @@ namespace tracer
         int m_maxDepth{};
 
         Spectrum eval_rec(const RayTr& ray, const RayScene* scene, Sampler* sampler, int level, bool specular);
-        Spectrum UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene, Sampler* sampler);
-        Spectrum EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
-            const Vector2f& sampleLight, const Vector2f& sampleBSDF,
-            const crystal::Light* light, Sampler* sampler);
     };
 }

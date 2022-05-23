@@ -21,6 +21,10 @@ namespace crystal
         auto& params = setting["Data"];
         switch (type)
         {
+        case crystal::MaterialType::Null:
+        {
+            return nullptr;
+        }
         case crystal::MaterialType::Lambertian:
         {
             auto settings = SJson::de_serialize<LambertianMaterialSettings>(params);

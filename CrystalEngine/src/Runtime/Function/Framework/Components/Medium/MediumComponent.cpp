@@ -15,13 +15,13 @@ namespace crystal
     {
         // Treat as null medium when no parameter was passed
 
-            m_mediumIn = std::make_shared<HomogeneousMedium>(Spectrum(0.10014, 0.16503, 0.2468) * 6.f,
-                Spectrum(8.9053e-05, 8.372e-05, 0) * 10.f, 0.7f);
-        //m_mediumIn = std::make_shared<HomogeneousMedium>(Spectrum(0.01, 0.5, 0.5),
-        //        Spectrum(0.6), -0.7f);
-            m_mediumInterface.Inside = m_mediumIn.get();
-            return;
-        
+        m_mediumIn = std::make_shared<HomogeneousMedium>(Spectrum(0.10014, 0.16503, 0.2468) * 5.f,
+            Spectrum(8.9053e-05, 8.372e-05, 0) * 5.f, 0.7f);
+        //m_mediumIn = std::make_shared<HomogeneousMedium>(Spectrum(0.01449, 0.05796, 0.075823) * 5.f,
+        //        Spectrum(0.00015671, 0.00015947, 1.518e-05), -0.01f);
+        m_mediumInterface.Inside = m_mediumIn.get();
+        return;
+
         MediumType type = SRefl::EnumInfo<crystal::MediumType>::string_to_enum(m_setting["Type"].Get<std::string>());
         auto& params = m_setting["Data"];
         switch (type)
@@ -43,9 +43,9 @@ namespace crystal
         }
     }
 
-    void MediumComponent::Update(const GameTimer & gameTimer)
+    void MediumComponent::Update(const GameTimer& gameTimer)
     {}
 
-    void MediumComponent::Draw(const GameTimer & gameTimer)
+    void MediumComponent::Draw(const GameTimer& gameTimer)
     {}
 }

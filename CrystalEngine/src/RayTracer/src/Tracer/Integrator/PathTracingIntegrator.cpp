@@ -52,6 +52,12 @@ namespace tracer
                 break;
             }
 
+            if (!isec.GetMaterial())
+            {
+                currentRay = isec.SpawnRay(currentRay.Ray.Dir());
+                continue;
+            }
+
             isec.SetBSDF(std::make_shared<BSDF>(&isec));
             isec.GetMaterial()->ComputeScatteringFunctions(&isec, true);
 
@@ -64,7 +70,7 @@ namespace tracer
             }
 
             // 计算从光源采样的radiance
-            L += beta * UniformSampleAllLights(isec, scene, sampler);
+            L += beta * UniformSampleAllLights(isec, scene, sampler, false);
             NAN_DETECT_V(L, "PathTracingIntegrator::L::UniformSampleAllLights");
             INF_DETECT_V(L, "PathTracingIntegrator::L::UniformSampleAllLights");
 
@@ -117,152 +123,6 @@ namespace tracer
             NAN_DETECT_V(beta, "PathTracingIntegrator::beta");
             INF_DETECT_V(beta, "PathTracingIntegrator::beta");
         }
-        return L;
-    }
-
-	Spectrum PathTracingIntegrator::UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene,
-        Sampler* sampler)
-	{
-        Spectrum L(0.f);
-        // One sample for each light
-        Vector2f sampleLight = sampler->Get2D();
-        Vector2f sampleBSDF = sampler->Get2D();
-        scene->ForEachLights([&](const crystal::Light* light) {
-            if (light->Flux() == Spectrum(0.f)) return;
-            L += EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler);
-        });
-        return L;
-	}
-
-    Spectrum PathTracingIntegrator::UniformSampleOneLight(const SurfaceInteraction& isec,
-        const RayScene* scene, Sampler* sampler)
-    {
-        Float u = sampler->Get1D();
-        Vector2f sampleLight = sampler->Get2D();
-        Vector2f sampleBSDF = sampler->Get2D();
-
-        Float pdf, remapped;
-        auto light = scene->SampleOneLight(u, &pdf, &remapped);
-        return EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler) / pdf;
-    }
-
-    Spectrum PathTracingIntegrator::EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
-        const Vector2f& sampleLight, const Vector2f& sampleBSDF,
-        const crystal::Light* light, Sampler* sampler)
-    {
-        Spectrum L(0.f);
-
-        if (light->Flux() == Spectrum(0.f))
-        {
-            return L;
-        }
-
-        BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
-        Point3f P = isec.GetPosition();
-        Normal3f N = isec.GetInteractionNormal();
-        Vector3f wOut = isec.ToLocalCoordinate(isec.GetW_Out());
-
-        auto bsdf = isec.GetBSDF();
-
-        // Sample light source with MIS (Specular BSDF will not have value)
-        {
-            Point3f lightPos;
-            float pdf_light;
-            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(), sampleLight, &lightPos, &pdf_light);
-
-            Vector3f wIn = isec.ToLocalCoordinate(glm::normalize(lightPos - P));
-            float NdotL = std::max(0.f, wIn.y);
-            if (pdf_light != 0.f && !std::isinf(pdf_light)
-                && Li_light != Spectrum(0.f) && NdotL != 0.f)
-            {
-                Spectrum f = bsdf->DistributionFunction(wOut, wIn);
-                float pdf_bsdf = bsdf->Pdf(wOut, wIn, bsdfSampleType);
-                if (f != Spectrum(0.f))
-                {
-                    if (scene->IntersectTest(isec.SpawnRayTo(lightPos).Ray, 0, 1.f - EPS))
-                    {
-                        Li_light = Spectrum(0.f);
-                    }
-
-                    if (Li_light != Spectrum(0.f))
-                    {
-                        if (light->IsDeltaLight())
-                        {
-                            L += f * Li_light * NdotL / pdf_light;
-                        }
-                        else
-                        {
-                            L += f * Li_light * NdotL * PowerHeuristic(1, pdf_light, 1, pdf_bsdf) / pdf_light;
-                        }
-                    }
-                }
-
-                NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::Light");
-                INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::Light");
-            }
-        }
-
-        // Sample BSDF (Delta light should not have any value in BSDF sample)
-        if (!light->IsDeltaLight())
-        {
-            float pdf_bsdf = 0.f;
-            BxDFType sampledType;
-            Vector3f wIn;
-            Spectrum f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wOut, &wIn,
-                &pdf_bsdf, bsdfSampleType, &sampledType);
-            float NdotL = std::max(0.f, wIn.y);
-
-            Vector3f wi = isec.ToWorldCoordinate(wIn);
-
-            if (f == Spectrum(0.f) || pdf_bsdf == 0.f || NdotL == 0.f)
-            {
-                return L;
-            }
-            bool specularBSDF = sampledType & BxDFType::BxDF_SPECULAR;
-
-            float weight = 1.0f;
-            if (!specularBSDF)
-            {
-                Float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(), wi);
-                if (pdf_light == 0.f || f == Spectrum(0.f))
-                {
-                    return L;
-                }
-                weight = PowerHeuristic(1, pdf_bsdf, 1, pdf_light);
-            }
-
-            Spectrum Li(0.f);
-            Ray3f lightTestRay = isec.SpawnRay(wi).Ray;
-            SurfaceInteraction lightIsec;
-
-            if (light->GetFlags() & LightFlags::Area)
-            {
-                if (scene->Intersect(lightTestRay, &lightIsec)
-                    && lightIsec.GetHitPrimitive()->GetAreaLight() == light)
-                {
-                    Li = lightIsec.Le(-wi);
-                }
-                else
-                {
-                    Li = light->Le(wi);
-                }
-            }
-            else if (light->GetFlags() & LightFlags::Infinite)
-            {
-                if (!scene->IntersectTest(lightTestRay, 0, std::numeric_limits<float>::infinity()))
-                {
-                    Li = light->Le(wi);
-                }
-            }
-
-            if (Li != Spectrum(0.f))
-            {
-                L += Li * bsdf->CalculateBSDFNoLDivideByPdf(wOut, wIn, sampledType) * weight;
-            }
-        }
-
-        NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
-        INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
         return L;
     }
 }

@@ -25,7 +25,7 @@ namespace crystal
         auto roughness = m_roughness->Sample(isec->GetTexCoord());
         auto distribution = std::make_shared<GGXDistribution>(Vector2f(roughness.x, roughness.y));
         isec->GetBSDF()->AddBxDF(std::make_shared<AshikhminShirley>(baseColor,
-            Spectrum(24.f), distribution));
+            Spectrum(1.f), distribution));
         //isec->GetBSDF()->AddBxDF(std::make_shared<Neumann>(baseColor, std::pow(1.0f - roughness.x, 4) * 256));
     }
 }
