@@ -17,10 +17,10 @@ namespace crystal
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
         float SurfaceArea() const override;
 
-        InteractionGeometryInfo SampleSurfaceArea(const Vector2f& sample) const override;
+        SurfaceGeometryInfo SampleSurfaceArea(const Vector2f& sample) const override;
         // 采样目标点为半球的立体角
-        InteractionGeometryInfo SampleSurfaceLight(const Vector2f& sample,
-            const InteractionGeometryInfo& ref) const override;
+        SurfaceGeometryInfo SampleSurfaceLight(const Vector2f& sample,
+            const SurfaceGeometryInfo& ref) const override;
 
     private:
         const MeshVertexData*   m_vertices[3];

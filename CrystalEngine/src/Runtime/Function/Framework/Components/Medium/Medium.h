@@ -6,6 +6,8 @@
 #include <Core/Sampling/Sampler/Sampler.h>
 #include <Platform/RHI/Graphics/GraphicsCommon.h>
 
+#include "PhaseFunctions/PhaseFunction.h"
+
 namespace crystal
 {
     class MediumInteractionInfo;
@@ -16,6 +18,7 @@ namespace crystal
 
         virtual Spectrum Tr(const Ray3f& ray, Float t, Sampler* sampler) const = 0;
         virtual Spectrum Sample(const Ray3f& ray, Float t, Sampler* sampler, MediumInteractionInfo* mi) const = 0;
+        virtual const PhaseFunction* GetPhaseFunction() const = 0;
     };
 
     struct MediumInterface
@@ -28,7 +31,5 @@ namespace crystal
         MediumInterface(const Medium* inside, const Medium* outside) : Inside(inside), Outside(outside) {}
 
         bool IsMediumTransition() const { return Inside != Outside; }
-
-        static const MediumInterface* GetNullMedium();
     };
 }

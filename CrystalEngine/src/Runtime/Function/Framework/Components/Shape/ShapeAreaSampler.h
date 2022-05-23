@@ -15,11 +15,11 @@ namespace crystal
 
         virtual Float SurfaceArea() const override;
 
-        virtual InteractionGeometryInfo SampleSurfaceArea(const Vector2f& sample) const override;
-        virtual InteractionGeometryInfo SampleSurfaceLight(const InteractionGeometryInfo& ref, const Vector2f& sample) const override;
+        virtual SurfaceGeometryInfo SampleSurfaceArea(const Vector2f& sample) const override;
+        virtual SurfaceGeometryInfo SampleSurfaceLight(const SurfaceGeometryInfo& ref, const Vector2f& sample) const override;
 
-        virtual Float PdfArea(const InteractionGeometryInfo& surface_w) const override;
-        virtual Float PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const override;
+        virtual Float PdfArea(const SurfaceGeometryInfo& surface_w) const override;
+        virtual Float PdfLight(const SurfaceGeometryInfo& ref, const Vector3f& wi) const override;
         virtual bool Intersect(const Ray3f& ray, SurfaceInteraction* info) const override;
 
     private:

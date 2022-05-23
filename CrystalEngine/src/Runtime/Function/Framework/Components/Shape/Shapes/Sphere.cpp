@@ -66,7 +66,7 @@ namespace crystal
         auto dpdv = glm::normalize(glm::cross(N, dpdu));
         N = m_local2World * N;
         // Interaction normal
-        info->SetHitInfo(t, realHitPos, ray.Dir(), N, Point2f(phi * 0.5f, theta),
+        info->SetHitInfo(t, realHitPos, -ray.Dir(), N, Point2f(phi * 0.5f, theta),
             front_face, dpdu, dpdv);
 
         if (std::isinf(t) || std::isnan(t))
@@ -106,14 +106,14 @@ namespace crystal
         return 4 * glm::pi<float>() * m_radius * m_radius;
     }
 
-    InteractionGeometryInfo Sphere::SampleSurfaceArea(const Vector2f& sample) const
+    SurfaceGeometryInfo Sphere::SampleSurfaceArea(const Vector2f& sample) const
     {
         float p;
         auto dir = NextUnitSphere(sample, &p);
-        return InteractionGeometryInfo(m_position + dir * m_radius, dir);
+        return SurfaceGeometryInfo(m_position + dir * m_radius, dir);
     }
 
-    InteractionGeometryInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const InteractionGeometryInfo& ref) const
+    SurfaceGeometryInfo Sphere::SampleSurfaceLight(const Vector2f& sample, const SurfaceGeometryInfo& ref) const
     {
         auto dirToP = ref.GetPosition() - m_position;
         Float d2 = glm::length2(dirToP);
@@ -139,10 +139,10 @@ namespace crystal
 
         auto v = GetUnitVectorUsingCos(cosAlpha, phi);
         v = TNBOnLight * v;
-        return InteractionGeometryInfo(m_position + v * m_radius, glm::normalize(v));
+        return SurfaceGeometryInfo(m_position + v * m_radius, glm::normalize(v));
     }
 
-    float Sphere::PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const
+    float Sphere::PdfLight(const SurfaceGeometryInfo& ref, const Vector3f& wi) const
     {
         Float d2 = glm::length2(wi);
         if (d2 < m_radius * m_radius)

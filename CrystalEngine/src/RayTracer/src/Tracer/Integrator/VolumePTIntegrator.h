@@ -18,18 +18,13 @@ namespace tracer
 
         int m_maxDepth;
 
-        Spectrum UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene, Sampler* sampler, bool handleMedium);
-        Spectrum UniformSampleOneLight(const SurfaceInteraction& isec, const RayScene* scene, Sampler* sampler, bool handleMedium);
-        Spectrum UniformSampleOneLightMedium(const MediumInteractionInfo& mi, const RayScene* scene, Sampler* sampler);
-        Spectrum EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
+        Spectrum UniformSampleAllLights(const InteractionInfo& it, const RayScene* scene, Sampler* sampler, bool handleMedium);
+        Spectrum UniformSampleOneLight(const InteractionInfo& it, const RayScene* scene, Sampler* sampler, bool handleMedium);
+        Spectrum EsimateDirect(const InteractionInfo& it, const RayScene* scene,
             const Vector2f& sampleLight, const Vector2f& sampleBSDF,
             const crystal::Light* light, Sampler* sampler, bool handleMedium);
 
-        Spectrum EsimateDirectMedium(const MediumInteractionInfo& mi, const RayScene* scene,
-            const Vector2f& sampleLight, const Vector2f& sampleBSDF,
-            const crystal::Light* light, Sampler* sampler, bool handleMedium);
-
-        Spectrum TraceLi(const RayScene* scene, const SurfaceInteraction& isec, const Point3f& lightPos);
-        Spectrum TraceLiM(const RayScene* scene, const MediumInteractionInfo& mi, const Point3f& lightPos);
+        Spectrum TraceLi(const RayScene* scene, const InteractionInfo& it, const Point3f& lightPos);
+        //Spectrum TraceLiM(const RayScene* scene, const MediumInteractionInfo& mi, const Point3f& lightPos);
     };
 }

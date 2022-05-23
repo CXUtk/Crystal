@@ -32,7 +32,7 @@ namespace tracer
 
             Vector3f wo = -currentRay.Ray.Dir();
             Normal3f N = isec.GetInteractionNormal();
-            Point3f P = isec.GetHitPos();
+            Point3f P = isec.GetPosition();
 
             // 如果是自发光物体就把发光项加上
             if (lightPath)
@@ -158,9 +158,9 @@ namespace tracer
         }
 
         BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
-        Point3f P = isec.GetHitPos();
+        Point3f P = isec.GetPosition();
         Normal3f N = isec.GetInteractionNormal();
-        Vector3f wOut = isec.ToLocalCoordinate(-isec.GetHitDir());
+        Vector3f wOut = isec.ToLocalCoordinate(isec.GetW_Out());
 
         auto bsdf = isec.GetBSDF();
 
@@ -168,7 +168,7 @@ namespace tracer
         {
             Point3f lightPos;
             float pdf_light;
-            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(false), sampleLight, &lightPos, &pdf_light);
+            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(), sampleLight, &lightPos, &pdf_light);
 
             Vector3f wIn = isec.ToLocalCoordinate(glm::normalize(lightPos - P));
             float NdotL = std::max(0.f, wIn.y);
@@ -223,7 +223,7 @@ namespace tracer
             float weight = 1.0f;
             if (!specularBSDF)
             {
-                Float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(false), wi);
+                Float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
                     return L;

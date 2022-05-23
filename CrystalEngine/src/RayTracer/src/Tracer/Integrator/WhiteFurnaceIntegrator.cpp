@@ -40,7 +40,6 @@ namespace tracer
         // Do one bsdf test
         Vector3f wo = -ray.Ray.Dir();
         Normal3f N = isec.GetInteractionNormal();
-        Point3f P = isec.GetHitPos();
         Vector3f wIn;
         float pdf;
         BxDFType bxdfType;
@@ -89,9 +88,9 @@ namespace tracer
         Spectrum L(0.f);
 
         BxDFType sampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
-        Point3f P = isec.GetHitPos();
+        Point3f P = isec.GetPosition();
         Normal3f N = isec.GetInteractionNormal();
-        Vector3f wo = -isec.GetHitDir();
+        Vector3f wOut = isec.ToLocalCoordinate(isec.GetW_Out());
 
         auto bsdf = isec.GetBSDF();
 
@@ -99,14 +98,14 @@ namespace tracer
         {
             Point3f lightPos;
             float pdf_light;
-            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(false), sampleLight, &lightPos, &pdf_light);
+            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(), sampleLight, &lightPos, &pdf_light);
 
-            Vector3f wi = glm::normalize(lightPos - P);
-            float NdotL = std::max(0.f, glm::dot(N, wi));
+            Vector3f wIn = isec.ToLocalCoordinate(glm::normalize(lightPos - P));
+            float NdotL = std::max(0.f, wIn.y);
             if (pdf_light != 0.f && !std::isinf(pdf_light) && Li_light != Spectrum(0.f) && NdotL != 0.f)
             {
-                Spectrum f = bsdf->DistributionFunction(wo, wi);
-                float pdf_bsdf = bsdf->Pdf(wo, wi, sampleType);
+                Spectrum f = bsdf->DistributionFunction(wOut, wIn);
+                float pdf_bsdf = bsdf->Pdf(wOut, wIn, sampleType);
                 if (f != Spectrum(0.f))
                 {
                     if (Li_light != Spectrum(0.f))
@@ -132,10 +131,11 @@ namespace tracer
         {
             float pdf_bsdf = 0.f;
             BxDFType sampledType;
-            Vector3f wi;
-            Spectrum f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wo, &wi,
+            Vector3f wIn;
+            Spectrum f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wOut, &wIn,
                 &pdf_bsdf, sampleType, &sampledType);
-            float NdotL = std::max(0.f, glm::dot(N, wi));
+            float NdotL = std::max(0.f, wIn.y);
+            Vector3f wi = isec.ToWorldCoordinate(wIn);
 
             if (f == Spectrum(0.f) || pdf_bsdf == 0.f || NdotL == 0.f)
             {
@@ -147,7 +147,7 @@ namespace tracer
             if (!specularBSDF)
             {
                 f *= NdotL;
-                float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(false), wi);
+                float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
                     return L;

@@ -11,6 +11,7 @@ namespace crystal
 
         virtual Spectrum Tr(const Ray3f& ray, Float t, Sampler* sampler) const override;
         virtual Spectrum Sample(const Ray3f& ray, Float t, Sampler* sampler, MediumInteractionInfo* mi) const override;
+        virtual const PhaseFunction* GetPhaseFunction() const override { return cptr(m_phaseFunction); }
 
     private:
         Spectrum    m_sigmaA{}, m_sigmaS{};

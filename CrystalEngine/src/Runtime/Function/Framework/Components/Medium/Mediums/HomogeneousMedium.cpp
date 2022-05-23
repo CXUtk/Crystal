@@ -42,7 +42,7 @@ namespace crystal
         if (sampledMedium)
         {
             *mi = MediumInteractionInfo(ray.Eval(dist / glm::length(ray.Dir())), -glm::normalize(ray.Dir()),
-                this, m_phaseFunction.get());
+                this);
         }
 
         Spectrum density = sampledMedium ? (sigmaT * tr) : tr;

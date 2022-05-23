@@ -1,6 +1,6 @@
 #include "Shape.h"
 
-float Shape::PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const
+float Shape::PdfLight(const SurfaceGeometryInfo& ref, const Vector3f& wi) const
 {
 	Ray3f ray = ref.SpawnRay(wi);
 	SurfaceInteraction isec_l;

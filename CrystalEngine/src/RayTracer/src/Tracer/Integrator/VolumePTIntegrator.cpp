@@ -43,19 +43,19 @@ namespace tracer
 
             Vector3f wo = -currentRay.Ray.Dir();
             Normal3f N = isec.GetInteractionNormal();
-            Point3f P = isec.GetHitPos();
+            Point3f P = isec.GetPosition();
 
             // If sampled to a medium
             if (mi.GetMedium())
             {
                 // Handle scattering at point in medium for volumetric path tracer
-                L += beta * UniformSampleOneLightMedium(mi, scene, sampler);
+                L += beta * UniformSampleOneLight(mi, scene, sampler, true);
                 NAN_DETECT_V(L, "VolumePTIntegrator::L::MediumPath");
                 INF_DETECT_V(L, "VolumePTIntegrator::L::MediumPath");
 
                 Vector3f wo = -currentRay.Ray.Dir(), wi;
                 mi.GetPhaseFunction()->Sample_p(wo, &wi, sampler->Get2D());
-                currentRay = mi.SpawnRayTr(wi);
+                currentRay = mi.SpawnRay(wi);
                 lightPath = false;
             }
             else
@@ -134,7 +134,7 @@ namespace tracer
         return L;
     }
 
-	Spectrum VolumePTIntegrator::UniformSampleAllLights(const SurfaceInteraction& isec, const RayScene* scene,
+	Spectrum VolumePTIntegrator::UniformSampleAllLights(const InteractionInfo& it, const RayScene* scene,
         Sampler* sampler, bool handleMedium)
 	{
         Spectrum L(0.f);
@@ -143,12 +143,12 @@ namespace tracer
         Vector2f sampleBSDF = sampler->Get2D();
         scene->ForEachLights([&](const crystal::Light* light) {
             if (light->Flux() == Spectrum(0.f)) return;
-            L += EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler, handleMedium);
+            L += EsimateDirect(it, scene, sampleLight, sampleBSDF, light, sampler, handleMedium);
         });
         return L;
 	}
 
-    Spectrum VolumePTIntegrator::UniformSampleOneLight(const SurfaceInteraction& isec,
+    Spectrum VolumePTIntegrator::UniformSampleOneLight(const InteractionInfo& it,
         const RayScene* scene, Sampler* sampler, bool handleMedium)
     {
         Float u = sampler->Get1D();
@@ -157,60 +157,56 @@ namespace tracer
 
         Float pdf, remapped;
         auto light = scene->SampleOneLight(u, &pdf, &remapped);
-        return EsimateDirect(isec, scene, sampleLight, sampleBSDF, light, sampler, handleMedium) / pdf;
+        return EsimateDirect(it, scene, sampleLight, sampleBSDF, light, sampler, handleMedium) / pdf;
     }
 
-    Spectrum VolumePTIntegrator::UniformSampleOneLightMedium(const MediumInteractionInfo& mi, const RayScene* scene, Sampler* sampler)
-    {
-        Float u = sampler->Get1D();
-        Vector2f sampleLight = sampler->Get2D();
-        Vector2f sampleBSDF = sampler->Get2D();
-
-        Float pdf, remapped;
-        auto light = scene->SampleOneLight(u, &pdf, &remapped);
-        return EsimateDirectMedium(mi, scene, sampleLight, sampleBSDF, light, sampler, true) / pdf;
-    }
-
-    Spectrum VolumePTIntegrator::EsimateDirect(const SurfaceInteraction& isec, const RayScene* scene,
+    Spectrum VolumePTIntegrator::EsimateDirect(const InteractionInfo& it, const RayScene* scene,
         const Vector2f& sampleLight, const Vector2f& sampleBSDF,
         const crystal::Light* light, Sampler* sampler, bool handleMedium)
     {
         Spectrum L(0.f);
-
-        if (light->Flux() == Spectrum(0.f))
-        {
-            return L;
-        }
-
         BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
-        Point3f P = isec.GetHitPos();
-        Normal3f N = isec.GetInteractionNormal();
-        Vector3f wOut = isec.ToLocalCoordinate(-isec.GetHitDir());
-
-        auto bsdf = isec.GetBSDF();
+        Vector3f wOut = it.ToLocalCoordinate(it.GetW_Out());
+        Point3f P = it.GetPosition();
 
         // Sample light source with MIS (Specular BSDF will not have value)
         {
             Point3f lightPos;
             float pdf_light;
-            auto Li_light = light->Sample_Li(isec.GetGeometryInfo(false), sampleLight, &lightPos, &pdf_light);
-
-            Vector3f wIn = isec.ToLocalCoordinate(glm::normalize(lightPos - P));
-            float NdotL = std::max(0.f, wIn.y);
-            if (pdf_light != 0.f && !std::isinf(pdf_light)
-                && Li_light != Spectrum(0.f) && NdotL != 0.f)
+            auto Li_light = light->Sample_Li(it.GetGeometryInfo(), sampleLight,
+                &lightPos, &pdf_light);
+            Vector3f wIn = it.ToLocalCoordinate(glm::normalize(lightPos - P));
+            
+            if (pdf_light != 0.f && !std::isinf(pdf_light) && Li_light != Spectrum(0.f))
             {
-                Spectrum f = bsdf->DistributionFunction(wOut, wIn);
-                float pdf_bsdf = bsdf->Pdf(wOut, wIn, bsdfSampleType);
+                Spectrum f;
+                Float pdf_bsdf;
+                if (it.IsSurfaceInteraction())
+                {
+                    const SurfaceInteraction& isec = dynamic_cast<const SurfaceInteraction&>(it);
+                    auto bsdf = isec.GetBSDF();
+
+                    // For surface interaction, we need to account surface radiance
+                    f = bsdf->DistributionFunction(wOut, wIn) * std::abs(wIn.y);
+                    pdf_bsdf = bsdf->Pdf(wOut, wIn, bsdfSampleType);
+                }
+                else
+                {
+                    const MediumInteractionInfo& mi = dynamic_cast<const MediumInteractionInfo&>(it);
+                    auto phase = mi.GetPhaseFunction();
+                    f = phase->Pdf(wOut, wIn);
+                    pdf_bsdf = phase->Pdf(wOut, wIn).x;
+                }
+
                 if (f != Spectrum(0.f))
                 {
                     if (handleMedium)
                     {
-                        Li_light *= TraceLi(scene, isec, lightPos);
+                        Li_light *= TraceLi(scene, it, lightPos);
                     }
                     else
                     {
-                        if (scene->IntersectTest(isec.SpawnRayTo(lightPos).Ray, 0, 1.f - EPS))
+                        if (scene->IntersectTest(it.SpawnRayTo(lightPos).Ray, 0, 1.f - EPS))
                         {
                             Li_light = Spectrum(0.f);
                         }
@@ -220,11 +216,11 @@ namespace tracer
                     {
                         if (light->IsDeltaLight())
                         {
-                            L += f * Li_light * NdotL / pdf_light;
+                            L += f * Li_light / pdf_light;
                         }
                         else
                         {
-                            L += f * Li_light * NdotL * PowerHeuristic(1, pdf_light, 1, pdf_bsdf) / pdf_light;
+                            L += f * Li_light * PowerHeuristic(1, pdf_light, 1, pdf_bsdf) / pdf_light;
                         }
                     }
                 }
@@ -238,24 +234,35 @@ namespace tracer
         if (!light->IsDeltaLight())
         {
             float pdf_bsdf = 0.f;
-            BxDFType sampledType;
             Vector3f wIn;
-            Spectrum f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wOut, &wIn,
-                &pdf_bsdf, bsdfSampleType, &sampledType);
-            float NdotL = std::max(0.f, wIn.y);
-
-            Vector3f wi = isec.ToWorldCoordinate(wIn);
-
-            if (f == Spectrum(0.f) || pdf_bsdf == 0.f || NdotL == 0.f)
+            Spectrum f;
+            BxDFType sampledType;
+            bool sampledSpecular = false;
+            if (it.IsSurfaceInteraction())
+            {
+                const SurfaceInteraction& isec = dynamic_cast<const SurfaceInteraction&>(it);
+                auto bsdf = isec.GetBSDF();
+                f = bsdf->SampleDirection(sampler->Get1D(), sampleBSDF, wOut, &wIn,
+                    &pdf_bsdf, bsdfSampleType, &sampledType) * std::abs(wIn.y);
+                sampledSpecular = sampledType & BxDFType::BxDF_SPECULAR;
+            }
+            else
+            {
+                const MediumInteractionInfo& mi = dynamic_cast<const MediumInteractionInfo&>(it);
+                auto phase = mi.GetPhaseFunction();
+                f = phase->Sample_p(wOut, &wIn, sampleBSDF);
+                pdf_bsdf = phase->Pdf(wOut, wIn).x;
+            }
+            Vector3f wi = it.ToWorldCoordinate(wIn);
+            if (f == Spectrum(0.f) || pdf_bsdf == 0.f)
             {
                 return L;
             }
-            bool specularBSDF = sampledType & BxDFType::BxDF_SPECULAR;
 
             float weight = 1.0f;
-            if (!specularBSDF)
+            if (!sampledSpecular)
             {
-                Float pdf_light = light->Pdf_Li(isec.GetGeometryInfo(false), wi);
+                Float pdf_light = light->Pdf_Li(it.GetGeometryInfo(), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
                     return L;
@@ -264,7 +271,7 @@ namespace tracer
             }
 
             Spectrum Li(0.f);
-            RayTr lightTestRay = isec.SpawnRay(wi);
+            RayTr lightTestRay = it.SpawnRay(wi);
             SurfaceInteraction lightIsec;
 
             if (handleMedium)
@@ -316,7 +323,16 @@ namespace tracer
 
             if (Li != Spectrum(0.f))
             {
-                L += Li * bsdf->CalculateBSDFNoLDivideByPdf(wOut, wIn, sampledType) * weight;
+                if (it.IsSurfaceInteraction())
+                {
+                    const SurfaceInteraction& isec = dynamic_cast<const SurfaceInteraction&>(it);
+                    auto bsdf = isec.GetBSDF();
+                    L += Li * bsdf->CalculateBSDFNoLDivideByPdf(wOut, wIn, sampledType) * weight;
+                }
+                else
+                {
+                    L += Li * f * weight / pdf_bsdf;
+                }
             }
         }
 
@@ -325,155 +341,130 @@ namespace tracer
         return L;
     }
 
-    Spectrum VolumePTIntegrator::EsimateDirectMedium(const MediumInteractionInfo& mi, const RayScene* scene,
-        const Vector2f& sampleLight, const Vector2f& sampleBSDF,
-        const crystal::Light* light, Sampler* sampler, bool handleMedium)
-    {
-        Spectrum L(0.f);
-        BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
+    //Spectrum VolumePTIntegrator::EsimateDirectMedium(const MediumInteractionInfo& mi, const RayScene* scene,
+    //    const Vector2f& sampleLight, const Vector2f& sampleBSDF,
+    //    const crystal::Light* light, Sampler* sampler, bool handleMedium)
+    //{
+    //    Spectrum L(0.f);
+    //    BxDFType bsdfSampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
 
-        Point3f P = mi.GetPosition();
+    //    Point3f P = mi.GetPosition();
 
-        Matrix3f TNB = BuildTNB(-mi.GetWOut());
-        Matrix3f InvTNB = glm::transpose(TNB);
-        Vector3f wOut = Vector3f(0, -1, 0);
+    //    Vector3f wOut = mi.ToLocalCoordinate(mi.GetW_Out());
 
-        auto phase = mi.GetPhaseFunction();
+    //    auto phase = mi.GetPhaseFunction();
 
-        // Sample light source with MIS (Specular BSDF will not have value)
-        {
-            Point3f lightPos;
-            float pdf_light;
-            auto Li_light = light->Sample_Li(mi.GetGeometryInfo(false), sampleLight,
-                &lightPos, &pdf_light);
+    //    // Sample light source with MIS (Specular BSDF will not have value)
+    //    {
+    //        Point3f lightPos;
+    //        float pdf_light;
+    //        auto Li_light = light->Sample_Li(mi.GetGeometryInfo(), sampleLight,
+    //            &lightPos, &pdf_light);
 
-            Vector3f wIn = InvTNB * glm::normalize(lightPos - P);
-            float NdotL = std::max(0.f, wIn.y);
-            if (pdf_light != 0.f && !std::isinf(pdf_light)
-                && Li_light != Spectrum(0.f) && NdotL != 0.f)
-            {
-                Spectrum f = phase->Pdf(wOut, wIn);
-                float pdf_bsdf = phase->Pdf(wOut, wIn).x;
-                if (f != Spectrum(0.f))
-                {
-                    if (handleMedium)
-                    {
-                        Li_light *= TraceLiM(scene, mi, lightPos);
-                    }
+    //        Vector3f wIn = mi.ToLocalCoordinate(glm::normalize(lightPos - P));
+    //        float NdotL = std::max(0.f, wIn.y);
+    //        if (pdf_light != 0.f && !std::isinf(pdf_light)
+    //            && Li_light != Spectrum(0.f) && NdotL != 0.f)
+    //        {
+    //            Spectrum f = phase->Pdf(wOut, wIn);
+    //            float pdf_bsdf = phase->Pdf(wOut, wIn).x;
+    //            if (f != Spectrum(0.f))
+    //            {
+    //                if (handleMedium)
+    //                {
+    //                    Li_light *= TraceLiM(scene, mi, lightPos);
+    //                }
 
-                    if (Li_light != Spectrum(0.f))
-                    {
-                        if (light->IsDeltaLight())
-                        {
-                            L += f * Li_light * NdotL / pdf_light;
-                        }
-                        else
-                        {
-                            L += f * Li_light * NdotL * PowerHeuristic(1, pdf_light, 1, pdf_bsdf) / pdf_light;
-                        }
-                    }
-                }
+    //                if (Li_light != Spectrum(0.f))
+    //                {
+    //                    if (light->IsDeltaLight())
+    //                    {
+    //                        L += f * Li_light * NdotL / pdf_light;
+    //                    }
+    //                    else
+    //                    {
+    //                        L += f * Li_light * NdotL * PowerHeuristic(1, pdf_light, 1, pdf_bsdf) / pdf_light;
+    //                    }
+    //                }
+    //            }
 
-                NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::Light");
-                INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::Light");
-            }
-        }
+    //            NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::Light");
+    //            INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::Light");
+    //        }
+    //    }
 
-        // Sample BSDF (Delta light should not have any value in BSDF sample)
-        if (!light->IsDeltaLight())
-        {
-            float pdf_bsdf = 0.f;
-            BxDFType sampledType;
-            Vector3f wIn;
-            Spectrum f = phase->Sample_p(wOut, &wIn, sampler->Get2D());
-            float NdotL = std::max(0.f, wIn.y);
+    //    // Sample BSDF (Delta light should not have any value in BSDF sample)
+    //    if (!light->IsDeltaLight())
+    //    {
+    //        float pdf_bsdf = 0.f;
+    //        BxDFType sampledType;
+    //        Vector3f wIn;
+    //        Spectrum f = phase->Sample_p(wOut, &wIn, sampler->Get2D());
+    //        float NdotL = std::max(0.f, wIn.y);
 
-            Vector3f wi = TNB * wIn;
+    //        Vector3f wi = mi.ToWorldCoordinate(wIn);
 
-            if (f == Spectrum(0.f) || pdf_bsdf == 0.f || NdotL == 0.f)
-            {
-                return L;
-            }
-            bool specularBSDF = sampledType & BxDFType::BxDF_SPECULAR;
+    //        if (f == Spectrum(0.f) || pdf_bsdf == 0.f || NdotL == 0.f)
+    //        {
+    //            return L;
+    //        }
+    //        bool specularBSDF = sampledType & BxDFType::BxDF_SPECULAR;
 
-            float weight = 1.0f;
-            if (!specularBSDF)
-            {
-                Float pdf_light = light->Pdf_Li(mi.GetGeometryInfo(false), wi);
-                if (pdf_light == 0.f || f == Spectrum(0.f))
-                {
-                    return L;
-                }
-                weight = PowerHeuristic(1, pdf_bsdf, 1, pdf_light);
-            }
+    //        float weight = 1.0f;
+    //        if (!specularBSDF)
+    //        {
+    //            Float pdf_light = light->Pdf_Li(mi.GetGeometryInfo(), wi);
+    //            if (pdf_light == 0.f || f == Spectrum(0.f))
+    //            {
+    //                return L;
+    //            }
+    //            weight = PowerHeuristic(1, pdf_bsdf, 1, pdf_light);
+    //        }
 
-            Spectrum Li(0.f);
-            RayTr lightTestRay = mi.SpawnRayTr(wi);
-            SurfaceInteraction lightIsec;
+    //        Spectrum Li(0.f);
+    //        RayTr lightTestRay = mi.SpawnRay(wi);
+    //        SurfaceInteraction lightIsec;
 
-            if (handleMedium)
-            {
-                Spectrum Tr = Spectrum(1.0);
-                if (light->GetFlags() & LightFlags::Area)
-                {
-                    if (scene->IntersectTr(lightTestRay, sampler, &lightIsec, &Tr)
-                        && lightIsec.GetHitPrimitive()->GetAreaLight() == light)
-                    {
-                        Li = lightIsec.Le(-wi);
-                    }
-                    else
-                    {
-                        Li = light->Le(wi);
-                    }
-                }
-                else if (light->GetFlags() & LightFlags::Infinite)
-                {
-                    if (!scene->IntersectTr(lightTestRay, sampler, &lightIsec, &Tr))
-                    {
-                        Li = light->Le(wi);
-                    }
-                }
-                Li *= Tr;
-            }
+    //        if (handleMedium)
+    //        {
+    //            Spectrum Tr = Spectrum(1.0);
+    //            if (light->GetFlags() & LightFlags::Area)
+    //            {
+    //                if (scene->IntersectTr(lightTestRay, sampler, &lightIsec, &Tr)
+    //                    && lightIsec.GetHitPrimitive()->GetAreaLight() == light)
+    //                {
+    //                    Li = lightIsec.Le(-wi);
+    //                }
+    //                else
+    //                {
+    //                    Li = light->Le(wi);
+    //                }
+    //            }
+    //            else if (light->GetFlags() & LightFlags::Infinite)
+    //            {
+    //                if (!scene->IntersectTr(lightTestRay, sampler, &lightIsec, &Tr))
+    //                {
+    //                    Li = light->Le(wi);
+    //                }
+    //            }
+    //            Li *= Tr;
+    //        }
 
-            if (Li != Spectrum(0.f))
-            {
-                L += Li * f * weight / pdf_bsdf;
-            }
-        }
+    //        if (Li != Spectrum(0.f))
+    //        {
+    //            L += Li * f * weight / pdf_bsdf;
+    //        }
+    //    }
 
-        NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
-        INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
-        return L;
-    }
+    //    NAN_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
+    //    INF_DETECT_V(L, "PathTracingIntegrator::EsimateDirect::L::BSDF");
+    //    return L;
+    //}
 
-    Spectrum VolumePTIntegrator::TraceLi(const RayScene* scene, const SurfaceInteraction& isec, const Point3f& lightPos)
+    Spectrum VolumePTIntegrator::TraceLi(const RayScene* scene, const InteractionInfo& it, const Point3f& lightPos)
     {
         Spectrum Tr(1.f);
-        RayTr currentRay = isec.SpawnRayTo(lightPos);
-        while (true)
-        {
-            SurfaceInteraction isect;
-            bool hitSurface = scene->Intersect(currentRay.Ray, &isect, 0.f, 1.f - EPS);
-
-            // Hit a surface instead of a medium, then it is blocked
-            if (hitSurface && isect.GetMaterial() != nullptr) return Spectrum(0.f);
-
-            if (currentRay.Medium)
-            {
-                Tr *= currentRay.Medium->Tr(currentRay.Ray, isect.GetDistance(), nullptr);
-            }
-
-            if (!hitSurface) return Tr;
-
-            currentRay = isect.SpawnRayTo(lightPos);
-        }
-        return Tr;
-    }
-    Spectrum VolumePTIntegrator::TraceLiM(const RayScene* scene, const MediumInteractionInfo& mi, const Point3f& lightPos)
-    {
-        Spectrum Tr(1.f);
-        RayTr currentRay = mi.SpawnRayTrTo(lightPos);
+        RayTr currentRay = it.SpawnRayTo(lightPos);
         while (true)
         {
             SurfaceInteraction isect;

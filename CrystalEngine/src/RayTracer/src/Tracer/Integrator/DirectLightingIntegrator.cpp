@@ -66,9 +66,9 @@ namespace tracer
         Spectrum L(0.f);
 
         BxDFType sampleType = (BxDFType)(BxDFType::BxDF_ALL & ~BxDFType::BxDF_SPECULAR);
-        Point3f P = isec.GetHitPos();
+        Point3f P = isec.GetPosition();
         Normal3f N = isec.GetInteractionNormal();
-        Vector3f wo = -isec.GetHitDir();
+        Vector3f wo = -isec.GetW_Out();
 
         auto bsdf = isec.GetBSDF();
 
@@ -76,7 +76,7 @@ namespace tracer
         // Sample light source with MIS (Specular BSDF will not have value)
         Point3f lightPos;
         float pdf_light;
-        auto Li_light = light->Sample_Li(isec.GetGeometryInfo(false), sampleLight, &lightPos, &pdf_light);
+        auto Li_light = light->Sample_Li(isec.GetGeometryInfo(), sampleLight, &lightPos, &pdf_light);
 
         Vector3f wi = glm::normalize(lightPos - P);
         float NdotL = std::max(0.f, glm::dot(N, wi));
@@ -126,7 +126,7 @@ namespace tracer
             if (!specularBSDF)
             {
                 f *= std::max(0.f, glm::dot(N, wi));
-                pdf_light = light->Pdf_Li(isec.GetGeometryInfo(false), wi);
+                pdf_light = light->Pdf_Li(isec.GetGeometryInfo(), wi);
                 if (pdf_light == 0.f || f == Spectrum(0.f))
                 {
                     return L;

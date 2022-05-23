@@ -1,5 +1,6 @@
 #pragma once
-#include "../Medium.h"
+#include <Core/Math/Geometry.h>
+#include <Platform/RHI/Graphics/GraphicsCommon.h>
 
 namespace crystal
 {

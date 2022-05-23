@@ -16,70 +16,98 @@
 namespace crystal
 {
     // Stores information of current surface patch (with front direction)
-    class InteractionGeometryInfo
+    class SurfaceGeometryInfo
     {
     public:
-        InteractionGeometryInfo(const Point3f& position, const Normal3f& normal)
+        SurfaceGeometryInfo(const Point3f& position, const Normal3f& normal)
             : m_position(position), m_normal(normal)
         {}
         Ray3f SpawnRay(const Vector3f& dir) const;
         Point3f GetPosition() const { return m_position; }
         Normal3f GetNormal() const { return m_normal; }
+
     private:
         Point3f m_position{};
         Normal3f m_normal{};
     };
 
-    // Stores information of simplified current surface interaction
-    class InteractionInfo : public InteractionGeometryInfo
+    // Stores information of simplified current interaction event
+    class InteractionInfo
     {
     public:
-        InteractionInfo(const Point3f& position, const Normal3f& normal,
-            const MediumInterface& mediumInterface)
-            : InteractionGeometryInfo(position, normal), m_mediumInterface(mediumInterface) {}
+        InteractionInfo() {}
+        InteractionInfo(const Point3f& position) : m_position(position) {}
+        InteractionInfo(const Point3f& position, const Vector3f& wo, const MediumInterface& minterface)
+            : m_position(position), m_wo(wo), m_mediumInterface(minterface) {}
+        virtual ~InteractionInfo() = 0 {};
 
-        RayTr SpawnRayTr(const Vector3f& dir) const;
-    private:
-        MediumInterface m_mediumInterface{};
-    };
-
-    // Stores information of current surface patch (with front direction)
-    class MediumInteractionInfo
-    {
-    public:
-        MediumInteractionInfo() {}
-        MediumInteractionInfo(const Point3f& position,
-            const Normal3f& wo,
-            const Medium* medium,
-            const PhaseFunction* phaseFunc)
-            : m_position(position), m_wo(wo), m_medium(medium), m_phaseFunction(phaseFunc)
-        {}
-        // Ray3f SpawnRay(const Vector3f& dir) const;
+        virtual RayTr SpawnRay(const Vector3f& dir) const;
+        virtual RayTr SpawnRayTo(const Point3f& pos) const;
+        virtual Vector3f ToLocalCoordinate(const Vector3f& v) const;
+        virtual Vector3f ToWorldCoordinate(const Vector3f& v) const;
+        // Get the medium on given exit/incoming direction
+        virtual const Medium* GetMedium(const Vector3f wi) const;
 
         Point3f GetPosition() const { return m_position; }
-        Vector3f GetWOut() const { return m_wo; }
-        const Medium* GetMedium() const { return m_medium; }
-        const PhaseFunction* GetPhaseFunction() const { return m_phaseFunction; }
-        RayTr SpawnRayTr(const Vector3f& dir) const;
-        RayTr SpawnRayTrTo(const Point3f& pos) const;
-        InteractionGeometryInfo GetGeometryInfo(bool modelNormal) const;
-    private:
-        Point3f                 m_position{};
-        Vector3f                m_wo{};
-        const Medium*           m_medium{};
-        const PhaseFunction*    m_phaseFunction{};
+        Vector3f GetW_Out() const { return m_wo; }
+
+        virtual bool IsSurfaceInteraction() const = 0;
+
+        virtual SurfaceGeometryInfo GetGeometryInfo() const { return SurfaceGeometryInfo(m_position, -m_wo); }
+
+    protected:
+        Point3f             m_position{};
+        Vector3f            m_wo{};
+        MediumInterface     m_mediumInterface{};
     };
 
-    class SurfaceInteraction
+
+
+    // Stores information of current surface patch (with front direction)
+    class MediumInteractionInfo : public InteractionInfo
     {
     public:
-        SurfaceInteraction();
+        MediumInteractionInfo() : InteractionInfo() {}
+        MediumInteractionInfo(const Point3f& position,
+            const Vector3f& wo,
+            const Medium* medium)
+            : InteractionInfo(position, wo, MediumInterface(medium, medium)), m_medium(medium)
+        {
+            m_phaseFunction = medium->GetPhaseFunction();
+            m_TNB = BuildTNB(-wo);
+            m_InvTNB = glm::transpose(m_TNB);
+        }
+        ~MediumInteractionInfo() override;
+
+        Vector3f ToLocalCoordinate(const Vector3f& v) const override;
+        Vector3f ToWorldCoordinate(const Vector3f& v) const override;
+        const Medium* GetMedium() const { return m_medium; }
+        const Medium* GetMedium(const Vector3f wi) const override { return m_medium; }
+        const PhaseFunction* GetPhaseFunction() const { return m_phaseFunction; }
+        virtual bool IsSurfaceInteraction() const override { return false; }
+
+    private:
+        const Medium*           m_medium{};
+        const PhaseFunction*    m_phaseFunction{};
+        Matrix3f                m_TNB{}, m_InvTNB{};
+    };
+
+    class SurfaceInteraction : public InteractionInfo
+    {
+    public:
+        SurfaceInteraction() {}
+        ~SurfaceInteraction() override;
 
         // Spawn a ray from its current hit information
-        RayTr SpawnRay(const Vector3f& dir) const;
-        RayTr SpawnRayTo(const Point3f& pos) const;
+        RayTr SpawnRay(const Vector3f& dir) const override;
+        RayTr SpawnRayTo(const Point3f& pos) const override;
 
-        void SetHitInfo(float t, const Point3f& hitPos, const Vector3f& hitDir,
+        virtual const Medium* GetMedium(const Vector3f wi) const override;
+        virtual SurfaceGeometryInfo GetGeometryInfo() const override;
+
+        virtual bool IsSurfaceInteraction() const override { return true; }
+
+        void SetHitInfo(float t, const Point3f& hitPos, const Vector3f& wo,
             const Vector3f& modelNormal, const Vector2f& uv, bool frontFace,
             const Vector3f& dpdu, const Vector3f& dpdv);
 
@@ -89,10 +117,8 @@ namespace crystal
         void SetHitPrimitive(const IRayPrimitive* primitive) { m_primitive = primitive; }
         const IRayPrimitive* GetHitPrimitive() const { return m_primitive; }
 
-        void SetHitPos(const Point3f& pos) { m_hitPos = pos; }
-        Point3f GetHitPos() const { return m_hitPos; }
-
         Normal3f GetInteractionNormal() const { return m_isFrontFace ? m_modelNormal : -m_modelNormal; }
+        Normal3f GetModelNormal() const { return m_modelNormal; }
 
         void SetTexCoord(const Point2f& texCoord) { m_texCoord = texCoord; }
         Point2f GetTexCoord() const { return m_texCoord; }
@@ -103,19 +129,14 @@ namespace crystal
         void SetDpDv(const Vector3f& dir) { m_dpDv = dir; }
         Vector3f GetDpDv() const { return m_dpDv; }
 
-        void SetHitDir(const Vector3f& dir) { m_hitDir = dir; }
-        Vector3f GetHitDir() const { return m_hitDir; }
-
         void SetMediumInterface(const MediumInterface& mediumInterface) { m_mediumInterface = mediumInterface; }
         MediumInterface GetMediumInterface() const { return m_mediumInterface; }
 
         Matrix3f GetInteractionTNB() const;
         Matrix3f GetInteractionInverseTNB() const;
 
-        Vector3f ToLocalCoordinate(const Vector3f& v) const;
-        Vector3f ToWorldCoordinate(const Vector3f& v) const;
-
-        InteractionGeometryInfo GetGeometryInfo(bool modelNormal) const;
+        Vector3f ToLocalCoordinate(const Vector3f& v) const override;
+        Vector3f ToWorldCoordinate(const Vector3f& v) const override;
 
         /**
          * @brief Get the emitted radiance at a surface point intersected by a ray
@@ -135,9 +156,7 @@ namespace crystal
     private:
         float                   m_distance = std::numeric_limits<float>::infinity();
         bool                    m_isFrontFace = false;
-        Point3f                 m_hitPos{};
-        Vector3f                m_hitDir{},
-                                m_dpDu{},
+        Vector3f                m_dpDu{},
                                 m_dpDv{};
         Normal3f                m_modelNormal{};
         Vector2f                m_texCoord{};
@@ -148,8 +167,5 @@ namespace crystal
         const IRayPrimitive*    m_primitive = nullptr;
         MediumInterface         m_mediumInterface{};
 
-
-        // Get the medium on given exit direction
-        const Medium* GetMedium(const Vector3f wi) const;
     };
 }

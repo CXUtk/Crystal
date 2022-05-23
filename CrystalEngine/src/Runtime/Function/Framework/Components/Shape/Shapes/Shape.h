@@ -21,12 +21,12 @@ namespace crystal
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const = 0;
 
         virtual float SurfaceArea() const = 0;
-        virtual InteractionGeometryInfo SampleSurfaceArea(const Vector2f& sample) const = 0;
-        virtual InteractionGeometryInfo SampleSurfaceLight(const Vector2f& sample,
-            const InteractionGeometryInfo& ref) const = 0;
+        virtual SurfaceGeometryInfo SampleSurfaceArea(const Vector2f& sample) const = 0;
+        virtual SurfaceGeometryInfo SampleSurfaceLight(const Vector2f& sample,
+            const SurfaceGeometryInfo& ref) const = 0;
 
-        virtual float PdfArea(const InteractionGeometryInfo& surface_w) const { return 1.f / SurfaceArea(); }
-        virtual float PdfLight(const InteractionGeometryInfo& ref, const Vector3f& wi) const;
+        virtual float PdfArea(const SurfaceGeometryInfo& surface_w) const { return 1.f / SurfaceArea(); }
+        virtual float PdfLight(const SurfaceGeometryInfo& ref, const Vector3f& wi) const;
     private:
     };
 }

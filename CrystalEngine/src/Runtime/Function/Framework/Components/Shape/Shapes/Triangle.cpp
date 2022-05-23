@@ -33,15 +33,15 @@ namespace crystal
     {
         glm::mat3 A(m_vertices[1]->Position - m_vertices[0]->Position,
             m_vertices[2]->Position - m_vertices[0]->Position, -ray.Dir());
-        glm::vec3 P = ray.Start() - m_vertices[0]->Position;
-        glm::vec3 res;
+        Vector3f P = ray.Start() - m_vertices[0]->Position;
+        Vector3f res;
         // 通过求解 Ax = b 算出光线打在三角形上的重心坐标
         res = glm::inverse(A) * P;
         if (glm::isnan(res) != glm::bvec3(false)) return false;
         if (res.x < 0.f || res.x > 1.f || res.y < 0.f || res.y > 1.f || res.x + res.y > 1.0001f || res.z < 0.f) return false;
-        glm::vec3 bary_coord = glm::vec3(1 - res.x - res.y, res.x, res.y);
-        glm::vec3 N;
-        glm::vec2 UV = bary_interp(bary_coord, m_vertices[0]->TexCoord, m_vertices[1]->TexCoord, m_vertices[2]->TexCoord);
+        Vector3f bary_coord = Vector3f(1 - res.x - res.y, res.x, res.y);
+        Normal3f N;
+        Vector2f UV = bary_interp(bary_coord, m_vertices[0]->TexCoord, m_vertices[1]->TexCoord, m_vertices[2]->TexCoord);
         if (FLAT_SHADING)
         {
             N = glm::normalize(glm::cross(m_vertices[1]->Position - m_vertices[0]->Position,
@@ -68,7 +68,7 @@ namespace crystal
             dpdv = glm::normalize(glm::cross(N, dpdu));
         }
 
-        isec->SetHitInfo(res.z, ray.Start() + ray.Dir() * res.z, ray.Dir(), N, UV, front_face, dpdu, dpdv);
+        isec->SetHitInfo(res.z, ray.Start() + ray.Dir() * res.z, -ray.Dir(), N, UV, front_face, dpdu, dpdv);
         if (std::isinf(res.z) || std::isnan(res.z))
         {
             printf("Invalid distance on triangle intersection: %lf\n", res.z);
@@ -97,7 +97,7 @@ namespace crystal
             m_vertices[2]->Position - m_vertices[0]->Position)) / 2.f;
     }
 
-    InteractionGeometryInfo Triangle::SampleSurfaceArea(const Vector2f& sample) const
+    SurfaceGeometryInfo Triangle::SampleSurfaceArea(const Vector2f& sample) const
     {
         Vector3f baryCoord = sampleTriangle(sample);
         Point3f pos = baryCoord.x * m_vertices[0]->Position
@@ -114,10 +114,10 @@ namespace crystal
             N = glm::normalize(bary_interp(baryCoord, m_vertices[0]->Normal,
                 m_vertices[1]->Normal, m_vertices[2]->Normal));
         }
-        return InteractionGeometryInfo(pos, N);
+        return SurfaceGeometryInfo(pos, N);
     }
 
-    InteractionGeometryInfo Triangle::SampleSurfaceLight(const Vector2f& sample, const InteractionGeometryInfo& ref) const
+    SurfaceGeometryInfo Triangle::SampleSurfaceLight(const Vector2f& sample, const SurfaceGeometryInfo& ref) const
     {
         return SampleSurfaceArea(sample);
     }

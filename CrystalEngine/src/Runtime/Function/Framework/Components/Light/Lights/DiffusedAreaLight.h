@@ -15,12 +15,12 @@ namespace crystal
 
         virtual Spectrum Flux() const override;
 
-        virtual Spectrum Sample_Li(const InteractionGeometryInfo& surface_w,
+        virtual Spectrum Sample_Li(const SurfaceGeometryInfo& surface_w,
             const Vector2f& sample, Point3f* endpoint, float* pdf) const override;
 
-        virtual float Pdf_Li(const InteractionGeometryInfo& surface_w, const Vector3f& wi) const override;
+        virtual float Pdf_Li(const SurfaceGeometryInfo& surface_w, const Vector3f& wi) const override;
 
-        virtual Spectrum Eval_Le(const InteractionGeometryInfo& surface, const Vector3f& wi) const override;
+        virtual Spectrum Eval_Le(const SurfaceGeometryInfo& surface, const Vector3f& wi) const override;
 
     private:
         Spectrum    m_Le{};

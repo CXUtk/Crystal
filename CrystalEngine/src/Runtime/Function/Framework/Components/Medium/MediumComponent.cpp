@@ -17,6 +17,8 @@ namespace crystal
 
             m_mediumIn = std::make_shared<HomogeneousMedium>(Spectrum(0.10014, 0.16503, 0.2468) * 6.f,
                 Spectrum(8.9053e-05, 8.372e-05, 0) * 10.f, 0.7f);
+        //m_mediumIn = std::make_shared<HomogeneousMedium>(Spectrum(0.01, 0.5, 0.5),
+        //        Spectrum(0.6), -0.7f);
             m_mediumInterface.Inside = m_mediumIn.get();
             return;
         

@@ -12,7 +12,7 @@ namespace crystal
             : Light(transform, LightFlags::Area, numSamples), m_areaSampler(areaSampler)
         {}
 
-        virtual Spectrum Eval_Le(const InteractionGeometryInfo& surface, const Vector3f& wi) const = 0;
+        virtual Spectrum Eval_Le(const SurfaceGeometryInfo& surface, const Vector3f& wi) const = 0;
         std::shared_ptr<const IAreaSampler> GetAreaSampler() const { return m_areaSampler; }
     protected:
         std::shared_ptr<IAreaSampler> m_areaSampler = nullptr;

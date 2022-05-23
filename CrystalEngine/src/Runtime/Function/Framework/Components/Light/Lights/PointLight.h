@@ -10,9 +10,9 @@ namespace crystal
         PointLight(const Transform& transform, const Spectrum& intensity);
         ~PointLight() override;
 
-        Spectrum Sample_Li(const InteractionGeometryInfo& surface, const Vector2f& sample,
+        Spectrum Sample_Li(const SurfaceGeometryInfo& surface, const Vector2f& sample,
             Point3f* endpoint, float* pdf) const override;
-        float Pdf_Li(const InteractionGeometryInfo& surface, const Vector3f& wi) const override;
+        float Pdf_Li(const SurfaceGeometryInfo& surface, const Vector3f& wi) const override;
         Spectrum Flux() const override;
 
     private:
