@@ -8,9 +8,16 @@ namespace crystal
     using RNG = std::mt19937;
     constexpr bool SHOW_DEBUG = false;
 
+    // Return a random float in range [0, 1)
     inline float UniformRandomFloat(RNG& mt)
     {
         return std::min(OneMinusEpsilon, mt() * 2.3283064365386963e-10f);
+    }
+
+    // Return a random float in range [-1, 1)
+    inline float UniformRandomFloat2(RNG& mt)
+    {
+        return (std::min(OneMinusEpsilon, mt() * 2.3283064365386963e-10f) - 0.5f) * 2.f;
     }
 
     // Solve for Ax = b

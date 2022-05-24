@@ -141,6 +141,8 @@ namespace crystal
             {
                 window->PollEvents();
             } while (GameTimer::GetCurrentTime() - frameBeginTime < m_fpsCap);
+
+            printf("%.2lf\n", 1.f / (GameTimer::GetCurrentTime() - frameBeginTime));
         }
 
         m_application->Exit();

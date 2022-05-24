@@ -1,0 +1,13 @@
+{
+    "dx11Src": "ToneMapping.hlsl",
+    "openGLVSSrc": "ToneMapping.vert",
+    "openGLFSSrc": "ToneMapping.frag",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "MVP",
+            "type": "mat4"
+        }
+    ]
+}

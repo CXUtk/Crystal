@@ -11,6 +11,7 @@
     "BuiltinPackage": "engine",
     "ExtraPackages": [
         "ui",
-        "constants"
+        "constants",
+        "raytracer"
     ]
 }

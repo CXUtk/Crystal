@@ -20,7 +20,7 @@ namespace crystal
 
         ~Transform() {}
 
-        Matrix4f getMatrix() const
+        Matrix4f GetMatrix() const
         {
             Matrix4f mat = glm::identity<Matrix4f>();
             if (m_scale != Vector3f(1.f))

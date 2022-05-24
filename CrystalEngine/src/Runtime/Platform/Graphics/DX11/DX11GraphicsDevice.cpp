@@ -180,8 +180,10 @@ namespace crystal
         };
         UINT numDriverTypes = ARRAYSIZE(driverTypes);
 
-        D3D_FEATURE_LEVEL featureLevels[1] = { D3D_FEATURE_LEVEL_11_0 };
-        UINT numFeatureLevels = 1;
+        D3D_FEATURE_LEVEL featureLevels[2] = {
+            D3D_FEATURE_LEVEL_11_1,
+            D3D_FEATURE_LEVEL_11_0 };
+        UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
         D3D_FEATURE_LEVEL curFeatureLevel;
         D3D_DRIVER_TYPE d3dDriverType;

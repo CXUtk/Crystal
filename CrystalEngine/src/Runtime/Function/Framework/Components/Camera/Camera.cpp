@@ -37,7 +37,7 @@ namespace crystal
 
     Vector3f Camera::GetDirection(const Vector2f& coord) const
     {
-        auto T = m_tranform->getMatrix();
+        auto T = m_tranform->GetMatrix();
         auto forward = T * Vector4f(Forward, 0);
         auto up = T * Vector4f(Up, 0);
         auto right = T * Vector4f(Right, 0);

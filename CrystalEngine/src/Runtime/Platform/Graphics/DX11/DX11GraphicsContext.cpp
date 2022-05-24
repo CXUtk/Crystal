@@ -156,45 +156,80 @@ namespace crystal
 
 		ComPtr<IDXGIDevice> dxgiDevice = nullptr;
 		ComPtr<IDXGIAdapter> dxgiAdapter = nullptr;
-		ComPtr<IDXGIFactory> dxgiFactory = 0;
+		ComPtr<IDXGIFactory> dxgiFactory = nullptr;
+        ComPtr<IDXGIFactory1> dxgiFactory1 = nullptr;
+        ComPtr<IDXGIFactory2> dxgiFactory2 = nullptr;
+
 		HR(dx11GraphicsDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
 		HR(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
-		HR(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void**>(dxgiFactory.GetAddressOf())));
+		HR(dxgiAdapter->GetParent(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(dxgiFactory1.GetAddressOf())));
 
-		auto clientSize = m_pWindow->GetWindowSize();
+        auto clientSize = m_pWindow->GetWindowSize();
 
-		DXGI_SWAP_CHAIN_DESC sd;
-		ZeroMemory(&sd, sizeof(sd));
-		sd.BufferDesc.Width = clientSize.x;
-		sd.BufferDesc.Height = clientSize.y;
-		sd.BufferDesc.RefreshRate.Numerator = 60;
-		sd.BufferDesc.RefreshRate.Denominator = 1;
-		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+        // Test if has factory4 support
+        auto hr = dxgiFactory1.As<IDXGIFactory2>(&dxgiFactory2);
 
-		// 是否开启4倍多重采样？
-		if (args.Enable4xMSAA)
-		{
-			sd.SampleDesc.Count = 4;
-			sd.SampleDesc.Quality = m_MSAAQuality - 1;
-		}
-		else
-		{
-			sd.SampleDesc.Count = 1;
-			sd.SampleDesc.Quality = 0;
-		}
+        if (dxgiFactory2 != nullptr)
+        {
+            HR(m_pd3dGraphicsDevice.As<ID3D11Device1>(&m_pd3dGraphicsDevice1));
+            HR(m_pd3dImmediateContext.As<ID3D11DeviceContext1>(&m_pd3dImmediateContext1));
 
-		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		sd.BufferCount = 1;
-		sd.OutputWindow = m_pWindow->GetHWND();
-		sd.Windowed = TRUE;
-		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-		sd.Flags = 0;
+            DXGI_SWAP_CHAIN_DESC1 sd;
+            ZeroMemory(&sd, sizeof(sd));
+            sd.Width = clientSize.x;
+            sd.Height = clientSize.y;
+            sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            // 是否开启4倍多重采样？
+            if (args.Enable4xMSAA)
+            {
+                sd.SampleDesc.Count = 4;
+                sd.SampleDesc.Quality = m_MSAAQuality - 1;
+            }
+            else
+            {
+                sd.SampleDesc.Count = 1;
+                sd.SampleDesc.Quality = 0;
+            }
+            sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+            sd.BufferCount = 1;
+            sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+            sd.Flags = 0;
 
-		HR(dxgiFactory->CreateSwapChain(dx11GraphicsDevice, &sd, m_pSwapChain.GetAddressOf()));
+            DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc;
+            fsDesc.RefreshRate.Numerator = 60;
+            fsDesc.RefreshRate.Denominator = 1;
+            fsDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+            fsDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+            fsDesc.Windowed = true;
 
-		dxgiFactory->MakeWindowAssociation(m_pWindow->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
+            HR(dxgiFactory2->CreateSwapChainForHwnd(m_pd3dGraphicsDevice.Get(), m_pWindow->GetHWND(),
+                &sd, &fsDesc, nullptr, m_pSwapChain1.GetAddressOf()));
+            HR(m_pSwapChain1.As<IDXGISwapChain>(&m_pSwapChain));
+        }
+        else
+        {
+            DXGI_SWAP_CHAIN_DESC sd;
+            ZeroMemory(&sd, sizeof(sd));
+            sd.BufferDesc.Width = clientSize.x;
+            sd.BufferDesc.Height = clientSize.y;
+            sd.BufferDesc.RefreshRate.Numerator = 60;
+            sd.BufferDesc.RefreshRate.Denominator = 1;
+            sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+            sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+
+
+            sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+            sd.BufferCount = 1;
+            sd.OutputWindow = m_pWindow->GetHWND();
+            sd.Windowed = TRUE;
+            sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+            sd.Flags = 0;
+
+            HR(dxgiFactory1->CreateSwapChain(dx11GraphicsDevice, &sd, m_pSwapChain.GetAddressOf()));
+            dxgiFactory1->MakeWindowAssociation(m_pWindow->GetHWND(), DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES);
+        }
 
 		// 设置调试对象名
 		d3dUtils::D3D11SetDebugObjectName(m_pd3dImmediateContext.Get(), "ImmediateContext");

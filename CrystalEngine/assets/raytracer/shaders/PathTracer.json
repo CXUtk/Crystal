@@ -1,0 +1,49 @@
+{
+    "dx11Src": "PathTracer.hlsl",
+    "openGLVSSrc": "PathTracer.vert",
+    "openGLFSSrc": "PathTracer.frag",
+    "vsEntry": "VS",
+    "fsEntry": "PS",
+    "uniforms": [
+        {
+            "name": "MVP",
+            "type": "mat4"
+        },
+        {
+            "name": "uIteration",
+            "type": "float"
+        },
+        {
+            "name": "AspectRatio",
+            "type": "float"
+        },
+        {
+            "name": "FOV",
+            "type": "float"
+        },
+        {
+            "name": "Up",
+            "type": "vec3"
+        },
+        {
+            "name": "Right",
+            "type": "vec3"
+        },
+        {
+            "name": "Front",
+            "type": "vec3"
+        },
+        {
+            "name": "EyePos",
+            "type": "vec3"
+        },
+        {
+            "name": "uFrameWidth",
+            "type": "float"
+        },
+        {
+            "name": "uFrameHeight",
+            "type": "float"
+        }
+    ]
+}

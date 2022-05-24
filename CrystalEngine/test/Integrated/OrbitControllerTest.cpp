@@ -1,4 +1,4 @@
-﻿#include "OrbitControllerTest.h"
+#include "OrbitControllerTest.h"
 #include <Engine.h>
 #include "Platform/RHI/Interfaces.h"
 #include <Core/Utils/Logger.h>
@@ -80,10 +80,13 @@ namespace crystal
 		m_PRO->SetShaderProgram(m_pShader);
 		m_PRO->SetShaderResource(m_texture2D, 0);
 		m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
-		m_PSO->SetBlendState(graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque));
-		m_PSO->SetDepthStencilState(graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::DefaultDepthTest));
-		m_PSO->SetRasterState(graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone));
-		//indexBuffer->Bind(0);
+
+        auto BS = graphicsDevice->CreateBlendStateFromTemplate(BlendStates::Opaque);
+        auto RS = graphicsDevice->CreateRasterStateFromTemplate(RasterStates::CullNone);
+        auto DS = graphicsDevice->CreateDepthStencilStateFromTemplate(DepthStencilStates::NoDepthTest);
+        m_PSO->SetBlendState(BS);
+        m_PSO->SetDepthStencilState(DS);
+        m_PSO->SetRasterState(RS);
 	}
 
 

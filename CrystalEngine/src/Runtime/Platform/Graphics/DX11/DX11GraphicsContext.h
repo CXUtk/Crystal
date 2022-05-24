@@ -36,8 +36,13 @@ namespace crystal
 	private:
 
         ComPtr<ID3D11Device>		    m_pd3dGraphicsDevice = nullptr;
-		ComPtr<ID3D11DeviceContext>		m_pd3dImmediateContext = nullptr;
+		ComPtr<ID3D11DeviceContext>	    m_pd3dImmediateContext = nullptr;
+
+        ComPtr<ID3D11Device1>		    m_pd3dGraphicsDevice1 = nullptr;
+        ComPtr<ID3D11DeviceContext1>	m_pd3dImmediateContext1 = nullptr;
+
 		ComPtr<IDXGISwapChain>			m_pSwapChain = nullptr;
+        ComPtr<IDXGISwapChain1>			m_pSwapChain1 = nullptr;
 
 		//ComPtr<ID3D11RenderTargetView>	m_pRenderTargetView = nullptr;
 		//ComPtr<ID3D11Texture2D>			m_pDepthStencilBuffer = nullptr;

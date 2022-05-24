@@ -31,7 +31,7 @@ namespace crystal
         std::vector<MeshVertexData> newV;
         newV.reserve(m_vertices.size());
 
-        auto matrix = transform.getMatrix();
+        auto matrix = transform.GetMatrix();
         auto normalMatrix = glm::transpose(glm::inverse(matrix));
         for (auto& v : m_vertices)
         {

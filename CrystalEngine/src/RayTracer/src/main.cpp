@@ -1,5 +1,6 @@
 #include <Engine.h>
 #include "Presenter.h"
+#include "GPUPresenter.h"
 #include "Function/Framework/Framework.h"
 #include "Function/Framework/Components/Mesh/MeshComponent.h"
 #include "Function/Framework/Components/Transform/TransformComponent.h"
@@ -19,7 +20,7 @@ int main(int argc, char** argv)
     auto n1 = glm::quatLookAt(glm::normalize(objectPos - eyePos), glm::vec3(0, 1, 0));
 
     Engine* engine = Engine::GetInstance();
-    auto uptr = std::make_unique<tracer::Presenter>();
+    auto uptr = std::make_unique<tracer::GPUPresenter>();
     engine->Start(std::move(uptr));
     //GameObject gameObject;
     //gameObject.AddComponent(std::make_shared<TransformComponent>(&gameObject));
