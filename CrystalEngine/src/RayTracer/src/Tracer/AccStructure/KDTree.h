@@ -15,6 +15,7 @@ namespace tracer
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
         bool IntersectTest(const Ray3f& ray, const crystal::IRayPrimitive* ignoreShape,
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
+        GPUDataPackage GetGPUData() const override;
 
     private:
 

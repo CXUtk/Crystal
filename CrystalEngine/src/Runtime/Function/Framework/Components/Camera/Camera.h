@@ -14,7 +14,12 @@ namespace crystal
         ~Camera();
 
         Point3f GetEyePos() const;
-        Point3f GetForwardDir() const;
+        Vector3f GetForwardDir() const;
+        Vector3f GetUpDir() const;
+        Vector3f GetRightDir() const;
+        Float GetAspectRatio() const { return m_AspectRatio; }
+        Float GetFOV() const { return m_FovY; }
+
 
         Matrix4f GetProjectionMatrix() const;
         Matrix4f GetViewMatrix() const;

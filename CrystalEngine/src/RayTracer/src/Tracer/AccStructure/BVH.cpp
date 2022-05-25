@@ -164,6 +164,17 @@ namespace tracer
         return false;
     }
 
+    GPUDataPackage BVH::GetGPUData() const
+    {
+        GPUDataPackage package;
+        for (auto& p : m_primitives)
+        {
+            package.AddObject(p);
+        }
+        size_t index = dfs(&m_nodes[m_root], &package);
+        return package;
+    }
+
     void BVH::_build(int& p, int l, int r)
     {
         if (r < l) return;
@@ -285,5 +296,34 @@ namespace tracer
         m_nodes[m_tot].bound = box;
         m_nodes[m_tot].splitAxis = splitAxis;
         return m_tot;
+    }
+
+    size_t BVH::dfs(const BVHNode* node, GPUDataPackage* package) const
+    {
+        if (node->splitAxis == -1)
+        {
+            // Objects node
+            const IRayPrimitive* const* startP = &m_primitives[node->entitiesStartOffset];
+            int objCnt = node->count;
+            std::vector<const IRayPrimitive*> prims;
+            for (int i = 0; i < objCnt; i++)
+            {
+                prims.push_back(startP[i]);
+            }
+            return package->AddObjectsNode(node->bound, prims);
+        }
+        else
+        {
+            size_t nodeId = package->AddBVHNode(node->bound);
+            if (node->ch[0])
+            {
+                package->SetBVHNodeLeft(nodeId, dfs(&m_nodes[node->ch[0]], package));
+            }
+            if (node->ch[1])
+            {
+                package->SetBVHNodeRight(nodeId, dfs(&m_nodes[node->ch[1]], package));
+            }
+            return nodeId;
+        }
     }
 }

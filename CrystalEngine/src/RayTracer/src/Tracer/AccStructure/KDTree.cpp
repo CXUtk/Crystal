@@ -82,6 +82,11 @@ namespace tracer
         return ray_test_p(m_root, ray, ignoreShape, tMin, tMax);
     }
 
+    GPUDataPackage KDTree::GetGPUData() const
+    {
+        return GPUDataPackage();
+    }
+
     int KDTree::newNode(const std::vector<const crystal::IRayPrimitive*>& objs,
         const Bound3f& box, int split, float splitPos)
     {

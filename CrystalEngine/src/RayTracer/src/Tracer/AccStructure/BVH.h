@@ -16,6 +16,8 @@ namespace tracer
         bool IntersectTest(const Ray3f& ray, const IRayPrimitive* ignoreShape,
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
 
+        GPUDataPackage GetGPUData() const override;
+
     private:
         BVHNode* m_nodes;
         int m_tot, m_root;
@@ -34,5 +36,7 @@ namespace tracer
 
         int createLeaf(int& p, int l, int r);
         int createInternal(int splitAxis, const Bound3f& box);
+
+        size_t dfs(const BVHNode* node, GPUDataPackage* package) const;
     };
 }

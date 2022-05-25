@@ -19,9 +19,19 @@ namespace crystal
         return m_tranform->GetTranslation();
     }
 
-    Point3f Camera::GetForwardDir() const
+    Vector3f Camera::GetForwardDir() const
     {
         return m_tranform->GetRotation() * Forward;
+    }
+
+    Vector3f Camera::GetUpDir() const
+    {
+        return m_tranform->GetRotation() * Up;
+    }
+
+    Vector3f Camera::GetRightDir() const
+    {
+        return m_tranform->GetRotation() * Right;
     }
 
     Matrix4f Camera::GetProjectionMatrix() const

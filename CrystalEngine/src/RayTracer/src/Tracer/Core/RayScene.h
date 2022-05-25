@@ -24,13 +24,20 @@ namespace tracer
             float tMin = 0, float tMax = std::numeric_limits<Float>::infinity()) const;
 
         bool IntersectTest(const Ray3f& ray, float tMin, float tMax) const;
+
         void ForEachLights(std::function<void(const crystal::Light*)> action) const;
+
         const std::vector<std::shared_ptr<crystal::Light>>& GetLights() const { return m_lights; }
+
         crystal::Light* SampleOneLight(Float sample, Float* pdf, Float* remapped) const;
 
         Spectrum GetEnvironmentLight(const Vector3f& dir) const;
 
         Bound3f GetWorldBound() const { return m_worldBound; }
+
+        const std::vector<std::shared_ptr<crystal::IRayPrimitive>>& GetPrimitives() const { return m_primitives; }
+
+        GPUDataPackage GetGPUPackage() const { return m_accelStructure->GetGPUData(); }
 
     private:
         std::shared_ptr<Scene>              m_scene = nullptr;

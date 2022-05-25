@@ -13,6 +13,7 @@ namespace tracer
         for (auto& ptr : primitive)
         {
             m_primitives.push_back(cptr(ptr));
+            m_masterBox = m_masterBox.Union(ptr->GetBoundingBox());
         }
     }
 
@@ -55,5 +56,16 @@ namespace tracer
             }
         }
         return false;
+    }
+
+    GPUDataPackage Brute::GetGPUData() const
+    {
+        GPUDataPackage package;
+        for (auto& p : m_primitives)
+        {
+            package.AddObject(p);
+        }
+        package.AddObjectsNode(m_masterBox, m_primitives);
+        return package;
     }
 }

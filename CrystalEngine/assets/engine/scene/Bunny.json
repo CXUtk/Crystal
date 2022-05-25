@@ -1,0 +1,59 @@
+{
+    "Objects": [
+        {
+            "Name": "Camera",
+            "Components": [
+                {
+                    "Type": "CameraComponent",
+                    "Setting": {
+                        "Type": "Perspective",
+                        "Data": {
+                            "FovY": 1.04719753,
+                            "Aspect": 1.33333,
+                            "ZNear": 0,
+                            "ZFar": 100
+                        }
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 5, -15 ],
+                        "Scale": [ 1, 1, 1 ],
+                        "Rotation": [ 0, 0.995133340, 0.0985376164, 0 ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "KnobObject1",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Monkey"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 0, 0 ],
+                        "Scale": [ 3, 3, 3 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Plastic",
+                        "Data": {
+                            "Kd": "constants:pure/White",
+                            "Roughness": "constants:pure/OneTenth",
+                            "IOR": 1.5
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

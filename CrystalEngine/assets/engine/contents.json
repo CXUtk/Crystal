@@ -34,8 +34,7 @@
     "meshes": [
         "Floor",
         "Knob",
-        "sibenik",
-        "hero"
+        "Monkey"
     ],
     "cputextures": [
         "LUT_cpu",

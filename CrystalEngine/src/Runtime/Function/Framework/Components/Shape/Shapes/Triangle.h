@@ -22,6 +22,8 @@ namespace crystal
         SurfaceGeometryInfo SampleSurfaceLight(const Vector2f& sample,
             const SurfaceGeometryInfo& ref) const override;
 
+        std::vector<const MeshVertexData*> GetVertices() const { return { m_vertices[0], m_vertices[1],m_vertices[2] }; }
+
     private:
         const MeshVertexData*   m_vertices[3];
         Vector3f                m_dpDu, m_dpDv;

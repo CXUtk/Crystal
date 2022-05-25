@@ -4,6 +4,7 @@
 #include <vector>
 #include <Core/Math/Geometry.h>
 #include <Core/Interaction/SurfaceInteraction.h>
+#include <Tracer/Core/GPUDataPackage.h>
 
 namespace tracer
 {
@@ -24,6 +25,7 @@ namespace tracer
         virtual bool IntersectTest(const crystal::Ray3f& ray, const IRayPrimitive* ignoreItem,
             float tMin = 0,
             float tMax = std::numeric_limits<float>::infinity()) const = 0;
+        virtual GPUDataPackage GetGPUData() const = 0;
 
     protected:
     };

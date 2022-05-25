@@ -30,6 +30,7 @@ cbuffer ConstantBuffer : register(b0)
 }
 
 static const float RT_GEOMETRY_COLLECTION = 1.0;
+static const float RT_GEOMETRY_BVH_NODE = 2.0;
 
 static const float RT_GEOMETRY_SPHERE = 1.0;
 static const float RT_GEOMETRY_TRIANGLE = 2.0;
@@ -81,15 +82,28 @@ struct SurfaceInteraction
 	float	GeometryId;
 	float	t;
 	float3  Normal;
+	float3  Albedo;
+};
+
+struct Bound3f
+{
+	float3 minPos;
+	float3 maxPos;
 };
 
 
-bool SphereIntersect(int index, Ray ray, out SurfaceInteraction isec);
-bool TriangleIntersect(int index, Ray ray, out SurfaceInteraction isec);
+
+
+bool SphereIntersect(int index, Ray ray, inout SurfaceInteraction isec);
+bool TriangleIntersect(int index, Ray ray, inout SurfaceInteraction isec);
+bool RayBoxIntersect(Bound3f bound, Ray ray, bool3 dirIsNeg, float3 invDir, float tMin, float tMax);
+bool Do_RayObjectIntersect(int index, Ray ray, inout SurfaceInteraction isec);
+
 float RandXY(float x, float y);
 float GetValue(float index, Texture2D tex);
 float4 GetData(float index, Texture2D tex);
 float3x3 BuildTNB(float3 N);
+void ExtractBoundingBox(float index, out Bound3f bound);
 
 
 
@@ -106,7 +120,7 @@ float RandXY(float x, float y)
 float3x3 BuildTNB(float3 N)
 {
 	float3 n = normalize(N);
-	float3 v = abs(dot(n, float3(0, 0, 1))) < 1e-3 ? float3(1, 0, 0) : float3(0, 0, 1);
+	float3 v = abs(dot(n, float3(0, 0, 1))) == 1.0 ? float3(1, 0, 0) : float3(0, 0, 1);
 	float3 T = normalize(cross(v, n));
 	float3 B = normalize(cross(n, T));
 	return float3x3(T, n, B);
@@ -150,7 +164,7 @@ Ray GenerateRay(float2 coord)
 	return ray;
 }
 
-bool SphereIntersect(int index, Ray ray, out SurfaceInteraction isec)
+bool SphereIntersect(int index, Ray ray, inout SurfaceInteraction isec)
 {
 	float4 data = GetData(index, GeometryData);
 	Sphere sphere;
@@ -179,10 +193,11 @@ bool SphereIntersect(int index, Ray ray, out SurfaceInteraction isec)
 	isec.t = t1 < 0 ? t2 : t1;
 	isec.GeometryId = index;
 	isec.Normal = normalize(ray.Start + ray.Dir * isec.t - sphere.Center);
+	isec.Albedo = GetData(index + 1, GeometryData).xyz;
 	return isec.t >= 0;
 }
 
-bool TriangleIntersect(int index, Ray ray, out SurfaceInteraction isec)
+bool TriangleIntersect(int index, Ray ray, inout SurfaceInteraction isec)
 {
 	float4 point1 = GetData(index, GeometryData);
 	float4 point2 = GetData(index + 1, GeometryData);
@@ -221,66 +236,175 @@ bool TriangleIntersect(int index, Ray ray, out SurfaceInteraction isec)
 	
 	isec.GeometryId = index;
 	isec.Normal = normalize(cross(E1, E2));
+	if (dot(isec.Normal, ray.Dir) > 0)
+	{
+		isec.Normal = -isec.Normal;
+	}
 	isec.t = t;
+	isec.Albedo = GetData(index + 3, GeometryData).rgb;
 	return t >= 0;
 }
 
+bool RayBoxIntersect(Bound3f bound, Ray ray, bool3 dirIsNeg, float3 invDir, float tMin, float tMax)
+{
+	float3 minP = (bound.minPos - ray.Start) * invDir;
+	float3 maxP = (bound.maxPos - ray.Start) * invDir;
+	
+	if (dirIsNeg.x)
+	{
+		float t = minP.x;
+		minP.x = maxP.x;
+		maxP.x = t;
+	}
+	tMin = max(tMin, minP.x);
+	tMax = min(tMax, maxP.x);
+	if (tMax < tMin)
+	{
+		return false;
+	}
+	
+	if (dirIsNeg.y)
+	{
+		float t = minP.y;
+		minP.y = maxP.y;
+		maxP.y = t;
+	}
+	tMin = max(tMin, minP.y);
+	tMax = min(tMax, maxP.y);
+	if (tMax < tMin)
+	{
+		return false;
+	}
+	
+	if (dirIsNeg.z)
+	{
+		float t = minP.z;
+		minP.z = maxP.z;
+		maxP.z = t;
+	}
+	tMin = max(tMin, minP.z);
+	tMax = min(tMax, maxP.z);
+	if (tMax < tMin)
+	{
+		return false;
+	}
+	return true;
+}
+
+void ExtractBoundingBox(float index, out Bound3f bound)
+{
+	bound.minPos = GetData(index, GeometryData).xyz;
+	bound.maxPos = GetData(index + 1, GeometryData).xyz;
+}
+
+bool Do_RayObjectIntersect(int index, Ray ray, inout SurfaceInteraction isec)
+{	
+	SurfaceInteraction tmp;
+	float geometryType = GetData(index, GeometryData).x;
+	if (geometryType == RT_GEOMETRY_SPHERE)
+	{
+		if (SphereIntersect(index + 1, ray, tmp))
+		{
+			if (tmp.t < isec.t)
+			{
+				isec = tmp;
+			}
+			return true;
+		}
+	}
+	else if (geometryType == RT_GEOMETRY_TRIANGLE)
+	{
+		if (TriangleIntersect(index + 1, ray, tmp))
+		{
+			if (tmp.t < isec.t)
+			{
+				isec = tmp;
+			}
+			return true;
+		}
+	}
+	return false;
+}
 
 bool Scene_Intersect(Ray ray, out SurfaceInteraction isec)
 {
-	float type = GetValue(0, SceneData);
-	
 	isec.Normal = float3(0, 0, 0);
 	isec.GeometryId = -1;
 	isec.t = MAX_FLOAT;
+	isec.Albedo = float3(0, 0, 0);
 	
 	bool hitSomething = false;
 	
-	if (type == RT_GEOMETRY_COLLECTION)
+	float3 invDir = float3(1.f / ray.Dir.x, 1.f / ray.Dir.y, 1.f / ray.Dir.z);
+	bool3 dirIsNeg = bool3(invDir.x < 0, invDir.y < 0, invDir.z < 0);
+	
+	int TraceStack[64];
+	int StackPtr = 0;
+	
+	TraceStack[0] = 0;
+	StackPtr = 0;
+	
+	
+	while (StackPtr >= 0)
 	{
-		float count = GetValue(1, SceneData);
-
-		for (int i = 0; i < count; i++)
+		float currentPos = TraceStack[StackPtr];
+		StackPtr--;
+		
+		float type = GetValue(currentPos, SceneData);
+		if (type == RT_GEOMETRY_COLLECTION)
 		{
-			float geometryType = GetValue(i * 2 + 2, SceneData);
-			float geometryId = GetValue(i * 2 + 3, SceneData);
+			float ptrBBox = GetValue(currentPos + 1, SceneData);
+			Bound3f bound;
+			ExtractBoundingBox(ptrBBox, bound);
 			
-			SurfaceInteraction tmp;
-			
-			if (geometryType == RT_GEOMETRY_SPHERE)
+			float tMin = 0;
+			float tMax = isec.t;
+			if (!RayBoxIntersect(bound, ray, dirIsNeg, invDir, tMin, tMax))
 			{
-				if (SphereIntersect(geometryId, ray, tmp))
+				continue;
+			}
+		
+			float count = GetValue(currentPos + 2, SceneData);
+			
+		
+			for (int i = 0; i < count; i++)
+			{
+				float geometryId = GetValue(currentPos + 3 + i, SceneData);
+				if (Do_RayObjectIntersect(geometryId, ray, isec))
 				{
-					if (tmp.t < isec.t)
-					{
-						isec = tmp;
-					}
 					hitSomething = true;
 				}
 			}
-			else if (geometryType == RT_GEOMETRY_TRIANGLE)
+		}
+		else if (type == RT_GEOMETRY_BVH_NODE)
+		{
+			float ptrBBox = GetValue(currentPos + 1, SceneData);
+			Bound3f bound;
+			ExtractBoundingBox(ptrBBox, bound);
+			
+			float tMin = 0;
+			float tMax = isec.t;
+			if (!RayBoxIntersect(bound, ray, dirIsNeg, invDir, tMin, tMax))
 			{
-				if (TriangleIntersect(geometryId, ray, tmp))
-				{
-					if (tmp.t < isec.t)
-					{
-						isec = tmp;
-					}
-					hitSomething = true;
-				}
+				continue;
 			}
+		
+			float left = GetValue(currentPos + 2, SceneData);
+			float right = GetValue(currentPos + 3, SceneData);
+			
+			TraceStack[++StackPtr] = right;
+			TraceStack[++StackPtr] = left;
 		}
 	}
 	return hitSomething;
 }
 
-
 float4 PS(VertexOut pIn) : SV_Target
 {
 	SurfaceInteraction isec;
 	
-	float sampleA = RandXY(RandXY(RandXY(RandXY(pIn.texCoord * 10.0), 44), 114), uIteration);
-	float sampleB = RandXY(RandXY(RandXY(RandXY(pIn.texCoord * 10.0), 33), 514), uIteration);
+	float sampleA = RandXY(RandXY(RandXY(pIn.texCoord), uIteration * 0.314), RandXY(uIteration * 0.1, pIn.texCoord.x));
+	float sampleB = RandXY(RandXY(RandXY(pIn.texCoord), uIteration * 0.618), RandXY(uIteration * 0.1, pIn.texCoord.y));
 	
 	float2 invFrameSize = float2(1.0 / uFrameWidth, 1.0 / uFrameHeight);
 	Ray ray = GenerateRay(pIn.texCoord + invFrameSize * float2(sampleA, sampleB));
@@ -288,12 +412,12 @@ float4 PS(VertexOut pIn) : SV_Target
 	float3 Li = float3(0, 0, 0);
 	float3 beta = float3(1, 1, 1);
 	
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (Scene_Intersect(ray, isec))
 		{
-			float sampleX = RandXY(RandXY(RandXY(RandXY(pIn.texCoord * 10.0), i), 114), uIteration);
-			float sampleY = RandXY(RandXY(RandXY(RandXY(pIn.texCoord * 10.0), i), 514), uIteration);
+			float sampleX = RandXY(RandXY(RandXY(pIn.texCoord), i), RandXY(uIteration * 0.1, pIn.texCoord.x));
+			float sampleY = RandXY(RandXY(RandXY(pIn.texCoord), i), RandXY(uIteration * 0.1, pIn.texCoord.y));
 			
 			float r = sqrt(sampleX);
 			float phi = PI * 2 * sampleY;
@@ -306,11 +430,10 @@ float4 PS(VertexOut pIn) : SV_Target
 			
 			Ray newRay;
 			newRay.Start = ray.Start + ray.Dir * isec.t + isec.Normal * 1e-3;
-			newRay.Dir = mul(float3(x, y, z), TNB);
+			newRay.Dir = normalize(mul(float3(x, y, z), TNB));
 			
 			ray = newRay;
-			beta *= float3(0.9, 0.5, 0.6);
-
+			beta *= isec.Albedo;
 		}
 		else
 		{
@@ -320,5 +443,9 @@ float4 PS(VertexOut pIn) : SV_Target
 	}
 	
 	float2 uv = float2(pIn.texCoord.x, 1 - pIn.texCoord.y);
-	return (LastFrameTexture.Sample(MeshTextureSampler, uv) * uIteration + float4(Li, 1.0)) / (uIteration + 1);
+	if (uIteration == 1.0)
+	{
+		return float4(Li, 1.0);
+	}
+	return (LastFrameTexture.Sample(MeshTextureSampler, uv) * (uIteration - 1) + float4(Li, 1.0)) / (uIteration);
 }
