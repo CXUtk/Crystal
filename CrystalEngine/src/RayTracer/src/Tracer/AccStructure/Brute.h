@@ -14,7 +14,7 @@ namespace tracer
         bool IntersectTest(const crystal::Ray3f& ray, const IRayPrimitive* ignoreShape,
             float tMin = 0, float tMax = std::numeric_limits<float>::infinity()) const override;
 
-        GPUDataPackage GetGPUData() const override;
+        virtual void WriteGPUSceneData(GPUDataPackage* package) const override;
     private:
         std::vector<const IRayPrimitive*> m_primitives{};
         Bound3f m_masterBox;

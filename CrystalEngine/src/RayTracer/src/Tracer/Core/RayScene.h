@@ -37,7 +37,7 @@ namespace tracer
 
         const std::vector<std::shared_ptr<crystal::IRayPrimitive>>& GetPrimitives() const { return m_primitives; }
 
-        GPUDataPackage GetGPUPackage() const { return m_accelStructure->GetGPUData(); }
+        GPUDataPackage GetGPUPackage() const;
 
     private:
         std::shared_ptr<Scene>              m_scene = nullptr;

@@ -25,7 +25,8 @@ namespace tracer
         virtual bool IntersectTest(const crystal::Ray3f& ray, const IRayPrimitive* ignoreItem,
             float tMin = 0,
             float tMax = std::numeric_limits<float>::infinity()) const = 0;
-        virtual GPUDataPackage GetGPUData() const = 0;
+
+        virtual void WriteGPUSceneData(GPUDataPackage* package) const = 0;
 
     protected:
     };

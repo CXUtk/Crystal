@@ -34,11 +34,13 @@
     "meshes": [
         "Floor",
         "Knob",
-        "Monkey"
+        "Monkey",
+        "Bunny"
     ],
     "cputextures": [
         "LUT_cpu",
         "Cubemaps/Sky/Skybox_cpu",
+        "Cubemaps/Sky2/Skybox_cpu",
         "Sibenik/Kamen",
         "Sibenik/Kamen_stup",
         "Sibenik/Mramor",

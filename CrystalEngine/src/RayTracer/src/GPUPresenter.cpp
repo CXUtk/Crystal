@@ -211,12 +211,14 @@ namespace tracer
 
         m_pShader = assetManager->LoadAsset<IShaderProgram>("raytracer:PathTracer");
         m_pToneMapping = assetManager->LoadAsset<IShaderProgram>("raytracer:ToneMapping");
+        m_skyBox = assetManager->LoadAssetBuiltIn<ITextureCubemap>("Cubemaps/Sky2/Skybox");
 
         m_PRO->SetVertexBuffer(vertexBuffer);
         m_PRO->SetShaderProgram(m_pShader);
         m_PRO->SetSamplerState(graphicsDevice->GetCommonSamplerState(SamplerStates::PointClamp), 0);
         m_PRO->SetShaderResource(m_sceneBuffer, 1);
         m_PRO->SetShaderResource(m_geometryDataBuffer, 2);
+        m_PRO->SetShaderResource(m_skyBox, 3);
 
         m_PROScreen->SetVertexBuffer(vertexBuffer);
         m_PROScreen->SetShaderProgram(m_pToneMapping);
@@ -232,6 +234,8 @@ namespace tracer
         setting.ZNear = 0.f;
         setting.ZFar = 10000.f;
         m_pCamera = std::make_shared<Camera>(m_cameraTransform.get(), setting);
+
+
     }
 
     static Vector2f orbitControl = Vector2f(glm::half_pi<float>(), glm::half_pi<float>());

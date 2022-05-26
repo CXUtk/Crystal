@@ -8,7 +8,7 @@ namespace tracer
         EQUAL_COUNTS,
         SAH
     };
-    constexpr int MAX_OBJ_IN_NODE = 4;
+    constexpr int MAX_OBJ_IN_NODE = 1;
     constexpr SplitMethod SLILT_METHOD = SplitMethod::EQUAL_COUNTS;
     constexpr float TRAV_COST = 0.5f;
     constexpr float INTERSECT_COST = 1.0f;
@@ -164,15 +164,9 @@ namespace tracer
         return false;
     }
 
-    GPUDataPackage BVH::GetGPUData() const
+    void BVH::WriteGPUSceneData(GPUDataPackage* package) const
     {
-        GPUDataPackage package;
-        for (auto& p : m_primitives)
-        {
-            package.AddObject(p);
-        }
-        size_t index = dfs(&m_nodes[m_root], &package);
-        return package;
+        dfs(&m_nodes[m_root], package);
     }
 
     void BVH::_build(int& p, int l, int r)
@@ -314,7 +308,7 @@ namespace tracer
         }
         else
         {
-            size_t nodeId = package->AddBVHNode(node->bound);
+            size_t nodeId = package->AddBVHNode(node->bound, node->splitAxis);
             if (node->ch[0])
             {
                 package->SetBVHNodeLeft(nodeId, dfs(&m_nodes[node->ch[0]], package));

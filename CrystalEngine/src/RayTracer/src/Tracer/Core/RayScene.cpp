@@ -112,4 +112,41 @@ namespace tracer
         if (!m_environmentLight) return Spectrum(0.f);
         return m_environmentLight->Le(dir);
     }
+
+    GPUDataPackage RayScene::GetGPUPackage() const
+    {
+        //struct Header
+        //{
+        //    float SceneOffset;
+        //    float LightOffset;
+        //};
+
+        //struct Lights
+        //{
+        //    float count;
+        //    float lightOffsets[count];
+        //};
+
+        GPUDataPackage package{};
+        // Scene
+        package.WriteSceneData(2);
+        // Light
+        package.WriteSceneData(-1);
+
+        for (auto& p : m_primitives)
+        {
+            package.AddObject(p.get());
+        }
+
+        for (auto& p : m_lights)
+        {
+            package.AddLight(p.get());
+        }
+        m_accelStructure->WriteGPUSceneData(&package);
+
+        package.ModifySceneData(1, package.GetSceneDataPtr());
+        package.AddLights(m_lights);
+
+        return package;
+    }
 }

@@ -28,6 +28,7 @@ namespace tracer
 
         std::shared_ptr<ITexture2D>                 m_sceneBuffer = nullptr;
         std::shared_ptr<ITexture2D>                 m_geometryDataBuffer = nullptr;
+        std::shared_ptr<ITextureCubemap>            m_skyBox = nullptr;
 
         std::shared_ptr<IPipelineStateObject>       m_PSO = nullptr;
         std::shared_ptr<IPipelineResourceObject>	m_PRO = nullptr;

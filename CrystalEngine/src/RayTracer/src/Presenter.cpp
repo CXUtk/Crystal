@@ -56,7 +56,7 @@ namespace tracer
         m_rayTraceTexture = graphicsDevice->CreateTexture2DFromMemory(nullptr, 0, texDesc);
 
         auto assetManager = m_engine->GetAssetManager();
-        auto scene = Scene::LoadScene(File::ReadAllText("assets/engine/scene/Knob.json"));
+        auto scene = Scene::LoadScene(File::ReadAllText("assets/engine/scene/Bunny.json"));
 
         //auto pureWhite = std::make_shared<CPUTexture2DPure>(Spectrum(1.f));
         //auto pureRed = std::make_shared<CPUTexture2DPure>(Spectrum(1.f, 0.f, 0.f));

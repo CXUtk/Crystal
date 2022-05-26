@@ -58,14 +58,8 @@ namespace tracer
         return false;
     }
 
-    GPUDataPackage Brute::GetGPUData() const
+    void Brute::WriteGPUSceneData(GPUDataPackage* package) const
     {
-        GPUDataPackage package;
-        for (auto& p : m_primitives)
-        {
-            package.AddObject(p);
-        }
-        package.AddObjectsNode(m_masterBox, m_primitives);
-        return package;
+        package->AddObjectsNode(m_masterBox, m_primitives);
     }
 }

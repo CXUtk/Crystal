@@ -33,5 +33,7 @@ VertexOut VS(VertexIn vIn)
 
 float4 PS(VertexOut pIn) : SV_Target
 {
-	return myTexture.Sample(TextureSampler, pIn.texCoord);
+	float3 c = myTexture.Sample(TextureSampler, pIn.texCoord).rgb;
+	c = pow(c, 1 / 2.2);
+	return float4(c, 1.0);
 }

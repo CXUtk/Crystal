@@ -22,6 +22,8 @@ namespace crystal
 
         virtual Spectrum Eval_Le(const SurfaceGeometryInfo& surface, const Vector3f& wi) const override;
 
+        Spectrum GetLe() const { return m_Le; }
+
     private:
         Spectrum    m_Le{};
         Float       m_totalArea{};

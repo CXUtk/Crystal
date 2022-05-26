@@ -18,9 +18,9 @@
                 {
                     "Type": "TransformComponent",
                     "Setting": {
-                        "Translation": [ 0, 5, -15 ],
+                        "Translation": [ 0, 0, -15 ],
                         "Scale": [ 1, 1, 1 ],
-                        "Rotation": [ 0, 0.995133340, 0.0985376164, 0 ]
+                        "Rotation": [ 0, 0, 0, 1 ]
                     }
                 }
             ]
@@ -45,11 +45,49 @@
                 {
                     "Type": "MaterialComponent",
                     "Setting": {
-                        "Type": "Plastic",
+                        "Type": "Lambertian",
                         "Data": {
                             "Kd": "constants:pure/White",
                             "Roughness": "constants:pure/OneTenth",
                             "IOR": 1.5
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Light",
+            "Components": [
+                {
+                    "Type": "MeshComponent",
+                    "Setting": {
+                        "Model": "engine:Floor"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Setting": {
+                        "Translation": [ 0, 12, 0 ],
+                        "Scale": [ 1, -1, 1 ],
+                        "Rotation": [ 0, 0, 0, 1 ]
+                    }
+                },
+                {
+                    "Type": "MaterialComponent",
+                    "Setting": {
+                        "Type": "Lambertian",
+                        "Data": {
+                            "Kd": "constants:pure/White"
+                        }
+                    }
+                },
+                {
+                    "Type": "LightComponent",
+                    "Setting": {
+                        "Type": "DiffuseAreaLight",
+                        "Data": {
+                            "LEmit": [ 10, 10, 10 ],
+                            "NumSamples": 1
                         }
                     }
                 }
